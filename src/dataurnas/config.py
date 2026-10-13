@@ -18,10 +18,8 @@ TSE_CONFIG_URL = f"{TSE_BASE_URL}/comum/config/ele-c.json"
 MAX_RETRIES = 10
 CONNECT_TIMEOUT = 20
 READ_TIMEOUT = 30
-MAX_CONCURRENT_DOWNLOADS = 500
-RATE_LIMIT_PER_SECOND = 3000  # Máximo para 500 Mbps
 
-# Eleicoes conhecidas
+# Eleições conhecidas
 ELECTIONS = {
     "municipal_2024": {
         "ciclo": "ele2024",
@@ -48,6 +46,27 @@ ELECTIONS = {
         "spec_version": "v1",
     },
 }
+
+# Eleicao geral de 2026 (1o turno em 04/10/2026). Spec ASN.1 v2 (arquivos -bu.dat).
+ELE2026 = {
+    "ciclo": "ele2026",
+    "pleito_1t": "3220",
+    "eleicao_1t": "6257",  # Eleicao Ordinaria Federal 2026 1o Turno (Presidente)
+    "eleicao_2t": "6258",
+    "data_1t": "04/10/2026",
+    "cargo_presidente": 1,
+    "spec_version": "v2",
+}
+ELECTIONS["geral_2026"] = {
+    "ciclo": ELE2026["ciclo"],
+    "pleito_1t": ELE2026["pleito_1t"],
+    "eleicao_1t": ELE2026["eleicao_1t"],
+    "eleicao_2t": ELE2026["eleicao_2t"],
+    "cargos": {"presidente": 1},
+    "spec_version": ELE2026["spec_version"],
+}
+PARQUET_DIR = DATA_DIR / "parquet"
+PARQUET_2026_DIR = PARQUET_DIR / "2026"
 
 # Todos os estados brasileiros
 ESTADOS = [
