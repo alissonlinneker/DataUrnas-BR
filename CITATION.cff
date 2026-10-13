@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "Se você usar este software ou os dados derivados, cite-o conforme abaixo."
+type: software
+title: "DataUrnas-BR: auditoria independente dos arquivos públicos da urna eletrônica"
+abstract: >-
+  Ferramenta de código aberto que baixa, decodifica e audita os arquivos
+  públicos da urna eletrônica brasileira publicados pelo TSE (Boletim de Urna,
+  log e assinaturas), refaz a totalização a partir dos dados brutos e aplica
+  verificações de integridade, consistência e estatística. Cobre as Eleições
+  Presidenciais de 2022 e o 1º turno de 2026.
+authors:
+  - family-names: Linneker
+    given-names: Alisson
+version: 0.2.0
+date-released: "2026-10-13"
+license: MIT
+repository-code: "https://github.com/alissonlinneker/dataUrnas-br"
+url: "https://huggingface.co/spaces/alissonlinneker/dataurnas-br"
+keywords:
+  - eleições
+  - urna eletrônica
+  - auditoria
+  - TSE
+  - boletim de urna
+  - dados abertos
+  - Brasil
