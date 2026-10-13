@@ -3,14 +3,29 @@ name: Deploy to Hugging Face Spaces
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Um deploy por vez; um push novo espera o anterior em vez de disputar o push forçado
+concurrency:
+  group: deploy-hf
+  cancel-in-progress: false
 
 jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
   sync-to-hf:
+    needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           lfs: true
+          persist-credentials: false
 
       - name: Deploy to Hugging Face
         env:
@@ -18,24 +33,47 @@ jobs:
           HF_USERNAME: ${{ vars.HF_USERNAME }}
           SPACE_NAME: ${{ vars.SPACE_NAME }}
         run: |
-          # Criar repo limpo para HF (evita histórico com blobs grandes)
-          mkdir /tmp/hf-deploy
-          cd /tmp/hf-deploy
+          set -euo pipefail
+          if [ -z "${HF_TOKEN}" ] || [ -z "${HF_USERNAME}" ] || [ -z "${SPACE_NAME}" ]; then
+            echo "::error::Configure o secret HF_TOKEN e as variables HF_USERNAME e SPACE_NAME"
+            exit 1
+          fi
+
+          # Repositório limpo para o HF (evita histórico com blobs grandes)
+          DEPLOY_DIR="${RUNNER_TEMP}/hf-deploy"
+          rm -rf "${DEPLOY_DIR}"
+          mkdir -p "${DEPLOY_DIR}"
+          cd "${DEPLOY_DIR}"
           git init -b main
-          git lfs install
-          git lfs track "data/parquet/*.parquet"
+          git lfs install --local
 
-          # Copiar arquivos do projeto
-          cp -r $GITHUB_WORKSPACE/* .
-          cp $GITHUB_WORKSPACE/.gitignore . 2>/dev/null || true
+          # Copiar arquivos do projeto (inclui dotfiles como .streamlit e .dockerignore)
+          shopt -s dotglob
+          for item in "${GITHUB_WORKSPACE}"/*; do
+            case "$(basename "${item}")" in
+              .git|.github) continue ;;
+            esac
+            cp -r "${item}" .
+          done
+          shopt -u dotglob
+          # Depois da cópia, pois o .gitattributes do projeto sobrescreve o gerado aqui
+          git lfs track "data/parquet/*.parquet" "data/parquet/**/*.parquet" "*.png" "*.jpg" "*.ico"
 
-          # Adicionar frontmatter do HF Space ao README
-          printf '%s\n' '---' 'title: DataUrnas-BR' 'emoji: 🗳️' 'colorFrom: green' 'colorTo: blue' 'sdk: docker' 'pinned: false' 'license: mit' '---' '' > /tmp/hf_readme.md
-          cat README.md >> /tmp/hf_readme.md
-          mv /tmp/hf_readme.md README.md
+          # Frontmatter do HF Space no README
+          {
+            printf '%s\n' '---' 'title: DataUrnas-BR' 'emoji: 🗳️' 'colorFrom: green' \
+              'colorTo: blue' 'sdk: docker' 'app_port: 7860' 'pinned: false' 'license: mit' '---' ''
+            cat README.md
+          } > "${RUNNER_TEMP}/hf_readme.md"
+          mv "${RUNNER_TEMP}/hf_readme.md" README.md
 
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add -A
-          git commit -m "Deploy from GitHub"
-          git push --force https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${SPACE_NAME} main
+          git commit -q -m "Deploy from GitHub ${GITHUB_SHA::7}"
+
+          # Token no header HTTP, não na URL (não aparece em argv nem em mensagens de erro do git)
+          AUTH="$(printf '%s:%s' "${HF_USERNAME}" "${HF_TOKEN}" | base64 -w0)"
+          echo "::add-mask::${AUTH}"
+          git -c "http.https://huggingface.co/.extraheader=Authorization: Basic ${AUTH}" \
+            push --force "https://huggingface.co/spaces/${HF_USERNAME}/${SPACE_NAME}" main

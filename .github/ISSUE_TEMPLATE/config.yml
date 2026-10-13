@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Reportar vulnerabilidade
+    url: https://github.com/alissonlinneker/dataUrnas-br/security/advisories/new
+    about: Use o reporte privado para falhas de segurança.
+  - name: Painel online
+    url: https://huggingface.co/spaces/alissonlinneker/dataurnas-br
+    about: Consulte os dados sem instalar nada.
+  - name: Resultados oficiais do TSE
+    url: https://resultados.tse.jus.br/oficial/
+    about: Fonte primária de todos os dados usados pelo projeto.

@@ -1,0 +1,61 @@
+name: Relatar bug
+description: Algo não funciona como deveria (código, dados ou painel).
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar. Vulnerabilidades de segurança não devem ser abertas aqui: siga o SECURITY.md.
+  - type: textarea
+    id: descricao
+    attributes:
+      label: O que aconteceu
+      description: Descreva o problema de forma objetiva.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduzir
+    attributes:
+      label: Como reproduzir
+      description: Comandos, página do painel, filtros usados ou seção afetada (UF, município, zona, seção, turno).
+      placeholder: |
+        1. dataurnas analyze section data/raw/df/97012/0001/0001
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Download
+        - Parsers (BU, log, assinatura)
+        - Análises e códigos de ocorrência
+        - Banco de dados e Parquet
+        - Painel
+        - Scripts de 2026
+        - Documentação
+        - Outro
+    validations:
+      required: true
+  - type: input
+    id: versao
+    attributes:
+      label: Versão ou commit
+      placeholder: "0.2.0 ou hash do commit"
+  - type: input
+    id: ambiente
+    attributes:
+      label: Ambiente
+      placeholder: "Python 3.12, macOS 15, Docker, painel online"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs ou mensagens de erro
+      render: shell
