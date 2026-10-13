@@ -1,0 +1,50 @@
+# Segredos e configuração local
+.env
+.env.*
+*.pem
+*.key
+.mcp.json
+
+# Controle de versão e ferramentas locais
+.git
+.gitignore
+.gitattributes
+.github
+.cla*
+.memory-bank
+CLA*.md
+graphify-out
+
+# Dados brutos e bancos locais (a imagem reconstrói o banco a partir dos Parquet)
+data/raw
+data/json
+data/db
+data/*.log
+*.duckdb
+*.duckdb.wal
+
+# Desenvolvimento
+tests
+notebooks
+scripts/features
+test_*.py
+.venv
+venv
+env
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+htmlcov
+*.egg-info
+build
+dist
+
+# Sistema operacional e editores
+**/.DS_Store
+**/._*
+.vscode
+.idea
+ARCHITECTURE.md
