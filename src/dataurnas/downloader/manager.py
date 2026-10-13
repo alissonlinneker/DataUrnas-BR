@@ -6,12 +6,20 @@ import random
 from pathlib import Path
 from typing import Callable, Optional
 
-from ..config import MAX_CONCURRENT_DOWNLOADS, RAW_DIR, JSON_DIR
+from ..config import JSON_DIR, RAW_DIR
 from ..models import Section, UrnaMeta
-from .client import TSEClient
-from .tse_api import TSEApi, StateConfig
+from .client import DownloadResult, TSEClient, env_int
+from .tse_api import TSEApi
 
 logger = logging.getLogger(__name__)
+
+#: Downloads simultâneos por gerenciador. Padrão conservador; ajuste com
+#: a variável de ambiente DATAURNAS_MAX_CONCURRENT.
+DEFAULT_MAX_CONCURRENT = env_int("DATAURNAS_MAX_CONCURRENT", 50)
+
+
+def _new_stats() -> dict:
+    return {"downloaded": 0, "skipped": 0, "errors": 0, "sections_processed": 0}
 
 
 class DownloadManager:
@@ -21,19 +29,15 @@ class DownloadManager:
         self,
         raw_dir: Path = RAW_DIR,
         json_dir: Path = JSON_DIR,
-        max_concurrent: int = MAX_CONCURRENT_DOWNLOADS,
+        max_concurrent: int = DEFAULT_MAX_CONCURRENT,
         on_section_done: Optional[Callable[[Path, str], None]] = None,
     ):
         self._raw_dir = raw_dir
         self._json_dir = json_dir
-        self._semaphore = asyncio.Semaphore(max_concurrent)
+        self._max_concurrent = max(1, max_concurrent)
+        self._semaphore = asyncio.Semaphore(self._max_concurrent)
         self._on_section_done = on_section_done
-        self._stats = {
-            "downloaded": 0,
-            "skipped": 0,
-            "errors": 0,
-            "sections_processed": 0,
-        }
+        self._stats = _new_stats()
 
     def _section_dir(self, section: Section) -> Path:
         return (
@@ -72,14 +76,13 @@ class DownloadManager:
             dest = dest_dir / filename
 
             async with self._semaphore:
-                ok = await client.download_file(url, dest)
-                if ok:
-                    if dest.exists():
-                        results["ok"] += 1
-                    else:
-                        results["skip"] += 1
-                else:
-                    results["fail"] += 1
+                outcome = await client.download_file(url, dest)
+            if outcome is DownloadResult.DOWNLOADED:
+                results["ok"] += 1
+            elif outcome is DownloadResult.SKIPPED:
+                results["skip"] += 1
+            else:
+                results["fail"] += 1
 
         return results
 
@@ -151,7 +154,11 @@ class DownloadManager:
         """Baixa dados de um estado inteiro (ou amostra) com secoes em paralelo."""
         logger.info("Baixando dados de %s...", uf.upper())
 
-        state_config = await api.get_state_config(ciclo, pleito, uf)
+        try:
+            state_config = await api.get_state_config(ciclo, pleito, uf)
+        except Exception as exc:
+            logger.error("Falha ao obter configuracao de %s: %s", uf, exc)
+            state_config = None
         if not state_config:
             logger.error("Nao foi possivel obter configuracao de %s", uf)
             return self._stats
@@ -168,10 +175,11 @@ class DownloadManager:
 
         # Filtrar por municipio se especificado
         if municipio_filter:
+            codigos = set(municipio_filter)
+            nomes = {m.upper() for m in municipio_filter}
             sections = [
                 s for s in sections
-                if s.municipio_codigo in municipio_filter
-                or s.municipio_nome.upper() in [m.upper() for m in municipio_filter]
+                if s.municipio_codigo in codigos or s.municipio_nome.upper() in nomes
             ]
             logger.info("Filtrado para %d secoes em municipios selecionados", len(sections))
 
@@ -181,7 +189,7 @@ class DownloadManager:
             logger.info("Amostra aleatoria de %d secoes", max_sections)
 
         # Semaforo para limitar secoes concorrentes (separado do semaforo de arquivos)
-        section_sem = asyncio.Semaphore(self._semaphore._value)
+        section_sem = asyncio.Semaphore(self._max_concurrent)
 
         # Processar secoes em lotes paralelos
         BATCH = 500
@@ -222,10 +230,10 @@ class DownloadManager:
             len(states),
             sections_per_state,
         )
-        all_stats = {"downloaded": 0, "skipped": 0, "errors": 0, "sections_processed": 0}
+        all_stats = _new_stats()
 
         for uf in states:
-            self._stats = {"downloaded": 0, "skipped": 0, "errors": 0, "sections_processed": 0}
+            self._stats = _new_stats()
             await self.download_state(
                 client, api, ciclo, pleito, uf,
                 file_types=file_types,

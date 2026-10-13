@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ..config import TSE_BASE_URL, TSE_CONFIG_URL
-from ..models import Election, Section, SpecVersion, UrnaMeta
+from ..models import Section, UrnaMeta
 from .client import TSEClient
 
 logger = logging.getLogger(__name__)
