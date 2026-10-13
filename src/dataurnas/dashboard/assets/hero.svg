@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" role="img" aria-labelledby="ht">
+  <title id="ht">Ilustração: urna eletrônica com gráficos de apuração</title>
+  <defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0072B2" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#009E73" stop-opacity=".10"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="360" height="200" rx="18" fill="url(#hg)"/>
+  <circle cx="300" cy="44" r="26" fill="#E69F00" opacity=".22"/>
+  <circle cx="54" cy="160" r="34" fill="#56B4E9" opacity=".18"/>
+  <g transform="translate(36 46)">
+    <rect width="150" height="104" rx="14" fill="#0B3A5B"/>
+    <rect x="12" y="12" width="78" height="54" rx="6" fill="#E8F3FA"/>
+    <rect x="22" y="44" width="10" height="14" rx="2" fill="#0072B2"/>
+    <rect x="38" y="34" width="10" height="24" rx="2" fill="#009E73"/>
+    <rect x="54" y="24" width="10" height="34" rx="2" fill="#E69F00"/>
+    <rect x="70" y="38" width="10" height="20" rx="2" fill="#D55E00"/>
+    <g fill="#9CC9E6">
+      <rect x="102" y="14" width="14" height="10" rx="2"/><rect x="122" y="14" width="14" height="10" rx="2"/>
+      <rect x="102" y="30" width="14" height="10" rx="2"/><rect x="122" y="30" width="14" height="10" rx="2"/>
+      <rect x="102" y="46" width="14" height="10" rx="2"/><rect x="122" y="46" width="14" height="10" rx="2"/>
+    </g>
+    <rect x="102" y="64" width="34" height="12" rx="3" fill="#009E73"/>
+    <rect x="12" y="78" width="78" height="7" rx="3.5" fill="#56B4E9"/>
+    <rect x="12" y="90" width="48" height="5" rx="2.5" fill="#56B4E9" opacity=".6"/>
+  </g>
+  <g transform="translate(208 58)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="0" y="0" width="118" height="84" rx="10" fill="#FFFFFF" fill-opacity=".85" stroke="#0B3A5B" stroke-opacity=".25"/>
+    <polyline points="12,66 34,50 54,56 76,30 104,20" stroke="#0072B2" stroke-width="4"/>
+    <polyline points="12,72 34,64 54,68 76,52 104,48" stroke="#E69F00" stroke-width="3" stroke-dasharray="5 5"/>
+    <circle cx="104" cy="20" r="5" fill="#0072B2"/>
+  </g>
+  <g transform="translate(226 152)">
+    <circle cx="14" cy="14" r="14" fill="#009E73"/>
+    <polyline points="7,14 12,19 21,9" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="36" y="6" width="64" height="7" rx="3.5" fill="#0B3A5B" opacity=".35"/>
+    <rect x="36" y="17" width="40" height="5" rx="2.5" fill="#0B3A5B" opacity=".2"/>
+  </g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" role="img" aria-labelledby="dt">
+  <title id="dt">Ilustração: banco de dados ainda não construído</title>
+  <ellipse cx="110" cy="126" rx="78" ry="8" fill="#8A8F98" opacity=".18"/>
+  <g fill="#56B4E9" fill-opacity=".18" stroke="#0072B2" stroke-opacity=".55" stroke-width="2">
+    <path d="M70 34 v66 c0 9 18 16 40 16 s40 -7 40 -16 v-66"/>
+    <ellipse cx="110" cy="34" rx="40" ry="14"/>
+    <path d="M70 56 c0 9 18 16 40 16 s40 -7 40 -16" fill="none"/>
+    <path d="M70 78 c0 9 18 16 40 16 s40 -7 40 -16" fill="none"/>
+  </g>
+  <circle cx="160" cy="98" r="16" fill="#E69F00"/>
+  <rect x="158" y="88" width="4" height="12" rx="2" fill="#FFFFFF"/>
+  <circle cx="160" cy="105" r="2.4" fill="#FFFFFF"/>
+</svg>

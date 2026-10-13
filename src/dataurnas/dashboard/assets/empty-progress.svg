@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" role="img" aria-labelledby="pt">
+  <title id="pt">Ilustração: coleta de boletins em andamento</title>
+  <ellipse cx="110" cy="124" rx="78" ry="8" fill="#8A8F98" opacity=".18"/>
+  <rect x="34" y="34" width="88" height="70" rx="10" fill="#0B3A5B" opacity=".9"/>
+  <rect x="44" y="44" width="46" height="30" rx="4" fill="#E8F3FA"/>
+  <rect x="98" y="46" width="16" height="8" rx="2" fill="#9CC9E6"/><rect x="98" y="58" width="16" height="8" rx="2" fill="#9CC9E6"/>
+  <rect x="44" y="82" width="46" height="6" rx="3" fill="#56B4E9"/>
+  <g fill="none" stroke="#009E73" stroke-width="6" stroke-linecap="round">
+    <path d="M150 50 a28 28 0 1 1 -10 22" opacity=".9"/>
+  </g>
+  <polygon points="134,64 146,74 150,58" fill="#009E73"/>
+  <rect x="140" y="104" width="50" height="7" rx="3.5" fill="#E69F00" opacity=".7"/>
+</svg>
