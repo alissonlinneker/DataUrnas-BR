@@ -8,7 +8,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from dataurnas.config import ESTADOS
 from dataurnas.downloader.client import TSEClient
 from dataurnas.downloader.tse_api import TSEApi
 from dataurnas.downloader.manager import DownloadManager

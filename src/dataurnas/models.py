@@ -155,8 +155,9 @@ class LogEntry:
 
     @property
     def timestamp(self) -> Optional[datetime]:
+        """Data e hora da entrada (formato do log: DD/MM/YYYY e HH:MM:SS)."""
         try:
-            return datetime.strptime(f"{self.data}{self.hora}", "%Y%m%d%H%M%S")
+            return datetime.strptime(f"{self.data} {self.hora}", "%d/%m/%Y %H:%M:%S")
         except (ValueError, TypeError):
             return None
 
@@ -168,6 +169,9 @@ class HashVerification:
     hash_esperado: bytes
     hash_calculado: bytes
     valido: bool
+    # False quando o arquivo listado na assinatura não existe localmente:
+    # o hash não pôde ser verificado, o que é diferente de hash divergente.
+    encontrado: bool = True
 
     @property
     def match(self) -> bool:

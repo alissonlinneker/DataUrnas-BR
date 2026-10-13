@@ -1,6 +1,5 @@
 """Parser de logs da urna eletronica (.logjez / .jez)."""
 
-import io
 import logging
 import re
 from pathlib import Path
@@ -32,6 +31,9 @@ PATTERN_DESLIGADA = re.compile(r"Urna desligada")
 PATTERN_CARGA = re.compile(r"Modo de carga da UE")
 PATTERN_REBOOT = re.compile(r"In[ií]cio das opera[çc][oõ]es do logd")
 
+# Limite de segurança para o log descompactado (logs reais têm poucos MB)
+MAX_LOG_BYTES = 256 * 1024 * 1024
+
 
 class LogParser:
     """Parser de logs da urna eletronica."""
@@ -48,6 +50,7 @@ class LogParser:
             return []
 
         entries = []
+        ignoradas = 0
         for line in text.splitlines():
             line = line.strip()
             if not line:
@@ -55,28 +58,50 @@ class LogParser:
             entry = self._parse_line(line)
             if entry:
                 entries.append(entry)
+            else:
+                ignoradas += 1
 
+        if ignoradas:
+            logger.debug(
+                "%s: %d linha(s) fora do formato esperado ignoradas", file_path, ignoradas
+            )
         return entries
 
     def _extract_text(self, file_path: Path) -> Optional[str]:
-        """Extrai texto do arquivo 7-zip."""
+        """Extrai em memoria o texto do arquivo 7-zip.
+
+        Le o primeiro arquivo do pacote (geralmente logd.dat), sem gravar
+        nada em disco. Pacotes acima de MAX_LOG_BYTES (descompactados) sao
+        recusados: o conteudo vem de fonte externa e nao pode esgotar a
+        memoria.
+        """
         try:
             import py7zr
-            import tempfile
-            with tempfile.TemporaryDirectory() as tmpdir:
-                with py7zr.SevenZipFile(file_path, mode="r") as archive:
-                    archive.extractall(path=tmpdir)
-                # Ler o arquivo extraido (geralmente logd.dat)
-                tmppath = Path(tmpdir)
-                for extracted in tmppath.iterdir():
-                    return extracted.read_bytes().decode("latin-1", errors="replace")
+            from py7zr.io import BytesIOFactory
         except ImportError:
-            logger.error("py7zr nao instalado. Execute: pip install py7zr")
+            logger.error("py7zr não instalado. Execute: pip install py7zr")
             return None
+
+        try:
+            with py7zr.SevenZipFile(file_path, mode="r") as archive:
+                infos = [i for i in archive.list() if not i.is_directory]
+                if not infos:
+                    return None
+                total = sum(i.uncompressed or 0 for i in infos)
+                if total > MAX_LOG_BYTES:
+                    logger.error(
+                        "Log %s excede o limite (%d bytes descompactados)", file_path, total
+                    )
+                    return None
+                alvo = sorted(i.filename for i in infos)[0]
+                factory = BytesIOFactory(MAX_LOG_BYTES)
+                archive.extract(targets=[alvo], factory=factory)
+            buf = factory.get(alvo)
+            buf.seek(0)
+            return buf.read().decode("latin-1", errors="replace")
         except Exception as e:
             logger.error("Erro ao extrair log de %s: %s", file_path, e)
             return None
-        return None
 
     def _parse_line(self, line: str) -> Optional[LogEntry]:
         """Parseia uma linha do log."""
@@ -102,8 +127,16 @@ class LogParser:
                 return match.group(1)
         return None
 
-    def extract_events(self, entries: list[LogEntry], turno_date: str = None) -> dict:
+    def extract_events(
+        self, entries: list[LogEntry], turno_date: Optional[str] = None
+    ) -> dict:
         """Extrai eventos relevantes do log.
+
+        Critérios (assimetria intencional):
+            - abertura: PRIMEIRA ocorrência de "Urna pronta para receber votos"
+              no dia; as demais contam como reinicializações.
+            - encerramento: ÚLTIMA ocorrência de "Início do Encerramento", que é
+              o encerramento efetivo quando o procedimento é repetido.
 
         Args:
             entries: Lista de entradas do log.

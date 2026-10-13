@@ -2,9 +2,8 @@
 
 import logging
 from pathlib import Path
-from typing import Optional
 
-from ..config import CARGOS, MODELOS_URNA
+from ..config import CARGOS
 from ..models import (
     BoletimUrna,
     Fase,
@@ -17,6 +16,10 @@ from ..models import (
 from .asn1_helper import decode_envelope, detect_spec_version
 
 logger = logging.getLogger(__name__)
+
+
+class BUParseError(ValueError):
+    """BU com conteúdo que não pode ser interpretado com segurança."""
 
 
 def _unwrap_tuple(val, index=1):
@@ -66,6 +69,32 @@ _TIPO_VOTO_MAP = {
 }
 
 
+def _parse_tipo_voto(vv: dict) -> TipoVoto:
+    """Converte o tipoVoto decodificado no enum.
+
+    Tipo ausente ou desconhecido levanta BUParseError: assumir "nominal"
+    contaria votos de natureza desconhecida para um candidato.
+    """
+    if "tipoVoto" not in vv:
+        raise BUParseError("tipoVoto ausente em TotalVotosVotavel")
+    tipo_raw = vv["tipoVoto"]
+    if isinstance(tipo_raw, tuple):
+        tipo_raw = tipo_raw[0] if isinstance(tipo_raw[0], str) else tipo_raw[1]
+    try:
+        return _TIPO_VOTO_MAP[tipo_raw]
+    except (KeyError, TypeError):
+        raise BUParseError(f"tipoVoto desconhecido: {tipo_raw!r}") from None
+
+
+def _numero_serie(raw) -> int | None:
+    """NumeroSerieFlash (OCTET STRING de 4 bytes) para inteiro."""
+    if isinstance(raw, (bytes, bytearray)) and raw:
+        return int.from_bytes(raw, "big")
+    if isinstance(raw, int):
+        return raw
+    return None
+
+
 class BUParser:
     """Parser de Boletim de Urna."""
 
@@ -100,6 +129,7 @@ class BUParser:
         versao_votacao = None
 
         if urna_data:
+            numero_serie = _numero_serie(urna_data.get("numeroSerieFV"))
             corr = urna_data.get("correspondenciaResultado", {})
             if corr:
                 carga = corr.get("carga", {})
@@ -193,10 +223,7 @@ class BUParser:
 
                 votos = []
                 for vv in totais.get("votosVotaveis", []):
-                    tipo_raw = vv.get("tipoVoto", "nominal")
-                    if isinstance(tipo_raw, tuple):
-                        tipo_raw = tipo_raw[0] if isinstance(tipo_raw[0], str) else tipo_raw[1]
-                    tipo_voto = _TIPO_VOTO_MAP.get(tipo_raw, TipoVoto.NOMINAL)
+                    tipo_voto = _parse_tipo_voto(vv)
 
                     ident_votavel = vv.get("identificacaoVotavel", {}) or {}
                     codigo_votavel = ident_votavel.get("codigo", None)

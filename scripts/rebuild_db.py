@@ -12,6 +12,7 @@ O parser agora filtra por turno_date, eliminando:
 - ~452k issues C06/A03 falsas no T2
 """
 
+import os
 import shutil
 import sys
 import time
@@ -64,38 +65,28 @@ def main():
     store.clear()
     logger.info("Tabelas do banco limpas. Iniciando rebuild...")
 
-    # 4. Recompilar todas as secoes
+    # 4. Recompilar todas as secoes em lotes transacionais
     start = time.time()
-    compiled = 0
-    errors = 0
 
-    for i, bu_file in enumerate(bu_files):
-        try:
-            store._process_section(analyzer, bu_file.parent, bu_file=bu_file)
-            compiled += 1
-        except Exception as e:
-            errors += 1
-            if errors <= 50:
-                logger.warning("Erro ao processar %s: %s", bu_file.name, e)
+    def progress(processados, gravados, erros):
+        elapsed = time.time() - start
+        rate = processados / (elapsed / 60) if elapsed > 0 else 0
+        eta_min = (total - processados) / rate if rate > 0 else 0
+        logger.info(
+            "Progresso: %d/%d (%.1f%%) | %d ok, %d erros | %.0f/min | ETA: %.1f h",
+            processados, total, processados / total * 100,
+            gravados, erros, rate, eta_min / 60,
+        )
 
-        # Checkpoint periodico para persistir e liberar WAL
-        if (i + 1) % 1000 == 0:
-            store._conn.execute("CHECKPOINT")
-            elapsed = time.time() - start
-            rate = compiled / (elapsed / 60) if elapsed > 0 else 0
-            eta_min = (total - i - 1) / rate if rate > 0 else 0
-            logger.info(
-                "Progresso: %d/%d (%.1f%%) | %d ok, %d erros | %.0f/min | ETA: %.1f h",
-                i + 1, total, (i + 1) / total * 100,
-                compiled, errors, rate, eta_min / 60,
-            )
-
-    # 5. Finalizar
-    store._conn.execute("CHECKPOINT")
+    _, errors = store.build_from_bu_files(
+        analyzer, bu_files, batch_size=1000, progress=progress,
+    )
 
     # Snapshot para dashboard
     logger.info("Criando snapshot para dashboard...")
-    shutil.copy2(str(DEFAULT_DB_PATH), str(SNAPSHOT))
+    tmp_snapshot = SNAPSHOT.with_suffix(".duckdb.tmp")
+    shutil.copy2(str(DEFAULT_DB_PATH), str(tmp_snapshot))
+    os.replace(tmp_snapshot, SNAPSHOT)
     wal = SNAPSHOT.with_suffix(".duckdb.wal")
     wal.unlink(missing_ok=True)
 

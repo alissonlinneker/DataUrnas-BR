@@ -1,11 +1,13 @@
 """Analise de logs da urna eletronica."""
 
 import logging
+from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
-from ..config import TIMEZONE_OFFSETS
-from ..models import BoletimUrna, Issue, IssueSeverity
+from ..models import BoletimUrna, Issue, IssueSeverity, LogEntry
 from ..parsers.log import LogParser
+from .timezones import get_tz_offset
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +29,26 @@ def _time_to_min(h: int, m: int) -> int:
     return h * 60 + m
 
 
-def _parse_time(hora_str: str) -> tuple[int, int]:
-    """Parseia HH:MM:SS para (hora, minuto)."""
+def _parse_time(hora_str: str) -> float:
+    """Parseia HH:MM[:SS] para minutos desde 00:00 (segundos como fração)."""
     parts = hora_str.split(":")
-    return int(parts[0]), int(parts[1])
+    if len(parts) not in (2, 3):
+        raise ValueError(f"hora inválida: {hora_str!r}")
+    h, m = int(parts[0]), int(parts[1])
+    sec = int(parts[2]) if len(parts) == 3 else 0
+    if not (0 <= h < 24 and 0 <= m < 60 and 0 <= sec < 60):
+        raise ValueError(f"hora inválida: {hora_str!r}")
+    return h * 60 + m + sec / 60
 
 
-def _local_limits(uf: str) -> dict:
-    """Retorna horarios limites em hora LOCAL para um estado."""
-    offset = TIMEZONE_OFFSETS.get(uf.lower(), 0)
+def _entry_datetime(entry: LogEntry) -> Optional[datetime]:
+    """Combina data (DD/MM/YYYY) e hora (HH:MM:SS) de uma entrada do log."""
+    return entry.timestamp
+
+
+def _local_limits(uf: str, municipio=None) -> dict:
+    """Retorna horarios limites em hora LOCAL para uma seção."""
+    offset = get_tz_offset(uf, municipio)
 
     ab_h, ab_m = HORA_ABERTURA_BRT
     enc_h, enc_m = HORA_ENCERRAMENTO_BRT
@@ -55,14 +68,22 @@ class LogAnalyzer:
     def __init__(self):
         self._parser = LogParser()
 
-    def analyze_log(self, log_path: Path, bu: BoletimUrna = None, uf: str = "",
-                    turno_date: str = None) -> dict:
+    def analyze_log(
+        self,
+        log_path: Path,
+        bu: Optional[BoletimUrna] = None,
+        uf: str = "",
+        turno_date: Optional[str] = None,
+        municipio=None,
+    ) -> dict:
         """Analisa um arquivo de log e retorna resultados completos.
 
         Args:
             log_path: Caminho do arquivo .logjez/.jez.
             bu: Boletim de Urna parseado (para comparacao votos).
             uf: Sigla do estado (para ajuste de fuso horario).
+            municipio: Codigo TSE do municipio (fusos que diferem da UF,
+                como o oeste do Amazonas e Fernando de Noronha).
             turno_date: Data do turno (DD/MM/YYYY) para filtrar entradas.
                 Necessario para T2, cujo .logjez acumula eventos do T1.
 
@@ -73,7 +94,9 @@ class LogAnalyzer:
         events = self._parser.extract_events(entries, turno_date=turno_date)
 
         issues = []
-        issues.extend(self._check_timing(events, uf))
+        timing = self._extract_timing(events)
+        issues.extend(self._check_timing(events, uf, municipio))
+        issues.extend(self._check_timeline(timing))
         issues.extend(self._check_errors(events))
         issues.extend(self._check_mesario_alerts(events))
 
@@ -83,25 +106,24 @@ class LogAnalyzer:
         return {
             "events": events,
             "issues": issues,
-            "timing": self._extract_timing(events),
+            "timing": timing,
         }
 
-    def _check_timing(self, events: dict, uf: str = "") -> list[Issue]:
+    def _check_timing(self, events: dict, uf: str = "", municipio=None) -> list[Issue]:
         """Verifica horarios de abertura e encerramento.
 
         Ajusta os limites para o fuso horario do estado.
         Logs usam hora local. Votacao e das 8h-17h Brasilia.
         """
         issues = []
-        limits = _local_limits(uf)
-        offset = TIMEZONE_OFFSETS.get(uf.lower(), 0)
+        limits = _local_limits(uf, municipio)
+        offset = get_tz_offset(uf, municipio)
         tz_note = f" (fuso {offset:+d}h)" if offset != 0 else ""
 
         abertura = events.get("abertura")
         if abertura:
             try:
-                ab_h, ab_m = _parse_time(abertura.hora)
-                ab_min = _time_to_min(ab_h, ab_m)
+                ab_min = _parse_time(abertura.hora)
 
                 if ab_min < limits["abertura_min"]:
                     issues.append(
@@ -109,7 +131,7 @@ class LogAnalyzer:
                             codigo="M01",
                             severidade=IssueSeverity.MEDIUM,
                             descricao=(
-                                f"Urna pronta antes do horario: {abertura.hora}{tz_note}"
+                                f"Urna pronta antes do horário: {abertura.hora}{tz_note}"
                             ),
                             uf="", municipio="", zona="", secao="",
                             detalhes={
@@ -117,7 +139,7 @@ class LogAnalyzer:
                                 "data": abertura.data,
                                 "fuso_offset": offset,
                             },
-                            base_legal="Art. 59 da Lei 9.504/97 - Abertura as 8h BRT",
+                            base_legal="Art. 59 da Lei 9.504/97: abertura às 8h BRT",
                         )
                     )
                 elif ab_min > limits["abertura_max"]:
@@ -126,7 +148,7 @@ class LogAnalyzer:
                             codigo="A04",
                             severidade=IssueSeverity.HIGH,
                             descricao=(
-                                f"Urna aberta MUITO apos o horario: "
+                                f"Urna aberta MUITO após o horário: "
                                 f"{abertura.hora}{tz_note}"
                             ),
                             uf="", municipio="", zona="", secao="",
@@ -139,13 +161,12 @@ class LogAnalyzer:
                         )
                     )
             except (ValueError, IndexError):
-                pass
+                logger.warning("Hora de abertura malformada no log: %r", abertura.hora)
 
         encerramento = events.get("encerramento")
         if encerramento:
             try:
-                enc_h, enc_m = _parse_time(encerramento.hora)
-                enc_min = _time_to_min(enc_h, enc_m)
+                enc_min = _parse_time(encerramento.hora)
 
                 if enc_min < limits["encerramento_min"]:
                     issues.append(
@@ -153,7 +174,7 @@ class LogAnalyzer:
                             codigo="A05",
                             severidade=IssueSeverity.HIGH,
                             descricao=(
-                                f"Votacao encerrada ANTES do horario: "
+                                f"Votação encerrada ANTES do horário: "
                                 f"{encerramento.hora}{tz_note}"
                             ),
                             uf="", municipio="", zona="", secao="",
@@ -162,7 +183,7 @@ class LogAnalyzer:
                                 "data": encerramento.data,
                                 "fuso_offset": offset,
                             },
-                            base_legal="Art. 153, CE - Encerramento as 17h BRT",
+                            base_legal="Art. 153, CE: encerramento às 17h BRT",
                         )
                     )
                 elif enc_min > limits["encerramento_max"]:
@@ -171,7 +192,7 @@ class LogAnalyzer:
                             codigo="M02",
                             severidade=IssueSeverity.MEDIUM,
                             descricao=(
-                                f"Votacao encerrada muito tarde: "
+                                f"Votação encerrada muito tarde: "
                                 f"{encerramento.hora}{tz_note}"
                             ),
                             uf="", municipio="", zona="", secao="",
@@ -183,7 +204,9 @@ class LogAnalyzer:
                         )
                     )
             except (ValueError, IndexError):
-                pass
+                logger.warning(
+                    "Hora de encerramento malformada no log: %r", encerramento.hora
+                )
 
         # Sem evento de abertura detectado
         if not abertura and events.get("total_entries", 0) > 100:
@@ -191,7 +214,7 @@ class LogAnalyzer:
                 Issue(
                     codigo="M03",
                     severidade=IssueSeverity.MEDIUM,
-                    descricao="Evento de abertura nao encontrado no log",
+                    descricao="Evento de abertura não encontrado no log",
                     uf="", municipio="", zona="", secao="",
                     detalhes={"total_entries": events.get("total_entries", 0)},
                 )
@@ -208,7 +231,7 @@ class LogAnalyzer:
                     codigo="C06",
                     severidade=sev,
                     descricao=(
-                        f"Urna reiniciou {reboots}x durante a votacao"
+                        f"Urna reiniciou {reboots}x durante a votação"
                     ),
                     uf="", municipio="", zona="", secao="",
                     detalhes={
@@ -216,7 +239,7 @@ class LogAnalyzer:
                         "horarios_abertura": horarios,
                         "desligamentos": len(events.get("desligadas", [])),
                     },
-                    base_legal="Integridade do processo de votacao - reinicio pode indicar falha de hardware ou software",
+                    base_legal="Integridade do processo de votação: reinício pode indicar falha de hardware ou software",
                 )
             )
 
@@ -232,7 +255,7 @@ class LogAnalyzer:
                 Issue(
                     codigo="M04",
                     severidade=IssueSeverity.MEDIUM,
-                    descricao=f"Numero elevado de erros no log: {len(erros)}",
+                    descricao=f"Número elevado de erros no log: {len(erros)}",
                     uf="", municipio="", zona="", secao="",
                     detalhes={
                         "total_erros": len(erros),
@@ -251,7 +274,7 @@ class LogAnalyzer:
                 Issue(
                     codigo="I01",
                     severidade=IssueSeverity.INFO,
-                    descricao=f"Eventos de substituicao/contingencia: {len(substituicoes)}",
+                    descricao=f"Eventos de substituição/contingência: {len(substituicoes)}",
                     uf="", municipio="", zona="", secao="",
                     detalhes={
                         "total_substituicoes": len(substituicoes),
@@ -296,7 +319,7 @@ class LogAnalyzer:
                     codigo="I02",
                     severidade=IssueSeverity.INFO,
                     descricao=(
-                        f"Numero elevado de alertas de mesario: {len(alertas)} "
+                        f"Número elevado de alertas de mesário: {len(alertas)} "
                         f"(limiar: {LIMIAR_ALERTAS_MESARIO})"
                     ),
                     uf="", municipio="", zona="", secao="",
@@ -329,7 +352,7 @@ class LogAnalyzer:
                         codigo="A03",
                         severidade=IssueSeverity.HIGH,
                         descricao=(
-                            f"Divergencia entre votos no log ({votos_log}) "
+                            f"Divergência entre votos no log ({votos_log}) "
                             f"e comparecimento no BU ({max_comparecimento})"
                         ),
                         uf=str(bu.uf),
@@ -367,15 +390,45 @@ class LogAnalyzer:
         if ligada:
             timing["hora_ligada"] = f"{ligada.data} {ligada.hora}"
 
-        # Calcular duracao em minutos
+        # Duracao: datetime completo (data + hora + segundos), o que cobre
+        # votacao que atravessa a meia-noite. Valores negativos indicam linha
+        # do tempo inconsistente e sao descartados (ver _check_timeline).
         if abertura and encerramento:
-            try:
-                h1, m1, s1 = map(int, abertura.hora.split(":"))
-                h2, m2, s2 = map(int, encerramento.hora.split(":"))
-                min1 = h1 * 60 + m1
-                min2 = h2 * 60 + m2
-                timing["duracao_votacao_min"] = min2 - min1
-            except (ValueError, AttributeError):
-                pass
+            inicio = _entry_datetime(abertura)
+            fim = _entry_datetime(encerramento)
+            if inicio is None or fim is None:
+                logger.warning(
+                    "Data/hora malformada no log: abertura=%s %s, encerramento=%s %s",
+                    abertura.data, abertura.hora, encerramento.data, encerramento.hora,
+                )
+            else:
+                minutos = (fim - inicio).total_seconds() / 60
+                if minutos < 0:
+                    timing["duracao_invalida_min"] = round(minutos)
+                else:
+                    timing["duracao_votacao_min"] = round(minutos)
 
         return timing
+
+    def _check_timeline(self, timing: dict) -> list[Issue]:
+        """Sinaliza encerramento registrado antes da abertura."""
+        negativo = timing.get("duracao_invalida_min")
+        if negativo is None:
+            return []
+        return [
+            Issue(
+                codigo="E03",
+                severidade=IssueSeverity.INFO,
+                descricao=(
+                    "Linha do tempo inconsistente no log: encerramento registrado "
+                    f"antes da abertura ({timing.get('hora_abertura')} -> "
+                    f"{timing.get('hora_encerramento')})"
+                ),
+                uf="", municipio="", zona="", secao="",
+                detalhes={
+                    "hora_abertura": timing.get("hora_abertura"),
+                    "hora_encerramento": timing.get("hora_encerramento"),
+                    "diferenca_min": negativo,
+                },
+            )
+        ]

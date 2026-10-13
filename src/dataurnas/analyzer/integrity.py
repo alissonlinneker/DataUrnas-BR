@@ -1,6 +1,5 @@
 """Verificacao de integridade: hashes SHA-512, assinaturas digitais."""
 
-import hashlib
 import logging
 from pathlib import Path
 
@@ -12,6 +11,12 @@ from ..models import (
 from ..parsers.signature import SignatureParser
 
 logger = logging.getLogger(__name__)
+
+# C01 só é emitido quando o hash foi de fato calculado e diverge do assinado.
+# Falha de parse ou arquivo ausente vira E01: a verificação não foi possível,
+# o que não é evidência de adulteração.
+CODIGO_HASH_INVALIDO = "C01"
+CODIGO_NAO_VERIFICAVEL = "E01"
 
 
 class IntegrityAnalyzer:
@@ -41,9 +46,12 @@ class IntegrityAnalyzer:
             logger.error("Erro ao verificar hashes em %s: %s", section_dir, e)
             issues.append(
                 Issue(
-                    codigo="C01",
-                    severidade=IssueSeverity.CRITICAL,
-                    descricao=f"Erro ao processar arquivo de assinatura: {e}",
+                    codigo=CODIGO_NAO_VERIFICAVEL,
+                    severidade=IssueSeverity.INFO,
+                    descricao=(
+                        "Assinatura não verificável: falha ao processar o arquivo "
+                        f"de assinatura ({type(e).__name__})"
+                    ),
                     uf="",
                     municipio="",
                     zona="",
@@ -54,12 +62,31 @@ class IntegrityAnalyzer:
             return issues
 
         for result in results:
-            if not result.valido:
+            if not result.encontrado:
                 issues.append(
                     Issue(
-                        codigo="C01",
+                        codigo=CODIGO_NAO_VERIFICAVEL,
+                        severidade=IssueSeverity.INFO,
+                        descricao=(
+                            f"Hash não verificável: {result.arquivo} ausente no "
+                            "diretório da seção"
+                        ),
+                        uf="",
+                        municipio="",
+                        zona="",
+                        secao="",
+                        detalhes={
+                            "arquivo": result.arquivo,
+                            "hash_esperado": result.hash_esperado.hex(),
+                        },
+                    )
+                )
+            elif not result.valido:
+                issues.append(
+                    Issue(
+                        codigo=CODIGO_HASH_INVALIDO,
                         severidade=IssueSeverity.CRITICAL,
-                        descricao=f"Hash SHA-512 INVALIDO para {result.arquivo}",
+                        descricao=f"Hash SHA-512 INVÁLIDO para {result.arquivo}",
                         uf="",
                         municipio="",
                         zona="",
@@ -69,7 +96,7 @@ class IntegrityAnalyzer:
                             "hash_esperado": result.hash_esperado.hex(),
                             "hash_calculado": result.hash_calculado.hex(),
                         },
-                        base_legal="Art. 59, Lei 9.504/97 - Cerimonia de Lacracao",
+                        base_legal="Art. 59, Lei 9.504/97: Cerimônia de Lacração",
                     )
                 )
 
@@ -156,7 +183,7 @@ class ConsistencyAnalyzer:
                     codigo="A01",
                     severidade=IssueSeverity.HIGH,
                     descricao=(
-                        f"Divergencia de eleitores aptos entre eleicoes: "
+                        f"Divergência de eleitores aptos entre eleições: "
                         f"{aptos_por_eleicao}"
                     ),
                     uf=str(bu.uf),
@@ -164,17 +191,9 @@ class ConsistencyAnalyzer:
                     zona=str(bu.zona),
                     secao=str(bu.secao),
                     detalhes={"aptos_por_eleicao": aptos_por_eleicao},
-                    base_legal="Caderno de eleitores unico por secao",
+                    base_legal="Caderno de eleitores único por seção",
                 )
             )
-
-        # Comparar comparecimento entre eleicoes
-        comp_por_eleicao = {}
-        for eleicao in bu.resultados_por_eleicao:
-            for resultado in eleicao.resultados:
-                if resultado.comparecimento > 0:
-                    key = f"{eleicao.id_eleicao}_{resultado.nome_cargo}"
-                    comp_por_eleicao[key] = resultado.comparecimento
 
         return issues
 
@@ -199,7 +218,7 @@ class ConsistencyAnalyzer:
                         codigo="A06",
                         severidade=IssueSeverity.HIGH,
                         descricao=(
-                            f"Comparecimento divergente entre cargos da eleicao "
+                            f"Comparecimento divergente entre cargos da eleição "
                             f"{eleicao.id_eleicao}: {comps}"
                         ),
                         uf=str(bu.uf),
@@ -210,7 +229,7 @@ class ConsistencyAnalyzer:
                             "eleicao": eleicao.id_eleicao,
                             "comparecimentos": comps,
                         },
-                        base_legal="Eleitor vota em todos os cargos na mesma sessao",
+                        base_legal="Eleitor vota em todos os cargos na mesma sessão",
                     )
                 )
 
@@ -225,7 +244,7 @@ class ConsistencyAnalyzer:
                 Issue(
                     codigo="I06",
                     severidade=IssueSeverity.INFO,
-                    descricao=f"Urna nao-padrao: tipo={bu.tipo_urna}",
+                    descricao=f"Urna não padrão: tipo={bu.tipo_urna}",
                     uf=str(bu.uf),
                     municipio=str(bu.municipio),
                     zona=str(bu.zona),
