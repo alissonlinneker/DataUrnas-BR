@@ -90,7 +90,7 @@ Tipos conforme lidos dos próprios arquivos com DuckDB.
 | `vice_nome_urna` | VARCHAR | Nome de urna do vice |
 | `vice_partido` | VARCHAR | Partido do vice |
 | `vice_sq_candidato` | VARCHAR | Sequencial do vice |
-| `votos` | BIGINT | Votos (nos arquivos de resultado: votos do candidato; em votos_presidente_2026: quantidade na seção) |
+| `votos` | BIGINT | Votos do candidato no Brasil |
 | `pct_validos` | DOUBLE | Percentual dos votos válidos, como publicado |
 | `situacao` | VARCHAR | Situação divulgada (`2º turno`, `Não eleito`) |
 | `eleito` | BOOLEAN | Marcador do TSE (verdadeiro também para quem segue ao 2º turno) |
@@ -135,7 +135,7 @@ Tipos conforme lidos dos próprios arquivos com DuckDB.
 | `uf` | VARCHAR | UF em minúsculas (`zz` = exterior) |
 | `cd_mun` | VARCHAR | Código do município no TSE |
 | `cd_ibge` | VARCHAR | Código IBGE (nulo no exterior) |
-| `nome` | VARCHAR | Nome civil |
+| `nome` | VARCHAR | Nome do município |
 | `capital` | BOOLEAN | Capital da UF |
 | `secoes_total` | BIGINT | Seções previstas |
 | `secoes_totalizadas` | BIGINT | Seções totalizadas |
@@ -222,7 +222,7 @@ Tipos conforme lidos dos próprios arquivos com DuckDB.
 | `zona` | VARCHAR | Zona eleitoral (4 dígitos) |
 | `secao` | VARCHAR | Seção (4 dígitos) |
 | `tipo_voto` | VARCHAR | `nominal`, `branco`, `nulo` ou `legenda` |
-| `numero` | INTEGER | Número do candidato |
+| `numero` | INTEGER | Número digitado (nulo para branco e nulo) |
 | `partido` | INTEGER | Número do partido (nulo para branco e nulo) |
-| `votos` | INTEGER | Votos (nos arquivos de resultado: votos do candidato; em votos_presidente_2026: quantidade na seção) |
+| `votos` | INTEGER | Quantidade de votos na seção para o tipo e o número |
 

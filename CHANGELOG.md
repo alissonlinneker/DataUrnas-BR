@@ -21,7 +21,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Integração contínua (`ci.yml`) com ruff e pytest em Python 3.11 e 3.12; o deploy passa a depender dela.
 - `requirements-dev.txt`, extras `dashboard` e `dev` no `pyproject.toml` e configuração do ruff.
 - `.dockerignore`, configuração do Streamlit em `.streamlit/config.toml`, `HEALTHCHECK` e usuário sem privilégios na imagem Docker.
-- Documentação em `docs/` (metodologia, arquitetura e dados de 2026), identidade visual, licença, guia de contribuição, código de conduta, política de segurança, `CITATION.cff`, modelos de issue e PR e Dependabot.
+- `Makefile` com os alvos de uso comum (instalação, lint, testes, banco, painel, coleta e reconciliação de 2026, Docker) e opção `dataurnas --version`.
+- Documentação em `docs/` (índice, metodologia, arquitetura, dados de 2026 e perguntas frequentes), identidade visual, licença, guia de contribuição, código de conduta, política de segurança, `CITATION.cff`, modelos de issue e PR e Dependabot.
 
 ### Alterado
 
@@ -29,6 +30,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Compilação do DuckDB em transações por lote, com remoção das linhas filhas antes de reprocessar uma seção e modo incremental (`dataurnas db build --incremental`).
 - `scripts/rebuild_parallel.py` passa a reutilizar a montagem de linhas do pacote em vez de duplicá-la.
 - CLI valida a UF com a lista oficial de estados.
+- Metadados do pacote completos no `pyproject.toml` (autor, palavras-chave, classificadores e links do projeto).
+- Acentuação corrigida em mensagens, textos de ajuda, comentários e docstrings.
 - Dockerfile copia uma lista explícita de arquivos e constrói o banco durante o build.
 - Workflow de deploy envia o token por cabeçalho HTTP e roda a CI antes de publicar.
 
@@ -60,6 +63,6 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Banco DuckDB, exportação Parquet com ZSTD e painel Streamlit com filtros e exportação.
 - Deploy no Hugging Face Spaces via GitHub Actions.
 
-[Não publicado]: https://github.com/alissonlinneker/dataUrnas-br/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/alissonlinneker/dataUrnas-br/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/alissonlinneker/dataUrnas-br/releases/tag/v0.1.0
+[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.1.0

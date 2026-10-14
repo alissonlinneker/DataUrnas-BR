@@ -57,10 +57,24 @@ flowchart LR
 | `analyzer/integrity.py` | Hashes e consistência do BU |
 | `analyzer/log_analyzer.py` | Horários, reinícios, erros, divergência log x BU |
 | `analyzer/statistical.py` | Nulos, brancos, abstenção, biometria, outliers |
-| `analyzer/timezones.py` | Fuso de cada UF |
+| `analyzer/timezones.py` | Fuso de cada UF, com exceções por município (oeste do Amazonas em UTC-5 e Fernando de Noronha em UTC-2) |
 | `database/rows.py` | Conversão do resultado de uma seção em linhas das quatro tabelas |
 | `database/duckdb_store.py` | Esquema, inserção em lote com transação, consultas |
 | `dashboard/` | Painel Streamlit com várias páginas, componentes reutilizáveis, filtros e consultas SQL |
+
+## Scripts
+
+| Script | Função |
+|---|---|
+| `scripts/build_db.py` | Reconstrói o DuckDB a partir dos Parquet e cria as tabelas agregadas do painel (`--no-live` dispensa a cópia de leitura) |
+| `scripts/download_full.py`, `scripts/download_full_2t.py` | Download completo dos arquivos de urna de 2022 (1º e 2º turnos) para `data/raw` |
+| `scripts/download_and_build.py` | Download e compilação simultâneos, com cópia periódica do banco para leitura pelo painel |
+| `scripts/rebuild_db.py`, `scripts/rebuild_parallel.py` | Recompilação do banco a partir de `data/raw`, com backup prévio; a versão paralela usa vários processos e retoma de onde parou |
+| `scripts/ele2026/fetch_resultados.py` | Resultado agregado oficial de 2026 (Brasil, UFs e municípios) |
+| `scripts/ele2026/fetch_secoes.py` | Coleta e decodificação dos BUs de 2026 por seção, com checkpoint |
+| `scripts/ele2026/reconcile.py` | Reconciliação da soma dos BUs com o resultado oficial por UF |
+
+Os alvos do `Makefile` encapsulam os usos mais comuns desses scripts e da CLI.
 
 ## Fluxo de uma seção
 

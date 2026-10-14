@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="638" viewBox="0 0 1000 638" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Presidente, 1º turno de 2026: votos por candidato</title>
+<desc id="descricao">Barras horizontais com os votos de cada candidato. Flávio Bolsonaro (PL): 56.104.503 votos, 47,03% dos válidos; Lula (PT): 53.879.538 votos, 45,16% dos válidos; Escritor Augusto Cury (AVANTE): 3.448.569 votos, 2,89% dos válidos; Renan Santos (MISSÃO): 2.675.887 votos, 2,24% dos válidos; Ronaldo Caiado (PSD): 2.605.148 votos, 2,18% dos válidos; Zema (NOVO): 326.488 votos, 0,27% dos válidos; Samara (UP): 122.911 votos, 0,10% dos válidos; Hertz Dias (PSTU): 43.103 votos, 0,04% dos válidos; Clariana Barao (DC): 40.043 votos, 0,03% dos válidos; Edmilson Costa (PCB): 22.693 votos, 0,02% dos válidos; Veterinário Wilson Grassi (DEMOCRATA): 16.881 votos, 0,01% dos válidos; Rui Costa Pimenta (PCO): 15.024 votos, 0,01% dos válidos.</desc>
+<rect x="1" y="1" width="998" height="636" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Presidente, 1º turno de 2026: votos por candidato</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Votos nominais e percentual dos 119.300.788 votos válidos; em destaque, quem vai ao 2º turno</text>
+<rect x="24.0" y="108.0" width="952.0" height="36.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="131.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">22</text>
+<text x="74.0" y="131.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Flávio Bolsonaro</text>
+<text x="366.0" y="131.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">PL</text>
+<rect x="382.0" y="117.0" width="286.0" height="22.0" rx="4" fill="#0072B2"/>
+<text x="678.0" y="131.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">56.104.503  ·  47,03%</text>
+<rect x="829.4" y="115.0" width="74.0" height="24.0" rx="12" fill="#E69F00"/>
+<text x="866.4" y="132.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="middle">2º turno</text>
+<text x="40.0" y="169.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">13</text>
+<text x="74.0" y="169.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Lula</text>
+<text x="366.0" y="169.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">PT</text>
+<rect x="382.0" y="155.0" width="274.7" height="22.0" rx="4" fill="#0072B2"/>
+<text x="666.7" y="169.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">53.879.538  ·  45,16%</text>
+<rect x="818.0" y="153.0" width="74.0" height="24.0" rx="12" fill="#E69F00"/>
+<text x="855.0" y="170.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="middle">2º turno</text>
+<rect x="24.0" y="184.0" width="952.0" height="36.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="207.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">70</text>
+<text x="74.0" y="207.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Escritor Augusto Cury</text>
+<text x="366.0" y="207.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">AVANTE</text>
+<rect x="382.0" y="193.0" width="17.6" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="409.6" y="207.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">3.448.569  ·  2,89%</text>
+<text x="40.0" y="245.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">14</text>
+<text x="74.0" y="245.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Renan Santos</text>
+<text x="366.0" y="245.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">MISSÃO</text>
+<rect x="382.0" y="231.0" width="13.6" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="405.6" y="245.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">2.675.887  ·  2,24%</text>
+<rect x="24.0" y="260.0" width="952.0" height="36.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="283.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">55</text>
+<text x="74.0" y="283.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Ronaldo Caiado</text>
+<text x="366.0" y="283.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">PSD</text>
+<rect x="382.0" y="269.0" width="13.3" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="405.3" y="283.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">2.605.148  ·  2,18%</text>
+<text x="40.0" y="321.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">30</text>
+<text x="74.0" y="321.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Zema</text>
+<text x="366.0" y="321.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">NOVO</text>
+<rect x="382.0" y="307.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="321.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">326.488  ·  0,27%</text>
+<rect x="24.0" y="336.0" width="952.0" height="36.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="359.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">80</text>
+<text x="74.0" y="359.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Samara</text>
+<text x="366.0" y="359.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">UP</text>
+<rect x="382.0" y="345.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="359.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">122.911  ·  0,10%</text>
+<text x="40.0" y="397.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">16</text>
+<text x="74.0" y="397.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Hertz Dias</text>
+<text x="366.0" y="397.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">PSTU</text>
+<rect x="382.0" y="383.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="397.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">43.103  ·  0,04%</text>
+<rect x="24.0" y="412.0" width="952.0" height="36.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="435.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">27</text>
+<text x="74.0" y="435.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Clariana Barao</text>
+<text x="366.0" y="435.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">DC</text>
+<rect x="382.0" y="421.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="435.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">40.043  ·  0,03%</text>
+<text x="40.0" y="473.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">21</text>
+<text x="74.0" y="473.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Edmilson Costa</text>
+<text x="366.0" y="473.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">PCB</text>
+<rect x="382.0" y="459.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="473.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">22.693  ·  0,02%</text>
+<rect x="24.0" y="488.0" width="952.0" height="36.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="511.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">35</text>
+<text x="74.0" y="511.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Veterinário Wilson Grassi</text>
+<text x="366.0" y="511.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">DEMOCRATA</text>
+<rect x="382.0" y="497.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="511.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">16.881  ·  0,01%</text>
+<text x="40.0" y="549.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">29</text>
+<text x="74.0" y="549.0" font-size="15" font-weight="500" fill="#0B3A5B" text-anchor="start">Rui Costa Pimenta</text>
+<text x="366.0" y="549.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">PCO</text>
+<rect x="382.0" y="535.0" width="3.0" height="22.0" rx="4" fill="#9FB8CB"/>
+<text x="395.0" y="549.0" font-size="13.5" font-weight="400" fill="#4F6B80" text-anchor="start">15.024  ·  0,01%</text>
+<line x1="32" y1="592" x2="968" y2="592" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="616.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: TSE, resultados oficiais do 1º turno de 2026</text>
+<text x="968.0" y="616.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>

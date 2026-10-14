@@ -14,8 +14,8 @@ Ao participar, você concorda em seguir o [Código de Conduta](CODE_OF_CONDUCT.m
 ## Preparando o ambiente
 
 ```bash
-git clone https://github.com/alissonlinneker/dataUrnas-br.git
-cd dataUrnas-br
+git clone https://github.com/alissonlinneker/DataUrnas-BR.git
+cd DataUrnas-BR
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dashboard,dev]"
@@ -27,6 +27,8 @@ Verifique que está tudo certo:
 ruff check .
 pytest -q
 ```
+
+O `Makefile` reúne os mesmos passos: `make install`, `make lint` e `make test` (rode `make help` para ver todos os alvos, como `build-db`, `dashboard` e `reconcile-2026`).
 
 Os testes usam fixtures sintéticas geradas a partir das especificações ASN.1 em `spec/`; eles não precisam de rede nem dos dados brutos.
 
@@ -62,7 +64,7 @@ Ao criar um código novo:
 
 - escolha a família pela natureza do achado (C, A, M, I ou E) e documente a severidade;
 - inclua descrição objetiva e, quando houver, a base legal;
-- atualize a tabela de códigos no `README.md` e em `docs/metodologia.md`;
+- atualize a tabela de códigos no `README.md` e em `docs/metodologia.md`, com severidade e limiar;
 - adicione teste que gere a ocorrência a partir de uma fixture.
 
 ## Dados e análises
