@@ -5,6 +5,13 @@ Base local: `data/parquet/2026/secoes_2026.parquet` (consolidado em 13/10/2026 2
 `data/parquet/2026/resultado_uf.parquet` / `resultado_municipio.parquet` (baixados em 13/10/2026 14:31).
 Lista completa das seções: `data/parquet/2026/secoes_recebidas_2026.csv` (2.677 linhas).
 
+> **Atualização (14/10/2026, fim da verificação nacional de integridade).** Das 2.677 seções, 2.658 continuavam
+> com a imagem do BU listada e indisponível (HTTP 404) na passagem final; BU, RDV, log e `.vsc` delas conferem com
+> o que a urna assinou. As outras 19, todas do PI, passaram a constar como "Totalizada" num `aux.json` gerado em
+> 14/10/2026, sem a imagem do BU na lista. Por isso o registro `ocorrencias_publicacao.jsonl` tem 2.677 entradas e o
+> catálogo, 2.658 arquivos com `disponivel = false`. Os pedidos de esclarecimento estão em
+> [relatorio-tse-ocorrencias-2026.md](relatorio-tse-ocorrencias-2026.md).
+
 ## Resumo
 
 - 2.677 seções têm `st = "Recebida"` no `aux.json` (hash com `st = "Recebido"`), em 8 UFs e 60 municípios.

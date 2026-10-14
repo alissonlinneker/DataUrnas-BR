@@ -47,9 +47,10 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 
 - **2022 completo:** 941.987 seções dos dois turnos da eleição presidencial, em todas as 27 UFs, decodificadas e auditadas.
 - **2026 completo:** 1º turno de Presidente com o resultado oficial agregado (Brasil, 27 UFs, exterior e 5.757 municípios) e os Boletins de Urna de todas as 499.207 seções instaladas, cuja soma reproduz exatamente o resultado oficial em todas as 28 UFs (27 mais o exterior).
-- **Integridade dos arquivos de 2026 (em andamento):** o SHA-512 do BU, do RDV e do log de cada seção é recalculado a partir dos arquivos publicados e comparado ao valor assinado pela urna, com verificação da assinatura; a cobertura real está no [relatório de integridade](docs/relatorio-integridade-2026.md).
+- **Integridade dos arquivos de 2026 concluída:** em 499.207 seções, 1.497.620 SHA-512 de BU, RDV e log recalculados a partir dos arquivos publicados conferem com o valor assinado pela urna, sem nenhum divergente, e as 499.207 assinaturas de urna são válidas. Detalhes no [resultado](#integridade-dos-arquivos-resultado) e no [relatório de integridade](docs/relatorio-integridade-2026.md).
+- **Auditoria de BU e log de 2026:** nenhuma ocorrência do grupo 1 (indício direto de adulteração) nas 499.207 seções; certificados coerentes em todas e cadeia conferida até a AC intermediária numa amostra determinística de 5%.
 - **Totalização paralela:** os votos são somados a partir dos BUs e reconciliados com os totais oficiais, UF por UF.
-- **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. A etapa é opcional (ativada com `--hashes`) e não fez parte da compilação da base de 2022 distribuída.
+- **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. Em 2026 foi feita em todas as seções, com verificação da assinatura; em 2022 é opcional (ativada com `--hashes`) e não fez parte da compilação da base distribuída.
 - **Dados distribuídos em Parquet (ZSTD):** os 181 GB de arquivos brutos de 2022 viram cerca de 183 MB, prontos para consulta com DuckDB.
 - **Painel web** em Streamlit, com filtros por turno, região, UF, município, modelo de urna, severidade e grupo de leitura das inconsistências.
 
@@ -123,17 +124,49 @@ Os esquemas de cada arquivo estão em [docs/dados-2026.md](docs/dados-2026.md).
 
 ### Integridade dos arquivos (2026)
 
-> **Em andamento.** A verificação percorre todas as seções e leva horas; o relatório informa a cobertura real a cada geração.
+#### Integridade dos arquivos: resultado
 
-Cada urna grava, ao encerrar a votação, o BU, o RDV e o log, e assina com a própria chave um arquivo (`.vsc`) que contém o SHA-512 de cada um deles. O projeto recalcula esses SHA-512 a partir dos arquivos que o TSE publica, compara com os valores assinados e verifica a assinatura. MD5 e SHA-256 também são catalogados, apenas para conferências futuras: não fazem parte do mecanismo da urna.
+> **Concluído** em 499.207 de 499.207 seções instaladas (100%), sem erros pendentes. **C01: zero hashes divergentes em 1.497.620 conferidos; zero assinaturas inválidas.**
+
+Cada urna grava, ao encerrar a votação, o BU, o RDV e o log, e assina com a própria chave um arquivo (`.vsc`) que contém o SHA-512 de cada um deles. O projeto recalculou esses SHA-512 a partir dos arquivos que o TSE publica, comparou com os valores assinados, verificou a assinatura de cada urna e comparou os votos do BU assinado com os do BU lido na coleta de resultados. MD5 e SHA-256 também são catalogados, apenas para conferências futuras: não fazem parte do mecanismo da urna.
+
+| Verificação | Resultado |
+|---|---:|
+| Seções com arquivos verificados | 499.207 (517.179 linhas, incluindo 17.931 agregadas e 41 não instaladas) |
+| SHA-512 de BU, RDV e log iguais ao assinado pela urna | 1.497.620 |
+| SHA-512 divergentes (C01) | **0** |
+| Assinaturas de urna válidas | 499.207 (Ed521: 399.222; ECDSA P-521: 99.985) |
+| Assinaturas inválidas | **0** |
+| Votos do BU assinado iguais aos do BU coletado | 499.207 |
+| RDV assinado pela urna e não publicado | 1 |
+| Imagens do BU listadas no `aux.json` e indisponíveis (HTTP 404) | 2.658 |
 
 <p align="center">
-  <img src="docs/assets/2026-integridade.svg" alt="Cobertura da verificação de integridade dos arquivos de urna de 2026 por UF, com seções verificadas, hashes conferidos, divergências e assinaturas válidas" width="100%">
+  <img src="docs/assets/2026-integridade.svg" alt="Integridade dos arquivos de urna de 2026: 499.207 seções verificadas em todas as UFs, 1.497.620 SHA-512 iguais ao assinado pela urna, nenhum divergente e 499.207 assinaturas válidas" width="100%">
 </p>
 
-Totais, tabela por UF, divergências e o passo a passo para conferir qualquer seção manualmente estão no [relatório de integridade](docs/relatorio-integridade-2026.md) (gerado por `python scripts/docs/gerar_relatorio_integridade.py`). No painel, a página **Integridade dos arquivos (2026)** permite consultar cada seção e baixar o catálogo de hashes em CSV.
+**Dois pontos de publicação a informar ao TSE**, nenhum deles com divergência de conteúdo:
 
-**Certificados das urnas** (em andamento). O certificado que acompanha cada `.vsc` também é conferido (`scripts/ele2026/analisar_certificados.py`). No catálogo parcial de 14/10/2026 (5 UFs, 50.699 seções com certificado), cada urna tem um certificado próprio, nenhum certificado, chave pública ou par emissor e número de série se repete entre urnas, o CN do certificado (`UEAO` + 8 dígitos) é igual ao número interno da urna registrado no BU em todas as seções, e o emissor e o algoritmo são coerentes com o modelo: AC URNA com ECDSA P-521 para UE2013 e UE2015, AC UE2020 e AC UE2022 com Ed521 para os modelos de mesmo nome. Os certificados públicos das AC intermediárias estão em [`data/certificados/`](data/certificados/README.md), com origem e impressões digitais; os da AC UE2020 e AC UE2022 conferem byte a byte com o SHA-512 publicado pelo TSE no resumo digital de 2026. Numa amostra de 400 arquivos `.vsc`, estratificada por modelo e emissor, e num teste com 200 seções de Roraima, a assinatura de todos os certificados de urna conferiu com a chave da AC emissora e todos estavam válidos no dia da eleição. A cadeia vai **até a AC intermediária**: os certificados das raízes (AC RAIZ UE e AC RAIZ UE v2) e da AC URNA v2 não estão disponíveis publicamente para download. Uma observação a esclarecer com o TSE: o certificado publicado da AC URNA venceu em 18/07/2026, e há certificado de urna emitido depois disso que confere com a mesma chave; a explicação mais provável é um certificado renovado da AC URNA, com a mesma chave, que não foi publicado. Não é indício de adulteração. O modo `--todas` do script estende essa conferência a todas as seções e grava `data/parquet/2026/integridade/certificados.parquet`.
+- **Um RDV não publicado.** Na seção 0228 da zona 0074 de Lagoa Grande do Maranhão (MA, município 07846), o `.vsc` traz o SHA-512 do `rdv.dat`, mas o `aux.json` lista só o log, o `.vsc` e o BU, e o endereço do RDV responde HTTP 404. O BU e o log dessa seção conferem com o que a urna assinou, a assinatura é válida e os votos do BU são os mesmos da coleta. É o único registro de `arquivo_ausente_tse` no país.
+- **2.658 imagens do BU indisponíveis.** Em 2.658 seções (PA 1.613, PR 500, MA 403, BA 135, SP 4, RS 2, SC 1), o `aux.json` lista a imagem do BU (`imgbu.dat`) e o servidor responde HTTP 404. Todas estão com status "Recebida" e foram republicadas entre 05 e 07/10/2026; o BU, o RDV e o log delas foram conferidos normalmente. O registro `ocorrencias_publicacao.jsonl` tem 2.677 entradas porque, em 19 seções do PI, a imagem deixou de constar no `aux.json` quando a seção foi verificada de novo (não passou a ser servida). Detalhes na [investigação das seções "Recebida"](docs/investigacao-secoes-recebidas-2026.md).
+
+São lacunas de publicação, não evidência de adulteração. Os pedidos de esclarecimento estão reunidos em [docs/relatorio-tse-ocorrencias-2026.md](docs/relatorio-tse-ocorrencias-2026.md).
+
+**Auditoria do BU e do log (2026), por grupo de leitura.** Concluída em 499.207 seções: 250.176 ocorrências em 159.526 seções.
+
+| Grupo | Resultado |
+|---|---|
+| 1. Indício direto de adulteração | Nenhuma ocorrência de C01, C05, A02 ou A06. Na conferência dos arquivos, 1 registro: o RDV não publicado descrito acima. |
+| 2. Inconsistência a investigar | Nenhuma ocorrência de A01 ou A03. 31 M03 (abertura não encontrada no log), todas em seções com BU do sistema de apuração (votação por cédula), cujo log não tem abertura de urna. |
+| 3. Operacional ou estatístico | I04 177.616, I03 35.631, C06 25.675 (22.414 de severidade média e 3.261 alta), I05 3.794, I06 3.064, I02 2.595, A04 718, M06 533, M04 265, A05 88, I01 69, M05 66, M02 31. |
+
+**Certificados das urnas.** Em todas as 499.207 seções: cada modelo tem uma única AC emissora e um único algoritmo (AC URNA com ECDSA P-521 para UE2013 e UE2015; AC UE2020 e AC UE2022 com Ed521 para os modelos de mesmo nome); nenhuma urna aparece com dois certificados e nenhum certificado aparece em urnas diferentes; o CN (`UEAO` + 8 dígitos) segue o padrão em todas. Há 499.179 certificados distintos porque um certificado de urna de apuração do exterior assina 29 BUs do sistema de apuração. O CN é igual ao número interno da urna registrado na carga do BU em 499.193 seções; as 14 restantes, com hash e assinatura válidos, estão listadas no relatório para confirmação com o TSE. A **validação da cadeia** foi **concluída na amostra de 5%, sorteio determinístico** (24.846 seções de todas as UFs, escolhidas pelo SHA-256 da chave da seção): em 24.846 de 24.846 a assinatura do certificado conferiu com a chave da AC emissora e o certificado estava válido no dia da eleição. A cadeia vai **até a AC intermediária**: os certificados das raízes (AC RAIZ UE e AC RAIZ UE v2) e da AC URNA v2 não estão disponíveis publicamente. Os certificados públicos das AC estão em [`data/certificados/`](data/certificados/README.md); os da AC UE2020 e AC UE2022 conferem byte a byte com o SHA-512 publicado pelo TSE. Uma observação a esclarecer com o TSE: o certificado publicado da AC URNA venceu em 18/07/2026, e há certificado de urna emitido em 03/08/2026 que confere com a mesma chave; a explicação mais provável é um certificado renovado da AC URNA, com a mesma chave, que não foi publicado. Não é indício de adulteração.
+
+**Onde ver os detalhes.**
+
+- [Relatório de integridade](docs/relatorio-integridade-2026.md): totais, tabela por UF, divergências com endereços, arquivos indisponíveis, auditoria por código, certificados e o passo a passo para conferir qualquer seção à mão (gerado por `python scripts/docs/gerar_relatorio_integridade.py`).
+- [Catálogo de hashes por arquivo](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0): MD5, SHA-256 e SHA-512 dos 1.999.485 arquivos, um Parquet por UF nos anexos da versão v0.3.0, conferível com `sha256sum -c SHA256SUMS`.
+- No painel, a página **Integridade dos arquivos (2026)** permite consultar cada seção.
 
 ---
 
@@ -539,6 +572,9 @@ DataUrnas-BR/
 | [Arquitetura](docs/arquitetura.md) | Módulos, scripts, fluxo de uma seção, banco de dados e deploy |
 | [Dados de 2026](docs/dados-2026.md) | Arquivos Parquet de 2026, forma de coleta, totais oficiais, nulos técnicos e esquemas |
 | [Perguntas frequentes](docs/faq.md) | O que o projeto prova e não prova, como reproduzir, BU x RDV, nulos técnicos e cobertura |
+| [Relatório de integridade de 2026](docs/relatorio-integridade-2026.md) | Hashes, assinaturas, auditoria por grupo de leitura, certificados e conferência manual de uma seção |
+| [Investigação das seções "Recebida"](docs/investigacao-secoes-recebidas-2026.md) | Seções republicadas entre 05 e 07/10/2026 e imagens do BU indisponíveis |
+| [Ocorrências para o TSE](docs/relatorio-tse-ocorrencias-2026.md) | Pontos de publicação e de certificação a esclarecer com o TSE |
 
 ---
 
@@ -568,7 +604,7 @@ DataUrnas-BR/
 - O projeto trabalha **somente com os arquivos públicos**. Ele não tem acesso às urnas, ao código-fonte compilado nem às chaves privadas. Em 2026 a cadeia de certificados das urnas é conferida até a AC intermediária (AC URNA, AC UE2020 e AC UE2022), não até a raiz, cujos certificados não estão publicados; a assinatura de software (CEPESC) usa algoritmo não publicado e não é verificada.
 - Uma ocorrência é um **indicador para investigação**, não uma conclusão. Reinícios, horários e proporções atípicas costumam ter explicação operacional.
 - Testes estatísticos como Benford têm alcance limitado em dados eleitorais, cuja distribuição depende do tamanho das seções. Por isso o projeto usa medidas de efeito (V de Cramér) além do p-valor.
-- Em 2026, a coleta por seção ainda não terminou; até lá, as análises por seção desse ano cobrem apenas as UFs já coletadas.
+- Em 2026, a validação da cadeia de certificados foi feita numa amostra determinística de 5% das seções; a coerência dos certificados (unicidade, CN e emissor por modelo) cobre todas. Arquivos que o TSE não publica (um RDV e 2.658 imagens do BU listadas e indisponíveis) não puderam ser conferidos.
 - Seções cujo BU não pôde ser decodificado (E02) ficam fora dos totais e são listadas para conferência.
 - A base de 2022 distribuída foi compilada **sem conferência de hashes**: não contém C01 nem E01, e o componente de integridade do índice de confiança aparece como "não verificado".
 - O RDV e a imagem do BU são baixados, mas não decodificados; a recontagem voto a voto pelo RDV ainda não é feita.
@@ -583,6 +619,12 @@ DataUrnas-BR/
 | 2022, Presidente, 1º e 2º turnos: BU, log e assinatura por seção | Concluído |
 | 2026, Presidente, 1º turno: resultado oficial agregado (Brasil, UFs, exterior e municípios) | Concluído |
 | 2026, Presidente, 1º turno: BU por seção e reconciliação com o oficial | Concluído (diferença zero nas 28 UFs) |
+| 2026, 1º turno: integridade dos arquivos (SHA-512 e assinatura de cada urna) | Concluído (0 divergentes em 1.497.620; 0 assinaturas inválidas) |
+| 2026, 1º turno: auditoria do BU e do log por grupo de leitura | Concluído (nenhuma ocorrência do grupo 1) |
+| 2026, 1º turno: coerência dos certificados das urnas | Concluído (todas as seções) |
+| 2026, 1º turno: validação da cadeia de certificados até a AC intermediária | Concluído na amostra de 5%, sorteio determinístico |
+| 2026, 1º turno: catálogo de hashes por arquivo | Publicado nos anexos da [v0.3.0](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0) |
+| Cadeia de certificados até a raiz | Depende da publicação dos certificados raiz pelo TSE |
 | 2026, Presidente, 2º turno | Planejado |
 | Decodificação do RDV e conferência voto a voto do RDV com o BU de cada seção; imagem do BU | Futuro |
 
@@ -599,7 +641,7 @@ Use o botão **Cite this repository** do GitHub (gerado a partir de [CITATION.cf
   author  = {Linneker, Alisson},
   title   = {DataUrnas-BR: auditoria independente dos arquivos públicos da urna eletrônica},
   year    = {2026},
-  version = {0.2.0},
+  version = {0.3.0},
   url     = {https://github.com/alissonlinneker/DataUrnas-BR},
   license = {MIT}
 }
