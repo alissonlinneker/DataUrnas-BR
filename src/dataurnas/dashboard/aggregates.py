@@ -23,8 +23,14 @@ como antes era feito em pandas com ``astype(str).str[0]`` e ``str[1]``.
 
 from __future__ import annotations
 
+import hashlib
+import json
+import os
 import re
 from dataclasses import dataclass
+from pathlib import Path
+
+import duckdb
 
 # Dimensões de filtro do dashboard presentes nos cubos (sem município: com ele
 # os cubos ficariam do tamanho da tabela bruta; filtro por município usa a
@@ -104,6 +110,21 @@ _CUBE_SELECTS = {
 
 AGGREGATE_TABLES = ("agg_presidente_secao", *_CUBE_SELECTS)
 
+# SELECT e ORDER BY de cada tabela. A ordem física aproveita os zone maps do
+# DuckDB nas colunas mais filtradas.
+_TABLE_DEFS = {
+    "agg_presidente_secao": (PRESIDENTE_SECAO_SELECT, "secao_id"),
+    **{name: (select, "turno, uf") for name, select in _CUBE_SELECTS.items()},
+}
+
+# Arquivos de entrada dos agregados (em data/parquet). ``issues`` e
+# ``totais_cargo`` não participam das definições acima.
+INPUT_PATTERNS = ("secoes.parquet", "votos_*.parquet")
+
+MANIFEST_NAME = "manifest.json"
+_MANIFEST_VERSION = 1
+_HASH_CHUNK = 1 << 20
+
 
 def create_aggregates(conn) -> dict[str, int]:
     """Cria (ou recria) as tabelas agregadas a partir de ``votos`` e ``secoes``.
@@ -111,17 +132,158 @@ def create_aggregates(conn) -> dict[str, int]:
     Ordena cada tabela pelas colunas mais filtradas para aproveitar os zone
     maps do DuckDB. Devolve o número de linhas de cada tabela.
     """
-    counts = {}
-    conn.execute("DROP TABLE IF EXISTS agg_presidente_secao")
-    conn.execute(
-        f"CREATE TABLE agg_presidente_secao AS {PRESIDENTE_SECAO_SELECT} ORDER BY secao_id"
-    )
-    for name, select in _CUBE_SELECTS.items():
+    for name, (select, order) in _TABLE_DEFS.items():
         conn.execute(f"DROP TABLE IF EXISTS {name}")
-        conn.execute(f"CREATE TABLE {name} AS {select} ORDER BY turno, uf")
+        conn.execute(f"CREATE TABLE {name} AS {select} ORDER BY {order}")
+    return {name: conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
+            for name in AGGREGATE_TABLES}
+
+
+# ----------------------------------------------------------------------
+# Agregados pré-calculados em Parquet (build rápido da imagem)
+# ----------------------------------------------------------------------
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        while chunk := f.read(_HASH_CHUNK):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def definitions_hash() -> str:
+    """Hash das definições SQL; muda sempre que um agregado muda de fórmula."""
+    h = hashlib.sha256(f"v{_MANIFEST_VERSION}".encode())
+    for name, (select, order) in _TABLE_DEFS.items():
+        h.update(f"\0{name}\0{select}\0{order}".encode())
+    return h.hexdigest()
+
+
+def input_files(parquet_dir: Path) -> list[Path]:
+    """Parquet de origem dos agregados, em ordem estável."""
+    files: list[Path] = []
+    for pattern in INPUT_PATTERNS:
+        files.extend(sorted(Path(parquet_dir).glob(pattern)))
+    return files
+
+
+def input_fingerprint(files: list[Path]) -> str:
+    """Hash do conteúdo (e do nome) dos Parquet de origem.
+
+    Usa o conteúdo e não o mtime: o git não preserva datas de modificação,
+    então o mtime mudaria a cada checkout sem que os dados mudassem.
+    """
+    h = hashlib.sha256()
+    for f in files:
+        h.update(f"\0{Path(f).name}\0{_sha256_file(Path(f))}".encode())
+    return h.hexdigest()
+
+
+def _columns(conn, relation: str) -> list[list[str]]:
+    return [[r[0], r[1]] for r in conn.execute(f"DESCRIBE {relation}").fetchall()]
+
+
+def export_aggregates(conn, out_dir: Path, fingerprint: str) -> dict:
+    """Grava cada ``agg_*`` em ``out_dir/<nome>.parquet`` (ZSTD) e o manifesto.
+
+    ``fingerprint`` deve ser o ``input_fingerprint`` dos Parquet a partir dos
+    quais o banco aberto em ``conn`` foi construído.
+    """
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    tabelas = {}
     for name in AGGREGATE_TABLES:
-        counts[name] = conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
-    return counts
+        dest = out_dir / f"{name}.parquet"
+        tmp = dest.with_name(f"{dest.name}.tmp")
+        # SELECT * sem ORDER BY preserva a ordem de inserção (ORDER BY do CREATE)
+        conn.execute(
+            f"COPY (SELECT * FROM {name}) TO '{tmp}' "  # nome constante, caminho local
+            "(FORMAT PARQUET, COMPRESSION ZSTD, ROW_GROUP_SIZE 122880)"
+        )
+        os.replace(tmp, dest)
+        tabelas[name] = {
+            "arquivo": dest.name,
+            "linhas": conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0],
+            "colunas": _columns(conn, name),
+            "sha256": _sha256_file(dest),
+        }
+    manifest = {
+        "versao": _MANIFEST_VERSION,
+        "definicoes": definitions_hash(),
+        "entradas": fingerprint,
+        "tabelas": tabelas,
+    }
+    tmp = out_dir / f"{MANIFEST_NAME}.tmp"
+    tmp.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    os.replace(tmp, out_dir / MANIFEST_NAME)
+    return manifest
+
+
+def check_manifest(agg_dir: Path, fingerprint: str) -> tuple[dict | None, str]:
+    """Valida o manifesto dos agregados pré-calculados.
+
+    Returns:
+        (manifesto, "") quando os arquivos podem ser usados, ou (None, motivo).
+    """
+    path = Path(agg_dir) / MANIFEST_NAME
+    if not path.exists():
+        return None, "manifesto ausente"
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        return None, f"manifesto ilegível ({e})"
+    if manifest.get("versao") != _MANIFEST_VERSION:
+        return None, "versão do manifesto diferente"
+    if manifest.get("definicoes") != definitions_hash():
+        return None, "definições SQL mudaram desde a exportação"
+    if manifest.get("entradas") != fingerprint:
+        return None, "Parquet de origem mudaram desde a exportação"
+    tabelas = manifest.get("tabelas") or {}
+    if set(tabelas) != set(AGGREGATE_TABLES):
+        return None, "conjunto de tabelas diferente"
+    for info in tabelas.values():
+        f = Path(agg_dir) / Path(str(info.get("arquivo", ""))).name
+        if not f.is_file():
+            return None, f"{f.name} ausente"
+        if _sha256_file(f) != info.get("sha256"):
+            return None, f"{f.name} com conteúdo diferente do manifesto"
+    return manifest, ""
+
+
+def import_aggregates(conn, agg_dir: Path, fingerprint: str) -> tuple[dict[str, int] | None, str]:
+    """Importa os ``agg_*`` pré-calculados, se o manifesto confere.
+
+    Requer ``votos`` e ``secoes`` já carregados: os tipos das colunas vêm das
+    próprias definições (``DESCRIBE`` só faz o bind, sem executar a consulta) e
+    são conferidos com o manifesto, de modo que o resultado é idêntico ao de
+    ``create_aggregates``. Em qualquer divergência, nada fica criado e o motivo
+    é devolvido para o chamador recalcular.
+    """
+    manifest, motivo = check_manifest(agg_dir, fingerprint)
+    if manifest is None:
+        return None, motivo
+    counts = {}
+    try:
+        for name, (select, _order) in _TABLE_DEFS.items():
+            info = manifest["tabelas"][name]
+            colunas = _columns(conn, f"({select})")
+            if colunas != info["colunas"]:
+                raise ValueError(f"{name}: colunas ou tipos diferentes do manifesto")
+            ddl = ", ".join(f'"{c}" {t}' for c, t in colunas)
+            conn.execute(f"DROP TABLE IF EXISTS {name}")
+            conn.execute(f"CREATE TABLE {name} ({ddl})")
+            conn.execute(
+                f"INSERT INTO {name} SELECT * FROM read_parquet(?)",
+                [str(Path(agg_dir) / Path(info["arquivo"]).name)],
+            )
+            n = conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
+            if n != info["linhas"]:
+                raise ValueError(f"{name}: {n} linhas, manifesto indica {info['linhas']}")
+            counts[name] = n
+    except (duckdb.Error, ValueError, KeyError, TypeError) as e:
+        for name in AGGREGATE_TABLES:
+            conn.execute(f"DROP TABLE IF EXISTS {name}")
+        return None, str(e)
+    return counts, ""
 
 
 # ----------------------------------------------------------------------
