@@ -78,13 +78,16 @@ def create_snapshot(store: DuckDBStore) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
-    ap.add_argument("--batch-size", type=int, default=500)
+    ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1),
+                    help="processos de parsing (padrão: núcleos menos 1)")
+    ap.add_argument("--batch-size", type=int, default=500,
+                    help="seções por transação de escrita no DuckDB (padrão: 500)")
     ap.add_argument("--snapshot-every", type=int, default=50_000,
                     help="Seções gravadas entre snapshots do dashboard (0 desativa)")
     ap.add_argument("--min-bus", type=int, default=900_000,
                     help="Aborta se houver menos BUs no disco (proteção contra raw incompleto)")
-    ap.add_argument("--no-backup-check", action="store_true")
+    ap.add_argument("--no-backup-check", action="store_true",
+                    help="não exige o backup do banco antes de começar")
     args = ap.parse_args()
 
     _setup_logging()
@@ -148,6 +151,10 @@ def main() -> None:
     if batch:
         compiled += store.insert_rows(batch)
 
+    # Workers usam BatchAnalyzer padrão (sem verificação SHA-512)
+    store.registrar_verificacao_hashes(
+        analyzer.verify_hashes, incremental=True, secoes_anteriores=len(existing_ids),
+    )
     create_snapshot(store)
     count, t1, t2 = store._contagem_turnos()
     reboots_t2 = store._conn.execute(

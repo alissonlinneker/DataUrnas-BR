@@ -1,4 +1,4 @@
-"""Download + compilacao DuckDB em tempo real - ambos os turnos.
+"""Download + compilação DuckDB em tempo real - ambos os turnos.
 
 Baixa seções e compila no banco de dados imediatamente após o download.
 Concorrência e taxa configuráveis por variável de ambiente
@@ -190,6 +190,10 @@ class RealtimeBuilder:
 
         # Snapshot final
         with self._lock:
+            self._store.registrar_verificacao_hashes(
+                self._analyzer.verify_hashes, incremental=True,
+                secoes_anteriores=len(self._existing),
+            )
             create_snapshot(self._store)
 
         count = self._store._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0]
@@ -226,7 +230,7 @@ async def download_state_task(builder: RealtimeBuilder, pleito: str, turno_label
                 max_sections=None,
             )
             logger.info(
-                "%s ESTADO %s CONCLUIDO: %d secoes, %d downloads, %d erros",
+                "%s ESTADO %s CONCLUÍDO: %d seções, %d downloads, %d erros",
                 turno_label, uf.upper(),
                 stats.get("sections_processed", 0),
                 stats.get("downloaded", 0),
@@ -257,7 +261,7 @@ async def download_turno(builder: RealtimeBuilder, pleito: str, turno_label: str
         await asyncio.gather(*tasks)
 
         elapsed = time.time() - start
-        logger.info("%s LOTE CONCLUIDO em %.0f min | DB: %s", turno_label, elapsed / 60, builder.stats)
+        logger.info("%s LOTE CONCLUÍDO em %.0f min | DB: %s", turno_label, elapsed / 60, builder.stats)
 
     elapsed = time.time() - start
     logger.info("=" * 60)

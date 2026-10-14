@@ -160,7 +160,9 @@ def _persist_mode() -> str | None:
 # primeira vez); os dados de 2022 são estáticos, então o resultado sobrevive a
 # reinícios do servidor. Limpar com "Limpar cache" ou `streamlit cache clear`.
 @st.cache_data(persist=_persist_mode(), max_entries=ANALYSIS_CACHE_ENTRIES, show_spinner="Calculando análise...")
-def _run_analysis(name: str, filters_key, args: tuple, kwargs: tuple):
+def _run_analysis(name: str, filters_key, args: tuple, kwargs: tuple, versao: str = ""):
+    # ``versao`` (analysis.ANALYSIS_CACHE_VERSION) entra só na chave do cache:
+    # mudar a semântica de uma análise invalida o cache persistido em disco.
     store = get_store()
     if store is None:
         raise RuntimeError("Banco de dados indisponível")
@@ -187,8 +189,10 @@ class CachedAnalysis:
 
         def call(store, *args, **kwargs):
             if args and isinstance(args[0], Filters):
-                return _run_analysis(name, args[0].cache_key(), tuple(args[1:]), tuple(sorted(kwargs.items())))
-            return _run_analysis(name, None, tuple(args), tuple(sorted(kwargs.items())))
+                return _run_analysis(name, args[0].cache_key(), tuple(args[1:]),
+                                     tuple(sorted(kwargs.items())), _analysis.ANALYSIS_CACHE_VERSION)
+            return _run_analysis(name, None, tuple(args), tuple(sorted(kwargs.items())),
+                                 _analysis.ANALYSIS_CACHE_VERSION)
 
         call.__name__ = name
         return call

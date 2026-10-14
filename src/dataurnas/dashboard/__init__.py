@@ -1,1 +1,1 @@
-"""Modulo do dashboard web."""
+"""Módulo do dashboard web."""

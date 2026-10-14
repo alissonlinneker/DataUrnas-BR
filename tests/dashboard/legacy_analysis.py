@@ -47,8 +47,8 @@ def _benford_cramers_v_score(cramers_v_value):
     """Converte Cramer's V em score (0-100) para o confidence score.
 
     V < 0.05:  conforme     -> score 100
-    V < 0.10:  aceitavel    -> score 75
-    V < 0.20:  atencao      -> score 50
+    V < 0.10:  aceitável    -> score 75
+    V < 0.20:  atenção      -> score 50
     V >= 0.20: não conforme -> score 0
     """
     if cramers_v_value < 0.05:
@@ -1284,7 +1284,7 @@ def null_blank_vs_result(store, f) -> pd.DataFrame:
         total=("total", "sum"),
     ).reset_index()
 
-    result["faixa"] = result["quartil"].map(faixas).fillna("")
+    result["faixa"] = result["quartil"].astype(str).map(faixas).fillna("")
     result["pct_lula"] = np.where(
         result["total"] > 0,
         (result["lula"] / result["total"] * 100).round(2),

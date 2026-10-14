@@ -59,7 +59,7 @@ PRESIDENTE_SECAO_SELECT = """
 """
 
 # Fontes "linha a linha" equivalentes aos cubos: expõem todas as colunas de
-# secoes (s.*), então qualquer filtro funciona sobre elas.
+# seções (s.*), então qualquer filtro funciona sobre elas.
 _RAW_SOURCES = {
     "agg_votos_nominais": """
         SELECT s.*, v.secao_id, v.cargo, v.codigo_candidato, v.partido, v.quantidade AS votos

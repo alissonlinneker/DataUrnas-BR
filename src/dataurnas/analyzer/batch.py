@@ -1,4 +1,4 @@
-"""Analise em lote de todas as secoes baixadas."""
+"""Análise em lote de todas as seções baixadas."""
 
 import logging
 from collections import defaultdict
@@ -16,7 +16,7 @@ from .statistical import StatisticalAnalyzer, VoteAggregator
 
 logger = logging.getLogger(__name__)
 
-# Datas de votacao por pleito (DD/MM/YYYY), usadas para filtrar logs do T2,
+# Datas de votação por pleito (DD/MM/YYYY), usadas para filtrar logs do T2,
 # que acumulam eventos do T1.
 _PLEITO_DATAS = {
     "406": "02/10/2022",
@@ -42,7 +42,7 @@ def _soma_tipo(votos, tipo: TipoVoto) -> int:
 
 
 def _tag_issues(issues: list[Issue], result: dict) -> list[Issue]:
-    """Preenche a localizacao da secao nas issues."""
+    """Preenche a localização da seção nas issues."""
     for issue in issues:
         issue.uf = result["uf"]
         issue.municipio = result["municipio"]
@@ -52,7 +52,7 @@ def _tag_issues(issues: list[Issue], result: dict) -> list[Issue]:
 
 
 class BatchAnalyzer:
-    """Executa analise em lote em todas as secoes baixadas."""
+    """Executa análise em lote em todas as seções baixadas."""
 
     def __init__(self, raw_dir: Path = RAW_DIR, verify_hashes: bool = False):
         self._raw_dir = Path(raw_dir)
@@ -65,8 +65,13 @@ class BatchAnalyzer:
         self._log_analyzer = LogAnalyzer()
         self._statistical = StatisticalAnalyzer()
 
+    @property
+    def verify_hashes(self) -> bool:
+        """Se a verificação SHA-512 dos arquivos é executada em cada seção."""
+        return self._verify_hashes
+
     def find_sections(self, uf: Optional[str] = None) -> list[Path]:
-        """Encontra todas as secoes baixadas (diretorios unicos, ordenados)."""
+        """Encontra todas as seções baixadas (diretórios únicos, ordenados)."""
         sections = {bu_file.parent for bu_file in self.find_bu_files(uf)}
         return sorted(sections)
 
@@ -82,7 +87,7 @@ class BatchAnalyzer:
 
     @staticmethod
     def extract_pleito_from_filename(bu_path: Path) -> str:
-        """Extrai o codigo do pleito do nome do arquivo BU.
+        """Extrai o código do pleito do nome do arquivo BU.
 
         Ex: 'o00406-9701200170097.bu' -> '406'
             'o00407-9701200170097.bu' -> '407'
@@ -95,30 +100,30 @@ class BatchAnalyzer:
 
     @staticmethod
     def pleito_to_turno(pleito: str) -> int:
-        """Converte codigo de pleito para numero do turno.
+        """Converte código de pleito para número do turno.
 
-        Pleito vazio (nome de arquivo sem prefixo) assume 1o turno. Pleito
-        desconhecido tambem assume 1, mas registra aviso: o mapeamento deve
+        Pleito vazio (nome de arquivo sem prefixo) assume 1º turno. Pleito
+        desconhecido também assume 1, mas registra aviso: o mapeamento deve
         ser adicionado em config.ELECTIONS.
         """
         if not pleito:
             return 1
         turno = _pleito_turnos().get(str(pleito))
         if turno is None:
-            logger.warning("Pleito %s desconhecido; assumindo 1o turno", pleito)
+            logger.warning("Pleito %s desconhecido; assumindo 1º turno", pleito)
             return 1
         return turno
 
     @staticmethod
     def pleito_to_date(pleito: str) -> str:
-        """Converte codigo de pleito para data do turno (DD/MM/YYYY).
+        """Converte código de pleito para data do turno (DD/MM/YYYY).
 
-        Necessario para filtrar logs do T2, que acumulam eventos do T1.
+        Necessário para filtrar logs do T2, que acumulam eventos do T1.
         """
         return _PLEITO_DATAS.get(str(pleito), "")
 
     def locate(self, section_dir: Path) -> dict:
-        """Extrai uf/municipio/zona/secao do caminho da secao.
+        """Extrai uf/municipio/zona/secao do caminho da seção.
 
         Estrutura: {raw_dir}/{uf}/{mun}/{zona}/{secao}/
         """
@@ -128,7 +133,7 @@ class BatchAnalyzer:
         except ValueError:
             parts = ()
         if len(parts) < 4:
-            # Fora de raw_dir: usar os 4 ultimos componentes
+            # Fora de raw_dir: usar os 4 últimos componentes
             parts = section_dir.parts[-4:]
         parts = ("",) * (4 - len(parts)) + tuple(parts)
         uf, municipio, zona, secao = parts[-4:]
@@ -143,9 +148,9 @@ class BatchAnalyzer:
         return f"{turno}T/{loc['uf']}/{loc['municipio']}/{loc['zona']}/{loc['secao']}"
 
     def analyze_all(self, uf: Optional[str] = None) -> dict:
-        """Analisa todas as secoes (um BU por turno) e gera relatorio completo."""
+        """Analisa todas as seções (um BU por turno) e gera relatório completo."""
         bu_files = self.find_bu_files(uf)
-        logger.info("Encontrados %d BUs para analise", len(bu_files))
+        logger.info("Encontrados %d BUs para análise", len(bu_files))
         aggregator = VoteAggregator()
 
         results = {
@@ -176,7 +181,7 @@ class BatchAnalyzer:
 
         for i, bu_file in enumerate(bu_files):
             if (i + 1) % 50 == 0:
-                logger.info("Progresso: %d/%d secoes", i + 1, len(bu_files))
+                logger.info("Progresso: %d/%d seções", i + 1, len(bu_files))
 
             section_result = self.analyze_section(bu_file.parent, bu_file=bu_file)
             self._aggregate(results, section_result)
@@ -202,11 +207,11 @@ class BatchAnalyzer:
         return results
 
     def analyze_section(self, section_dir: Path, bu_file: Optional[Path] = None) -> dict:
-        """Analisa uma secao individual com todos os analyzers.
+        """Analisa uma seção individual com todos os analyzers.
 
         Args:
-            section_dir: Diretorio da secao.
-            bu_file: Arquivo BU especifico (define o turno). Se None, usa o
+            section_dir: Diretório da seção.
+            bu_file: Arquivo BU específico (define o turno). Se None, usa o
                 primeiro encontrado.
         """
         section_dir = Path(section_dir)
@@ -252,7 +257,7 @@ class BatchAnalyzer:
 
         return result
 
-    # Compatibilidade: scripts antigos chamam o metodo privado
+    # Compatibilidade: scripts antigos chamam o método privado
     _analyze_section = analyze_section
 
     def _parse_bu(self, bu_file: Path, result: dict) -> Optional[BoletimUrna]:
@@ -378,7 +383,7 @@ class BatchAnalyzer:
         result["issues"].extend(_tag_issues(log_result["issues"], result))
 
     def _aggregate(self, results: dict, section_result: dict):
-        """Agrega resultado de uma secao no resumo geral."""
+        """Agrega resultado de uma seção no resumo geral."""
         uf = section_result["uf"]
         issues = section_result["issues"]
 
@@ -403,7 +408,7 @@ class BatchAnalyzer:
         else:
             results["secoes_ok"] += 1
 
-        # Modelo de urna (agora vem do .vscmr ou log, nao do BU)
+        # Modelo de urna (agora vem do .vscmr ou log, não do BU)
         modelo = section_result.get("modelo")
         if modelo:
             results["modelos_urna"][str(modelo)] += 1
@@ -413,7 +418,7 @@ class BatchAnalyzer:
         if tipo_urna:
             results["tipos_urna"][str(tipo_urna)] += 1
 
-        # Versao de SW
+        # Versão de SW
         versao = section_result.get("versao_sw")
         if versao:
             results["versoes_sw"][str(versao)] += 1
@@ -421,10 +426,10 @@ class BatchAnalyzer:
         # Votos e eleitores (corrigido: sem double-counting)
         bu_info = section_result.get("bu")
         if bu_info:
-            # Aptos: pegar da primeira eleicao (e o mesmo caderno)
+            # Aptos: pegar da primeira eleição (e o mesmo caderno)
             eleicoes = bu_info.get("eleicoes", [])
             if eleicoes:
-                # Usar aptos da primeira eleicao (mesmo caderno para todos os cargos)
+                # Usar aptos da primeira eleição (mesmo caderno para todos os cargos)
                 results["eleitores_por_uf"][uf]["aptos"] += eleicoes[0]["aptos"]
                 results["eleitores_por_uf"][uf]["secoes"] += 1
 
@@ -464,7 +469,7 @@ class BatchAnalyzer:
         })
 
     def _calc_abstencao(self, results: dict) -> dict:
-        """Calcula taxa de abstencao por UF."""
+        """Calcula taxa de abstenção por UF."""
         abstencao = {}
         for uf, dados in results["eleitores_por_uf"].items():
             if dados["aptos"] > 0:
@@ -474,7 +479,7 @@ class BatchAnalyzer:
         return abstencao
 
     def _calc_biometria_pct(self, results: dict) -> dict:
-        """Calcula percentual de liberacao por codigo (sem biometria) por UF."""
+        """Calcula percentual de liberação por código (sem biometria) por UF."""
         bio_pct = {}
         for uf, dados in results["biometria_por_uf"].items():
             total = dados["lib_codigo"] + dados["comp_biometrico"]
@@ -490,22 +495,22 @@ class BatchAnalyzer:
         return bio_pct
 
     def print_report(self, results: dict):
-        """Imprime relatorio completo no terminal."""
+        """Imprime relatório completo no terminal."""
         print("=" * 70)
-        print("RELATORIO DE AUDITORIA - DADOS DE URNA")
+        print("RELATÓRIO DE AUDITORIA: DADOS DE URNA")
         print("=" * 70)
         print()
 
         # Resumo geral
-        print(f"Total de secoes analisadas: {results['total_secoes']}")
-        print(f"Secoes sem inconsistencias: {results['secoes_ok']}")
-        print(f"Secoes com inconsistencias: {results['secoes_com_issues']}")
-        print(f"Total de inconsistencias: {results['total_issues']}")
+        print(f"Total de seções analisadas: {results['total_secoes']}")
+        print(f"Seções sem inconsistências: {results['secoes_ok']}")
+        print(f"Seções com inconsistências: {results['secoes_com_issues']}")
+        print(f"Total de inconsistências: {results['total_issues']}")
         print()
 
-        # Inconsistencias por severidade
+        # Inconsistências por severidade
         if results.get("issues_por_severidade"):
-            print("--- Inconsistencias por Severidade ---")
+            print("--- Inconsistências por severidade ---")
             order = {"critica": 0, "alta": 1, "media": 2, "informativa": 3}
             for sev, count in sorted(
                 results["issues_por_severidade"].items(),
@@ -514,25 +519,25 @@ class BatchAnalyzer:
                 print(f"  {sev.upper()}: {count}")
             print()
 
-        # Inconsistencias por codigo
+        # Inconsistências por código
         if results.get("issues_por_codigo"):
-            print("--- Inconsistencias por Codigo ---")
+            print("--- Inconsistências por código ---")
             for cod, count in sorted(results["issues_por_codigo"].items()):
                 print(f"  {cod}: {count}")
             print()
 
         # Modelos de urna
         if results.get("modelos_urna"):
-            print("--- Modelos de Urna ---")
+            print("--- Modelos de urna ---")
             total_urnas = sum(results["modelos_urna"].values())
             for modelo, count in sorted(results["modelos_urna"].items()):
                 pct = (count / total_urnas * 100) if total_urnas > 0 else 0
                 print(f"  UE{modelo}: {count} urnas ({pct:.1f}%)")
             print()
 
-        # Versoes de software
+        # Versões de software
         if results.get("versoes_sw"):
-            print("--- Versoes de Software ---")
+            print("--- Versões de software ---")
             for versao, count in sorted(results["versoes_sw"].items()):
                 print(f"  {versao}: {count} urnas")
             print()
@@ -552,12 +557,12 @@ class BatchAnalyzer:
                 total_comp += comp
                 print(
                     f"  {uf.upper()}: {aptos:>6} aptos, {comp:>6} comp. "
-                    f"(abstencao {abstencao:.1f}%) [{secoes} secoes]"
+                    f"(abstenção {abstencao:.1f}%) [{secoes} seções]"
                 )
             if total_aptos > 0:
                 total_abs = (1 - total_comp / total_aptos) * 100
                 print(f"  TOTAL: {total_aptos:>6} aptos, {total_comp:>6} comp. "
-                      f"(abstencao {total_abs:.1f}%)")
+                      f"(abstenção {total_abs:.1f}%)")
             print()
 
         # Biometria por UF
@@ -568,7 +573,7 @@ class BatchAnalyzer:
                 dados = bio_pct[uf]
                 print(
                     f"  {uf.upper()}: biometria {dados['pct_biometria']:.1f}%, "
-                    f"codigo {dados['pct_codigo']:.1f}%"
+                    f"código {dados['pct_codigo']:.1f}%"
                 )
             print()
 
@@ -579,10 +584,10 @@ class BatchAnalyzer:
             avg_dur = sum(duracoes) / len(duracoes)
             min_dur = min(duracoes)
             max_dur = max(duracoes)
-            print("--- Timing de Votacao ---")
-            print(f"  Duracao media: {avg_dur:.0f} min ({avg_dur/60:.1f}h)")
-            print(f"  Menor duracao: {min_dur} min ({min_dur/60:.1f}h)")
-            print(f"  Maior duracao: {max_dur} min ({max_dur/60:.1f}h)")
+            print("--- Duração da votação ---")
+            print(f"  Duração média: {avg_dur:.0f} min ({avg_dur/60:.1f}h)")
+            print(f"  Menor duração: {min_dur} min ({min_dur/60:.1f}h)")
+            print(f"  Maior duração: {max_dur} min ({max_dur/60:.1f}h)")
             print()
 
         # Votos por candidato (Presidente), separados por turno
@@ -591,7 +596,7 @@ class BatchAnalyzer:
             cands = por_escopo.get("BR", {}).get("Presidente")
             if not cands:
                 continue
-            print(f"--- Votacao para Presidente ({turno}o turno) ---")
+            print(f"--- Votação para Presidente ({turno}º turno) ---")
             totais = votacao.get("totais_por_cargo", {}).get(turno, {}).get("Presidente", {})
             if totais:
                 print(
@@ -607,11 +612,11 @@ class BatchAnalyzer:
                     f"  Candidato {cand['codigo']} "
                     f"(partido {cand['partido']}): "
                     f"{cand['votos']} votos ({pct:.1f}%) "
-                    f"[{cand['secoes']} secoes]"
+                    f"[{cand['secoes']} seções]"
                 )
             print()
 
-        # Detalhes das inconsistencias
+        # Detalhes das inconsistências
         issues = results.get("issues", [])
         if issues:
             # Agrupar por severidade
@@ -621,23 +626,23 @@ class BatchAnalyzer:
             infos = [i for i in issues if i.get("severidade") == "informativa"]
 
             if criticas:
-                print("--- INCONSISTENCIAS CRITICAS ---")
+                print("--- INCONSISTÊNCIAS CRÍTICAS ---")
                 for issue in criticas:
                     self._print_issue(issue)
                 print()
 
             if altas:
-                print("--- INCONSISTENCIAS ALTAS ---")
+                print("--- INCONSISTÊNCIAS ALTAS ---")
                 for issue in altas:
                     self._print_issue(issue)
                 print()
 
             if medias:
-                print("--- INCONSISTENCIAS MEDIAS ---")
+                print("--- INCONSISTÊNCIAS MÉDIAS ---")
                 for issue in medias[:20]:
                     self._print_issue(issue)
                 if len(medias) > 20:
-                    print(f"  ... e mais {len(medias) - 20} inconsistencias medias")
+                    print(f"  ... e mais {len(medias) - 20} inconsistências médias")
                 print()
 
             if infos:

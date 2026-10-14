@@ -197,6 +197,8 @@ def tab_veredicto(store, f):
         )
     """, f["params"])
 
+    hashes_verificados = bool(analysis.hash_verification_status(store)["verificado"])
+
     col1, col2 = st.columns(2)
 
     with col1:
@@ -207,6 +209,9 @@ def tab_veredicto(store, f):
         hash_issues = issues_voto[issues_voto["codigo"] == "C01"]["total"].sum() if not issues_voto.empty else 0
         if hash_issues > 0:
             riscos.append(("CRÍTICO", f"{int(hash_issues)} arquivo(s) com hash SHA-512 inválido (possível adulteração)"))
+        elif not hashes_verificados:
+            riscos.append(("NÃO VERIFICADO", "Hashes SHA-512 não verificados nesta base: "
+                           "a integridade dos arquivos não foi avaliada"))
         else:
             riscos.append(("OK", "Nenhum hash inválido detectado: integridade dos arquivos preservada"))
 
@@ -344,6 +349,7 @@ def tab_veredicto(store, f):
         veredicto_votos = confidence_data.get("veredicto_votos", "")
         veredicto_auditoria = confidence_data.get("veredicto_auditoria", "")
         justificativa = confidence_data.get("justificativa", "")
+        nota_integridade = confidence_data.get("nota_integridade")
 
         # Classificação visual
         if score >= 85:
@@ -360,6 +366,8 @@ def tab_veredicto(store, f):
         st.markdown(f"#### Confiança na Integridade: **{fmt_num(score, 0)}/100** ({nivel_conf})")
         st.progress(min(100, max(0, int(score))) / 100)
         getattr(st, cor_conf)(f"**{veredicto}**")
+        if nota_integridade:
+            st.info(f"**Integridade de hash não verificada.** {nota_integridade}")
 
         # Categorias de risco individuais
         if categorias:
@@ -368,9 +376,15 @@ def tab_veredicto(store, f):
             for idx, cat in enumerate(categorias):
                 cat_name = cat.get("nome", f"Categoria {idx + 1}")
                 cat_score_val = cat.get("score", 0)
+                col_idx = idx % min(len(categorias), 4)
+                if cat_score_val is None:  # componente não avaliado: sem score
+                    with cat_cols[col_idx]:
+                        st.metric(cat_name, "Não verificado")
+                        if cat.get("detalhe"):
+                            st.caption(cat["detalhe"])
+                    continue
                 if not isinstance(cat_score_val, (int, float)):
                     cat_score_val = 0
-                col_idx = idx % min(len(categorias), 4)
                 with cat_cols[col_idx]:
                     if cat_score_val >= 85:
                         cat_color = "normal"
@@ -413,8 +427,12 @@ def tab_veredicto(store, f):
                 f"Desvio de {fmt_num(max(desvio_lula, desvio_bolso), 2)} p.p. em relação ao resultado oficial"
             )
 
-        # Fator 2: Hashes
-        if hash_issues == 0:
+        # Fator 2: Hashes (sem verificação SHA-512, nada a afirmar nem a pontuar)
+        if hash_issues == 0 and not hashes_verificados:
+            motivos_risco.append(
+                "Hashes SHA-512 não verificados nesta base: integridade dos arquivos não avaliada"
+            )
+        elif hash_issues == 0:
             motivos_ok.append("Integridade de arquivos verificada: nenhum hash corrompido")
         else:
             score -= 30

@@ -1,4 +1,4 @@
-"""Camada de persistencia DuckDB para dados eleitorais."""
+"""Camada de persistência DuckDB para dados eleitorais."""
 
 import logging
 from collections.abc import Callable, Iterable
@@ -8,6 +8,7 @@ from typing import Optional
 import duckdb
 
 from ..config import DB_DIR, RAW_DIR, TIMEZONE_OFFSETS  # noqa: F401 (reexport legado)
+from . import metadados as _meta
 from .rows import SECOES_COLUMNS, UF_REGIAO, SectionRows, extract_rows
 
 logger = logging.getLogger(__name__)
@@ -26,7 +27,7 @@ _UPSERT_SECAO_SQL = (
 
 
 class DuckDBStore:
-    """Gerencia persistencia e consultas em DuckDB."""
+    """Gerencia persistência e consultas em DuckDB."""
 
     def __init__(self, db_path: Path = DEFAULT_DB_PATH, read_only: bool = False):
         db_path = Path(db_path)
@@ -125,6 +126,7 @@ class DuckDBStore:
 
             CREATE SEQUENCE IF NOT EXISTS issue_seq START 1;
         """)
+        self._conn.execute(_meta.DDL)
 
     def clear(self):
         """Limpa todos os dados (para rebuild)."""
@@ -132,6 +134,7 @@ class DuckDBStore:
         self._conn.execute("DELETE FROM issues")
         self._conn.execute("DELETE FROM totais_cargo")
         self._conn.execute("DELETE FROM secoes")
+        self._conn.execute(f"DELETE FROM {_meta.TABELA}")  # o flag vale para os dados apagados
         self._conn.execute("DROP SEQUENCE IF EXISTS issue_seq")
         self._conn.execute("CREATE SEQUENCE issue_seq START 1")
 
@@ -140,25 +143,25 @@ class DuckDBStore:
     # ============================================================
 
     def existing_ids(self) -> set[str]:
-        """IDs de secoes ja presentes no banco."""
+        """IDs de seções já presentes no banco."""
         return {r[0] for r in self._conn.execute("SELECT id FROM secoes").fetchall()}
 
     def insert_rows(self, batch: Iterable[SectionRows]) -> int:
-        """Insere (ou substitui) um lote de secoes em uma unica transacao.
+        """Insere (ou substitui) um lote de seções em uma única transação.
 
-        Idempotente: se uma secao ja existe, suas linhas filhas (votos,
-        issues, totais_cargo) sao apagadas antes da reinsercao, e a linha
-        em secoes e atualizada no lugar (sem violar as FKs).
+        Idempotente: se uma seção já existe, suas linhas filhas (votos,
+        issues, totais_cargo) são apagadas antes da reinserção, e a linha
+        em seções e atualizada no lugar (sem violar as FKs).
         Em caso de erro, o lote inteiro e desfeito.
 
         Returns:
-            Quantidade de secoes gravadas.
+            Quantidade de seções gravadas.
         """
         batch = list(batch)
         if not batch:
             return 0
 
-        # Ultima ocorrencia vence se o mesmo id aparecer duas vezes no lote
+        # Última ocorrência vence se o mesmo id aparecer duas vezes no lote
         by_id = {rows.secao_id: rows for rows in batch}
         ids = list(by_id)
 
@@ -216,7 +219,7 @@ class DuckDBStore:
         Args:
             analyzer: BatchAnalyzer.
             bu_files: arquivos BU a processar.
-            batch_size: secoes por transacao.
+            batch_size: seções por transação.
             skip_ids: secao_ids a pular ANTES do parse (modo incremental).
             progress: callback(processados, gravados, erros).
 
@@ -253,34 +256,76 @@ class DuckDBStore:
             progress(processados, gravados, erros)
         return gravados, erros
 
-    def build_from_raw(self, raw_dir: Path = RAW_DIR, batch_size: int = 500) -> int:
+    # ============================================================
+    # Metadados de construção
+    # ============================================================
+    def metadados(self) -> dict[str, str]:
+        """Metadados de construção gravados no banco (vazio se ausentes)."""
+        return _meta.ler_metadados(self._conn)
+
+    def hashes_verificados(self) -> Optional[bool]:
+        """True/False conforme registrado; None se o banco não registrou."""
+        return _meta.texto_para_bool(self.metadados().get(_meta.CHAVE_VERIFY_HASHES))
+
+    def registrar_verificacao_hashes(
+        self,
+        verificado: bool,
+        incremental: bool = False,
+        secoes_anteriores: int = 0,
+        origem: str = "raw",
+    ) -> bool:
+        """Registra se a verificação SHA-512 foi executada na construção.
+
+        Em modo incremental, o banco só conta como verificado se a carga atual
+        verificou E o registro anterior também, ou se não havia seções antes da
+        carga (``secoes_anteriores``): uma base mista não pode ser apresentada
+        como integralmente verificada.
+
+        Returns:
+            o valor efetivamente gravado.
+        """
+        efetivo = bool(verificado)
+        if incremental and efetivo and secoes_anteriores > 0:
+            efetivo = self.hashes_verificados() is True
+        _meta.gravar_verificacao_hashes(self._conn, efetivo, origem)
+        return efetivo
+
+    def build_from_raw(
+        self, raw_dir: Path = RAW_DIR, batch_size: int = 500, verify_hashes: bool = False,
+    ) -> int:
         """Popula o banco do zero re-analisando todos os dados brutos."""
         from ..analyzer.batch import BatchAnalyzer
 
         self.clear()
-        analyzer = BatchAnalyzer(raw_dir=raw_dir)
+        analyzer = BatchAnalyzer(raw_dir=raw_dir, verify_hashes=verify_hashes)
         bu_files = analyzer.find_bu_files()
         logger.info("Processando %d arquivos BU para DuckDB...", len(bu_files))
         _, erros = self.build_from_bu_files(analyzer, bu_files, batch_size=batch_size)
+        self.registrar_verificacao_hashes(analyzer.verify_hashes)
 
         count, t1, t2 = self._contagem_turnos()
-        logger.info("DuckDB populado: %d secoes (1T: %d, 2T: %d, %d erros)",
+        logger.info("DuckDB populado: %d seções (1T: %d, 2T: %d, %d erros)",
                     count, t1, t2, erros)
         return count
 
-    def build_incremental(self, raw_dir: Path = RAW_DIR, batch_size: int = 500) -> int:
-        """Compila apenas BUs novos (nao presentes no banco), sem reparsear os demais."""
+    def build_incremental(
+        self, raw_dir: Path = RAW_DIR, batch_size: int = 500, verify_hashes: bool = False,
+    ) -> int:
+        """Compila apenas BUs novos (não presentes no banco), sem reparsear os demais."""
         from ..analyzer.batch import BatchAnalyzer
 
         existing = self.existing_ids()
-        logger.info("DuckDB tem %d secoes existentes", len(existing))
-        analyzer = BatchAnalyzer(raw_dir=raw_dir)
+        logger.info("DuckDB tem %d seções existentes", len(existing))
+        analyzer = BatchAnalyzer(raw_dir=raw_dir, verify_hashes=verify_hashes)
         bu_files = analyzer.find_bu_files()
         gravados, erros = self.build_from_bu_files(
             analyzer, bu_files, batch_size=batch_size, skip_ids=existing,
         )
+        self.registrar_verificacao_hashes(
+            analyzer.verify_hashes, incremental=True, secoes_anteriores=len(existing),
+        )
         count, t1, t2 = self._contagem_turnos()
-        logger.info("DuckDB incremental: +%d secoes (%d erros). Total: %d (1T: %d, 2T: %d)",
+        logger.info("DuckDB incremental: +%d seções (%d erros). Total: %d (1T: %d, 2T: %d)",
                     gravados, erros, count, t1, t2)
         return count
 
@@ -300,11 +345,11 @@ class DuckDBStore:
             analyzer = BatchAnalyzer()
         secao_id = analyzer.secao_id_for(bu_file)
         if not secao_id:
-            logger.warning("Nao foi possivel derivar secao_id de %s", bu_file)
+            logger.warning("Não foi possível derivar secao_id de %s", bu_file)
         return secao_id
 
     def _process_section(self, analyzer, section_dir: Path, bu_file: Optional[Path] = None):
-        """Processa uma secao e grava no DuckDB (uma transacao)."""
+        """Processa uma seção e grava no DuckDB (uma transação)."""
         result = analyzer.analyze_section(section_dir, bu_file=bu_file)
         self.insert_rows([extract_rows(result)])
 
@@ -323,7 +368,7 @@ class DuckDBStore:
         return self._conn.execute(sql, params or []).fetchdf()
 
     def get_summary(self) -> dict:
-        """Resumo geral para a pagina principal do BI (uma consulta por tabela)."""
+        """Resumo geral para a página principal do BI (uma consulta por tabela)."""
         row = self._conn.execute("""
             SELECT
                 COUNT(*),
@@ -348,7 +393,7 @@ class DuckDBStore:
         }
 
     def get_filter_options(self) -> dict:
-        """Opcoes disponiveis para filtros do dashboard."""
+        """Opções disponíveis para filtros do dashboard."""
         return {
             "turnos": [r[0] for r in self._conn.execute("SELECT DISTINCT turno FROM secoes ORDER BY turno").fetchall()],
             "ufs": [r[0] for r in self._conn.execute("SELECT DISTINCT uf FROM secoes ORDER BY uf").fetchall()],

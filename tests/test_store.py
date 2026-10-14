@@ -94,3 +94,36 @@ def test_colunas_alinhadas_ao_schema(store):
         "SELECT column_name FROM information_schema.columns "
         "WHERE table_name = 'secoes' ORDER BY ordinal_position")]
     assert tuple(cols) == SECOES_COLUMNS
+
+
+def test_build_registra_hashes_nao_verificados(store, raw_tree):
+    assert store.hashes_verificados() is None  # banco novo, nada registrado
+    store.build_from_raw(raw_dir=raw_tree)
+    assert store.hashes_verificados() is False
+    meta = store.metadados()
+    assert meta["verify_hashes"] == "false"
+    assert meta["origem"] == "raw"
+    assert meta["atualizado_em"]
+
+
+def test_build_registra_hashes_verificados(store, raw_tree):
+    store.build_from_raw(raw_dir=raw_tree, verify_hashes=True)
+    assert store.hashes_verificados() is True
+
+
+def test_clear_apaga_flag_de_hash(store, raw_tree):
+    store.build_from_raw(raw_dir=raw_tree, verify_hashes=True)
+    store.clear()
+    assert store.hashes_verificados() is None
+
+
+def test_incremental_misto_nao_conta_como_verificado(store, raw_tree):
+    store.build_from_raw(raw_dir=raw_tree)  # base sem verificação
+    store.build_incremental(raw_dir=raw_tree, verify_hashes=True)
+    assert store.hashes_verificados() is False
+    # Banco vazio + incremental verificado: toda a base foi verificada
+    store.clear()
+    store.build_incremental(raw_dir=raw_tree, verify_hashes=True)
+    assert store.hashes_verificados() is True
+    # Base verificada + carga incremental sem verificação: deixa de ser verificada
+    assert store.registrar_verificacao_hashes(False, incremental=True, secoes_anteriores=3) is False

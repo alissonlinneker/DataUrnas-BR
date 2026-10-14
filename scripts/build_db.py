@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-"""Reconstroi o banco DuckDB a partir dos arquivos Parquet distribuidos.
+"""Reconstrói o banco DuckDB a partir dos arquivos Parquet distribuídos.
 
-O banco e montado em um arquivo temporario e publicado com os.replace, de
-modo que uma execucao concorrente ou interrompida nunca deixa um banco pela
+O banco e montado em um arquivo temporário e publicado com os.replace, de
+modo que uma execução concorrente ou interrompida nunca deixa um banco pela
 metade no caminho final.
 
 Depois da importação, o script cria as tabelas agregadas do dashboard
 (``agg_*``, ver ``dataurnas.dashboard.aggregates``). Elas evitam varrer os 72
 milhões de votos a cada primeira carga das páginas (Benford, votação etc.).
 
+A tabela ``metadados`` registra se os dados passaram pela verificação de
+hashes SHA-512 (``verify_hashes``). O valor vem de ``metadados.parquet``,
+quando distribuído junto; sem ele, o banco é marcado como NÃO verificado, a
+menos que ``--hashes-verificados`` seja informado (use só se os Parquet vieram
+de uma compilação com ``dataurnas db build --hashes``). O dashboard usa esse
+flag para não apresentar a integridade de hash como avaliada sem que tenha sido.
+
 Uso:
     python scripts/build_db.py            # banco principal + copia "live"
     python scripts/build_db.py --no-live  # apenas o banco principal (imagem Docker)
+    python scripts/build_db.py --hashes-verificados  # Parquet de base verificada
 """
 
 import argparse
@@ -28,6 +36,8 @@ if str(PROJECT_ROOT / "src") not in sys.path:  # execução sem o pacote instala
     sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from dataurnas.dashboard.aggregates import create_aggregates  # noqa: E402
+from dataurnas.database import metadados as _meta  # noqa: E402
+
 PARQUET_DIR = PROJECT_ROOT / "data" / "parquet"
 DB_DIR = PROJECT_ROOT / "data" / "db"
 DB_PATH = DB_DIR / "eleicoes_2022.duckdb"
@@ -44,15 +54,37 @@ def _import(conn, table: str, files: list[Path]) -> int:
     return conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
 
 
-def build(live: bool = True) -> Path:
+def _gravar_metadados(conn, hashes_verificados: bool | None) -> bool:
+    """Importa metadados.parquet (se houver) e fixa o flag verify_hashes.
+
+    Returns:
+        o valor de verify_hashes gravado.
+    """
+    meta_pq = PARQUET_DIR / "metadados.parquet"
+    if meta_pq.exists():
+        conn.execute(_meta.DDL)
+        conn.execute(
+            f"INSERT INTO {_meta.TABELA} (chave, valor) "
+            "SELECT CAST(chave AS VARCHAR), CAST(valor AS VARCHAR) FROM read_parquet(?)",
+            [str(meta_pq)],
+        )
+    if hashes_verificados is None:
+        registrado = _meta.texto_para_bool(
+            _meta.ler_metadados(conn).get(_meta.CHAVE_VERIFY_HASHES))
+        hashes_verificados = bool(registrado)
+    _meta.gravar_verificacao_hashes(conn, hashes_verificados, origem="parquet")
+    return hashes_verificados
+
+
+def build(live: bool = True, hashes_verificados: bool | None = None) -> Path:
     if not PARQUET_DIR.exists():
-        print(f"ERRO: Diretorio {PARQUET_DIR} nao encontrado.")
-        print("Certifique-se de que os arquivos Parquet estao em data/parquet/")
+        print(f"ERRO: Diretório {PARQUET_DIR} não encontrado.")
+        print("Certifique-se de que os arquivos Parquet estão em data/parquet/")
         sys.exit(1)
 
     for f in REQUIRED:
         if not (PARQUET_DIR / f).exists():
-            print(f"ERRO: Arquivo obrigatorio nao encontrado: {f}")
+            print(f"ERRO: Arquivo obrigatório não encontrado: {f}")
             sys.exit(1)
 
     votos_files = sorted(PARQUET_DIR.glob("votos_*.parquet"))
@@ -86,6 +118,9 @@ def build(live: bool = True) -> Path:
             n = _import(conn, table, files)
             print(f"    {n:,} linhas")
 
+        verificado = _gravar_metadados(conn, hashes_verificados)
+        print(f"  Hashes SHA-512 verificados: {'sim' if verificado else 'não'}")
+
         print("  Criando tabelas agregadas do dashboard...", flush=True)
         t_agg = time.time()
         for name, n in create_aggregates(conn).items():
@@ -111,7 +146,7 @@ def build(live: bool = True) -> Path:
         LIVE_PATH.unlink(missing_ok=True)
 
     elapsed = time.time() - start
-    print(f"\nBanco construido com sucesso em {elapsed:.1f}s")
+    print(f"\nBanco construído com sucesso em {elapsed:.1f}s")
     print(f"  Principal: {DB_PATH} ({DB_PATH.stat().st_size / 1e9:.1f} GB)")
     if live:
         print(f"  Live:      {LIVE_PATH}")
@@ -119,8 +154,11 @@ def build(live: bool = True) -> Path:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Reconstroi o DuckDB a partir dos Parquet")
+    parser = argparse.ArgumentParser(description="Reconstrói o DuckDB a partir dos Parquet")
     parser.add_argument("--no-live", action="store_true",
-                        help="Nao criar a copia eleicoes_2022_live.duckdb")
+                        help="Não criar a cópia eleicoes_2022_live.duckdb")
+    parser.add_argument("--hashes-verificados", action="store_true", default=None,
+                        help="Declarar que os Parquet vêm de uma compilação com "
+                             "verificação SHA-512 (padrão: metadados.parquet ou não verificado)")
     args = parser.parse_args()
-    build(live=not args.no_live)
+    build(live=not args.no_live, hashes_verificados=args.hashes_verificados)

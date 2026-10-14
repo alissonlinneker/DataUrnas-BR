@@ -9,6 +9,7 @@ from pathlib import Path
 
 import click
 
+from . import __version__
 from .config import ESTADOS, JSON_DIR
 from .downloader.client import TSEClient
 from .downloader.tse_api import TSEApi
@@ -28,6 +29,7 @@ def setup_logging(verbose: bool = False):
 
 
 @click.group()
+@click.version_option(__version__, prog_name="dataurnas", message="%(prog)s %(version)s")
 @click.option("-v", "--verbose", is_flag=True, help="Modo verboso")
 def main(verbose):
     """DataUrnas-BR: Auditoria dos dados eleitorais brasileiros."""
@@ -66,7 +68,7 @@ def download_list():
                 click.echo(f"  Data: {pleito.get('dt', '?')}")
                 for eleicao in pleito.get("e", []):
                     click.echo(
-                        f"  Eleicao {eleicao.get('cd', '?')}: {eleicao.get('nm', '?')} "
+                        f"  Eleição {eleicao.get('cd', '?')}: {eleicao.get('nm', '?')} "
                         f"(turno {eleicao.get('t', '?')})"
                     )
                 click.echo()
@@ -79,11 +81,11 @@ _UF_CHOICE = click.Choice(ESTADOS, case_sensitive=False)
 
 @download.command("state")
 @click.argument("uf", type=_UF_CHOICE)
-@click.option("--ciclo", default="ele2022", help="Ciclo eleitoral (default: ele2022)")
-@click.option("--pleito", default="406", help="Codigo do pleito (default: 406 = Pres. 2022 1T)")
+@click.option("--ciclo", default="ele2022", help="Ciclo eleitoral (padrão: ele2022)")
+@click.option("--pleito", default="406", help="Código do pleito (padrão: 406 = Presidente 2022, 1º turno)")
 @click.option("--tipo", multiple=True, help="Tipos de arquivo: bu, rdv, logjez, imgbu, vscmr")
-@click.option("--max-secoes", type=int, default=None, help="Maximo de secoes (amostra)")
-@click.option("--municipio", multiple=True, help="Filtrar por codigo de municipio")
+@click.option("--max-secoes", type=int, default=None, help="Máximo de seções (amostra)")
+@click.option("--municipio", multiple=True, help="Filtrar por código de município")
 def download_state(uf, ciclo, pleito, tipo, max_secoes, municipio):
     """Baixa dados de um estado. Ex: dataurnas download state df"""
 
@@ -108,13 +110,13 @@ def download_state(uf, ciclo, pleito, tipo, max_secoes, municipio):
 
 @download.command("sample")
 @click.option("--ciclo", default="ele2022", help="Ciclo eleitoral")
-@click.option("--pleito", default="406", help="Codigo do pleito")
-@click.option("--secoes", default=20, help="Secoes por estado")
+@click.option("--pleito", default="406", help="Código do pleito")
+@click.option("--secoes", default=20, help="Seções por estado")
 @click.option("--tipo", multiple=True, help="Tipos de arquivo")
 @click.option(
     "--estados",
     default="ac,ce,df,sp,rs",
-    help="Estados separados por virgula",
+    help="Estados separados por vírgula",
 )
 def download_sample(ciclo, pleito, secoes, tipo, estados):
     """Baixa amostra de dados de múltiplos estados."""
@@ -142,7 +144,7 @@ def download_sample(ciclo, pleito, secoes, tipo, estados):
 @download.command("info")
 @click.argument("uf", type=_UF_CHOICE)
 @click.option("--ciclo", default="ele2022", help="Ciclo eleitoral")
-@click.option("--pleito", default="406", help="Codigo do pleito")
+@click.option("--pleito", default="406", help="Código do pleito")
 def download_info(uf, ciclo, pleito):
     """Mostra informações de um estado (municípios, zonas, seções)."""
 
@@ -163,16 +165,16 @@ def download_info(uf, ciclo, pleito):
                 n_secoes = sum(len(z.get("sec", [])) for z in mun.get("zon", []))
                 click.echo(
                     f"  {mun['cd']} {mun['nm']}: "
-                    f"{len(mun.get('zon', []))} zonas, {n_secoes} secoes"
+                    f"{len(mun.get('zon', []))} zonas, {n_secoes} seções"
                 )
             if len(state.municipios) > 20:
-                click.echo(f"  ... e mais {len(state.municipios) - 20} municipios")
+                click.echo(f"  ... e mais {len(state.municipios) - 20} municípios")
 
     asyncio.run(_run())
 
 
 # ============================================================
-# Comandos de analise
+# Comandos de análise
 # ============================================================
 
 @main.group()
@@ -195,14 +197,14 @@ def analyze_bu(path, raw):
         return
 
     bu = parser.parse(file_path)
-    click.echo(f"Municipio: {bu.municipio} | Zona: {bu.zona} | Secao: {bu.secao}")
+    click.echo(f"Município: {bu.municipio} | Zona: {bu.zona} | Seção: {bu.secao}")
     click.echo(f"Modelo: {bu.modelo_urna} | Fase: {bu.fase.name}")
-    click.echo(f"Emissao: {bu.data_hora_emissao}")
+    click.echo(f"Emissão: {bu.data_hora_emissao}")
     click.echo(f"Spec: {bu.spec_version.value}")
     click.echo()
 
     for eleicao in bu.resultados_por_eleicao:
-        click.echo(f"Eleicao {eleicao.id_eleicao}: {eleicao.eleitores_aptos} eleitores aptos")
+        click.echo(f"Eleição {eleicao.id_eleicao}: {eleicao.eleitores_aptos} eleitores aptos")
         for resultado in eleicao.resultados:
             click.echo(f"  {resultado.nome_cargo} (comparecimento: {resultado.comparecimento})")
             for voto in resultado.votos:
@@ -215,7 +217,7 @@ def analyze_bu(path, raw):
                     click.echo(f"    {voto.tipo_voto.value.upper()}: {voto.quantidade}")
         click.echo()
 
-    # Analise de consistencia
+    # Análise de consistência
     analyzer = ConsistencyAnalyzer()
     issues = analyzer.full_analysis(bu)
     if issues:
@@ -343,17 +345,22 @@ def db():
 @db.command("build")
 @click.option("--incremental", is_flag=True, help="Compilar apenas seções ainda ausentes")
 @click.option("--batch-size", default=500, show_default=True, help="Seções por transação")
-def db_build(incremental, batch_size):
+@click.option("--hashes/--no-hashes", default=False, show_default=True,
+              help="Verificar hashes SHA-512 de cada seção (lento). O resultado fica "
+                   "registrado na tabela metadados (verify_hashes).")
+def db_build(incremental, batch_size, hashes):
     """Compila todos os dados brutos em DuckDB."""
     from .database.duckdb_store import DuckDBStore
 
     click.echo("Compilando dados para DuckDB...")
     with DuckDBStore() as store:
         if incremental:
-            count = store.build_incremental(batch_size=batch_size)
+            count = store.build_incremental(batch_size=batch_size, verify_hashes=hashes)
         else:
-            count = store.build_from_raw(batch_size=batch_size)
+            count = store.build_from_raw(batch_size=batch_size, verify_hashes=hashes)
         click.echo(f"Banco compilado: {count} seções")
+        verificado = store.hashes_verificados()
+        click.echo(f"  Hashes SHA-512 verificados: {'sim' if verificado else 'não'}")
         summary = store.get_summary()
         click.echo(f"  Eleitores: {summary['total_eleitores']}")
         click.echo(f"  Comparecimento: {summary['total_comparecimento']}")

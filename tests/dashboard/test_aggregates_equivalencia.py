@@ -27,6 +27,7 @@ import legacy_analysis as legacy  # noqa: E402
 from dataurnas.dashboard import aggregates  # noqa: E402
 from dataurnas.dashboard import analysis as novo  # noqa: E402
 from dataurnas.dashboard.filters import Filters  # noqa: E402
+from dataurnas.database import metadados  # noqa: E402
 
 SCHEMA = ROOT / "data" / "parquet" / "schema.sql"
 
@@ -136,7 +137,9 @@ def _dados_sinteticos(seed: int = 7) -> dict[str, pd.DataFrame]:
     }
 
 
-def _montar_banco(path: Path, dados: dict, com_agregados: bool) -> None:
+def _montar_banco(path: Path, dados: dict, com_agregados: bool,
+                  hashes_verificados: bool | None = None) -> None:
+    """Monta o banco; ``hashes_verificados`` None = sem tabela metadados (base antiga)."""
     conn = duckdb.connect(str(path))
     for stmt in SCHEMA.read_text(encoding="utf-8").split(";;"):
         if stmt.strip():
@@ -148,6 +151,8 @@ def _montar_banco(path: Path, dados: dict, com_agregados: bool) -> None:
         conn.unregister("df_tmp")
     if com_agregados:
         aggregates.create_aggregates(conn)
+    if hashes_verificados is not None:
+        metadados.gravar_verificacao_hashes(conn, hashes_verificados, origem="teste")
     conn.close()
 
 
@@ -425,3 +430,125 @@ def test_filtro_legado_em_dict_usa_fonte_bruta(stores):
          "issue_where": "1=1", "issue_params": [], "turno": None}
     _assert_equal(novo.benford_all_offices(com, f), legacy.benford_all_offices(sem, f), "dict")
     _assert_equal(novo.benford_first_digit(com, f), legacy.benford_first_digit(sem, f), "dict")
+
+
+# ----------------------------------------------------------------------
+# Integridade de hash: base verificada x não verificada
+# ----------------------------------------------------------------------
+# A base sintética padrão tem issues C01, logo é inferida como verificada
+# (só a verificação SHA-512 gera C01/E01) e os testes acima cobrem o caminho
+# "verificado". As bases abaixo não têm C01/E01, como a base real de 2022.
+def _sem_c01(dados: dict) -> dict:
+    dados = dict(dados)
+    iss = dados["issues"]
+    dados["issues"] = iss[~iss["codigo"].isin(["C01", "E01"])].reset_index(drop=True)
+    return dados
+
+
+@pytest.fixture(scope="module")
+def bases_hash(tmp_path_factory):
+    """Bancos sem C01: sem metadados (com/sem agregados), flag false e flag true."""
+    pasta = tmp_path_factory.mktemp("hash")
+    dados = _sem_c01(_dados_sinteticos())
+    specs = {
+        "ausente_agg": (True, None),
+        "ausente_bruto": (False, None),
+        "false_agg": (True, False),
+        "true_agg": (True, True),
+    }
+    lojas = {}
+    for nome, (agg, flag) in specs.items():
+        _montar_banco(pasta / f"{nome}.duckdb", dados, com_agregados=agg, hashes_verificados=flag)
+        lojas[nome] = Store(pasta / f"{nome}.duckdb")
+    # Base com C01 mas flag false: o metadado é autoritativo para o status
+    _montar_banco(pasta / "c01_false.duckdb", _dados_sinteticos(), com_agregados=True,
+                  hashes_verificados=False)
+    lojas["c01_false"] = Store(pasta / "c01_false.duckdb")
+    yield lojas
+    for loja in lojas.values():
+        loja.conn.close()
+
+
+def _cat_hash(res: dict) -> dict:
+    return next(c for c in res["categorias"] if c["nome"].startswith("Integridade hash"))
+
+
+def _media_ponderada(categorias: list[dict]) -> float:
+    avaliadas = [c for c in categorias if c["score"] is not None]
+    return sum(c["score"] * c["peso"] for c in avaliadas) / sum(c["peso"] for c in avaliadas)
+
+
+def test_status_de_verificacao_de_hash(stores, bases_hash):
+    com, _ = stores
+    assert novo.hash_verification_status(com) == {"verificado": True, "fonte": "issues"}
+    assert novo.hash_verification_status(bases_hash["ausente_agg"]) == {
+        "verificado": False, "fonte": "ausente"}
+    assert novo.hash_verification_status(bases_hash["false_agg"]) == {
+        "verificado": False, "fonte": "metadados"}
+    assert novo.hash_verification_status(bases_hash["true_agg"]) == {
+        "verificado": True, "fonte": "metadados"}
+    assert novo.hash_verification_status(bases_hash["c01_false"]) == {
+        "verificado": False, "fonte": "metadados"}
+
+
+@pytest.mark.parametrize("base", ["ausente_agg", "false_agg"])
+@pytest.mark.parametrize("filtro", ["sem_filtro", "turno1", "municipio"])
+def test_score_nao_verificado_exclui_hash_e_renormaliza(bases_hash, base, filtro):
+    f = FILTROS[filtro]
+    res = novo.compute_confidence_score(bases_hash[base], f)
+    cat = _cat_hash(res)
+    assert cat["score"] is None
+    assert cat["status"] == "NAO_VERIFICADO"
+    assert cat["peso"] == 25
+    assert "Não verificado" in cat["detalhe"]
+    assert res["hashes_verificados"] is False
+    assert res["nota_integridade"] == novo.NOTA_HASH_NAO_VERIFICADO
+    assert "renormalizados" in res["justificativa"]
+
+    # Renormalização: média dos 6 componentes restantes (pesos somam 75)
+    outras = [c for c in res["categorias"] if c is not cat]
+    assert sum(c["peso"] for c in outras) == 75
+    esperado = sum(c["score"] * c["peso"] for c in outras) / 75
+    assert res["score"] == pytest.approx(round(esperado, 1), abs=1e-9)
+    assert 0.0 <= res["score"] <= 100.0
+
+    # Os demais componentes não mudam com a verificação
+    verif = novo.compute_confidence_score(bases_hash["true_agg"], f)
+    assert [c for c in verif["categorias"] if c["nome"] != cat["nome"]] == outras
+
+
+@pytest.mark.parametrize("filtro", ["sem_filtro", "turno1", "municipio"])
+def test_score_verificado_mantem_formula_original(bases_hash, filtro):
+    f = FILTROS[filtro]
+    res = novo.compute_confidence_score(bases_hash["true_agg"], f)
+    cat = _cat_hash(res)
+    assert cat == {"nome": "Integridade hash (C01)", "score": 100.0, "peso": 25,
+                   "status": "OK", "detalhe": "Nenhum hash SHA-512 inválido detectado."}
+    assert res["hashes_verificados"] is True
+    assert res["nota_integridade"] is None
+    # Fórmula original: média ponderada dos 7 componentes com pesos somando 100
+    assert sum(c["peso"] for c in res["categorias"]) == 100
+    original = sum(c["score"] * c["peso"] for c in res["categorias"]) / 100
+    assert res["score"] == pytest.approx(round(original, 1), abs=1e-9)
+    assert res["score"] == pytest.approx(round(_media_ponderada(res["categorias"]), 1), abs=1e-9)
+
+
+def test_c01_existente_pontua_mesmo_com_flag_false(bases_hash):
+    res = novo.compute_confidence_score(bases_hash["c01_false"], FILTROS["sem_filtro"])
+    cat = _cat_hash(res)
+    assert cat["status"] == "CRITICO"
+    assert isinstance(cat["score"], float)
+    assert any("C01" in v for v in res["vulnerabilidades"])
+
+
+@pytest.mark.parametrize("filtro", ["sem_filtro", "turno1", "municipio", "issues"])
+def test_score_nao_verificado_igual_com_e_sem_agregados(bases_hash, filtro):
+    f = FILTROS[filtro]
+    _assert_equal(novo.compute_confidence_score(bases_hash["ausente_agg"], f),
+                  novo.compute_confidence_score(bases_hash["ausente_bruto"], f), filtro)
+
+
+def test_relatorio_texto_mostra_hash_nao_verificado(bases_hash):
+    texto = novo.generate_text_report(bases_hash["false_agg"], FILTROS["sem_filtro"])
+    assert "Integridade hash (C01): Não verificado" in texto
+    assert "Nota sobre integridade de hash" in texto

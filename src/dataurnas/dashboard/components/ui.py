@@ -16,7 +16,7 @@ import streamlit as st
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
 LICENCA = "MIT"
-REPO_URL = "https://github.com/alissonlinneker/dataUrnas-br"
+REPO_URL = "https://github.com/alissonlinneker/DataUrnas-BR"
 
 CSS = """
 <style>
@@ -50,13 +50,13 @@ h1, h2, h3 { letter-spacing: -0.01em; }
 .du-hero p { margin: 0; opacity: 0.85; }
 
 /* Cartões de KPI */
-.du-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin: 0.25rem 0 1rem 0; }
+.du-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 0.75rem; margin: 0.25rem 0 1rem 0; }
 .du-kpi { border: 1px solid var(--du-border); background: var(--du-surface); border-radius: 14px;
   padding: 0.75rem 0.9rem; border-left: 5px solid var(--du-blue); min-width: 0; }
 .du-kpi .du-kpi-label { font-size: 0.8rem; font-weight: 600; opacity: 0.8; text-transform: uppercase;
   letter-spacing: 0.04em; white-space: normal; }
-.du-kpi .du-kpi-value { font-size: 1.55rem; font-weight: 700; line-height: 1.25; margin-top: 0.15rem;
-  overflow-wrap: anywhere; }
+.du-kpi .du-kpi-value { font-size: clamp(1.15rem, 1.6vw, 1.55rem); font-weight: 700; line-height: 1.25;
+  margin-top: 0.15rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .du-kpi .du-kpi-help { font-size: 0.82rem; opacity: 0.78; margin-top: 0.1rem; }
 .du-kpi.green { border-left-color: var(--du-green); }
 .du-kpi.amber { border-left-color: var(--du-amber); }

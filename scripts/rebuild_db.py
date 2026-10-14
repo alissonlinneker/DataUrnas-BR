@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Rebuild do banco DuckDB com parser de logs corrigido (turno-aware).
 
-SEGURANCA: Faz backup do banco antes de reconstruir.
-Os dados raw (181 GB, 27 estados) NAO sao alterados.
+SEGURANÇA: Faz backup do banco antes de reconstruir.
+Os dados raw (181 GB, 27 estados) NÃO são alterados.
 
-Correcao: T2 .logjez acumula eventos do T1 (urna nao e limpa entre turnos).
+Correção: T2 .logjez acumula eventos do T1 (urna não e limpa entre turnos).
 O parser agora filtra por turno_date, eliminando:
 - Falsos reboots no T2 (abertura T1 contada como reboot)
 - hora_abertura incorreta no T2 (data do T1)
@@ -46,26 +46,26 @@ def main():
     if total < 900_000:
         logger.error(
             "ABORTANDO: Apenas %d BUs no disco (esperado ~941k). "
-            "Verifique se os dados raw estao intactos em %s",
+            "Verifique se os dados brutos estão intactos em %s",
             total, RAW_DIR,
         )
         sys.exit(1)
 
-    # 2. Backup do banco existente (SEGURANCA)
+    # 2. Backup do banco existente (SEGURANÇA)
     if DEFAULT_DB_PATH.exists():
         logger.info("Fazendo backup: %s -> %s", DEFAULT_DB_PATH.name, BACKUP.name)
         shutil.copy2(str(DEFAULT_DB_PATH), str(BACKUP))
         size_gb = BACKUP.stat().st_size / 1e9
         logger.info("Backup criado com sucesso (%.2f GB)", size_gb)
     else:
-        logger.info("Banco nao existe ainda, pulando backup")
+        logger.info("Banco ainda não existe, pulando backup")
 
-    # 3. Abrir store e limpar tabelas (dados raw no disco sao preservados)
+    # 3. Abrir store e limpar tabelas (dados raw no disco são preservados)
     store = DuckDBStore(DEFAULT_DB_PATH)
     store.clear()
     logger.info("Tabelas do banco limpas. Iniciando rebuild...")
 
-    # 4. Recompilar todas as secoes em lotes transacionais
+    # 4. Recompilar todas as seções em lotes transacionais
     start = time.time()
 
     def progress(processados, gravados, erros):
@@ -81,6 +81,7 @@ def main():
     _, errors = store.build_from_bu_files(
         analyzer, bu_files, batch_size=1000, progress=progress,
     )
+    store.registrar_verificacao_hashes(analyzer.verify_hashes)
 
     # Snapshot para dashboard
     logger.info("Criando snapshot para dashboard...")
@@ -95,7 +96,7 @@ def main():
     t1 = store._conn.execute("SELECT COUNT(*) FROM secoes WHERE turno=1").fetchone()[0]
     t2 = store._conn.execute("SELECT COUNT(*) FROM secoes WHERE turno=2").fetchone()[0]
 
-    # Verificacao rapida do fix
+    # Verificação rápida do fix
     reboots_t2 = store._conn.execute(
         "SELECT COUNT(*) FROM secoes WHERE turno=2 AND reboots > 0"
     ).fetchone()[0]
@@ -106,9 +107,9 @@ def main():
 
     logger.info("=" * 60)
     logger.info("REBUILD COMPLETO em %.1f horas", elapsed / 3600)
-    logger.info("Total: %d secoes (1T: %d, 2T: %d)", count, t1, t2)
+    logger.info("Total: %d seções (1T: %d, 2T: %d)", count, t1, t2)
     logger.info("Erros: %d (de %d tentativas)", errors, total)
-    logger.info("Reboots T2: %d secoes (%.1f%%) - ANTES era ~96%%", reboots_t2, pct_reboot_t2)
+    logger.info("Reboots T2: %d seções (%.1f%%); antes da correção eram ~96%%", reboots_t2, pct_reboot_t2)
     logger.info("=" * 60)
 
     if BACKUP.exists():

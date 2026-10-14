@@ -23,6 +23,11 @@ from scipy import stats
 from dataurnas.dashboard import aggregates as _agg
 from dataurnas.dashboard.reference import ISSUE_DESCRICOES, oficial_resumo
 
+# Incrementar quando o resultado de alguma análise mudar de semântica: o valor
+# entra na chave do cache em disco do dashboard (state._run_analysis).
+# 2: score de confiança passa a tratar hashes não verificados.
+ANALYSIS_CACHE_VERSION = "2"
+
 # ============================================================
 # Constantes
 # ============================================================
@@ -223,8 +228,8 @@ def _benford_cramers_v_score(cramers_v_value):
     """Converte Cramer's V em score (0-100) para o confidence score.
 
     V < 0.05:  conforme     -> score 100
-    V < 0.10:  aceitavel    -> score 75
-    V < 0.20:  atencao      -> score 50
+    V < 0.10:  aceitável    -> score 75
+    V < 0.20:  atenção      -> score 50
     V >= 0.20: não conforme -> score 0
     """
     if cramers_v_value < 0.05:
@@ -1632,7 +1637,8 @@ def null_blank_vs_result(store, f) -> pd.DataFrame:
         total=("total", "sum"),
     ).reset_index()
 
-    result["faixa"] = result["quartil"].map(faixas).fillna("")
+    # astype(str): no pandas 2.x o map de um Categorical devolve Categorical
+    result["faixa"] = result["quartil"].astype(str).map(faixas).fillna("")
     result["pct_lula"] = np.where(
         result["total"] > 0,
         (result["lula"] / result["total"] * 100).round(2),
@@ -2334,7 +2340,7 @@ def section_risk_score(store, secao_id) -> dict:
     Returns:
         dict com:
         - score: int (0-100, onde 100 = mais risco)
-        - nivel: str ('OK' | 'ATENÇÃO' | 'ALTO')
+        - nível: str ('OK' | 'ATENÇÃO' | 'ALTO')
         - detalhes: list de strings
     """
     info_df = store.query_df("""
@@ -2652,11 +2658,11 @@ def generate_excel_report(store, f) -> BytesIO:
     """Gera relatório Excel em memória (BytesIO) com múltiplas planilhas.
 
     Planilhas:
-        - Resumo: KPIs gerais (secoes, votos, reboots, issues, comparecimento)
-        - Por Estado: metricas por UF
-        - Issues: todas as issues (secao_id, codigo, severidade, descricao)
-        - Outliers: secoes outliers (z-score > 3)
-        - Reboots: secoes com reboots > 0
+        - Resumo: KPIs gerais (seções, votos, reboots, issues, comparecimento)
+        - Por Estado: métricas por UF
+        - Issues: todas as issues (secao_id, código, severidade, descrição)
+        - Outliers: seções outliers (z-score > 3)
+        - Reboots: seções com reboots > 0
 
     Returns:
         BytesIO com o arquivo Excel pronto para download.
@@ -2720,7 +2726,7 @@ def generate_excel_report(store, f) -> BytesIO:
             ],
         })
 
-        # Adicionar data/hora de geracao
+        # Adicionar data/hora de geração
         meta = pd.DataFrame({
             "Métrica": ["Data de Geração", "Filtros Aplicados"],
             "Valor": [
@@ -2842,7 +2848,7 @@ def generate_text_report(store, f) -> str:
     """Gera relatório em texto formatado para download como .txt.
 
     Inclui:
-        - Score de confianca e veredicto
+        - Score de confiança e veredicto
         - KPIs resumidos
         - Categorias de risco
         - Top issues
@@ -2861,7 +2867,7 @@ def generate_text_report(store, f) -> str:
     lines.append(sep)
     lines.append("")
 
-    # --- Score de confianca ---
+    # --- Score de confiança ---
     try:
         confidence = compute_confidence_score(store, f)
     except Exception:
@@ -2875,12 +2881,18 @@ def generate_text_report(store, f) -> str:
         justificativa = confidence.get("justificativa", "")
         vulnerabilidades = confidence.get("vulnerabilidades", [])
         categorias = confidence.get("categorias", [])
+        nota_integridade = confidence.get("nota_integridade")
 
         lines.append("1. SCORE DE CONFIANÇA")
         lines.append("-" * 40)
         lines.append(f"   Score: {score:.1f}/100")
         lines.append(f"   Nível: {nivel}")
         lines.append("")
+        if nota_integridade:
+            lines.append("   Nota sobre integridade de hash:")
+            for line in textwrap.wrap(nota_integridade, width=65):
+                lines.append(f"   {line}")
+            lines.append("")
 
         if veredicto_votos:
             lines.append("   Veredicto sobre os votos:")
@@ -2911,7 +2923,8 @@ def generate_text_report(store, f) -> str:
                 peso = cat.get("peso", 0)
                 status = cat.get("status", "?")
                 detalhe = cat.get("detalhe", "")
-                lines.append(f"   [{status:>12s}] {nome}: {cat_score:.0f}/100 (peso {peso}%)")
+                valor = "Não verificado" if cat_score is None else f"{cat_score:.0f}/100"
+                lines.append(f"   [{status:>12s}] {nome}: {valor} (peso {peso}%)")
                 if detalhe:
                     for line in textwrap.wrap(detalhe, width=60):
                         lines.append(f"               {line}")
@@ -3027,6 +3040,55 @@ def generate_text_report(store, f) -> str:
 # 19. Score de Confiança
 # ============================================================
 
+NOTA_HASH_NAO_VERIFICADO = (
+    "A verificação de hashes SHA-512 não foi executada na construção desta base "
+    "(verify_hashes desativado). A ausência de issues C01 não comprova a integridade "
+    "dos arquivos, por isso o componente de integridade de hash aparece como "
+    "\"Não verificado\" e fica fora do score: os pesos dos demais componentes são "
+    "renormalizados para manter a escala de 0 a 100."
+)
+
+
+def hash_verification_status(store) -> dict:
+    """Informa se a base passou pela verificação de hashes SHA-512.
+
+    Ordem de decisão:
+    1. tabela ``metadados`` com a chave ``verify_hashes`` (gravada por
+       ``dataurnas db build`` e ``scripts/build_db.py``): valor autoritativo;
+    2. sem esse registro, a existência de qualquer issue C01 ou E01 na base
+       inteira indica que a verificação rodou (só ela gera esses códigos);
+    3. caso contrário, a base é tratada como NÃO verificada.
+
+    Returns:
+        dict com ``verificado`` (bool) e ``fonte`` ("metadados", "issues"
+        ou "ausente").
+    """
+    try:
+        tem_tabela = store.query_df(
+            "SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_name = 'metadados'"
+        )
+        if not tem_tabela.empty and int(tem_tabela.iloc[0]["n"]) > 0:
+            meta = store.query_df(
+                "SELECT valor FROM metadados WHERE chave = 'verify_hashes'"
+            )
+            if not meta.empty:
+                valor = str(meta.iloc[0]["valor"]).strip().lower()
+                if valor in ("true", "false"):
+                    return {"verificado": valor == "true", "fonte": "metadados"}
+    except Exception:  # store sem information_schema: segue para a inferência
+        pass
+
+    try:
+        n = store.query_df(
+            "SELECT COUNT(*) AS n FROM issues WHERE codigo IN ('C01', 'E01')"
+        )
+        if not n.empty and int(n.iloc[0]["n"]) > 0:
+            return {"verificado": True, "fonte": "issues"}
+    except Exception:
+        pass
+    return {"verificado": False, "fonte": "ausente"}
+
+
 def compute_confidence_score(store, f) -> dict:
     """Calcula score de confiança 0-100 com detalhamento por categoria.
 
@@ -3037,7 +3099,7 @@ def compute_confidence_score(store, f) -> dict:
     Returns:
         dict com:
         - score: float (0-100)
-        - nivel: str (ALTA/MODERADA/BAIXA)
+        - nível: str (ALTA/MODERADA/BAIXA)
         - categorias: list of dicts com {nome, score, peso, status, detalhe}
         - veredicto_votos: str
         - veredicto_auditoria: str
@@ -3129,8 +3191,20 @@ def compute_confidence_score(store, f) -> dict:
     # ----------------------------------------------------------
     # Categoria 1: Integridade de hash (C01)
     # ----------------------------------------------------------
+    # Sem C01 só vale 100 se a verificação SHA-512 rodou; do contrário o
+    # componente fica sem score (None) e sai da média ponderada. Issues C01
+    # existentes contam sempre: são evidência concreta, verificada ou não a
+    # base inteira.
+    hashes_verificados = bool(hash_verification_status(store)["verificado"])
     c01_count = int(issue_counts.get("C01", 0))
-    if c01_count == 0:
+    if c01_count == 0 and not hashes_verificados:
+        cat1_score = None
+        cat1_status = "NAO_VERIFICADO"
+        cat1_detalhe = (
+            "Não verificado: a base foi construída sem verificação de hashes SHA-512; "
+            "componente excluído do score."
+        )
+    elif c01_count == 0:
         cat1_score = 100.0
         cat1_status = "OK"
         cat1_detalhe = "Nenhum hash SHA-512 inválido detectado."
@@ -3142,7 +3216,7 @@ def compute_confidence_score(store, f) -> dict:
 
     categorias.append({
         "nome": "Integridade hash (C01)",
-        "score": round(cat1_score, 1),
+        "score": None if cat1_score is None else round(cat1_score, 1),
         "peso": 25,
         "status": cat1_status,
         "detalhe": cat1_detalhe,
@@ -3436,9 +3510,12 @@ def compute_confidence_score(store, f) -> dict:
     # ----------------------------------------------------------
     # Score ponderado final
     # ----------------------------------------------------------
-    total_peso = sum(c["peso"] for c in categorias)
+    # Componentes sem score (não verificados) saem da média; dividir pela
+    # soma dos pesos avaliados renormaliza os demais para a escala 0-100.
+    avaliadas = [c for c in categorias if c["score"] is not None]
+    total_peso = sum(c["peso"] for c in avaliadas)
     if total_peso > 0:
-        score = sum(c["score"] * c["peso"] for c in categorias) / total_peso
+        score = sum(c["score"] * c["peso"] for c in avaliadas) / total_peso
     else:
         score = 0.0
 
@@ -3509,12 +3586,20 @@ def compute_confidence_score(store, f) -> dict:
     n_criticos = sum(1 for c in categorias if c["status"] == "CRITICO")
     n_altos = sum(1 for c in categorias if c["status"] == "ALTO")
     n_ok = sum(1 for c in categorias if c["status"] == "OK")
+    n_nao_verif = len(categorias) - len(avaliadas)
 
     justificativa_parts = []
-    justificativa_parts.append(
-        f"Score baseado em {len(categorias)} categorias de análise "
-        f"({n_ok} OK, {n_criticos} críticas, {n_altos} altas)."
-    )
+    if n_nao_verif:
+        justificativa_parts.append(
+            f"Score baseado em {len(avaliadas)} de {len(categorias)} categorias de análise "
+            f"({n_ok} OK, {n_criticos} críticas, {n_altos} altas; "
+            f"{n_nao_verif} não verificada, com pesos renormalizados)."
+        )
+    else:
+        justificativa_parts.append(
+            f"Score baseado em {len(categorias)} categorias de análise "
+            f"({n_ok} OK, {n_criticos} críticas, {n_altos} altas)."
+        )
     justificativa_parts.append(
         f"Base de {total_secoes:,} seções "
         f"({total_comp:,} votos, {int(s['ufs'])} UFs)."
@@ -3537,4 +3622,6 @@ def compute_confidence_score(store, f) -> dict:
         "veredicto_auditoria": veredicto_auditoria,
         "justificativa": justificativa,
         "vulnerabilidades": vulnerabilidades,
+        "hashes_verificados": hashes_verificados,
+        "nota_integridade": None if hashes_verificados else NOTA_HASH_NAO_VERIFICADO,
     }

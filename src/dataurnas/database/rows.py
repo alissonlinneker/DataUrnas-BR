@@ -12,7 +12,7 @@ from ..models import TipoVoto
 
 UF_REGIAO: dict[str, str] = {uf: regiao for regiao, ufs in REGIOES.items() for uf in ufs}
 
-# Ordem das colunas da tabela secoes (igual ao CREATE TABLE)
+# Ordem das colunas da tabela seções (igual ao CREATE TABLE)
 SECOES_COLUMNS = (
     "id", "turno", "uf", "regiao", "municipio", "zona", "secao",
     "modelo_urna", "tipo_urna", "versao_sw", "fuso_offset",
@@ -40,7 +40,7 @@ def make_secao_id(turno: int, uf: str, municipio, zona, secao) -> str:
 
 
 def extract_rows(result: dict) -> SectionRows:
-    """Monta as linhas de secoes, issues, votos e totais_cargo.
+    """Monta as linhas de seções, issues, votos e totais_cargo.
 
     Args:
         result: dicionário devolvido por BatchAnalyzer.analyze_section().

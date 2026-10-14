@@ -1,1 +1,1 @@
-"""Modulo de persistencia em banco de dados."""
+"""Módulo de persistência em banco de dados."""

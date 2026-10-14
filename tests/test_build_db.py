@@ -55,8 +55,27 @@ def test_build_db_a_partir_de_parquet(tmp_path, raw_tree, monkeypatch):
     assert set(AGGREGATE_TABLES) <= tabelas
     assert n_pres == 3
 
+    def flag():
+        with DuckDBStore(db_dir / "eleicoes_2022.duckdb", read_only=True) as st:
+            return st.hashes_verificados()
+
+    # Sem metadados.parquet nem declaração: base marcada como não verificada
+    assert "metadados" in tabelas
+    assert flag() is False
+
     mod.build(live=True)  # reexecução substitui o banco sem erro
     assert (db_dir / "eleicoes_2022_live.duckdb").exists()
+
+    mod.build(live=False, hashes_verificados=True)  # declaração explícita
+    assert flag() is True
+
+    # metadados.parquet distribuído junto com os dados prevalece sem declaração
+    con = duckdb.connect()
+    con.execute(f"COPY (SELECT 'verify_hashes' AS chave, 'true' AS valor) "
+                f"TO '{pq / 'metadados.parquet'}' (FORMAT PARQUET)")
+    con.close()
+    mod.build(live=False)
+    assert flag() is True
 
 
 def test_rebuild_parallel_worker_sem_efeito_no_import(raw_tree, tmp_path):
