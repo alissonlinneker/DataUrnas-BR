@@ -5,28 +5,37 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# HF Spaces executa o contêiner com o usuário uid 1000
-RUN useradd --create-home --uid 1000 app
+# HF Spaces executa o contêiner com o usuário uid 1000. O diretório da
+# aplicação já nasce dele, sem chown recursivo depois do build: num chown -R,
+# o overlayfs copia para a camada nova cada arquivo vindo de um COPY anterior
+# (os Parquet seriam duplicados na imagem) e o passo percorre o banco inteiro.
+RUN useradd --create-home --uid 1000 app \
+    && mkdir -p /app/data/db \
+    && chown app:app /app /app/data /app/data/db
 WORKDIR /app
 
 # Dependências primeiro (camada reaproveitada entre builds)
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Código e dados distribuídos (lista explícita; o .dockerignore cobre o resto)
-COPY pyproject.toml README.md ./
-COPY src ./src
-COPY spec ./spec
-COPY scripts/build_db.py ./scripts/build_db.py
-COPY data/parquet ./data/parquet
-COPY .streamlit ./.streamlit
+# Código e dados distribuídos (lista explícita; o .dockerignore cobre o resto).
+# data/parquet inclui agregados/, os agg_* pré-calculados com manifesto: o
+# build só os importa, sem recalcular sobre os 72 milhões de votos.
+COPY --chown=app:app pyproject.toml README.md ./
+COPY --chown=app:app src ./src
+COPY --chown=app:app spec ./spec
+COPY --chown=app:app scripts/build_db.py ./scripts/build_db.py
+COPY --chown=app:app data/parquet ./data/parquet
+COPY --chown=app:app .streamlit ./.streamlit
 
-# Instalação editável: mantém spec/ e data/ resolvidos a partir de /app
-RUN pip install --no-deps -e . \
-    && python scripts/build_db.py --no-live \
-    && chown -R app:app /app
+# Instalação editável (precisa de root para o site-packages): mantém spec/ e
+# data/ resolvidos a partir de /app
+RUN pip install --no-deps -e .
 
+# O banco é gerado já como o usuário final, direto no caminho definitivo
+# (--no-live: sem segunda cópia de ~1,8 GB)
 USER app
+RUN python scripts/build_db.py --no-live
 
 EXPOSE 7860
 
