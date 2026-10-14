@@ -68,6 +68,16 @@ data/parquet/2026/integridade/certificados_partes/
 data/parquet/2026/integridade/arquivos_*.parquet
 data/parquet/2026/auditoria/*.tmp
 
+# Intermediários da auditoria de integridade (2022)
+data/parquet/2022/integridade/parts/
+data/parquet/2022/integridade/checkpoint.txt
+data/parquet/2022/integridade/erros-*.txt
+data/parquet/2022/integridade/execucoes.jsonl
+data/parquet/2022/integridade/pacotes.jsonl
+data/parquet/2022/integridade/*.tmp
+# Catálogo por arquivo (anexos de versão; o manifesto é versionado)
+data/parquet/2022/integridade/arquivos_*.parquet
+
 # Segredos e credenciais (nunca versionar)
 .env.*
 !.env.example
