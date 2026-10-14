@@ -19,6 +19,7 @@ from dataurnas.dashboard.pages import (
     explorador,
     geografia,
     inconsistencias,
+    integridade_2026,
     modelos,
     outliers,
     reboots,
@@ -73,6 +74,8 @@ def build_navigation() -> dict[str, list]:
         "Eleições 2026": [
             st.Page(eleicoes_2026.render, title="Presidente 1º turno", url_path="eleicoes-2026",
                     icon=":material/how_to_vote:", default=True),
+            st.Page(integridade_2026.render, title="Integridade dos arquivos (2026)", url_path="integridade-2026",
+                    icon=":material/verified_user:"),
         ],
         "Auditoria 2022: visão geral": [
             _page(veredicto.tab_veredicto, "Veredicto final", "veredicto", ":material/gavel:"),

@@ -56,3 +56,6 @@ data/parquet/2026/integridade/parts/
 data/parquet/2026/integridade/checkpoint.txt
 data/parquet/2026/integridade/*.jsonl
 data/parquet/2026/secoes_parts/
+data/parquet/2026/integridade/erros-*.txt
+data/parquet/2026/integridade/*.tmp
+data/parquet/2026/auditoria/*.tmp

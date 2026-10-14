@@ -45,7 +45,15 @@ class LogParser:
         Dentro dele existe um arquivo logd.dat em texto puro.
         """
         file_path = Path(file_path)
-        text = self._extract_text(file_path)
+        return self._parse_text(self._extract_text(file_path), str(file_path))
+
+    def parse_bytes(self, raw: bytes, origem: str = "<memória>") -> list[LogEntry]:
+        """Parseia um log .logjez/.jez já em memória (sem gravar em disco)."""
+        import io
+
+        return self._parse_text(self._extract_text(io.BytesIO(raw), origem), origem)
+
+    def _parse_text(self, text: Optional[str], file_path: str) -> list[LogEntry]:
         if not text:
             return []
 
@@ -67,7 +75,45 @@ class LogParser:
             )
         return entries
 
-    def _extract_text(self, file_path: Path) -> Optional[str]:
+    def _extract_zip(self, file_path, origem: Optional[str] = None):
+        """Logs de 2026 (-log.jez) vêm em ZIP, não em 7-zip.
+
+        Retorna o texto do primeiro arquivo do ZIP, None em erro, ou False
+        quando o conteúdo não é ZIP (para tentar o 7-zip).
+        """
+        import zipfile
+
+        try:
+            if hasattr(file_path, "seek"):
+                file_path.seek(0)
+                magica = file_path.read(4)
+                file_path.seek(0)
+            else:
+                with open(file_path, "rb") as fh:
+                    magica = fh.read(4)
+        except OSError:
+            return False
+        if magica != b"PK\x03\x04":
+            return False
+        try:
+            with zipfile.ZipFile(file_path) as z:
+                infos = [i for i in z.infolist() if not i.is_dir()]
+                if not infos:
+                    return None
+                if sum(i.file_size for i in infos) > MAX_LOG_BYTES:
+                    logger.error("Log %s excede o limite descompactado", origem or file_path)
+                    return None
+                alvo = sorted(infos, key=lambda i: i.filename)[0]
+                with z.open(alvo) as fh:
+                    dados = fh.read(MAX_LOG_BYTES + 1)
+            if len(dados) > MAX_LOG_BYTES:
+                return None
+            return dados.decode("latin-1", errors="replace")
+        except (zipfile.BadZipFile, OSError, RuntimeError) as e:
+            logger.error("Erro ao extrair log (zip) de %s: %s", origem or file_path, e)
+            return None
+
+    def _extract_text(self, file_path, origem: Optional[str] = None) -> Optional[str]:
         """Extrai em memória o texto do arquivo 7-zip.
 
         Le o primeiro arquivo do pacote (geralmente logd.dat), sem gravar
@@ -75,6 +121,9 @@ class LogParser:
         recusados: o conteúdo vem de fonte externa e não pode esgotar a
         memória.
         """
+        texto_zip = self._extract_zip(file_path, origem)
+        if texto_zip is not False:
+            return texto_zip
         try:
             import py7zr
             from py7zr.io import BytesIOFactory
@@ -90,7 +139,8 @@ class LogParser:
                 total = sum(i.uncompressed or 0 for i in infos)
                 if total > MAX_LOG_BYTES:
                     logger.error(
-                        "Log %s excede o limite (%d bytes descompactados)", file_path, total
+                        "Log %s excede o limite (%d bytes descompactados)",
+                        origem or file_path, total,
                     )
                     return None
                 alvo = sorted(i.filename for i in infos)[0]
@@ -100,7 +150,7 @@ class LogParser:
             buf.seek(0)
             return buf.read().decode("latin-1", errors="replace")
         except Exception as e:
-            logger.error("Erro ao extrair log de %s: %s", file_path, e)
+            logger.error("Erro ao extrair log de %s: %s", origem or file_path, e)
             return None
 
     def _parse_line(self, line: str) -> Optional[LogEntry]:
