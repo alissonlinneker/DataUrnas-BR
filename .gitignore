@@ -55,3 +55,27 @@ ARCHITECTURE.md
 data/parquet/2026/secoes_parts/
 data/parquet/2026/secoes_checkpoint.txt
 data/parquet/2026/secoes_erros.txt
+
+# Intermediários da auditoria de integridade (2026)
+data/parquet/2026/integridade/parts/
+data/parquet/2026/integridade/checkpoint.txt
+data/parquet/2026/integridade/erros-*.txt
+data/parquet/2026/integridade/execucoes.jsonl
+data/parquet/2026/integridade/*.tmp
+data/parquet/2026/integridade/certificados_partes/
+# Catálogo por arquivo: publicado como anexos da versão no GitHub, não no git
+# (o manifesto catalogo_manifest.json, pequeno, é versionado)
+data/parquet/2026/integridade/arquivos_*.parquet
+data/parquet/2026/auditoria/*.tmp
+
+# Segredos e credenciais (nunca versionar)
+.env.*
+!.env.example
+*.key
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+id_ed25519*
+secrets/
+credentials*.json

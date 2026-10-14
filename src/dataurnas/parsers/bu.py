@@ -110,6 +110,16 @@ class BUParser:
 
         return self._build_bu(envelope, bu, spec_version)
 
+    def parse_bytes(self, raw: bytes) -> BoletimUrna:
+        """Parseia um BU já em memória (tenta a spec v2 e depois a v1)."""
+        try:
+            spec_version = SpecVersion.V2
+            envelope, bu = decode_envelope(raw, "EntidadeBoletimUrna", spec_version)
+        except Exception:
+            spec_version = SpecVersion.V1
+            envelope, bu = decode_envelope(raw, "EntidadeBoletimUrna", spec_version)
+        return self._build_bu(envelope, bu, spec_version)
+
     def _build_bu(
         self, envelope: dict, bu: dict, spec_version: SpecVersion
     ) -> BoletimUrna:
@@ -196,8 +206,18 @@ class BUParser:
             data_hora_emissao=bu.get("dataHoraEmissao", None),
             hora_abertura=hora_abertura,
             hora_encerramento=hora_encerramento,
-            qtd_eleitores_lib_codigo=bu.get("qtdEleitoresLibCodigo", 0),
-            qtd_eleitores_comp_biometrico=bu.get("qtdEleitoresCompBiometrico", 0),
+            # Spec v2 (2024+): não há qtdEleitoresLibCodigo; o equivalente é o
+            # eleitor com biometria cadastrada habilitado manualmente (por ano
+            # de nascimento, "HabilitadosPorBiografia"). Quem não tinha
+            # biometria cadastrada fica fora das duas contagens, como em 2022.
+            qtd_eleitores_lib_codigo=bu.get(
+                "qtdEleitoresLibCodigo",
+                (bu.get("detalhamentoComparecimento") or {}).get(
+                    "qtdEleitoresHabilitadosPorBiografia", 0)),
+            qtd_eleitores_comp_biometrico=bu.get(
+                "qtdEleitoresCompBiometrico",
+                (bu.get("detalhamentoComparecimento") or {}).get(
+                    "qtdEleitoresHabilitadosPorBiometria", 0)),
             resultados_por_eleicao=resultados,
             historico_correspondencias=bu.get("historicoCorrespondencias", None),
         )

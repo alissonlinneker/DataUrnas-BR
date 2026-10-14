@@ -8,6 +8,7 @@ from dataurnas.dashboard.state import analysis
 from dataurnas.dashboard.components.charts import C_BLUE, C_VERMILLION, show_chart
 from dataurnas.dashboard.components.errors import show_error
 from dataurnas.dashboard.components.tables import show_df
+from dataurnas.dashboard.components.ui import nota_grupo_analise
 
 
 def tab_benford_v2(store, f):
@@ -18,6 +19,7 @@ def tab_benford_v2(store, f):
         "Análise da conformidade dos votos com a distribuição esperada "
         "pela Lei de Benford (1º e 2º dígitos)"
     )
+    nota_grupo_analise("benford")
 
     with st.expander("O que é a Lei de Benford?"):
         st.markdown(

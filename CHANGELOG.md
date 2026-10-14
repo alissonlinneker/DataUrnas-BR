@@ -6,6 +6,25 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não publicado]
 
+## [0.2.1] - 2026-10-14
+
+### Adicionado
+
+- Verificação de integridade dos arquivos de urna de 2026 em todas as seções (`scripts/ele2026/fetch_integridade.py`): SHA-512 do BU, do RDV e do log recalculado a partir dos arquivos publicados e comparado ao valor assinado no `.vsc`, verificação da assinatura de hardware de cada urna (Ed521 da ICP-Brasil, em `parsers/ed521.py`, e ECDSA P-521) e comparação dos votos do BU assinado com os do BU coletado. Resultado em 499.207 seções: 1.497.620 SHA-512 iguais ao assinado, nenhum divergente, 499.207 assinaturas válidas e nenhuma inválida.
+- Catálogo por arquivo (`arquivos_<uf>.parquet`, com MD5, SHA-256, SHA-512, SHA-512 assinado, token, `disponivel` e `http_status`), resumo por seção (`secoes.parquet`) e `resumo.json` em `data/parquet/2026/integridade`. O catálogo de 1.999.485 arquivos é publicado como anexos desta versão, um Parquet por UF com `SHA256SUMS` (`scripts/ele2026/publicar_catalogo.py`), e o painel baixa sob demanda a UF consultada.
+- Auditoria de BU e log de 2026 (`data/parquet/2026/auditoria/issues_2026.parquet` e `secoes_log_2026.parquet`): nenhuma ocorrência do grupo 1 nas 499.207 seções.
+- Grupos de leitura dos códigos de ocorrência (indício direto de adulteração, inconsistência a investigar, operacional ou estatístico), com fonte única em `dashboard/reference.py`, filtro no painel e resumo em três quadros; inclui as categorias da conferência de integridade de 2026.
+- Análise dos certificados das urnas (`scripts/ele2026/analisar_certificados.py`): unicidade, CN igual ao número interno da urna, emissor e algoritmo por modelo e validação da cadeia até a AC intermediária com os certificados públicos das AC em `data/certificados/`. Validação da cadeia concluída na amostra de 5%, sorteio determinístico pelo SHA-256 da chave da seção (24.846 seções, todas com cadeia conferida e certificado válido no dia da eleição); resultado em `certificados_resumo.json` e `certificados.parquet`.
+- Registro de lacunas de publicação (`ocorrencias_publicacao.jsonl`, `scripts/ele2026/registrar_ocorrencias_publicacao.py`): arquivos listados no `aux.json` que o servidor do TSE responde com HTTP 404. Na passagem final, 2.658 imagens do BU em seções com status "Recebida"; e um RDV assinado pela urna e não publicado (`divergencias.jsonl`, categoria `arquivo_ausente_tse`).
+- Página **Integridade dos arquivos (2026)** no painel, com consulta por seção e totais por UF.
+- Documentos `docs/relatorio-integridade-2026.md` (gerado por `scripts/docs/gerar_relatorio_integridade.py`), `docs/investigacao-secoes-recebidas-2026.md` e `docs/relatorio-tse-ocorrencias-2026.md`.
+
+### Corrigido
+
+- Verificação de integridade: um arquivo listado no `aux.json` que responde HTTP 404 não derruba mais a seção; vira linha com `disponivel = false`, e o restante da seção continua sendo conferido.
+- Deploy: o Space passa a receber os agregados do painel pré-calculados, e o build deixa de estourar o tempo limite.
+- Relatório de integridade: o passo a passo de conferência manual usa o diretório de publicação correto (o campo `hash` do `aux.json`, que é o token em hexadecimal) e o leitor de assinatura de 2026 (`verificar_vsc`).
+
 ## [0.2.0] - 2026-10-13
 
 ### Adicionado
@@ -63,6 +82,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Banco DuckDB, exportação Parquet com ZSTD e painel Streamlit com filtros e exportação.
 - Deploy no Hugging Face Spaces via GitHub Actions.
 
-[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...HEAD
+[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.1.0

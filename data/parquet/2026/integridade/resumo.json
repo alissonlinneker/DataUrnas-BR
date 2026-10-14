@@ -1,0 +1,1221 @@
+{
+ "gerado_em": "2026-10-14T13:41:17",
+ "pleito": "3220",
+ "ciclo": "ele2026",
+ "metodo": {
+  "hash_arquivo": "SHA-512 do arquivo publicado comparado ao hash da lista de arquivos assinados no .vsc (partes SW e HW).",
+  "assinatura_hw": "Ed521 (ICP-Brasil, SHAKE256, dom5 'SigEd521', contexto vazio) ou ECDSA P-521 com SHA-512; a mensagem assinada é SHA-512(hash), em que hash = SHA-512 do conteúdo. Verificados o autoAssinado (lista inteira) e cada arquivo publicado.",
+  "assinatura_sw": "CEPESC (algoritmo de governo não publicado): não verificada.",
+  "cadeia_certificado": "não validada: os certificados das AC emissoras (AC URNA, AC UE2022) não vêm nos arquivos e a LCR pública responde 403; registramos subject, issuer, serial e SHA-256 do certificado da urna.",
+  "token_tse": "token base64url de 32 bytes do aux.json; não corresponde ao hash de nenhum arquivo isolado publicado e não é verificado."
+ },
+ "totais": {
+  "secoes": 517179,
+  "ok": 499207,
+  "agregada": 17931,
+  "nao_instalada": 41,
+  "sem_arquivos": 0,
+  "arquivos": 1999485,
+  "hash_confere": 1497620,
+  "hash_diverge": 0,
+  "sem_hash": 499207,
+  "assinatura_valida": 499207,
+  "assinatura_invalida": 0,
+  "assinatura_nao_verificada": 0,
+  "votos_conferem": 499207,
+  "votos_divergem": 0,
+  "arquivos_indisponiveis": 2658,
+  "secoes_com_indisponiveis": 2658
+ },
+ "por_uf": {
+  "ac": {
+   "secoes": 2411,
+   "ok": 2270,
+   "agregada": 141,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 9080,
+   "hash_confere": 6810,
+   "hash_diverge": 0,
+   "sem_hash": 2270,
+   "assinatura_valida": 2270,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 2270,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "al": {
+   "secoes": 7246,
+   "ok": 7101,
+   "agregada": 145,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 28404,
+   "hash_confere": 21303,
+   "hash_diverge": 0,
+   "sem_hash": 7101,
+   "assinatura_valida": 7101,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 7101,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "am": {
+   "secoes": 8577,
+   "ok": 8157,
+   "agregada": 420,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 32628,
+   "hash_confere": 24471,
+   "hash_diverge": 0,
+   "sem_hash": 8157,
+   "assinatura_valida": 8157,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 8157,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "ap": {
+   "secoes": 1971,
+   "ok": 1914,
+   "agregada": 57,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 7656,
+   "hash_confere": 5742,
+   "hash_diverge": 0,
+   "sem_hash": 1914,
+   "assinatura_valida": 1914,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 1914,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "ba": {
+   "secoes": 37950,
+   "ok": 35476,
+   "agregada": 2474,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 142039,
+   "hash_confere": 106428,
+   "hash_diverge": 0,
+   "sem_hash": 35476,
+   "assinatura_valida": 35476,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 35476,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 135,
+   "secoes_com_indisponiveis": 135
+  },
+  "ce": {
+   "secoes": 25650,
+   "ok": 23765,
+   "agregada": 1885,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 95060,
+   "hash_confere": 71295,
+   "hash_diverge": 0,
+   "sem_hash": 23765,
+   "assinatura_valida": 23765,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 23765,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "df": {
+   "secoes": 7050,
+   "ok": 6969,
+   "agregada": 81,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 27876,
+   "hash_confere": 20907,
+   "hash_diverge": 0,
+   "sem_hash": 6969,
+   "assinatura_valida": 6969,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 6969,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "es": {
+   "secoes": 10123,
+   "ok": 9844,
+   "agregada": 279,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 39376,
+   "hash_confere": 29532,
+   "hash_diverge": 0,
+   "sem_hash": 9844,
+   "assinatura_valida": 9844,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 9844,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "go": {
+   "secoes": 16226,
+   "ok": 15686,
+   "agregada": 540,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 62744,
+   "hash_confere": 47058,
+   "hash_diverge": 0,
+   "sem_hash": 15686,
+   "assinatura_valida": 15686,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 15686,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "ma": {
+   "secoes": 19794,
+   "ok": 18093,
+   "agregada": 1701,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 72774,
+   "hash_confere": 54278,
+   "hash_diverge": 0,
+   "sem_hash": 18093,
+   "assinatura_valida": 18093,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 18093,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 403,
+   "secoes_com_indisponiveis": 403
+  },
+  "mg": {
+   "secoes": 54193,
+   "ok": 52062,
+   "agregada": 2131,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 208248,
+   "hash_confere": 156186,
+   "hash_diverge": 0,
+   "sem_hash": 52062,
+   "assinatura_valida": 52062,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 52062,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "ms": {
+   "secoes": 7284,
+   "ok": 7106,
+   "agregada": 178,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 28424,
+   "hash_confere": 21318,
+   "hash_diverge": 0,
+   "sem_hash": 7106,
+   "assinatura_valida": 7106,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 7106,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "mt": {
+   "secoes": 8975,
+   "ok": 8287,
+   "agregada": 688,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 33148,
+   "hash_confere": 24861,
+   "hash_diverge": 0,
+   "sem_hash": 8287,
+   "assinatura_valida": 8287,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 8287,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "pa": {
+   "secoes": 22082,
+   "ok": 20827,
+   "agregada": 1255,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 84921,
+   "hash_confere": 62481,
+   "hash_diverge": 0,
+   "sem_hash": 20827,
+   "assinatura_valida": 20827,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 20827,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 1613,
+   "secoes_com_indisponiveis": 1613
+  },
+  "pb": {
+   "secoes": 10845,
+   "ok": 10712,
+   "agregada": 133,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 42848,
+   "hash_confere": 32136,
+   "hash_diverge": 0,
+   "sem_hash": 10712,
+   "assinatura_valida": 10712,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 10712,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "pe": {
+   "secoes": 22091,
+   "ok": 21418,
+   "agregada": 673,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 85672,
+   "hash_confere": 64254,
+   "hash_diverge": 0,
+   "sem_hash": 21418,
+   "assinatura_valida": 21418,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 21418,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "pi": {
+   "secoes": 11261,
+   "ok": 10225,
+   "agregada": 1036,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 40900,
+   "hash_confere": 30675,
+   "hash_diverge": 0,
+   "sem_hash": 10225,
+   "assinatura_valida": 10225,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 10225,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "pr": {
+   "secoes": 27336,
+   "ok": 27142,
+   "agregada": 194,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 109068,
+   "hash_confere": 81426,
+   "hash_diverge": 0,
+   "sem_hash": 27142,
+   "assinatura_valida": 27142,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 27142,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 500,
+   "secoes_com_indisponiveis": 500
+  },
+  "rj": {
+   "secoes": 38738,
+   "ok": 37675,
+   "agregada": 1063,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 150700,
+   "hash_confere": 113025,
+   "hash_diverge": 0,
+   "sem_hash": 37675,
+   "assinatura_valida": 37675,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 37675,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "rn": {
+   "secoes": 8336,
+   "ok": 8115,
+   "agregada": 221,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 32460,
+   "hash_confere": 24345,
+   "hash_diverge": 0,
+   "sem_hash": 8115,
+   "assinatura_valida": 8115,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 8115,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "ro": {
+   "secoes": 4941,
+   "ok": 4698,
+   "agregada": 243,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 18792,
+   "hash_confere": 14094,
+   "hash_diverge": 0,
+   "sem_hash": 4698,
+   "assinatura_valida": 4698,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 4698,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "rr": {
+   "secoes": 1627,
+   "ok": 1519,
+   "agregada": 108,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 6076,
+   "hash_confere": 4557,
+   "hash_diverge": 0,
+   "sem_hash": 1519,
+   "assinatura_valida": 1519,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 1519,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "rs": {
+   "secoes": 27738,
+   "ok": 27547,
+   "agregada": 191,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 110190,
+   "hash_confere": 82641,
+   "hash_diverge": 0,
+   "sem_hash": 27547,
+   "assinatura_valida": 27547,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 27547,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 2,
+   "secoes_com_indisponiveis": 2
+  },
+  "sc": {
+   "secoes": 17558,
+   "ok": 17326,
+   "agregada": 232,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 69305,
+   "hash_confere": 51978,
+   "hash_diverge": 0,
+   "sem_hash": 17326,
+   "assinatura_valida": 17326,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 17326,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 1,
+   "secoes_com_indisponiveis": 1
+  },
+  "se": {
+   "secoes": 6067,
+   "ok": 5923,
+   "agregada": 144,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 23692,
+   "hash_confere": 17769,
+   "hash_diverge": 0,
+   "sem_hash": 5923,
+   "assinatura_valida": 5923,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 5923,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "sp": {
+   "secoes": 103904,
+   "ok": 103656,
+   "agregada": 248,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 414628,
+   "hash_confere": 310968,
+   "hash_diverge": 0,
+   "sem_hash": 103656,
+   "assinatura_valida": 103656,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 103656,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 4,
+   "secoes_com_indisponiveis": 4
+  },
+  "to": {
+   "secoes": 4490,
+   "ok": 4384,
+   "agregada": 106,
+   "nao_instalada": 0,
+   "sem_arquivos": 0,
+   "arquivos": 17536,
+   "hash_confere": 13152,
+   "hash_diverge": 0,
+   "sem_hash": 4384,
+   "assinatura_valida": 4384,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 4384,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  },
+  "zz": {
+   "secoes": 2715,
+   "ok": 1310,
+   "agregada": 1364,
+   "nao_instalada": 41,
+   "sem_arquivos": 0,
+   "arquivos": 5240,
+   "hash_confere": 3930,
+   "hash_diverge": 0,
+   "sem_hash": 1310,
+   "assinatura_valida": 1310,
+   "assinatura_invalida": 0,
+   "assinatura_nao_verificada": 0,
+   "votos_conferem": 1310,
+   "votos_divergem": 0,
+   "arquivos_indisponiveis": 0,
+   "secoes_com_indisponiveis": 0
+  }
+ },
+ "por_tipo_arquivo": {
+  "bu": {
+   "arquivos": 499176,
+   "bytes": 6260473223,
+   "indisponiveis": 0
+  },
+  "busa": {
+   "arquivos": 31,
+   "bytes": 52848,
+   "indisponiveis": 0
+  },
+  "imgbu": {
+   "arquivos": 2658,
+   "bytes": 0,
+   "indisponiveis": 2658
+  },
+  "log": {
+   "arquivos": 499207,
+   "bytes": 53429816387,
+   "indisponiveis": 0
+  },
+  "rdv": {
+   "arquivos": 499206,
+   "bytes": 7563715128,
+   "indisponiveis": 0
+  },
+  "vota": {
+   "arquivos": 499207,
+   "bytes": 31233950690,
+   "indisponiveis": 0
+  }
+ },
+ "arquivos_indisponiveis": {
+  "total": 2658,
+  "por_tipo": {
+   "imgbu": 2658
+  },
+  "descricao": "arquivos listados no aux.json que o servidor do TSE responde com HTTP 404 (disponivel = false em arquivos_<uf>.parquet)"
+ },
+ "algoritmos_assinatura": {
+  "Ed521": 399222,
+  "ECDSA-secp521r1-SHA512": 99985
+ },
+ "modelos_urna": {
+  "UE2013": 11921,
+  "UE2015": 88064,
+  "UE2020": 200463,
+  "UE2022": 198759
+ },
+ "arquivos_parquet": [
+  "arquivos_ac.parquet",
+  "arquivos_al.parquet",
+  "arquivos_am.parquet",
+  "arquivos_ap.parquet",
+  "arquivos_ba.parquet",
+  "arquivos_ce.parquet",
+  "arquivos_df.parquet",
+  "arquivos_es.parquet",
+  "arquivos_go.parquet",
+  "arquivos_ma.parquet",
+  "arquivos_mg.parquet",
+  "arquivos_ms.parquet",
+  "arquivos_mt.parquet",
+  "arquivos_pa.parquet",
+  "arquivos_pb.parquet",
+  "arquivos_pe.parquet",
+  "arquivos_pi.parquet",
+  "arquivos_pr.parquet",
+  "arquivos_rj.parquet",
+  "arquivos_rn.parquet",
+  "arquivos_ro.parquet",
+  "arquivos_rr.parquet",
+  "arquivos_rs.parquet",
+  "arquivos_sc.parquet",
+  "arquivos_se.parquet",
+  "arquivos_sp.parquet",
+  "arquivos_to.parquet",
+  "arquivos_zz.parquet"
+ ],
+ "n_divergencias": 1,
+ "divergencias_por_categoria": {
+  "hash_diverge": 0,
+  "assinatura_invalida": 0,
+  "hash_assinado_ausente": 0,
+  "arquivo_ausente_tse": 1
+ },
+ "divergencias": [
+  {
+   "ts": "2026-10-14T06:33:17",
+   "uf": "ma",
+   "cd_mun": "07846",
+   "zona": "0074",
+   "secao": "0228",
+   "arquivo": "o03220ma0784600740228-rdv.dat",
+   "sha512_calculado": null,
+   "sha512_assinado": "ef182803995b07a03896bc5c5e5d2be9fbe41721fbf30ff239f5a6c777a916de0de450c7f02f51705233b81a289f928ff8be71329de9ddfed80f217ea33f126d",
+   "categoria": "arquivo_ausente_tse",
+   "motivo": "arquivo listado no .vsc, mas ausente no aux.json do TSE",
+   "token_tse": "61myyYeKY7IonxHc6++8r7RavxWF3yY0KkouBRSLERU="
+  }
+ ],
+ "erros_pendentes": 0,
+ "auditoria_bu_log": {
+  "secoes_log": 499207,
+  "issues_por_codigo": {
+   "A04": 718,
+   "A05": 88,
+   "C06": 25675,
+   "I01": 69,
+   "I02": 2595,
+   "I03": 35631,
+   "I04": 177616,
+   "I05": 3794,
+   "I06": 3064,
+   "M02": 31,
+   "M03": 31,
+   "M04": 265,
+   "M05": 66,
+   "M06": 533
+  }
+ },
+ "execucoes": [
+  {
+   "inicio": "2026-10-13T23:25:22",
+   "ufs": [
+    "ac",
+    "rr"
+   ],
+   "pid": 89246
+  },
+  {
+   "inicio": "2026-10-13T23:25:22",
+   "fim": "2026-10-13T23:29:30",
+   "secoes": 4038,
+   "segundos": 248,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 18947,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 676753363
+   }
+  },
+  {
+   "inicio": "2026-10-13T23:30:21",
+   "ufs": [
+    "rj",
+    "ba",
+    "pr",
+    "pa",
+    "go",
+    "es",
+    "rn",
+    "se",
+    "to"
+   ],
+   "pid": 6336
+  },
+  {
+   "inicio": "2026-10-13T23:30:21",
+   "ufs": [
+    "mg",
+    "rs",
+    "ce",
+    "ma",
+    "pi",
+    "pb",
+    "am",
+    "al",
+    "ro"
+   ],
+   "pid": 6335
+  },
+  {
+   "inicio": "2026-10-13T23:30:21",
+   "ufs": [
+    "sp",
+    "pe",
+    "sc",
+    "mt",
+    "ms",
+    "df",
+    "zz",
+    "ap"
+   ],
+   "pid": 6334
+  },
+  {
+   "inicio": "2026-10-14T02:35:23",
+   "ufs": [
+    "sp",
+    "pe",
+    "sc",
+    "mt",
+    "ms",
+    "df",
+    "zz",
+    "ap"
+   ],
+   "pid": 75626
+  },
+  {
+   "inicio": "2026-10-14T02:35:23",
+   "ufs": [
+    "mg",
+    "rs",
+    "ce",
+    "ma",
+    "pi",
+    "pb",
+    "am",
+    "al",
+    "ro"
+   ],
+   "pid": 75625
+  },
+  {
+   "inicio": "2026-10-14T02:35:23",
+   "ufs": [
+    "rj",
+    "ba",
+    "pr",
+    "pa",
+    "go",
+    "es",
+    "rn",
+    "se",
+    "to"
+   ],
+   "pid": 75627
+  },
+  {
+   "inicio": "2026-10-14T04:16:37",
+   "ufs": [
+    "sp",
+    "pe",
+    "sc",
+    "mt",
+    "ms",
+    "df",
+    "zz",
+    "ap"
+   ],
+   "pid": 50572
+  },
+  {
+   "inicio": "2026-10-14T04:16:38",
+   "ufs": [
+    "rj",
+    "ba",
+    "pr",
+    "pa",
+    "go",
+    "es",
+    "rn",
+    "se",
+    "to"
+   ],
+   "pid": 50576
+  },
+  {
+   "inicio": "2026-10-14T04:16:38",
+   "ufs": [
+    "mg",
+    "rs",
+    "ce",
+    "ma",
+    "pi",
+    "pb",
+    "am",
+    "al",
+    "ro"
+   ],
+   "pid": 50566
+  },
+  {
+   "inicio": "2026-10-14T04:16:38",
+   "fim": "2026-10-14T09:54:59",
+   "secoes": 83602,
+   "segundos": 20300,
+   "erros": 2263,
+   "divergencias": 1,
+   "http": {
+    "ok": 393861,
+    "404": 424,
+    "429": 0,
+    "retry": 16123,
+    "fail": 1973,
+    "bytes": 15269954735
+   }
+  },
+  {
+   "inicio": "2026-10-14T04:16:38",
+   "fim": "2026-10-14T10:19:22",
+   "secoes": 79130,
+   "segundos": 21763,
+   "erros": 5108,
+   "divergencias": 0,
+   "http": {
+    "ok": 394599,
+    "404": 2248,
+    "429": 0,
+    "retry": 24112,
+    "fail": 2978,
+    "bytes": 15503369100
+   }
+  },
+  {
+   "inicio": "2026-10-14T11:14:29",
+   "ufs": [
+    "al",
+    "ro",
+    "se",
+    "to"
+   ],
+   "pid": 85872
+  },
+  {
+   "inicio": "2026-10-14T04:16:37",
+   "fim": "2026-10-14T11:59:31",
+   "secoes": 94640,
+   "segundos": 27772,
+   "erros": 4908,
+   "divergencias": 0,
+   "http": {
+    "ok": 456806,
+    "404": 5,
+    "429": 0,
+    "retry": 44071,
+    "fail": 5203,
+    "bytes": 18492133024
+   }
+  },
+  {
+   "inicio": "2026-10-14T11:14:29",
+   "fim": "2026-10-14T12:30:00",
+   "secoes": 22744,
+   "segundos": 4530,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 110534,
+    "404": 0,
+    "429": 0,
+    "retry": 97,
+    "fail": 0,
+    "bytes": 4254381138
+   }
+  },
+  {
+   "inicio": "2026-10-14T12:30:02",
+   "ufs": [
+    "ac",
+    "al",
+    "ap",
+    "am",
+    "ba",
+    "ce",
+    "df",
+    "es",
+    "go",
+    "ma",
+    "mt",
+    "ms",
+    "mg",
+    "pa",
+    "pb",
+    "pr",
+    "pe",
+    "pi",
+    "rj",
+    "rn",
+    "rs",
+    "ro",
+    "rr",
+    "sc",
+    "sp",
+    "se",
+    "to",
+    "zz"
+   ],
+   "pid": 14563
+  },
+  {
+   "inicio": "2026-10-14T12:30:02",
+   "fim": "2026-10-14T13:17:10",
+   "secoes": 9621,
+   "segundos": 2827,
+   "erros": 2658,
+   "divergencias": 0,
+   "http": {
+    "ok": 61423,
+    "404": 2658,
+    "429": 0,
+    "retry": 125,
+    "fail": 0,
+    "bytes": 2387814141
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:27:20",
+   "ufs": [
+    "se",
+    "to",
+    "ro",
+    "rj",
+    "go",
+    "es",
+    "ac",
+    "rr"
+   ],
+   "pid": 46132
+  },
+  {
+   "inicio": "2026-10-14T13:27:20",
+   "ufs": [
+    "am",
+    "ms",
+    "rn",
+    "sp",
+    "sc",
+    "pe",
+    "mt",
+    "df",
+    "zz",
+    "ap"
+   ],
+   "pid": 46131
+  },
+  {
+   "inicio": "2026-10-14T13:27:21",
+   "ufs": [
+    "ba",
+    "ma",
+    "pa",
+    "pr",
+    "pi",
+    "mg",
+    "rs",
+    "ce",
+    "pb",
+    "al"
+   ],
+   "pid": 46130
+  },
+  {
+   "inicio": "2026-10-14T13:27:20",
+   "fim": "2026-10-14T13:28:00",
+   "secoes": 0,
+   "segundos": 38,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 8,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 5133822
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:27:20",
+   "fim": "2026-10-14T13:29:00",
+   "secoes": 5,
+   "segundos": 98,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 35,
+    "404": 5,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 12407074
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:27:21",
+   "fim": "2026-10-14T13:40:27",
+   "secoes": 2653,
+   "segundos": 785,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 13275,
+    "404": 2653,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 555257373
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:40:33",
+   "ufs": [
+    "ba",
+    "ma",
+    "pa",
+    "pr",
+    "pi",
+    "mg",
+    "rs",
+    "ce",
+    "pb",
+    "al"
+   ],
+   "pid": 10564
+  },
+  {
+   "inicio": "2026-10-14T13:40:33",
+   "ufs": [
+    "am",
+    "ms",
+    "rn",
+    "sp",
+    "sc",
+    "pe",
+    "mt",
+    "df",
+    "zz",
+    "ap"
+   ],
+   "pid": 10565
+  },
+  {
+   "inicio": "2026-10-14T13:40:33",
+   "ufs": [
+    "se",
+    "to",
+    "ro",
+    "rj",
+    "go",
+    "es",
+    "ac",
+    "rr"
+   ],
+   "pid": 10566
+  },
+  {
+   "inicio": "2026-10-14T13:40:33",
+   "fim": "2026-10-14T13:40:42",
+   "secoes": 0,
+   "segundos": 8,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 8,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 5133822
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:40:33",
+   "fim": "2026-10-14T13:40:47",
+   "secoes": 0,
+   "segundos": 13,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 10,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 11448321
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:40:33",
+   "fim": "2026-10-14T13:40:53",
+   "secoes": 0,
+   "segundos": 20,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 10,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 14881648
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:40:56",
+   "ufs": [
+    "ba",
+    "ma",
+    "pa",
+    "pr",
+    "pi",
+    "mg",
+    "rs",
+    "ce",
+    "pb",
+    "al"
+   ],
+   "pid": 12660
+  },
+  {
+   "inicio": "2026-10-14T13:40:56",
+   "ufs": [
+    "se",
+    "to",
+    "ro",
+    "rj",
+    "go",
+    "es",
+    "ac",
+    "rr"
+   ],
+   "pid": 12662
+  },
+  {
+   "inicio": "2026-10-14T13:40:57",
+   "ufs": [
+    "am",
+    "ms",
+    "rn",
+    "sp",
+    "sc",
+    "pe",
+    "mt",
+    "df",
+    "zz",
+    "ap"
+   ],
+   "pid": 12661
+  },
+  {
+   "inicio": "2026-10-14T13:40:56",
+   "fim": "2026-10-14T13:41:03",
+   "secoes": 0,
+   "segundos": 6,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 8,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 5133822
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:40:56",
+   "fim": "2026-10-14T13:41:06",
+   "secoes": 0,
+   "segundos": 10,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 10,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 14881648
+   }
+  },
+  {
+   "inicio": "2026-10-14T13:40:57",
+   "fim": "2026-10-14T13:41:06",
+   "secoes": 0,
+   "segundos": 10,
+   "erros": 0,
+   "divergencias": 0,
+   "http": {
+    "ok": 10,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 11448321
+   }
+  }
+ ]
+}

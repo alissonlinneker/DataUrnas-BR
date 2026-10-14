@@ -91,6 +91,19 @@ class LogAnalyzer:
             Dict com eventos, issues, e métricas de timing.
         """
         entries = self._parser.parse(log_path)
+        return self.analyze_entries(entries, bu, uf=uf, turno_date=turno_date,
+                                    municipio=municipio)
+
+    def analyze_entries(
+        self,
+        entries: list[LogEntry],
+        bu: Optional[BoletimUrna] = None,
+        uf: str = "",
+        turno_date: Optional[str] = None,
+        municipio=None,
+    ) -> dict:
+        """Mesma análise de analyze_log, a partir de entradas já parseadas
+        (permite analisar o log em memória, sem arquivo em disco)."""
         events = self._parser.extract_events(entries, turno_date=turno_date)
 
         issues = []

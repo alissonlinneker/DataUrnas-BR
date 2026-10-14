@@ -4,15 +4,64 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from dataurnas.dashboard.state import analysis
-from dataurnas.dashboard.components.charts import C_GREY, SEVERITY_COLORS, show_chart
+from dataurnas.dashboard.components.charts import C_GREY, C_ORANGE, C_VERMILLION, SEVERITY_COLORS, show_chart
 from dataurnas.dashboard.components.formatting import fmt_int, fmt_pct, severidade_label
 from dataurnas.dashboard.components.tables import show_df
-from dataurnas.dashboard.reference import ISSUE_DESCRICOES
+from dataurnas.dashboard.components.ui import grupos_resumo
+from dataurnas.dashboard.reference import (
+    ANALISES_ESTATISTICAS,
+    GRUPO_ADULTERACAO,
+    GRUPO_INVESTIGAR,
+    GRUPOS,
+    GRUPOS_ORDEM,
+    ISSUE_DESCRICOES,
+    ISSUE_GRUPOS,
+    ISSUE_MOTIVOS,
+    contar_por_grupo,
+    grupo_label,
+    grupo_nome,
+)
+
+# Cor de apoio por grupo; o nome numerado do grupo vai sempre junto (legenda e tabela)
+CORES_GRUPO = {GRUPO_ADULTERACAO: C_VERMILLION, GRUPO_INVESTIGAR: C_ORANGE}
+
+LEITURA_GRUPOS = (
+    "A severidade diz a prioridade de investigar; o **grupo de leitura** diz que tipo de conclusão o "
+    "achado admite. Só o grupo 1 aponta diretamente para adulteração dos arquivos. Os arquivos públicos "
+    "não alcançam uma manipulação feita dentro da urna antes da assinatura: isso é coberto por outros "
+    "mecanismos (inspeção do código-fonte, cerimônia de lacração, teste de integridade no dia da eleição "
+    "e Teste Público de Segurança)."
+)
+
+
+def _legenda_grupos() -> str:
+    linhas = []
+    for g in GRUPOS_ORDEM:
+        linhas.append(f"**{grupo_nome(g)}**: {GRUPOS[g]['resumo']}")
+        for cod in sorted(c for c, gg in ISSUE_GRUPOS.items() if gg == g):
+            linhas.append(f"- **{cod}** ({ISSUE_DESCRICOES[cod]}): {ISSUE_MOTIVOS[cod]}")
+        for nome, grupo, motivo in ANALISES_ESTATISTICAS.values():
+            if grupo == g:
+                linhas.append(f"- **{nome}** (análise agregada): {motivo}")
+        linhas.append("")
+    return "\n".join(linhas)
 
 
 def tab_inconsistencias(store, f):
     """Aba de Inconsistências."""
     st.subheader("Distribuição de Inconsistências")
+
+    cod_df = store.query_df(f"""
+        SELECT i.codigo, COUNT(*) as total
+        FROM issues i JOIN secoes s ON i.secao_id = s.id
+        WHERE {f['issue_where']}
+        GROUP BY i.codigo
+        ORDER BY total DESC
+    """, f["issue_params"])
+
+    st.markdown("**Por grupo de leitura**")
+    grupos_resumo(contar_por_grupo(dict(zip(cod_df["codigo"], cod_df["total"], strict=False))))
+    st.caption(LEITURA_GRUPOS)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -42,15 +91,23 @@ def tab_inconsistencias(store, f):
             st.info("Nenhuma inconsistência encontrada.")
 
     with col2:
-        cod_df = store.query_df(f"""
-            SELECT i.codigo, COUNT(*) as total
-            FROM issues i JOIN secoes s ON i.secao_id = s.id
-            WHERE {f['issue_where']}
-            GROUP BY i.codigo
-            ORDER BY total DESC
-        """, f["issue_params"])
         if not cod_df.empty:
-            st.bar_chart(cod_df.set_index("codigo"))
+            grupos = [ISSUE_GRUPOS.get(c) for c in cod_df["codigo"]]
+            fig = go.Figure()
+            for g in [*GRUPOS_ORDEM, None]:
+                sel = [i for i, gg in enumerate(grupos) if gg == g]
+                if not sel:
+                    continue
+                parte = cod_df.iloc[sel]
+                fig.add_bar(
+                    x=parte["codigo"], y=parte["total"], name=grupo_nome(g),
+                    marker_color=CORES_GRUPO.get(g, C_GREY),
+                    text=[fmt_int(v) for v in parte["total"]], textposition="auto",
+                )
+            fig.update_layout(xaxis_title="Código", yaxis_title="Ocorrências", legend_title_text="Grupo",
+                              xaxis={"categoryorder": "total descending"})
+            show_chart(fig, height=320, caption="Ocorrências por código; a legenda nomeia o grupo de leitura "
+                                                "de cada barra.")
 
     st.subheader("Issues por Estado")
     uf_issues_df = store.query_df(f"""
@@ -89,13 +146,15 @@ def tab_inconsistencias(store, f):
         LIMIT 500
     """, f["issue_params"])
     if not detail_df.empty:
-        show_df(detail_df, width="stretch", height=400)
+        detail_df = detail_df.copy()
+        detail_df.insert(1, "grupo", [grupo_label(c) for c in detail_df["codigo"]])
+        show_df(detail_df, width="stretch", height=400, hide_index=True)
     else:
         st.info("Nenhuma inconsistência encontrada para os filtros atuais.")
 
     # Legenda dos códigos
-    with st.expander("Legenda dos Códigos de Issue"):
-        st.markdown("\n".join(f"- **{cod}**: {desc}" for cod, desc in sorted(ISSUE_DESCRICOES.items())))
+    with st.expander("Legenda dos códigos por grupo de leitura"):
+        st.markdown(_legenda_grupos())
 
 
 def tab_integridade(store, f):

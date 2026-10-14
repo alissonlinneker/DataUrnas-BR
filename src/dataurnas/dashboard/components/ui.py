@@ -233,3 +233,33 @@ def footer() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def grupos_resumo(contagens: dict[str, int], unidade: str = "ocorrência(s)") -> None:
+    """Três cartões, um por grupo de leitura, com o total e a explicação de uma linha.
+
+    O grupo é identificado pelo número e pelo nome, não só pela cor da borda.
+    """
+    from dataurnas.dashboard.reference import GRUPO_OPERACIONAL, GRUPOS, GRUPOS_ORDEM, grupo_nome
+
+    def _tom(grupo: str, total: int) -> str:
+        # Zero nos grupos 1 e 2 é o resultado esperado (verde); o grupo 3 é sempre neutro
+        if grupo == GRUPO_OPERACIONAL or total:
+            return GRUPOS[grupo]["tom"]
+        return "green"
+
+    kpi_cards([
+        {"label": grupo_nome(g), "value": f"{int(contagens.get(g, 0)):,} {unidade}".replace(",", "."),
+         "help": GRUPOS[g]["resumo"], "tone": _tom(g, int(contagens.get(g, 0)))}
+        for g in GRUPOS_ORDEM
+    ])
+
+
+def nota_grupo_analise(chave: str) -> None:
+    """Linha que situa uma análise agregada (Benford, outliers) no seu grupo de leitura."""
+    from dataurnas.dashboard.reference import ANALISES_ESTATISTICAS, GRUPOS, grupo_nome
+
+    _nome, grupo, motivo = ANALISES_ESTATISTICAS[chave]
+    selo = badge_html(f"Grupo {GRUPOS[grupo]['ordem']}")
+    st.markdown(f"{selo} **Grupo de leitura: {html.escape(grupo_nome(grupo))}.** "
+                f"{html.escape(motivo)}", unsafe_allow_html=True)

@@ -1,0 +1,601 @@
+{
+  "gerado_em": "2026-10-14T00:50:53",
+  "dia_eleicao": "2026-10-04",
+  "fonte": {
+    "partes": 27,
+    "partes_ilegiveis": 0
+  },
+  "catalogo": {
+    "secoes_catalogo": 52038,
+    "secoes_com_certificado": 50699,
+    "secoes_sem_certificado_por_status": {
+      "agregada": 1339
+    },
+    "ufs": [
+      "ac",
+      "mg",
+      "rj",
+      "rr",
+      "sp"
+    ],
+    "emissores_por_modelo": {
+      "UE2013": [
+        {
+          "emissor": "AC URNA",
+          "algoritmo": "ECDSA",
+          "secoes": 419
+        }
+      ],
+      "UE2015": [
+        {
+          "emissor": "AC URNA",
+          "algoritmo": "ECDSA",
+          "secoes": 12303
+        }
+      ],
+      "UE2020": [
+        {
+          "emissor": "AC UE2020",
+          "algoritmo": "Ed521",
+          "secoes": 20942
+        }
+      ],
+      "UE2022": [
+        {
+          "emissor": "AC UE2022",
+          "algoritmo": "Ed521",
+          "secoes": 17035
+        }
+      ]
+    },
+    "unicidade": {
+      "certificados_distintos": 50699,
+      "subjects_distintos": 50699,
+      "pares_emissor_serial_distintos": 50699,
+      "certificados_em_mais_de_uma_secao": 0,
+      "secoes_com_certificado_compartilhado": 0,
+      "certificados_em_urnas_diferentes": 0,
+      "urnas_com_mais_de_um_certificado": 0,
+      "seriais_repetidos_na_emissora": 0,
+      "compartilhado_por_tipo_urna": {}
+    },
+    "identidade": {
+      "cn_no_padrao_UEAO": 50699,
+      "cn_fora_do_padrao": 0,
+      "comparados_com_bu": 50699,
+      "cn_igual_numero_interno_bu": 50699,
+      "cn_difere_numero_interno_bu": 0,
+      "sem_numero_interno_no_bu": 0,
+      "cn_difere_usuario_assinatura": 0,
+      "cn_minusculo": 12722
+    },
+    "assinatura_valida": {
+      "True": 50699
+    }
+  },
+  "vsc": {
+    "vsc_analisados": 400,
+    "com_certificado": 400,
+    "validade": {
+      "cobre_dia_eleicao": 400
+    },
+    "validade_por_emissor": {
+      "AC UE2020": {
+        "n": 100,
+        "nao_antes_min": "2022-04-29T12:44:37+00:00",
+        "nao_antes_max": "2023-02-23T19:14:12+00:00",
+        "nao_depois_min": "2036-01-06T12:44:37+00:00",
+        "nao_depois_max": "2036-11-01T19:14:12+00:00"
+      },
+      "AC UE2022": {
+        "n": 100,
+        "nao_antes_min": "2023-08-13T16:16:10+00:00",
+        "nao_antes_max": "2024-06-21T00:10:45+00:00",
+        "nao_depois_min": "2037-04-21T16:16:10+00:00",
+        "nao_depois_max": "2037-12-31T23:00:00+00:00"
+      },
+      "AC URNA": {
+        "n": 200,
+        "nao_antes_min": "2013-07-30T05:25:58+00:00",
+        "nao_antes_max": "2026-08-03T18:10:52+00:00",
+        "nao_depois_min": "2027-04-08T05:25:58+00:00",
+        "nao_depois_max": "2037-12-31T23:00:00+00:00"
+      }
+    },
+    "chaves_publicas_distintas": 400,
+    "chaves_em_urnas_diferentes": 0,
+    "algoritmo_chave_por_emissor": {
+      "AC UE2022": {
+        "Ed521": 100
+      },
+      "AC UE2020": {
+        "Ed521": 100
+      },
+      "AC URNA": {
+        "ECDSA": 200
+      }
+    },
+    "aki_por_emissor": {
+      "AC UE2020": "bcb3545deeea432e1e832e81283cb8ae948e400b",
+      "AC UE2022": "bb7c517f294a5b96f9bf6a964c4f255a755f698a",
+      "AC URNA": "cdaaf4b29701b3f0deb2b54258594a6d34ada48a"
+    },
+    "cadeia": {
+      "acs_carregadas": 3,
+      "valida": 400
+    }
+  },
+  "cadeia_validada": true,
+  "n_anomalias": 201,
+  "anomalias": {
+    "ac_emissora_fora_da_validade_no_dia": {
+      "n": 200,
+      "exemplos": [
+        {
+          "secao_id": "mg-40479-0262-0152",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40630-0206-0004",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40827-0012-0072",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40835-0018-0010",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40835-0018-0037",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40835-0018-0120",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40835-0018-0135",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-40835-0018-0141",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41190-0193-0060",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41190-0193-0069",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41530-0022-0037",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41530-0022-0040",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41599-0046-0027",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41599-0046-0084",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41998-0056-0024",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41998-0056-0025",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41998-0056-0026",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41998-0056-0030",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41998-0056-0066",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-41998-0056-0098",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-42390-0296-0053",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-42897-0208-0066",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-42897-0208-0079",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-42897-0208-0107",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-43591-0085-0043",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-43591-0085-0100",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-43591-0085-0103",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-43591-0085-0119",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-44539-0012-0047",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-45756-0275-0023",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-47074-0338-0054",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-47074-0338-0064",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-47074-0338-0068",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-48895-0328-0036",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49115-0197-0045",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49115-0197-0063",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49115-0197-0112",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49115-0197-0163",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49670-0242-0024",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49972-0216-0027",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49972-0216-0033",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49972-0216-0052",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-49972-0216-0058",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-51136-0150-0199",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-51195-0294-0034",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-52078-0249-0024",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-52078-0249-0029",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-52299-0284-0049",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-52370-0022-0093",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        },
+        {
+          "secao_id": "mg-52370-0022-0114",
+          "detalhe": "AC URNA válida de 2011-07-22 a 2026-07-18"
+        }
+      ]
+    },
+    "certificado_emitido_fora_da_validade_da_ac": {
+      "n": 1,
+      "exemplos": [
+        {
+          "secao_id": "sp-66818-0400-0141",
+          "detalhe": "emitido em 2026-08-03; AC URNA válida de 2011-07-22 a 2026-07-18"
+        }
+      ]
+    }
+  },
+  "acs": [
+    {
+      "arquivo": "acue2020.pem",
+      "cn": "AC UE2020",
+      "emissor": "AC URNA v2",
+      "serial": "5",
+      "sha256_der": "77f31bef3d8eb35f0cc969a2b9bba3ff2a498cc339d29a375d3181e0547c0376",
+      "nao_antes": "2021-07-05T21:31:56+00:00",
+      "nao_depois": "2037-07-01T21:31:56+00:00",
+      "valida_no_dia_da_eleicao": true,
+      "ski": "bcb3545deeea432e1e832e81283cb8ae948e400b",
+      "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+      "cadeia_conferida": [
+        "AC UE2020"
+      ],
+      "nivel": "intermediaria",
+      "confere_resumo_oficial_tse": "acue2020.cer"
+    },
+    {
+      "arquivo": "acue2022.pem",
+      "cn": "AC UE2022",
+      "emissor": "AC URNA v2",
+      "serial": "8",
+      "sha256_der": "6ae65790dae7cc5d97394e461204744c8e2f7a810d0303af828d4d3dbecfa293",
+      "nao_antes": "2023-02-28T13:46:49+00:00",
+      "nao_depois": "2039-02-24T13:46:49+00:00",
+      "valida_no_dia_da_eleicao": true,
+      "ski": "bb7c517f294a5b96f9bf6a964c4f255a755f698a",
+      "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+      "cadeia_conferida": [
+        "AC UE2022"
+      ],
+      "nivel": "intermediaria",
+      "confere_resumo_oficial_tse": "acue2022.cer"
+    },
+    {
+      "arquivo": "acurna.pem",
+      "cn": "AC URNA",
+      "emissor": "AC RAIZ UE",
+      "serial": "3",
+      "sha256_der": "dc20a4c3b8aef01794b80efe8e143e1fbf719707e00bb0d4ba8865191dc2731d",
+      "nao_antes": "2011-07-22T21:59:57+00:00",
+      "nao_depois": "2026-07-18T21:59:57+00:00",
+      "valida_no_dia_da_eleicao": false,
+      "ski": "cdaaf4b29701b3f0deb2b54258594a6d34ada48a",
+      "aki": "8668837bbbe348cd19b61030a489d5dfde6742c0",
+      "cadeia_conferida": [
+        "AC URNA"
+      ],
+      "nivel": "intermediaria",
+      "confere_resumo_oficial_tse": null
+    }
+  ],
+  "todas": {
+    "secoes_ok_no_pais": 499207,
+    "secoes_processadas": 24846,
+    "cobertura_pct": 4.98,
+    "situacao": "concluído (amostra de 5%)",
+    "ufs": [
+      "ac",
+      "al",
+      "am",
+      "ap",
+      "ba",
+      "ce",
+      "df",
+      "es",
+      "go",
+      "ma",
+      "mg",
+      "ms",
+      "mt",
+      "pa",
+      "pb",
+      "pe",
+      "pi",
+      "pr",
+      "rj",
+      "rn",
+      "ro",
+      "rr",
+      "rs",
+      "sc",
+      "se",
+      "sp",
+      "to",
+      "zz"
+    ],
+    "com_certificado": 24846,
+    "sem_certificado_por_motivo": {},
+    "valido_na_eleicao": {
+      "True": 24846
+    },
+    "cadeia_ok": {
+      "True": 24846
+    },
+    "nivel_cadeia": {
+      "intermediaria": 24846
+    },
+    "cn_confere_usuario": {
+      "True": 24846
+    },
+    "certificados_distintos": 24844,
+    "certificados_em_mais_de_uma_secao": 1,
+    "chaves_publicas_distintas": 24844,
+    "chaves_em_urnas_diferentes": 0,
+    "por_emissor_e_modelo": {
+      "AC UE2020": {
+        "UE2020": {
+          "secoes": 9915,
+          "nao_antes_min": "2022-04-23T00:27:28+00:00",
+          "nao_antes_max": "2026-09-29T20:24:57+00:00",
+          "nao_depois_min": "2035-12-31T00:27:28+00:00",
+          "nao_depois_max": "2038-01-15T16:44:49+00:00",
+          "cadeia_ok": {
+            "True": 9915
+          },
+          "ac_valida_na_eleicao": {
+            "True": 9915
+          },
+          "caminhos": {
+            "AC UE2020": 9915
+          }
+        }
+      },
+      "AC UE2022": {
+        "UE2022": {
+          "secoes": 9974,
+          "nao_antes_min": "2023-05-19T13:00:55+00:00",
+          "nao_antes_max": "2026-09-09T14:20:42+00:00",
+          "nao_depois_min": "2037-01-25T13:00:55+00:00",
+          "nao_depois_max": "2038-01-02T16:17:52+00:00",
+          "cadeia_ok": {
+            "True": 9974
+          },
+          "ac_valida_na_eleicao": {
+            "True": 9974
+          },
+          "caminhos": {
+            "AC UE2022": 9974
+          }
+        }
+      },
+      "AC URNA": {
+        "UE2013": {
+          "secoes": 576,
+          "nao_antes_min": "2013-07-30T05:32:51+00:00",
+          "nao_antes_max": "2024-08-19T19:08:01+00:00",
+          "nao_depois_min": "2027-04-08T05:32:51+00:00",
+          "nao_depois_max": "2037-12-31T23:00:00+00:00",
+          "cadeia_ok": {
+            "True": 576
+          },
+          "ac_valida_na_eleicao": {
+            "False": 576
+          },
+          "caminhos": {
+            "AC URNA": 576
+          }
+        },
+        "UE2015": {
+          "secoes": 4381,
+          "nao_antes_min": "2016-06-14T00:33:01+00:00",
+          "nao_antes_max": "2026-07-17T13:39:09+00:00",
+          "nao_depois_min": "2030-02-21T00:33:01+00:00",
+          "nao_depois_max": "2037-12-31T23:00:00+00:00",
+          "cadeia_ok": {
+            "True": 4381
+          },
+          "ac_valida_na_eleicao": {
+            "False": 4381
+          },
+          "caminhos": {
+            "AC URNA": 4381
+          }
+        }
+      }
+    },
+    "emitidos_apos_validade_publicada_da_ac": {
+      "n": 0,
+      "exemplos": []
+    },
+    "problemas": {
+      "n": 0,
+      "exemplos": []
+    },
+    "gerado_em": "2026-10-14T13:49:28",
+    "acs": [
+      {
+        "arquivo": "acue2020.pem",
+        "cn": "AC UE2020",
+        "emissor": "AC URNA v2",
+        "serial": "5",
+        "sha256_der": "77f31bef3d8eb35f0cc969a2b9bba3ff2a498cc339d29a375d3181e0547c0376",
+        "nao_antes": "2021-07-05T21:31:56+00:00",
+        "nao_depois": "2037-07-01T21:31:56+00:00",
+        "valida_no_dia_da_eleicao": true,
+        "ski": "bcb3545deeea432e1e832e81283cb8ae948e400b",
+        "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+        "cadeia_conferida": [
+          "AC UE2020"
+        ],
+        "nivel": "intermediaria",
+        "confere_resumo_oficial_tse": "acue2020.cer"
+      },
+      {
+        "arquivo": "acue2022.pem",
+        "cn": "AC UE2022",
+        "emissor": "AC URNA v2",
+        "serial": "8",
+        "sha256_der": "6ae65790dae7cc5d97394e461204744c8e2f7a810d0303af828d4d3dbecfa293",
+        "nao_antes": "2023-02-28T13:46:49+00:00",
+        "nao_depois": "2039-02-24T13:46:49+00:00",
+        "valida_no_dia_da_eleicao": true,
+        "ski": "bb7c517f294a5b96f9bf6a964c4f255a755f698a",
+        "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+        "cadeia_conferida": [
+          "AC UE2022"
+        ],
+        "nivel": "intermediaria",
+        "confere_resumo_oficial_tse": "acue2022.cer"
+      },
+      {
+        "arquivo": "acurna.pem",
+        "cn": "AC URNA",
+        "emissor": "AC RAIZ UE",
+        "serial": "3",
+        "sha256_der": "dc20a4c3b8aef01794b80efe8e143e1fbf719707e00bb0d4ba8865191dc2731d",
+        "nao_antes": "2011-07-22T21:59:57+00:00",
+        "nao_depois": "2026-07-18T21:59:57+00:00",
+        "valida_no_dia_da_eleicao": false,
+        "ski": "cdaaf4b29701b3f0deb2b54258594a6d34ada48a",
+        "aki": "8668837bbbe348cd19b61030a489d5dfde6742c0",
+        "cadeia_conferida": [
+          "AC URNA"
+        ],
+        "nivel": "intermediaria",
+        "confere_resumo_oficial_tse": null
+      }
+    ],
+    "ultima_execucao": {
+      "secoes_alvo": 24846,
+      "ja_feitas": 0,
+      "processadas": 24846,
+      "falhas_rede": 0,
+      "origem": {
+        "direto": 24843,
+        "aux": 3
+      },
+      "segundos": 1887.8,
+      "secoes_por_segundo": 13.16
+    },
+    "amostra_fracao": 0.05,
+    "amostra_criterio": "SHA-256 da chave uf/cd_mun/zona/secao abaixo do limiar"
+  }
+}

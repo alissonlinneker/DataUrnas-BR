@@ -108,6 +108,19 @@ def render() -> None:
         _comparacao_2022(res_uf)
     with safe_section("a auditoria por seção"):
         _auditoria_secoes(sig, res_uf, cand)
+    with safe_section("a leitura das ocorrências por grupo"):
+        _grupos(res_uf)
+
+
+def _grupos(res_uf: pd.DataFrame) -> None:
+    """Três grupos de leitura, com os mesmos números da página de integridade (cache compartilhado)."""
+    from dataurnas.dashboard import integridade2026 as ig
+    from dataurnas.dashboard.pages import integridade_2026 as pg
+
+    sig = ig.files_signature()
+    t = ig.totais(pg._dados(sig).secoes, res_uf)
+    pg.secao_grupos(sig, t, detalhe=False)
+    st.caption("Detalhe por categoria e código na página Integridade dos arquivos (2026).")
 
 
 def _kpis(resumo: dict) -> None:

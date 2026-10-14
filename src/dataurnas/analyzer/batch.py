@@ -23,6 +23,7 @@ _PLEITO_DATAS = {
     "407": "30/10/2022",
     "452": "06/10/2024",
     "453": "27/10/2024",
+    "3220": "04/10/2026",
 }
 
 
@@ -257,6 +258,42 @@ class BatchAnalyzer:
 
         return result
 
+    def analyze_section_bytes(
+        self,
+        loc: dict,
+        bu_raw: Optional[bytes],
+        log_raw: Optional[bytes] = None,
+        turno: int = 1,
+        turno_date: str = "",
+        modelo: Optional[str] = None,
+        nome_bu: str = "bu.dat",
+        nome_log: str = "log.jez",
+    ) -> dict:
+        """Mesma análise de analyze_section, com BU e log em memória.
+
+        Usada na coleta de 2026, que não grava arquivos brutos em disco.
+        loc = {"uf", "municipio", "zona", "secao"}; modelo no formato do log
+        ("2020"), já que o .vsc é lido pelo chamador.
+        """
+        result = {
+            "dir": None, **loc, "turno": turno, "bu": None, "bu_obj": None,
+            "modelo": modelo, "tipo_urna": None, "versao_sw": None, "issues": [],
+            "log_timing": None, "log_events": None,
+        }
+        bu = None
+        if bu_raw is not None:
+            bu = self._parse_bu_com(lambda: self._bu_parser.parse_bytes(bu_raw), nome_bu, result)
+        if log_raw is not None:
+            self._analyze_log_com(
+                lambda: self._log_analyzer.analyze_entries(
+                    self._log_parser.parse_bytes(log_raw, nome_log), bu,
+                    uf=loc["uf"], turno_date=turno_date or None,
+                    municipio=loc["municipio"],
+                ),
+                nome_log, result,
+            )
+        return result
+
     # Compatibilidade: scripts antigos chamam o método privado
     _analyze_section = analyze_section
 
@@ -264,10 +301,14 @@ class BatchAnalyzer:
         """Parseia o BU e preenche result; falha vira issue E02."""
         if not bu_file.exists():
             return None
+        return self._parse_bu_com(lambda: self._bu_parser.parse(bu_file), bu_file.name, result)
+
+    def _parse_bu_com(self, parse, nome: str, result: dict) -> Optional[BoletimUrna]:
+        """Executa parse() do BU, preenche result e roda as análises do BU."""
         try:
-            bu = self._bu_parser.parse(bu_file)
+            bu = parse()
         except Exception as e:
-            logger.error("Erro ao parsear BU %s: %s", bu_file, e)
+            logger.error("Erro ao parsear BU %s: %s", nome, e)
             result["issues"].append(
                 _tag_issues([
                     Issue(
@@ -278,7 +319,7 @@ class BatchAnalyzer:
                             f"totais ({type(e).__name__})"
                         ),
                         uf="", municipio="", zona="", secao="",
-                        detalhes={"arquivo": bu_file.name, "erro": str(e)[:300]},
+                        detalhes={"arquivo": nome, "erro": str(e)[:300]},
                     )
                 ], result)[0]
             )
@@ -354,14 +395,21 @@ class BatchAnalyzer:
                 sorted(section_dir.glob("*-log.jez"))
         if not log_files:
             return
-        try:
-            log_result = self._log_analyzer.analyze_log(
+        self._analyze_log_com(
+            lambda: self._log_analyzer.analyze_log(
                 log_files[0], bu, uf=result["uf"],
                 turno_date=turno_date or None,
                 municipio=result["municipio"],
-            )
+            ),
+            log_files[0].name, result,
+        )
+
+    def _analyze_log_com(self, analisar, nome: str, result: dict) -> None:
+        """Executa analisar() (análise do log) e preenche result."""
+        try:
+            log_result = analisar()
         except Exception as e:
-            logger.warning("Erro ao analisar log %s: %s", log_files[0], e)
+            logger.warning("Erro ao analisar log %s: %s", nome, e)
             return
 
         events = log_result["events"]
