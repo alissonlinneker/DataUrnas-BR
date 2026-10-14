@@ -46,7 +46,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 ## Destaques
 
 - **2022 completo:** 941.987 seções dos dois turnos da eleição presidencial, em todas as 27 UFs, decodificadas e auditadas.
-- **2026 em andamento:** resultado oficial agregado do 1º turno de Presidente (Brasil, 27 UFs, exterior e 5.757 municípios) já incorporado; a coleta seção a seção dos Boletins de Urna está em curso.
+- **2026 completo:** 1º turno de Presidente com o resultado oficial agregado (Brasil, 27 UFs, exterior e 5.757 municípios) e os Boletins de Urna de todas as 499.207 seções instaladas, cuja soma reproduz exatamente o resultado oficial em todas as 28 UFs (27 mais o exterior).
 - **Totalização paralela:** os votos são somados a partir dos BUs e reconciliados com os totais oficiais, UF por UF.
 - **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. A etapa é opcional (ativada com `--hashes`) e não fez parte da compilação da base de 2022 distribuída.
 - **Dados distribuídos em Parquet (ZSTD):** os 181 GB de arquivos brutos de 2022 viram cerca de 183 MB, prontos para consulta com DuckDB.
@@ -114,7 +114,9 @@ Na comparação com o 1º turno de 2022 (sem o exterior), o comparecimento ficou
 
 - A soma dos votos válidos por UF e por município bate exatamente com o total nacional (119.300.788 nas três agregações).
 - Os 5.757 municípios (incluindo as cidades do exterior, agrupadas na UF `ZZ`) foram baixados sem nenhuma falha HTTP.
-- A coleta dos BUs por seção (formato ASN.1 v2, arquivos `-bu.dat`) roda em segundo plano com checkpoint; o script `reconcile.py` confere, para cada UF concluída, se a soma dos BUs reproduz os totais oficiais de candidatos, brancos, nulos e comparecimento.
+- Os BUs (formato ASN.1 v2, arquivos `-bu.dat`) de todas as 499.207 seções instaladas foram baixados e decodificados, sem nenhuma falha: 502.388 seções processadas, das quais 17.931 agregadas a outra seção e 41 não instaladas no exterior, gerando 3.800.511 linhas de votos.
+- A soma dos BUs reproduz **exatamente** o resultado oficial em todas as 28 UFs (27 mais o exterior): votos de cada candidato, brancos, nulos, nulos técnicos e comparecimento (125.275.835 votos). Diferença zero em todos os itens, conferida por `reconcile.py`.
+- Modelos de urna identificados pelo arquivo de assinatura: UE2020 (200.463 seções), UE2022 (198.759), UE2015 (88.064) e UE2013 (11.921).
 
 Os esquemas de cada arquivo estão em [docs/dados-2026.md](docs/dados-2026.md).
 
@@ -543,7 +545,7 @@ DataUrnas-BR/
 |---|---|
 | 2022, Presidente, 1º e 2º turnos: BU, log e assinatura por seção | Concluído |
 | 2026, Presidente, 1º turno: resultado oficial agregado (Brasil, UFs, exterior e municípios) | Concluído |
-| 2026, Presidente, 1º turno: BU por seção e reconciliação com o oficial | Em andamento, UF a UF |
+| 2026, Presidente, 1º turno: BU por seção e reconciliação com o oficial | Concluído (diferença zero nas 28 UFs) |
 | 2026, Presidente, 2º turno | Planejado |
 | Decodificação do RDV (recontagem voto a voto) e da imagem do BU | Futuro |
 
@@ -581,7 +583,7 @@ python scripts/docs/gerar_ilustracoes.py     # docs/assets/*.svg (use --png DIR 
 python scripts/docs/capturar_telas.py        # docs/assets/telas/*.png (sobe o painel numa porta livre)
 ```
 
-O segundo script encerra o painel e o navegador ao final e remove os metadados dos PNG. Rode os dois de novo sempre que os dados mudarem, por exemplo quando a coleta seção a seção de 2026 terminar.
+O segundo script encerra o painel e o navegador ao final e remove os metadados dos PNG. Rode os dois de novo sempre que os dados mudarem.
 
 ---
 

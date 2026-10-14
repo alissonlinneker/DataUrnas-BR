@@ -12,8 +12,8 @@ Todos os arquivos ficam em `data/parquet/2026/` e são gravados em Parquet com c
 | `candidatos.parquet` | 12 candidatos, vices, partidos, agremiações e resultado nacional | `fetch_resultados.py` | Completo |
 | `resultado_uf.parquet` | 28 linhas: 27 UFs e exterior (`zz`) | `fetch_resultados.py` | Completo |
 | `resultado_municipio.parquet` | 5.757 municípios, incluindo cidades do exterior | `fetch_resultados.py` | Completo |
-| `secoes_2026.parquet` | Uma linha por seção: metadados do `aux.json` e campos do BU | `fetch_secoes.py` | Em coleta |
-| `votos_presidente_2026.parquet` | Votos de Presidente por seção e candidato | `fetch_secoes.py` | Em coleta |
+| `secoes_2026.parquet` | 517.179 linhas, uma por seção: metadados do `aux.json` e campos do BU (499.207 com BU, 17.931 agregadas, 41 não instaladas) | `fetch_secoes.py` | Completo |
+| `votos_presidente_2026.parquet` | 3.800.511 linhas de votos de Presidente por seção e candidato | `fetch_secoes.py` | Completo |
 | `secoes_parts/` | Partes intermediárias da coleta, consolidadas nos dois arquivos acima | `fetch_secoes.py` | Temporário |
 | `secoes_checkpoint.txt` | Seções já gravadas, usado para retomar a coleta | `fetch_secoes.py` | Temporário |
 | `secoes_erros.txt` | Seções com erro na última execução (refeitas na próxima) | `fetch_secoes.py` | Temporário |

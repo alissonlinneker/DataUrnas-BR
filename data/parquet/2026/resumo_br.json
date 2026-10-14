@@ -1,0 +1,149 @@
+{
+  "eleicao": "6257",
+  "pleito": "3220",
+  "ciclo": "ele2026",
+  "cargo": "Presidente",
+  "turno": 1,
+  "data_eleicao": "04/10/2026",
+  "data_geracao_tse": "05/10/2026 12:51:47",
+  "totais": {
+    "secoes_total": 499248,
+    "secoes_totalizadas": 499248,
+    "secoes_nao_totalizadas": 0,
+    "secoes_instaladas": 499207,
+    "secoes_nao_instaladas": 41,
+    "eleitorado": 158745502,
+    "eleitorado_secoes_totalizadas": 158745502,
+    "comparecimento": 125275835,
+    "abstencao": 33469244,
+    "pct_comparecimento": 78.916358094,
+    "pct_abstencao": 21.083641906,
+    "votos_total": 125275835,
+    "votos_validos": 119300788,
+    "votos_nominais": 119300788,
+    "votos_legenda": 0,
+    "votos_brancos": 2300798,
+    "votos_nulos": 3669003,
+    "votos_nulos_tecnicos": 5246,
+    "votos_nulos_total": 3674249,
+    "votos_anulados_apuracao_separada": 0,
+    "pct_brancos": 1.836585643,
+    "pct_nulos": 2.932927168,
+    "data_totalizacao": "05/10/2026",
+    "hora_totalizacao": "12:51:05"
+  },
+  "candidatos": [
+    {
+      "numero": 22,
+      "nome_urna": "FLAVIO BOLSONARO",
+      "partido_sigla": "PL",
+      "votos": 56104503,
+      "pct_validos": 47.027772356,
+      "situacao": "2º turno"
+    },
+    {
+      "numero": 13,
+      "nome_urna": "LULA",
+      "partido_sigla": "PT",
+      "votos": 53879538,
+      "pct_validos": 45.162767911,
+      "situacao": "2º turno"
+    },
+    {
+      "numero": 70,
+      "nome_urna": "ESCRITOR AUGUSTO CURY",
+      "partido_sigla": "AVANTE",
+      "votos": 3448569,
+      "pct_validos": 2.890650647,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 14,
+      "nome_urna": "RENAN SANTOS",
+      "partido_sigla": "MISSÃO",
+      "votos": 2675887,
+      "pct_validos": 2.242975126,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 55,
+      "nome_urna": "RONALDO CAIADO",
+      "partido_sigla": "PSD",
+      "votos": 2605148,
+      "pct_validos": 2.183680463,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 30,
+      "nome_urna": "ZEMA",
+      "partido_sigla": "NOVO",
+      "votos": 326488,
+      "pct_validos": 0.273667933,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 80,
+      "nome_urna": "SAMARA",
+      "partido_sigla": "UP",
+      "votos": 122911,
+      "pct_validos": 0.103026143,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 16,
+      "nome_urna": "HERTZ DIAS",
+      "partido_sigla": "PSTU",
+      "votos": 43103,
+      "pct_validos": 0.036129686,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 27,
+      "nome_urna": "CLARIANA BARAO",
+      "partido_sigla": "DC",
+      "votos": 40043,
+      "pct_validos": 0.033564741,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 21,
+      "nome_urna": "EDMILSON COSTA",
+      "partido_sigla": "PCB",
+      "votos": 22693,
+      "pct_validos": 0.019021668,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 35,
+      "nome_urna": "VETERINÁRIO WILSON GRASSI",
+      "partido_sigla": "DEMOCRATA",
+      "votos": 16881,
+      "pct_validos": 0.014149948,
+      "situacao": "Não eleito"
+    },
+    {
+      "numero": 29,
+      "nome_urna": "RUI COSTA PIMENTA",
+      "partido_sigla": "PCO",
+      "votos": 15024,
+      "pct_validos": 0.012593379,
+      "situacao": "Não eleito"
+    }
+  ],
+  "n_ufs": 28,
+  "n_municipios": 5757,
+  "municipios_faltando": [],
+  "checagem": {
+    "soma_uf_votos_validos": 119300788,
+    "soma_mun_votos_validos": 119300788,
+    "br_votos_validos": 119300788
+  },
+  "http": {
+    "ok": 5787,
+    "404": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 53524275
+  },
+  "segundos": 132.6
+}
