@@ -62,3 +62,10 @@ data/parquet/2026/secoes_parts/
 data/parquet/2026/integridade/erros-*.txt
 data/parquet/2026/integridade/*.tmp
 data/parquet/2026/auditoria/*.tmp
+
+# Intermediários da recontagem do RDV (2026)
+data/parquet/2026/rdv/parts/
+data/parquet/2026/rdv/checkpoint.txt
+data/parquet/2026/rdv/erros-*.txt
+data/parquet/2026/rdv/execucoes.jsonl
+data/parquet/2026/rdv/*.tmp

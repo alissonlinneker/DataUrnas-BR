@@ -6,6 +6,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não publicado]
 
+### Adicionado
+
+- Parser do Registro Digital do Voto de 2026 (`parsers/rdv.py`, spec v2) e recontagem do RDV contra o BU da mesma seção em todos os cargos (`scripts/ele2026/fetch_rdv.py`, `analyzer/rdv_recontagem.py`), com conferência dos registros contra o comparecimento, da estrutura do RDV e do SHA-512 contra o catálogo de integridade. No Acre e em Roraima (3.789 seções, 4.920.752 registros), todas as seções e cargos conferem.
+- Linha do tempo dos votos no log por seção: votos computados x comparecimento do BU, votos antes das 8h de Brasília, fora da sequência de abertura e encerramento, pico por minuto, intervalos e lacunas. Resultados em `data/parquet/2026/rdv/`.
+
+### Corrigido
+
+- Log de 2026 com troca de urna: o `-log.jez` traz o log da urna substituída como `.jez` aninhado, e o parser lia esse ZIP aninhado como texto em vez do `logd.dat`. A auditoria de BU e log já publicada (`secoes_log_2026.parquet`) registra `votos_log` 0 em 7.675 seções com log; nas 21 de AC e RR conferidas, a causa é essa, e o arquivo precisa ser regerado.
+
 ## [0.2.1] - 2026-10-14
 
 ### Adicionado

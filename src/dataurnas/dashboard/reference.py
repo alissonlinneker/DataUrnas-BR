@@ -189,6 +189,44 @@ INTEGRIDADE_CATEGORIAS: dict[str, tuple[str, str, str]] = {
                        "Compara duas leituras do BU; a diferença pode vir de versão republicada ou de contingência."),
 }
 
+# Recontagem do RDV x BU e linha do tempo do log (2026), mesmos nomes de
+# analyzer/rdv_recontagem.CATEGORIAS
+RDV_CATEGORIAS: dict[str, tuple[str, str, str]] = {
+    "rdv_bu_diverge": ("Recontagem do RDV difere do BU num cargo", GRUPO_ADULTERACAO,
+                       "O BU é a soma dos votos do RDV da mesma urna; não há causa operacional "
+                       "para a soma diferir."),
+    "rdv_registros_diverge": ("Registros do RDV diferem do comparecimento x escolhas",
+                              GRUPO_ADULTERACAO,
+                              "Cada eleitor gera um registro por escolha em cada cargo."),
+    "rdv_estrutura": ("RDV com registro inválido, cargo repetido ou seção trocada",
+                      GRUPO_ADULTERACAO,
+                      "O formato do RDV é fixo; registro fora do spec não sai de urna íntegra."),
+    "rdv_hash_diverge": ("SHA-512 baixado difere do catálogo assinado", GRUPO_ADULTERACAO,
+                         "Equivale ao C01: o arquivo mudou depois de assinado pela urna."),
+    "rdv_nao_decodificado": ("RDV publicado que o decodificador não lê", GRUPO_INVESTIGAR,
+                             "Pode ser arquivo corrompido ou limitação do decodificador."),
+    "rdv_bu_diverge_sa": ("RDV difere do BU do Sistema de Apuração", GRUPO_INVESTIGAR,
+                          "O BU do SA soma cédulas de papel que não estão no RDV da urna."),
+    "log_votos_diverge": ("Votos computados no log diferem do comparecimento do BU",
+                          GRUPO_INVESTIGAR,
+                          "A troca de urna divide o log entre equipamentos; equivale ao A03."),
+    "log_voto_fora_sequencia": ("Voto antes da abertura ou depois do encerramento no log",
+                                GRUPO_INVESTIGAR,
+                                "Pode vir de log de outra urna na seção ou de reinício; "
+                                "pede conferir a sequência de eventos."),
+    "log_voto_outra_data": ("Voto computado com data diferente do dia da eleição",
+                            GRUPO_INVESTIGAR,
+                            "Em geral relógio da urna desajustado; pede conferir o log."),
+    "log_voto_antes_8h": ("Voto antes das 8h de Brasília", GRUPO_OPERACIONAL,
+                          "Hora local da urna, relógio ou fuso; não altera a contagem."),
+    "log_intervalo_curto": ("Votos consecutivos a menos de 10 s", GRUPO_OPERACIONAL,
+                            "Eleitor rápido ou voto em poucos cargos; informativo."),
+    "log_lacuna_60min": ("Mais de 60 min sem voto durante a votação", GRUPO_OPERACIONAL,
+                         "Seção pequena ou movimento baixo; informativo."),
+    "log_relogio_inverso": ("Hora de voto menor que a do voto anterior", GRUPO_OPERACIONAL,
+                            "Ajuste de relógio durante a votação."),
+}
+
 # Análises agregadas: não geram ocorrência por seção, mas também precisam de leitura
 ANALISES_ESTATISTICAS: dict[str, tuple[str, str, str]] = {
     "benford": ("Lei de Benford", GRUPO_OPERACIONAL,
@@ -236,7 +274,8 @@ def contar_por_grupo(contagens) -> dict[str, int]:
     Aceita um mapeamento {código: total}. Chaves fora do catálogo são ignoradas.
     Devolve os três grupos, mesmo os sem ocorrência.
     """
-    grupos_por_chave = {**ISSUE_GRUPOS, **{k: v[1] for k, v in INTEGRIDADE_CATEGORIAS.items()}}
+    grupos_por_chave = {**ISSUE_GRUPOS, **{k: v[1] for k, v in INTEGRIDADE_CATEGORIAS.items()},
+                        **{k: v[1] for k, v in RDV_CATEGORIAS.items()}}
     out = {g: 0 for g in GRUPOS_ORDEM}
     for chave, total in dict(contagens).items():
         grupo = grupos_por_chave.get(str(chave))

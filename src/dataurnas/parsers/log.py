@@ -103,7 +103,10 @@ class LogParser:
                 if sum(i.file_size for i in infos) > MAX_LOG_BYTES:
                     logger.error("Log %s excede o limite descompactado", origem or file_path)
                     return None
-                alvo = sorted(infos, key=lambda i: i.filename)[0]
+                # Na troca de urna o pacote traz também o log da urna substituída
+                # como .jez aninhado (ZIP); o log da urna que encerrou é o logd.dat.
+                proprios = [i for i in infos if i.filename.lower().endswith(".dat")]
+                alvo = sorted(proprios or infos, key=lambda i: i.filename)[0]
                 with z.open(alvo) as fh:
                     dados = fh.read(MAX_LOG_BYTES + 1)
             if len(dados) > MAX_LOG_BYTES:
