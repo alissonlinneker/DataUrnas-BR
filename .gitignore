@@ -63,6 +63,9 @@ data/parquet/2026/integridade/erros-*.txt
 data/parquet/2026/integridade/execucoes.jsonl
 data/parquet/2026/integridade/*.tmp
 data/parquet/2026/integridade/certificados_partes/
+# Catálogo por arquivo: publicado como anexos da versão no GitHub, não no git
+# (o manifesto catalogo_manifest.json, pequeno, é versionado)
+data/parquet/2026/integridade/arquivos_*.parquet
 data/parquet/2026/auditoria/*.tmp
 
 # Segredos e credenciais (nunca versionar)

@@ -13,6 +13,13 @@ coleta de integridade, que roda por horas e grava aos poucos:
 - ``secoes.parquet``: uma linha por seção, com contagens, validade da
   assinatura e dados do certificado.
 - ``resumo.json``: totais e horários da coleta.
+- ``catalogo_manifest.json``: nome, tamanho, SHA-256, linhas e colunas de cada
+  ``arquivos_<uf>.parquet``. Os catálogos por arquivo não são versionados no
+  git: são publicados como anexos de uma versão do projeto no GitHub. Quando o
+  catálogo de uma UF não existe localmente, a consulta por seção e o CSV baixam
+  só o daquela UF (``DATAURNAS_CATALOGO_URL``), conferem o SHA-256 contra o
+  manifesto e guardam a cópia num cache em disco. Os indicadores agregados vêm
+  só de ``secoes.parquet`` e ``resumo.json``.
 
 Tudo aqui aceita dados parciais ou ausentes: arquivos ilegíveis (em gravação)
 são ignorados e, se ``secoes.parquet`` ainda não existe, o resumo por seção é
@@ -22,9 +29,16 @@ derivado dos catálogos de arquivos. Nada depende do Streamlit.
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import json
 import logging
+import os
+import tempfile
+import threading
+import urllib.error
+import urllib.request
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -49,6 +63,18 @@ COLUNAS_ARQUIVO = CHAVE_SECAO + [
 # Limite de linhas do catálogo exportado em CSV (acima disso, pedir filtro mais estreito)
 LIMITE_CSV = 250_000
 
+# Catálogo por arquivo publicado como anexos da versão do projeto no GitHub
+CATALOGO_VERSAO = "v0.3.0"
+CATALOGO_URL_PADRAO = (
+    f"https://github.com/alissonlinneker/DataUrnas-BR/releases/download/{CATALOGO_VERSAO}"
+)
+CATALOGO_PAGINA = f"https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/{CATALOGO_VERSAO}"
+MANIFESTO = "catalogo_manifest.json"
+LIMITE_DOWNLOAD_MB = 200  # maior anexo aceito (SP tem cerca de 78 MB)
+LIMITE_CACHE_MB = 600  # acima disso, os catálogos usados há mais tempo saem do cache
+TIMEOUT_DOWNLOAD = 30  # segundos sem resposta do servidor
+_BLOCO = 1 << 20
+
 
 def integ_dir(base: Path | None = None) -> Path:
     return (base or base_dir()) / "integridade"
@@ -65,6 +91,212 @@ def arquivos_parquet(pasta: Path | None = None, uf: str | None = None) -> list[P
     else:
         candidatos = list(pasta.glob("arquivos_*.parquet"))
     return sorted(p for p in candidatos if _legivel(p))
+
+
+class CatalogoIndisponivel(RuntimeError):
+    """O catálogo da UF não existe localmente e não pôde ser obtido (mensagem legível)."""
+
+
+def _env_int(nome: str, padrao: int) -> int:
+    try:
+        return int(os.environ.get(nome, "") or padrao)
+    except ValueError:
+        return padrao
+
+
+def load_manifesto(pasta: Path | None = None) -> dict:
+    """``catalogo_manifest.json`` (vazio se ausente ou ilegível)."""
+    path = (pasta or integ_dir()) / MANIFESTO
+    if not path.exists():
+        return {}
+    try:
+        dados = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        logger.info("Ignorando manifesto ilegível: %s", path)
+        return {}
+    return dados if isinstance(dados, dict) else {}
+
+
+def entradas_manifesto(manifesto: dict, uf: str) -> list[dict]:
+    """Entradas do manifesto da ``uf`` (SP pode ter várias partes)."""
+    uf = uf.lower()
+    out = []
+    for e in manifesto.get("arquivos") or []:
+        if not isinstance(e, dict) or not e.get("arquivo") or not e.get("sha256"):
+            continue
+        if str(e.get("uf", "")).lower() == uf:
+            out.append(e)
+    return sorted(out, key=lambda e: e["arquivo"])
+
+
+def url_catalogo(arquivo: str) -> str:
+    """URL do anexo. ``DATAURNAS_CATALOGO_URL`` é a base (ou um modelo com ``{arquivo}``)."""
+    base = os.environ.get("DATAURNAS_CATALOGO_URL") or CATALOGO_URL_PADRAO
+    if "{arquivo}" in base:
+        return base.replace("{arquivo}", arquivo)
+    return f"{base.rstrip('/')}/{arquivo}"
+
+
+def cache_dir() -> Path:
+    """Diretório do cache em disco (``DATAURNAS_CATALOGO_CACHE`` ou o temporário do sistema)."""
+    env = os.environ.get("DATAURNAS_CATALOGO_CACHE")
+    return Path(env) if env else Path(tempfile.gettempdir()) / "dataurnas-catalogo"
+
+
+def _sha256_arquivo(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for bloco in iter(lambda: fh.read(_BLOCO), b""):
+            h.update(bloco)
+    return h.hexdigest()
+
+
+def _abrir_url(url: str, timeout: float):
+    """Resposta HTTP em streaming (ponto único de rede, substituído nos testes)."""
+    req = urllib.request.Request(url, headers={"User-Agent": "DataUrnas-BR"})
+    return urllib.request.urlopen(req, timeout=timeout)  # noqa: S310 (URL https fixa ou configurada)
+
+
+_VERIFICADOS: set[tuple[str, int, int]] = set()
+_TRAVAS: dict[str, threading.Lock] = {}
+_TRAVA_GLOBAL = threading.Lock()
+
+
+def _trava(nome: str) -> threading.Lock:
+    with _TRAVA_GLOBAL:
+        return _TRAVAS.setdefault(nome, threading.Lock())
+
+
+def _confere_em_cache(path: Path, tamanho: int | None, sha256: str) -> bool:
+    try:
+        st_ = path.stat()
+    except OSError:
+        return False
+    if tamanho is not None and st_.st_size != tamanho:
+        return False
+    chave = (str(path), st_.st_size, st_.st_mtime_ns)
+    if chave in _VERIFICADOS:
+        return True
+    if _sha256_arquivo(path) != sha256:
+        return False
+    _VERIFICADOS.add(chave)
+    return True
+
+
+def _limpar_cache(pasta: Path, manter: Path, limite: int) -> None:
+    """Remove os catálogos usados há mais tempo até o cache caber em ``limite`` bytes."""
+    try:
+        itens = [(p, p.stat()) for p in pasta.glob("*.parquet")]
+    except OSError:
+        return
+    total = sum(st_.st_size for _, st_ in itens)
+    for p, st_ in sorted(itens, key=lambda x: x[1].st_mtime):
+        if total <= limite:
+            break
+        if p == manter:
+            continue
+        try:
+            p.unlink()
+            total -= st_.st_size
+        except OSError:
+            continue
+
+
+def _baixar_catalogo(entrada: dict, uf: str) -> Path:
+    arquivo = str(entrada["arquivo"])
+    sha256 = str(entrada["sha256"]).lower()
+    tamanho = entrada.get("tamanho")
+    tamanho = int(tamanho) if tamanho is not None else None
+    url = url_catalogo(arquivo)
+    pasta = cache_dir()
+    destino = pasta / f"{sha256[:16]}_{Path(arquivo).name}"
+    limite = _env_int("DATAURNAS_CATALOGO_MAX_MB", LIMITE_DOWNLOAD_MB) << 20
+    rotulo = uf.upper()
+    if tamanho is not None and tamanho > limite:
+        raise CatalogoIndisponivel(
+            f"O catálogo de hashes de {rotulo} tem {tamanho >> 20} MB, acima do limite de "
+            f"{limite >> 20} MB para download pelo painel. Baixe-o diretamente em {url}.")
+    with _trava(destino.name):
+        if _confere_em_cache(destino, tamanho, sha256):
+            try:
+                os.utime(destino)  # marca uso recente (ordem de limpeza do cache)
+            except OSError:
+                pass
+            return destino
+        try:
+            pasta.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise CatalogoIndisponivel(
+                f"Sem espaço de cache para o catálogo de hashes de {rotulo} ({exc.strerror or exc}).") from exc
+        tmp = pasta / f".{destino.name}.{uuid.uuid4().hex}.part"
+        timeout = _env_int("DATAURNAS_CATALOGO_TIMEOUT", TIMEOUT_DOWNLOAD)
+        h = hashlib.sha256()
+        lidos = 0
+        maximo = tamanho if tamanho is not None else limite
+        try:
+            with _abrir_url(url, timeout) as resp, tmp.open("wb") as out:
+                for bloco in iter(lambda: resp.read(_BLOCO), b""):
+                    lidos += len(bloco)
+                    if lidos > maximo:
+                        raise CatalogoIndisponivel(
+                            f"O catálogo de hashes de {rotulo} recebido é maior que o esperado; "
+                            "o download foi interrompido.")
+                    h.update(bloco)
+                    out.write(bloco)
+            if h.hexdigest() != sha256 or (tamanho is not None and lidos != tamanho):
+                raise CatalogoIndisponivel(
+                    f"O catálogo de hashes de {rotulo} baixado de {url} não confere com o SHA-256 do "
+                    "manifesto (catalogo_manifest.json) e foi descartado.")
+            os.replace(tmp, destino)
+        except CatalogoIndisponivel:
+            raise
+        except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+            motivo = getattr(exc, "reason", None) or getattr(exc, "code", None) or exc
+            raise CatalogoIndisponivel(
+                f"O catálogo de hashes de {rotulo} não está nesta instalação e não pôde ser baixado agora "
+                f"({motivo}). Verifique a conexão e tente de novo, ou baixe o arquivo em {url}.") from exc
+        finally:
+            tmp.unlink(missing_ok=True)
+        st_ = destino.stat()
+        _VERIFICADOS.add((str(destino), st_.st_size, st_.st_mtime_ns))
+        _limpar_cache(pasta, destino, _env_int("DATAURNAS_CATALOGO_CACHE_MB", LIMITE_CACHE_MB) << 20)
+        logger.info("Catálogo %s baixado (%d bytes) para %s", arquivo, lidos, destino)
+        return destino
+
+
+def catalogo_local(uf: str, pasta: Path | None = None) -> bool:
+    """True se o catálogo da ``uf`` está em ``pasta`` (sem precisar de download)."""
+    return bool(arquivos_parquet(pasta, uf))
+
+
+def tamanho_remoto(uf: str, pasta: Path | None = None) -> int:
+    """Bytes a baixar para a ``uf`` segundo o manifesto (0 se não há o que baixar)."""
+    return sum(int(e.get("tamanho") or 0) for e in entradas_manifesto(load_manifesto(pasta), uf))
+
+
+def catalogo_uf(uf: str, pasta: Path | None = None, remoto: bool = True) -> list[Path]:
+    """Catálogos da ``uf``: os locais e, sem eles, os anexos listados no manifesto.
+
+    O download só acontece com manifesto (é ele que dá o SHA-256 a conferir).
+    Levanta ``CatalogoIndisponivel`` com mensagem legível se a rede falhar.
+    """
+    locais = arquivos_parquet(pasta, uf)
+    if locais or not remoto:
+        return locais
+    entradas = entradas_manifesto(load_manifesto(pasta), uf)
+    return [_baixar_catalogo(e, uf) for e in entradas]
+
+
+def contar_pelas_secoes(secoes: pd.DataFrame, uf: str, cd_mun: str | None = None,
+                        apenas_divergentes: bool = False) -> int:
+    """Arquivos de um filtro contados pelo resumo por seção (sem ler o catálogo)."""
+    if secoes.empty:
+        return 0
+    s = secoes[secoes["uf"] == uf.lower()]
+    if cd_mun:
+        s = s[s["cd_mun"] == str(cd_mun)]
+    col = "n_hash_diverge" if apenas_divergentes else "n_arquivos"
+    return int(pd.to_numeric(s[col], errors="coerce").fillna(0).sum())
 
 
 def files_signature(pasta: Path | None = None) -> tuple:
@@ -380,7 +612,7 @@ def contagens_2026(t: dict, pasta: Path | None = None, base: Path | None = None)
 def _consulta_arquivos(pasta: Path | None, uf: str, cd_mun: str | None = None, zona: str | None = None,
                        secao: str | None = None, apenas_divergentes: bool = False,
                        limite: int | None = None) -> pd.DataFrame:
-    arquivos = arquivos_parquet(pasta, uf)
+    arquivos = catalogo_uf(uf, pasta)
     if not arquivos:
         return pd.DataFrame(columns=COLUNAS_ARQUIVO)
     filtros, params = ["lower(uf) = ?"], [uf.lower()]
@@ -425,8 +657,10 @@ def situacao_hash(row) -> str:
 
 
 def contar_catalogo(uf: str, cd_mun: str | None = None, zona: str | None = None,
-                    apenas_divergentes: bool = False, pasta: Path | None = None) -> int:
-    arquivos = arquivos_parquet(pasta, uf)
+                    apenas_divergentes: bool = False, pasta: Path | None = None,
+                    remoto: bool = False) -> int:
+    """Arquivos do filtro no catálogo (só local por padrão: contar não justifica um download)."""
+    arquivos = catalogo_uf(uf, pasta, remoto=remoto)
     if not arquivos:
         return 0
     filtros, params = ["lower(uf) = ?"], [uf.lower()]

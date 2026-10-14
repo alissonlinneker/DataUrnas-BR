@@ -357,10 +357,10 @@ def _detalhe_secao(sig: tuple, linha: pd.Series, municipio: str) -> None:
     if status != "ok":
         st.info("Seção sem arquivos próprios para conferir (agregada a outra, não instalada ou sem publicação).")
 
-    arquivos = _arquivos_secao(sig, uf, mun, zona, secao)
-    if arquivos.empty:
+    arquivos = _com_catalogo(uf, lambda: _arquivos_secao(sig, uf, mun, zona, secao))
+    if arquivos is not None and arquivos.empty:
         st.info("Nenhum arquivo catalogado para esta seção.")
-    else:
+    elif arquivos is not None:
         tab = arquivos.copy()
         for c in ("md5", "sha256", "sha512", "sha512_assinado"):
             tab[f"{c}_curto"] = tab[c].map(ig.mascarar_hash)
@@ -393,6 +393,23 @@ def _detalhe_secao(sig: tuple, linha: pd.Series, municipio: str) -> None:
         st.dataframe(cert, hide_index=True, width="stretch")
 
 
+def _com_catalogo(uf: str, ler):
+    """Executa ``ler``; se o catálogo da UF vier da internet, avisa e trata a falha sem quebrar a página."""
+    if ig.catalogo_local(uf):
+        return ler()
+    mb = ig.tamanho_remoto(uf) / (1 << 20)
+    try:
+        with st.spinner(f"Obtendo o catálogo de hashes de {uf.upper()} ({fmt_num_mb(mb)})..."):
+            return ler()
+    except ig.CatalogoIndisponivel as exc:
+        st.warning(str(exc))
+        return None
+
+
+def fmt_num_mb(mb: float) -> str:
+    return f"{mb:.1f} MB".replace(".", ",") if mb else "tamanho desconhecido"
+
+
 def _exportar(sig: tuple, secoes: pd.DataFrame, res_mun: pd.DataFrame) -> None:
     st.markdown("### Baixar o catálogo")
     st.caption("CSV com um registro por arquivo (UTF-8, separador ponto e vírgula): MD5, SHA-256, SHA-512 calculado, "
@@ -404,13 +421,18 @@ def _exportar(sig: tuple, secoes: pd.DataFrame, res_mun: pd.DataFrame) -> None:
     mun = c2.selectbox("Município (opcional)", muns, index=None, placeholder="Todos",
                        format_func=lambda m: f"{nomes.get((uf, m), 'Município')} ({m})", key="integ_csv_mun")
     divergentes = c3.toggle("Só divergentes", key="integ_csv_div")
-    n = _contar(sig, uf, mun, None, divergentes)
+    # Sem o catálogo local, a contagem sai do resumo por seção: o download só acontece ao preparar o CSV
+    if ig.catalogo_local(uf):
+        n = _contar(sig, uf, mun, None, divergentes)
+    else:
+        n = ig.contar_pelas_secoes(secoes, uf, mun, divergentes)
     if n == 0:
         st.info("Nenhum arquivo catalogado com esse filtro.")
         return
     if n > ig.LIMITE_CSV:
         st.info(f"O filtro seleciona {fmt_int(n)} arquivos, acima do limite de {fmt_int(ig.LIMITE_CSV)} por download. "
-                "Escolha um município. O catálogo completo está em data/parquet/2026/integridade.")
+                "Escolha um município. O catálogo completo de cada UF (Parquet) está nos anexos da versão "
+                f"[{ig.CATALOGO_VERSAO}]({ig.CATALOGO_PAGINA}) do projeto, conferível pelo SHA256SUMS.")
         return
     chave = ("integ_csv_pronto", uf, mun, divergentes)
     if st.session_state.get("integ_csv_chave") != chave:
@@ -418,5 +440,9 @@ def _exportar(sig: tuple, secoes: pd.DataFrame, res_mun: pd.DataFrame) -> None:
             return
         st.session_state["integ_csv_chave"] = chave
     nome = "_".join(p for p in ("integridade_2026", uf, mun, "divergentes" if divergentes else None) if p)
-    st.download_button("Baixar CSV", _csv(sig, uf, mun, None, divergentes), file_name=f"{nome}.csv",
+    dados = _com_catalogo(uf, lambda: _csv(sig, uf, mun, None, divergentes))
+    if dados is None:
+        st.session_state.pop("integ_csv_chave", None)
+        return
+    st.download_button("Baixar CSV", dados, file_name=f"{nome}.csv",
                        mime="text/csv", icon=":material/download:", key="integ_csv_baixar")
