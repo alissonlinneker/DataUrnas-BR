@@ -321,6 +321,11 @@ class ConsistencyAnalyzer:
 # não são publicados por padrão e por isso não contam como ausentes.
 SUFIXOS_PUBLICADOS = ("-bu.dat", "-rdv.dat", "-log.jez", "-busa.dat", "-logsa.jez")
 
+# 2022 (spec v1, .vscmr): o pacote de dados abertos do TSE traz .bu, .rdv,
+# .logjez, .imgbu e .vscmr de cada seção; .jufa, .hash, .wsq*, .ver e .chvtp
+# são assinados, mas não publicados.
+SUFIXOS_PUBLICADOS_V1 = (".bu", ".rdv", ".logjez", ".imgbu", ".busa", ".imgbusa", ".logsajez")
+
 CATEGORIAS_DIVERGENCIA = (
     "hash_diverge",            # SHA-512 calculado difere do assinado no .vsc
     "assinatura_invalida",     # assinatura ou estrutura do .vsc não confere
@@ -330,7 +335,9 @@ CATEGORIAS_DIVERGENCIA = (
 
 TIPOS_ARQUIVO = {"bu": "bu", "rdv": "rdv", "log": "log", "vota": "vota",
                  "busa": "busa", "imgbu": "imgbu",
-                 "sa": "vota", "logsa": "log"}
+                 "sa": "vota", "logsa": "log",
+                 # extensões de 2022 (spec v1)
+                 "logjez": "log", "vscmr": "vota", "logsajez": "log"}
 
 
 def tipo_arquivo(tp: str, nome: str) -> str:
@@ -342,7 +349,7 @@ def tipo_arquivo(tp: str, nome: str) -> str:
     t = TIPOS_ARQUIVO.get((tp or "").lower())
     if t:
         return t
-    if nome.endswith(".vsc"):
+    if nome.endswith((".vsc", ".vscmr", ".vscsa")):
         return "vota"
     return "other"
 
@@ -363,19 +370,24 @@ def digests(raw: bytes) -> dict:
     }
 
 
-def _votos_bu(raw: bytes) -> tuple:
+def _votos_bu(raw: bytes, eleicao: int | str | None = None) -> tuple:
     from ..downloader.ele2026 import bu_to_rows
 
-    _sec, votos = bu_to_rows(raw)
+    _sec, votos = bu_to_rows(raw, eleicao=int(eleicao)) if eleicao else bu_to_rows(raw)
     return tuple(sorted((v["tipo_voto"], v["numero"] or 0, v["votos"] or 0) for v in votos))
 
 
-def auditar_conjunto(ident: dict, conjunto: dict) -> dict:
+def auditar_conjunto(ident: dict, conjunto: dict,
+                     sufixos_publicados: tuple[str, ...] = SUFIXOS_PUBLICADOS,
+                     fonte: str = "aux.json") -> dict:
     """Audita um conjunto de arquivos (um hash do aux.json) de uma seção.
 
     conjunto = {"token", "data_hora", "arquivos": [(tp, nome, bytes|None), ...]}
     bytes None = arquivo listado no aux.json, mas indisponível no servidor
     (HTTP 404): vira linha com disponivel False e sem hashes calculados.
+    sufixos_publicados: arquivos assinados que o TSE publica (os demais nomes
+    do .vsc não contam como ausentes); fonte: onde a lista de arquivos
+    publicados foi lida ("aux.json" em 2026, o pacote zip em 2022).
     Retorna {"linhas": [...], "verificacao": dict|None, "divergencias": [...]}.
     """
     from ..parsers.signature import verificar_vsc
@@ -436,10 +448,10 @@ def auditar_conjunto(ident: dict, conjunto: dict) -> dict:
                 "; ".join(verif["falhas"]) or "assinatura inválida")
         publicados = {nm for _, nm, _ in arqs}
         for nm, h in assinados.items():
-            if nm.endswith(SUFIXOS_PUBLICADOS) and nm not in publicados:
-                motivo = ("arquivo listado no .vsc e no aux.json, mas indisponível no "
+            if nm.endswith(sufixos_publicados) and nm not in publicados:
+                motivo = (f"arquivo listado no .vsc e no {fonte}, mas indisponível no "
                           "servidor do TSE (HTTP 404)" if nm in indisponiveis else
-                          "arquivo listado no .vsc, mas ausente no aux.json do TSE")
+                          f"arquivo listado no .vsc, mas ausente no {fonte} do TSE")
                 div("arquivo_ausente_tse", nm, None, h.hex(), motivo)
     return {"linhas": linhas, "verificacao": verif, "divergencias": divs}
 
@@ -447,12 +459,12 @@ def auditar_conjunto(ident: dict, conjunto: dict) -> dict:
 _BATCH = None
 
 
-def _votos_presidente(bu) -> tuple:
-    """Votos de Presidente (1º turno de 2026) de um BoletimUrna, no mesmo
-    formato normalizado de _votos_bu."""
+def _votos_presidente(bu, eleicao: int | str | None = None) -> tuple:
+    """Votos de Presidente (2026; por padrão o 1º turno, eleição 6257) de um
+    BoletimUrna, no mesmo formato normalizado de _votos_bu."""
     from ..config import ELE2026
 
-    eleicao = int(ELE2026["eleicao_1t"])
+    eleicao = int(eleicao or ELE2026["eleicao_1t"])
     cargo = ELE2026["cargo_presidente"]
     out = []
     for res in bu.resultados_por_eleicao:
@@ -466,15 +478,18 @@ def _votos_presidente(bu) -> tuple:
     return tuple(sorted(out))
 
 
-def analisar_secao_2026(ident: dict, conjunto: dict, modelo_cod: int | None) -> dict:
+def analisar_secao_2026(ident: dict, conjunto: dict, modelo_cod: int | None,
+                        turno: int = 1, data: str | None = None) -> dict:
     """Auditoria por seção de 2022 (BatchAnalyzer) aplicada a BU e log em memória.
 
     Usa o BU da urna (-bu.dat) ou, na falta, o do Sistema de Apuração
     (-busa.dat), e o log da urna (-log.jez) ou do SA (-logsa.jez).
+    turno define o prefixo do secao_id ('1T/' ou '2T/'); data (DD/MM/AAAA,
+    padrão: a data do turno) filtra o log, que no 2º turno acumula o 1º.
     Retorna {"secao_log": dict, "issues": [linhas], "bu_obj": BoletimUrna|None}.
     """
-    from ..config import ELE2026
     from ..database.rows import SECOES_COLUMNS, extract_rows
+    from ..downloader.ele2026 import parametros_turno
     from .batch import BatchAnalyzer
 
     global _BATCH
@@ -489,8 +504,8 @@ def analisar_secao_2026(ident: dict, conjunto: dict, modelo_cod: int | None) -> 
     if modelo_cod:
         modelo = str(2000 + modelo_cod) if modelo_cod < 100 else str(modelo_cod)
     result = _BATCH.analyze_section_bytes(
-        loc, bu[1] if bu else None, lg[1] if lg else None, turno=1,
-        turno_date=ELE2026["data_1t"], modelo=modelo,
+        loc, bu[1] if bu else None, lg[1] if lg else None, turno=int(turno),
+        turno_date=data or parametros_turno(turno)["data"], modelo=modelo,
         nome_bu=bu[0] if bu else "bu.dat", nome_log=lg[0] if lg else "log.jez")
     rows = extract_rows(result)
     secao_log = dict(zip(SECOES_COLUMNS, rows.secao, strict=True))
@@ -502,16 +517,25 @@ def analisar_secao_2026(ident: dict, conjunto: dict, modelo_cod: int | None) -> 
 
 
 def auditar_secao(ident: dict, conjuntos: list[dict], escolhido: int = -1,
-                  votos_esperados: tuple | None = None, analisar: bool = False) -> dict:
+                  votos_esperados: tuple | None = None, analisar: bool = False,
+                  turno: int = 1, eleicao: int | str | None = None,
+                  data: str | None = None) -> dict:
     """Audita todos os conjuntos de arquivos de uma seção.
 
     Executada no pool de processos (só recebe tipos serializáveis).
     escolhido: índice do conjunto usado para os campos da seção (o hash
     totalizado). votos_esperados: tupla ordenada (tipo_voto, numero, votos)
-    já coletada; None desliga a conferência.
+    já coletada; None desliga a conferência. turno, eleicao e data seguem
+    parametros_turno(turno) quando não informados (1º turno: eleição 6257,
+    04/10/2026; 2º turno: eleição 6258, 25/10/2026).
     Retorna {"linhas", "secao", "divergencias"}.
     """
     from ..config import MODELOS_URNA
+    from ..downloader.ele2026 import parametros_turno
+
+    pt = parametros_turno(turno)
+    eleicao = int(eleicao or pt["eleicao"])
+    data = data or pt["data"]
 
     linhas: list[dict] = []
     divs: list[dict] = []
@@ -541,7 +565,8 @@ def auditar_secao(ident: dict, conjuntos: list[dict], escolhido: int = -1,
     analise = None
     if analisar and conjuntos:
         try:
-            analise = analisar_secao_2026(ident, conjuntos[escolhido], v.get("modelo_cod"))
+            analise = analisar_secao_2026(ident, conjuntos[escolhido], v.get("modelo_cod"),
+                                          turno, data)
         except Exception as e:  # noqa: BLE001 - falha da análise não derruba a auditoria
             motivos.append(f"análise BU/log falhou: {e!r}"[:200])
     votos_conferem = None
@@ -552,9 +577,10 @@ def auditar_secao(ident: dict, conjuntos: list[dict], escolhido: int = -1,
         if raw_bu is not None:
             try:
                 if analise is not None and analise["bu_obj"] is not None:
-                    votos_conferem = _votos_presidente(analise["bu_obj"]) == votos_esperados
+                    votos_conferem = (_votos_presidente(analise["bu_obj"], eleicao)
+                                      == votos_esperados)
                 else:
-                    votos_conferem = _votos_bu(raw_bu) == votos_esperados
+                    votos_conferem = _votos_bu(raw_bu, eleicao) == votos_esperados
             except Exception as e:  # noqa: BLE001 - BU ilegível vira motivo
                 motivos.append(f"BU não decodificado: {e!r}"[:200])
             if votos_conferem is False:

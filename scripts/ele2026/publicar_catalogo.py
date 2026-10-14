@@ -15,9 +15,14 @@ O script:
   usa esse manifesto para baixar só a UF consultada e conferir o SHA-256;
 - imprime o comando ``gh release upload`` (não executa nada no GitHub).
 
+Com --turno 2 os padrões passam a ``data/parquet/2026/t2/integridade/`` e
+``dist/catalogo-integridade-2026-t2/``. Os nomes dos anexos são os mesmos do 1º
+turno (``arquivos_<uf>.parquet``), então o 2º turno vai numa versão própria.
+
 Uso:
     python3 scripts/ele2026/publicar_catalogo.py
     python3 scripts/ele2026/publicar_catalogo.py --versao v0.2.1
+    python3 scripts/ele2026/publicar_catalogo.py --turno 2 --versao vX.Y.Z
 """
 
 from __future__ import annotations
@@ -104,13 +109,26 @@ def comando_upload(dist: Path = DIST, versao: str = VERSAO, repo: str = REPO) ->
             f"--repo {repo} --clobber")
 
 
+def pastas_turno(turno: int = 1) -> tuple[Path, Path]:
+    """(pasta dos catálogos, pasta dos anexos) do turno: o 1º mantém PASTA e DIST."""
+    if turno == 1:
+        return PASTA, DIST
+    return (RAIZ / f"data/parquet/2026/t{turno}/integridade",
+            RAIZ / f"dist/catalogo-integridade-2026-t{turno}")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--versao", default=VERSAO, help=f"tag da versão (padrão {VERSAO})")
     ap.add_argument("--repo", default=REPO)
-    ap.add_argument("--pasta", type=Path, default=PASTA)
-    ap.add_argument("--dist", type=Path, default=DIST)
+    ap.add_argument("--turno", type=int, choices=(1, 2), default=1,
+                    help="turno dos catálogos: 1 ou 2 (padrão: 1)")
+    ap.add_argument("--pasta", type=Path, default=None)
+    ap.add_argument("--dist", type=Path, default=None)
     args = ap.parse_args(argv)
+    pasta, dist = pastas_turno(args.turno)
+    args.pasta = args.pasta or pasta
+    args.dist = args.dist or dist
 
     m = montar(args.pasta, args.dist, args.versao, args.repo)
     mb = f"{m['total_bytes'] / (1 << 20):.1f}".replace(".", ",")

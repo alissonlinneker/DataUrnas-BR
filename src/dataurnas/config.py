@@ -47,19 +47,23 @@ ELECTIONS = {
     },
 }
 
-# Eleição geral de 2026 (1º turno em 04/10/2026). Spec ASN.1 v2 (arquivos -bu.dat).
+# Eleição geral de 2026 (1º turno em 04/10/2026, 2º turno em 25/10/2026).
+# Spec ASN.1 v2 (arquivos -bu.dat).
 ELE2026 = {
     "ciclo": "ele2026",
     "pleito_1t": "3220",
     "eleicao_1t": "6257",  # Eleição Ordinária Federal 2026 1º Turno (Presidente)
-    "eleicao_2t": "6258",
+    "eleicao_2t": "6258",  # Eleição Ordinária Federal 2026 2º Turno (Presidente)
+    "pleito_2t": "3221",
     "data_1t": "04/10/2026",
+    "data_2t": "25/10/2026",
     "cargo_presidente": 1,
     "spec_version": "v2",
 }
 ELECTIONS["geral_2026"] = {
     "ciclo": ELE2026["ciclo"],
     "pleito_1t": ELE2026["pleito_1t"],
+    "pleito_2t": ELE2026["pleito_2t"],
     "eleicao_1t": ELE2026["eleicao_1t"],
     "eleicao_2t": ELE2026["eleicao_2t"],
     "cargos": {"presidente": 1},
