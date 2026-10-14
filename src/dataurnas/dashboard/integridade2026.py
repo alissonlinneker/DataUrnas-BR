@@ -6,7 +6,10 @@ coleta de integridade, que roda por horas e grava aos poucos:
 - ``arquivos_<uf>.parquet`` (SP pode vir dividido em ``arquivos_sp_*.parquet``):
   um registro por arquivo publicado da seção, com MD5, SHA-256 e SHA-512
   calculados, o SHA-512 assinado pela urna (quando o arquivo é coberto pela
-  assinatura) e o resultado da comparação (``hash_confere``).
+  assinatura) e o resultado da comparação (``hash_confere``). Arquivo listado
+  no aux.json e indisponível no servidor (HTTP 404) vem com ``disponivel``
+  falso, ``http_status`` 404 e hashes nulos (catálogos antigos não têm essas
+  colunas: todo arquivo listado foi baixado).
 - ``secoes.parquet``: uma linha por seção, com contagens, validade da
   assinatura e dados do certificado.
 - ``resumo.json``: totais e horários da coleta.
@@ -37,11 +40,11 @@ STATUS_SECAO = ("ok", "agregada", "nao_instalada", "sem_arquivos")
 COLUNAS_SECAO = CHAVE_SECAO + [
     "status_secao", "n_arquivos", "n_hash_confere", "n_hash_diverge", "n_sem_hash",
     "assinatura_valida", "assinatura_algoritmo", "cert_subject", "cert_issuer", "cert_serial",
-    "cert_sha256", "modelo_urna", "motivo", "votos_conferem",
+    "cert_sha256", "modelo_urna", "motivo", "votos_conferem", "n_indisponiveis",
 ]
 COLUNAS_ARQUIVO = CHAVE_SECAO + [
     "tipo", "nome", "tamanho", "md5", "sha256", "sha512", "sha512_assinado", "hash_confere",
-    "token_tse", "data_hora_tse",
+    "token_tse", "data_hora_tse", "disponivel", "http_status",
 ]
 # Limite de linhas do catálogo exportado em CSV (acima disso, pedir filtro mais estreito)
 LIMITE_CSV = 250_000
@@ -143,7 +146,7 @@ def _normalizar_secoes(df: pd.DataFrame) -> pd.DataFrame:
     for c in COLUNAS_SECAO:
         if c not in df.columns:
             df[c] = None
-    for c in ("n_arquivos", "n_hash_confere", "n_hash_diverge", "n_sem_hash"):
+    for c in ("n_arquivos", "n_hash_confere", "n_hash_diverge", "n_sem_hash", "n_indisponiveis"):
         df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0).astype("int64")
     for c in ("assinatura_valida", "votos_conferem"):
         df[c] = df[c].astype("boolean")

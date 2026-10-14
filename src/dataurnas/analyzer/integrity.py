@@ -373,12 +373,15 @@ def _votos_bu(raw: bytes) -> tuple:
 def auditar_conjunto(ident: dict, conjunto: dict) -> dict:
     """Audita um conjunto de arquivos (um hash do aux.json) de uma seção.
 
-    conjunto = {"token", "data_hora", "arquivos": [(tp, nome, bytes), ...]}
+    conjunto = {"token", "data_hora", "arquivos": [(tp, nome, bytes|None), ...]}
+    bytes None = arquivo listado no aux.json, mas indisponível no servidor
+    (HTTP 404): vira linha com disponivel False e sem hashes calculados.
     Retorna {"linhas": [...], "verificacao": dict|None, "divergencias": [...]}.
     """
     from ..parsers.signature import verificar_vsc
 
-    arqs = conjunto["arquivos"]
+    todos = conjunto["arquivos"]
+    arqs = [(tp, nm, raw) for tp, nm, raw in todos if raw is not None]
     vscs = [(tp, nm, raw) for tp, nm, raw in arqs if eh_assinatura(tp, nm)]
     dados = [(tp, nm, raw) for tp, nm, raw in arqs if not eh_assinatura(tp, nm)]
     verif = None
@@ -414,7 +417,19 @@ def auditar_conjunto(ident: dict, conjunto: dict) -> dict:
         linhas.append({**ident, "tipo": tipo_arquivo(tp, nm), "nome": nm, **d,
                        "sha512_assinado": assin, "hash_confere": confere,
                        "token_tse": conjunto["token"],
-                       "data_hora_tse": conjunto["data_hora"]})
+                       "data_hora_tse": conjunto["data_hora"],
+                       "disponivel": True, "http_status": 200})
+    indisponiveis = {nm for _tp, nm, raw in todos if raw is None}
+    for tp, nm, raw in todos:
+        if raw is not None:
+            continue
+        h = assinados.get(nm)
+        linhas.append({**ident, "tipo": tipo_arquivo(tp, nm), "nome": nm,
+                       "tamanho": None, "md5": None, "sha256": None, "sha512": None,
+                       "sha512_assinado": h.hex() if h is not None else None,
+                       "hash_confere": None, "token_tse": conjunto["token"],
+                       "data_hora_tse": conjunto["data_hora"],
+                       "disponivel": False, "http_status": 404})
     if verif is not None:
         if verif["assinatura_valida"] is False:
             div("assinatura_invalida", vscs[0][1], None, None,
@@ -422,8 +437,10 @@ def auditar_conjunto(ident: dict, conjunto: dict) -> dict:
         publicados = {nm for _, nm, _ in arqs}
         for nm, h in assinados.items():
             if nm.endswith(SUFIXOS_PUBLICADOS) and nm not in publicados:
-                div("arquivo_ausente_tse", nm, None, h.hex(),
-                    "arquivo listado no .vsc, mas ausente no aux.json do TSE")
+                motivo = ("arquivo listado no .vsc e no aux.json, mas indisponível no "
+                          "servidor do TSE (HTTP 404)" if nm in indisponiveis else
+                          "arquivo listado no .vsc, mas ausente no aux.json do TSE")
+                div("arquivo_ausente_tse", nm, None, h.hex(), motivo)
     return {"linhas": linhas, "verificacao": verif, "divergencias": divs}
 
 
@@ -463,7 +480,7 @@ def analisar_secao_2026(ident: dict, conjunto: dict, modelo_cod: int | None) -> 
     global _BATCH
     if _BATCH is None:
         _BATCH = BatchAnalyzer()
-    arqs = {tp: (nm, raw) for tp, nm, raw in conjunto["arquivos"]}
+    arqs = {tp: (nm, raw) for tp, nm, raw in conjunto["arquivos"] if raw is not None}
     bu = arqs.get("bu") or arqs.get("busa")
     lg = arqs.get("log") or arqs.get("logsa")
     loc = {"uf": ident["uf"], "municipio": ident["cd_mun"], "zona": ident["zona"],
@@ -512,6 +529,8 @@ def auditar_secao(ident: dict, conjuntos: list[dict], escolhido: int = -1,
             motivos.append(pre + "conjunto sem arquivo de assinatura (.vsc)")
         else:
             motivos.extend(pre + m for m in vv["falhas"] + vv["motivos"])
+        motivos.extend(f"{pre}arquivo listado no aux.json e indisponível no servidor "
+                       f"(HTTP 404): {nm}" for _tp, nm, raw in c["arquivos"] if raw is None)
     validas = [r["verificacao"]["assinatura_valida"] for r in res if r["verificacao"]]
     if any(x is False for x in validas):
         assinatura_valida = False
@@ -527,7 +546,8 @@ def auditar_secao(ident: dict, conjuntos: list[dict], escolhido: int = -1,
             motivos.append(f"análise BU/log falhou: {e!r}"[:200])
     votos_conferem = None
     if votos_esperados is not None and conjuntos:
-        arqs = {tp: raw for tp, _nm, raw in conjuntos[escolhido]["arquivos"]}
+        arqs = {tp: raw for tp, _nm, raw in conjuntos[escolhido]["arquivos"]
+                if raw is not None}
         raw_bu = arqs.get("bu") or arqs.get("busa")
         if raw_bu is not None:
             try:
@@ -546,7 +566,9 @@ def auditar_secao(ident: dict, conjuntos: list[dict], escolhido: int = -1,
         "n_arquivos": len(linhas),
         "n_hash_confere": sum(1 for x in linhas if x["hash_confere"] is True),
         "n_hash_diverge": sum(1 for x in linhas if x["hash_confere"] is False),
-        "n_sem_hash": sum(1 for x in linhas if x["hash_confere"] is None),
+        "n_sem_hash": sum(1 for x in linhas
+                          if x["hash_confere"] is None and x["disponivel"]),
+        "n_indisponiveis": sum(1 for x in linhas if not x["disponivel"]),
         "assinatura_valida": assinatura_valida,
         "assinatura_algoritmo": v.get("algoritmo"),
         "cert_subject": v.get("cert_subject"),

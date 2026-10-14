@@ -345,3 +345,121 @@ def test_auditar_secao_com_analise(vsc_ac, bu_ac):
     assert s["modelo_urna"] == "2022" and s["fuso_offset"] == -2
     assert s["tem_log"] is False and s["origem_bu"] == "bu"
     assert all(i[0] == s["secao_id"] for i in r["issues"])
+
+
+# --- arquivo listado no aux.json e indisponível (HTTP 404) -----------------
+
+NOME_RDV = "o03220ac0106600040077-rdv.dat"
+NOME_IMGBU = "o03220ac0106600040077-imgbu.dat"
+
+
+class _FetcherFalso:
+    """HttpFetcher sem rede: aux.json fixo e corpos por nome (None = 404)."""
+
+    def __init__(self, arquivos: list[tuple[str, str, bytes | None]]):
+        self.arquivos = arquivos
+        self.corpos = {nm: raw for _tp, nm, raw in arquivos}
+
+    async def get_json(self, url: str):
+        return {"st": "Recebida", "hashes": [{
+            "hash": "4a6b70", "st": "Recebida", "dr": "06/10/2026", "hr": "10:00:00",
+            "arq": [{"tp": tp, "nm": nm} for tp, nm, _ in self.arquivos]}]}
+
+    async def get(self, url: str):
+        return self.corpos[url.rsplit("/", 1)[-1]]
+
+
+def _processar(mod, arquivos, caplog):
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+
+    s = {**IDENT, "secao_principal": None}
+    with ThreadPoolExecutor(1) as pool, \
+            caplog.at_level(logging.WARNING, logger="fetch_integridade"):
+        return asyncio.run(mod.processar_secao(_FetcherFalso(arquivos), pool, s, None, False))
+
+
+def _gravar(mod, tmp_path, r) -> set[str]:
+    import pyarrow.parquet as pq
+
+    w = mod.Writer(tmp_path, 10)
+    key = "ac/01066/0004/0077"
+    w.add(key, r["secao"], r["linhas"], r.get("secao_log"), r.get("issues"))
+    w.flush()
+    [parte] = (tmp_path / "parts").glob("arquivos-*.parquet")
+    assert {"disponivel", "http_status"} <= set(pq.read_schema(parte).names)
+    return w.done_keys()
+
+
+def test_imgbu_404_nao_derruba_a_secao(tmp_path, caplog, vsc_ac, bu_ac):
+    mod = _carregar_script()
+    r = _processar(mod, [("bu", NOME_BU, bu_ac), ("vota", NOME_VSC, vsc_ac),
+                         ("imgbu", NOME_IMGBU, None)], caplog)
+    por_nome = {x["nome"]: x for x in r["linhas"]}
+    img = por_nome[NOME_IMGBU]
+    assert img["disponivel"] is False and img["http_status"] == 404
+    assert img["tamanho"] is None and img["sha512"] is None and img["hash_confere"] is None
+    bu = por_nome[NOME_BU]
+    assert bu["disponivel"] is True and bu["http_status"] == 200 and bu["hash_confere"] is True
+    s = r["secao"]
+    assert s["status_secao"] == "ok" and s["assinatura_valida"] is True
+    assert s["n_indisponiveis"] == 1 and s["n_sem_hash"] == 1  # o .vsc
+    assert not any(d["arquivo"] == NOME_IMGBU for d in r["divergencias"])
+    assert any(m.startswith("PUBLICACAO ac/01066/0004/0077: HTTP 404") and NOME_IMGBU in m
+               for m in caplog.messages)
+    assert "ac/01066/0004/0077" in _gravar(mod, tmp_path, r)
+
+    mod.consolidar(tmp_path, tmp_path / "auditoria")
+    resumo = json.loads((tmp_path / "resumo.json").read_text(encoding="utf-8"))
+    assert resumo["arquivos_indisponiveis"]["total"] == 1
+    assert resumo["arquivos_indisponiveis"]["por_tipo"] == {"imgbu": 1}
+    assert resumo["por_uf"]["ac"]["arquivos_indisponiveis"] == 1
+    import duckdb
+
+    disp = duckdb.sql(f"SELECT nome, disponivel, http_status FROM "
+                      f"read_parquet('{tmp_path / 'arquivos_ac.parquet'}')").fetchall()
+    assert (NOME_IMGBU, False, 404) in disp and (NOME_BU, True, 200) in disp
+    [(n_ind,)] = duckdb.sql(f"SELECT n_indisponiveis FROM "
+                            f"read_parquet('{tmp_path / 'secoes.parquet'}')").fetchall()
+    assert n_ind == 1
+
+
+def test_rdv_assinado_404_gera_divergencia_e_checkpoint(tmp_path, caplog, vsc_ac, bu_ac):
+    mod = _carregar_script()
+    r = _processar(mod, [("bu", NOME_BU, bu_ac), ("rdv", NOME_RDV, None),
+                         ("vota", NOME_VSC, vsc_ac)], caplog)
+    [d] = [d for d in r["divergencias"] if d["arquivo"] == NOME_RDV]
+    assert d["categoria"] == "arquivo_ausente_tse" and "404" in d["motivo"]
+    rdv = next(x for x in r["linhas"] if x["nome"] == NOME_RDV)
+    assert rdv["disponivel"] is False and rdv["http_status"] == 404
+    assert rdv["sha512_assinado"] == d["sha512_assinado"] and rdv["hash_confere"] is None
+    s = r["secao"]
+    assert s["assinatura_valida"] is True and s["n_hash_confere"] == 1
+    assert s["n_indisponiveis"] == 1
+    assert "ac/01066/0004/0077" in _gravar(mod, tmp_path, r)
+
+
+def test_vsc_404_continua_derrubando_a_secao(caplog, bu_ac):
+    mod = _carregar_script()
+    with pytest.raises(RuntimeError, match="HTTP 404 em arquivo listado no aux.json"):
+        _processar(mod, [("bu", NOME_BU, bu_ac), ("vota", NOME_VSC, None)], caplog)
+
+
+def test_registrar_ocorrencias_formatos_antigo_e_novo():
+    p = Path(__file__).resolve().parents[2] / "scripts" / "ele2026" / \
+        "registrar_ocorrencias_publicacao.py"
+    spec = importlib.util.spec_from_file_location("registrar_ocorrencias_publicacao", p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    antigo = ("2026-10-08 10:00:00,123 WARNING erro em ba/38490/0016/0123: "
+              "RuntimeError('HTTP 404 em arquivo listado no aux.json: "
+              "o03220ba3849000160123-imgbu.dat')")
+    novo = ("2026-10-14 11:00:00,456 WARNING PUBLICACAO ba/38490/0016/0123: HTTP 404 em "
+            "arquivo listado no aux.json: o03220ba3849000160123-imgbu.dat")
+    outro = ("2026-10-14 11:00:01,000 WARNING PUBLICACAO ma/07846/0074/0228: HTTP 404 em "
+             "arquivo listado no aux.json: o03220ma0784600740228-rdv.dat")
+    oc = mod.extrair([antigo, novo, novo, outro, "linha qualquer"])
+    assert [(o["uf"], o["arquivo"], o["tipo"], o["http_status"]) for o in oc] == [
+        ("ba", "o03220ba3849000160123-imgbu.dat", "imgbu", 404),
+        ("ma", "o03220ma0784600740228-rdv.dat", "rdv", 404)]
+    assert oc[0]["primeira_ocorrencia"] == "2026-10-08 10:00:00"

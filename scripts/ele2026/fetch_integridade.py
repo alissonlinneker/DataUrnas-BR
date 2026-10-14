@@ -24,7 +24,11 @@ Intermediários (fora do git): parts/, checkpoint.txt, erros-*.txt, execucoes.js
 Vários processos podem rodar ao mesmo tempo com UFs disjuntas (--ufs): cada
 um grava partes com prefixo próprio e o checkpoint e o JSONL são só append.
 Falha de rede ou HTTP vai para erros.txt e a seção é refeita no próximo run;
-não é divergência.
+não é divergência. Exceção: arquivo listado no aux.json que responde 404 e não
+é o .vsc nem o BU/log do SA (imgbu, imgbusa e afins, ou bu/rdv/log da urna) não
+derruba a seção: vira linha com disponivel False e http_status 404, uma linha
+"PUBLICACAO" no log e, se for arquivo assinado no .vsc, a divergência
+arquivo_ausente_tse. A seção segue verificada e entra no checkpoint.
 
 Uso:
   python3 scripts/ele2026/fetch_integridade.py --ufs ac,rr     # teste
@@ -69,7 +73,8 @@ ARQUIVOS_SCHEMA = pa.schema([
     ("tamanho", pa.int64()), ("md5", pa.string()), ("sha256", pa.string()),
     ("sha512", pa.string()), ("sha512_assinado", pa.string()),
     ("hash_confere", pa.bool_()), ("token_tse", pa.string()),
-    ("data_hora_tse", pa.string()), ("_lote", pa.string()),
+    ("data_hora_tse", pa.string()), ("disponivel", pa.bool_()),
+    ("http_status", pa.int32()), ("_lote", pa.string()),
 ])
 
 ISSUES_SCHEMA = pa.schema([
@@ -105,8 +110,19 @@ SECOES_SCHEMA = pa.schema([
     ("cert_subject", pa.string()), ("cert_issuer", pa.string()),
     ("cert_serial", pa.string()), ("cert_sha256", pa.string()),
     ("modelo_urna", pa.string()), ("motivo", pa.string()),
-    ("votos_conferem", pa.bool_()), ("_lote", pa.string()),
+    ("votos_conferem", pa.bool_()), ("n_indisponiveis", pa.int32()),
+    ("_lote", pa.string()),
 ])
+
+
+# 404 nestes arquivos derruba a seção (refeita no próximo run): sem o .vsc não
+# há verificação, e o BU/log do SA são a alternativa ao BU/log da urna.
+TIPOS_404_REFAZ = {"vota", "sa", "busa", "logsa"}
+
+
+def refaz_em_404(tp: str, nome: str) -> bool:
+    """True se o 404 deste arquivo deve derrubar a seção (erro HTTP refeito)."""
+    return (tp or "").lower() in TIPOS_404_REFAZ or I.eh_assinatura(tp, nome)
 
 
 def _init_worker(src: str) -> None:
@@ -230,7 +246,8 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
                           esperado: Optional[tuple], analisar: bool = True) -> dict:
     uf, mun, zona, secao = s["uf"], s["cd_mun"], s["zona"], s["secao"]
     ident = {"uf": uf, "cd_mun": mun, "zona": zona, "secao": secao}
-    vazio = {"n_arquivos": 0, "n_hash_confere": 0, "n_hash_diverge": 0, "n_sem_hash": 0}
+    vazio = {"n_arquivos": 0, "n_hash_confere": 0, "n_hash_diverge": 0, "n_sem_hash": 0,
+             "n_indisponiveis": 0}
     if s.get("secao_principal"):
         return {"linhas": [], "divergencias": [], "secao": {
             **ident, **vazio, "status_secao": "agregada",
@@ -257,11 +274,18 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
                 pedidos.append((h["hash"], a.get("tp", ""), a["nm"]))
     corpos = await asyncio.gather(*[
         f.get(E.url_arquivo(uf, mun, zona, secao, hh, nm)) for hh, _tp, nm in pedidos])
-    faltando = [nm for (_h, _tp, nm), b in zip(pedidos, corpos, strict=True) if b is None]
-    if faltando:
-        # 404 em arquivo listado no aux.json: tratado como erro HTTP (refeito
-        # no próximo run), nunca como divergência.
-        raise RuntimeError(f"HTTP 404 em arquivo listado no aux.json: {','.join(faltando)}")
+    faltando = [(tp, nm) for (_h, tp, nm), b in zip(pedidos, corpos, strict=True)
+                if b is None]
+    refaz = [nm for tp, nm in faltando if refaz_em_404(tp, nm)]
+    if refaz:
+        # 404 no .vsc ou no BU/log do SA: tratado como erro HTTP (refeito no
+        # próximo run), nunca como divergência.
+        raise RuntimeError(f"HTTP 404 em arquivo listado no aux.json: {','.join(refaz)}")
+    for _tp, nm in faltando:
+        # demais arquivos: a seção segue; a falha fica registrada na linha do
+        # arquivo (disponivel False) e no log, para registrar_ocorrencias_publicacao.py
+        log.warning("PUBLICACAO %s/%s/%s/%s: HTTP 404 em arquivo listado no aux.json: %s",
+                    uf, mun, zona, secao, nm)
     conjuntos = []
     for h in hashes:
         arqs = [(tp, nm, b) for (hh, tp, nm), b in zip(pedidos, corpos, strict=True)
@@ -453,6 +477,14 @@ def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
         SELECT x.* FROM read_parquet('{parts / "arquivos-*.parquet"}', union_by_name = true) x
         JOIN s USING (uf, cd_mun, zona, secao, _lote)
     """)
+    # partes gravadas antes das colunas de disponibilidade: todo arquivo
+    # listado foi baixado (o 404 derrubava a seção)
+    for tbl, col, tipo, padrao in (("s", "n_indisponiveis", "INTEGER", "0"),
+                                   ("a", "disponivel", "BOOLEAN", "true"),
+                                   ("a", "http_status", "INTEGER", "200")):
+        if col not in {r[0] for r in con.execute(f"DESCRIBE {tbl}").fetchall()}:
+            con.execute(f"ALTER TABLE {tbl} ADD COLUMN {col} {tipo}")
+        con.execute(f"UPDATE {tbl} SET {col} = {padrao} WHERE {col} IS NULL")
     dst_s = out / "secoes.parquet"
     con.execute(f"""COPY (SELECT * EXCLUDE (_lote) FROM s ORDER BY uf, cd_mun, zona, secao)
                     TO '{dst_s}.tmp' (FORMAT PARQUET, COMPRESSION ZSTD)""")
@@ -477,16 +509,23 @@ def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
                count(*) FILTER (WHERE NOT assinatura_valida),
                count(*) FILTER (WHERE status_secao = 'ok' AND assinatura_valida IS NULL),
                count(*) FILTER (WHERE votos_conferem),
-               count(*) FILTER (WHERE NOT votos_conferem)
+               count(*) FILTER (WHERE NOT votos_conferem),
+               coalesce(sum(n_indisponiveis), 0),
+               count(*) FILTER (WHERE n_indisponiveis > 0)
         FROM s GROUP BY uf ORDER BY uf""").fetchall():
         por_uf[row[0]] = dict(zip(
             ["secoes", "ok", "agregada", "nao_instalada", "sem_arquivos", "arquivos",
              "hash_confere", "hash_diverge", "sem_hash", "assinatura_valida",
              "assinatura_invalida", "assinatura_nao_verificada", "votos_conferem",
-             "votos_divergem"], [int(x) for x in row[1:]], strict=True))
+             "votos_divergem", "arquivos_indisponiveis", "secoes_com_indisponiveis"],
+            [int(x) for x in row[1:]], strict=True))
     totais = {k: sum(v[k] for v in por_uf.values()) for k in next(iter(por_uf.values()))}
-    por_tipo = {t: {"arquivos": int(n), "bytes": int(b)} for t, n, b in con.execute(
-        "SELECT tipo, count(*), sum(tamanho) FROM a GROUP BY tipo ORDER BY tipo").fetchall()}
+    por_tipo = {t: {"arquivos": int(n), "bytes": int(b or 0), "indisponiveis": int(i)}
+                for t, n, b, i in con.execute(
+        "SELECT tipo, count(*), sum(tamanho), count(*) FILTER (WHERE NOT disponivel) "
+        "FROM a GROUP BY tipo ORDER BY tipo").fetchall()}
+    indisponiveis_por_tipo = {t: v["indisponiveis"] for t, v in por_tipo.items()
+                              if v["indisponiveis"]}
     algoritmos = {str(k): int(n) for k, n in con.execute(
         "SELECT assinatura_algoritmo, count(*) FROM s WHERE status_secao = 'ok' "
         "GROUP BY 1 ORDER BY 2 DESC").fetchall()}
@@ -545,6 +584,12 @@ def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
         "totais": totais,
         "por_uf": por_uf,
         "por_tipo_arquivo": por_tipo,
+        "arquivos_indisponiveis": {
+            "total": sum(indisponiveis_por_tipo.values()),
+            "por_tipo": indisponiveis_por_tipo,
+            "descricao": "arquivos listados no aux.json que o servidor do TSE responde "
+                         "com HTTP 404 (disponivel = false em arquivos_<uf>.parquet)",
+        },
         "algoritmos_assinatura": algoritmos,
         "modelos_urna": modelos,
         "arquivos_parquet": arquivos_parquet,

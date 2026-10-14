@@ -27,10 +27,18 @@ LOGS = sorted((RAIZ / "data").glob("ele2026_integridade*.log"))
 SAIDA = RAIZ / "data/parquet/2026/integridade/ocorrencias_publicacao.jsonl"
 BASE_URL = "https://resultados.tse.jus.br/oficial/ele2026/arquivo-urna/3220/dados"
 
+# Formato antigo: o 404 derrubava a seção (WARNING "erro em ... RuntimeError(...)").
 PADRAO = re.compile(
     r"^(?P<data>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),\d+ WARNING erro em "
     r"(?P<uf>[a-z]{2})/(?P<mun>\d{5})/(?P<zona>\d{4})/(?P<secao>\d{4}): "
     r"RuntimeError\('HTTP (?P<status>\d{3}) em arquivo listado no aux\.json: (?P<arquivo>[^']+)'\)"
+)
+# Formato novo: a seção segue verificada e o arquivo indisponível vira uma linha
+# "PUBLICACAO" (um arquivo por linha).
+PADRAO_PUBLICACAO = re.compile(
+    r"^(?P<data>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),\d+ WARNING PUBLICACAO "
+    r"(?P<uf>[a-z]{2})/(?P<mun>\d{5})/(?P<zona>\d{4})/(?P<secao>\d{4}): "
+    r"HTTP (?P<status>\d{3}) em arquivo listado no aux\.json: (?P<arquivo>\S+)$"
 )
 
 
@@ -41,30 +49,46 @@ def tipo_arquivo(nome: str) -> str:
 
 
 def extrair(linhas: list[str]) -> list[dict]:
-    """Extrai ocorrências de publicação das linhas de log."""
+    """Extrai ocorrências de publicação das linhas de log (formatos antigo e novo).
+
+    Sem duplicar: a mesma seção, arquivo e status entram uma vez só, com a data
+    da primeira ocorrência. No formato antigo, uma linha pode listar vários
+    arquivos separados por vírgula.
+    """
     ocorrencias = []
+    vistos: set[tuple] = set()
     for linha in linhas:
-        m = PADRAO.match(linha.strip())
+        linha = linha.strip()
+        m = PADRAO.match(linha) or PADRAO_PUBLICACAO.match(linha)
         if not m:
             continue
         g = m.groupdict()
-        ocorrencias.append({
-            "categoria": "arquivo_listado_nao_publicado",
-            "uf": g["uf"],
-            "cd_mun": g["mun"],
-            "zona": g["zona"],
-            "secao": g["secao"],
-            "arquivo": g["arquivo"],
-            "tipo": tipo_arquivo(g["arquivo"]),
-            "http_status": int(g["status"]),
-            "primeira_ocorrencia": g["data"],
-            "url_secao": f"{BASE_URL}/{g['uf']}/{g['mun']}/{g['zona']}/{g['secao']}/",
-            "observacao": (
-                "Arquivo listado no aux.json da seção e indisponível no servidor do TSE. "
-                "Não é divergência de hash nem de assinatura; o arquivo não pôde ser verificado."
-            ),
-        })
+        for arquivo in (a.strip() for a in g["arquivo"].split(",")):
+            k = (g["uf"], g["mun"], g["zona"], g["secao"], arquivo, int(g["status"]))
+            if not arquivo or k in vistos:
+                continue
+            vistos.add(k)
+            ocorrencias.append(_ocorrencia(g, arquivo))
     return ocorrencias
+
+
+def _ocorrencia(g: dict, arquivo: str) -> dict:
+    return {
+        "categoria": "arquivo_listado_nao_publicado",
+        "uf": g["uf"],
+        "cd_mun": g["mun"],
+        "zona": g["zona"],
+        "secao": g["secao"],
+        "arquivo": arquivo,
+        "tipo": tipo_arquivo(arquivo),
+        "http_status": int(g["status"]),
+        "primeira_ocorrencia": g["data"],
+        "url_secao": f"{BASE_URL}/{g['uf']}/{g['mun']}/{g['zona']}/{g['secao']}/",
+        "observacao": (
+            "Arquivo listado no aux.json da seção e indisponível no servidor do TSE. "
+            "Não é divergência de hash nem de assinatura; o arquivo não pôde ser verificado."
+        ),
+    }
 
 
 def enriquecer(o: dict) -> dict:
