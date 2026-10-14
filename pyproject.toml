@@ -49,7 +49,7 @@ dependencies = [
 # width="stretch" em st.plotly_chart exige Streamlit 1.51 ou superior.
 dashboard = [
     "streamlit>=1.51.0,<2",
-    "plotly>=5.22.0,<7",
+    "plotly>=5.22.0,<8",
     "scipy>=1.12.0,<2",
     "openpyxl>=3.1.0,<4",
 ]
