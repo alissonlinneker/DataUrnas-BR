@@ -165,7 +165,7 @@ São lacunas de publicação, não evidência de adulteração. Os pedidos de es
 **Onde ver os detalhes.**
 
 - [Relatório de integridade](docs/relatorio-integridade-2026.md): totais, tabela por UF, divergências com endereços, arquivos indisponíveis, auditoria por código, certificados e o passo a passo para conferir qualquer seção à mão (gerado por `python scripts/docs/gerar_relatorio_integridade.py`).
-- [Catálogo de hashes por arquivo](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0): MD5, SHA-256 e SHA-512 dos 1.999.485 arquivos, um Parquet por UF nos anexos da versão v0.3.0, conferível com `sha256sum -c SHA256SUMS`.
+- [Catálogo de hashes por arquivo](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1): MD5, SHA-256 e SHA-512 dos 1.999.485 arquivos, um Parquet por UF nos anexos da versão v0.2.1, conferível com `sha256sum -c SHA256SUMS`.
 - No painel, a página **Integridade dos arquivos (2026)** permite consultar cada seção.
 
 ---
@@ -623,7 +623,7 @@ DataUrnas-BR/
 | 2026, 1º turno: auditoria do BU e do log por grupo de leitura | Concluído (nenhuma ocorrência do grupo 1) |
 | 2026, 1º turno: coerência dos certificados das urnas | Concluído (todas as seções) |
 | 2026, 1º turno: validação da cadeia de certificados até a AC intermediária | Concluído na amostra de 5%, sorteio determinístico |
-| 2026, 1º turno: catálogo de hashes por arquivo | Publicado nos anexos da [v0.3.0](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0) |
+| 2026, 1º turno: catálogo de hashes por arquivo | Publicado nos anexos da [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1) |
 | Cadeia de certificados até a raiz | Depende da publicação dos certificados raiz pelo TSE |
 | 2026, Presidente, 2º turno | Planejado |
 | Decodificação do RDV e conferência voto a voto do RDV com o BU de cada seção; imagem do BU | Futuro |
@@ -641,7 +641,7 @@ Use o botão **Cite this repository** do GitHub (gerado a partir de [CITATION.cf
   author  = {Linneker, Alisson},
   title   = {DataUrnas-BR: auditoria independente dos arquivos públicos da urna eletrônica},
   year    = {2026},
-  version = {0.3.0},
+  version = {0.2.1},
   url     = {https://github.com/alissonlinneker/DataUrnas-BR},
   license = {MIT}
 }

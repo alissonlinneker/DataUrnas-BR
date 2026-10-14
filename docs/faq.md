@@ -97,7 +97,7 @@ A urna não usa MD5. O mecanismo oficial é o SHA-512: a urna calcula o SHA-512 
 
 Nas 499.207 seções instaladas, os 1.497.620 SHA-512 de BU, RDV e log recalculados a partir dos arquivos publicados são iguais aos que as urnas assinaram: **nenhum divergente (C01)**. As 499.207 assinaturas de urna são válidas, nenhuma inválida, e os votos de cada BU assinado são os mesmos do BU lido na coleta. A auditoria do BU e do log não registrou nenhuma ocorrência do grupo 1.
 
-Ficaram dois pontos de publicação, sem divergência de conteúdo: um RDV que a urna assinou e o TSE não publicou (seção 0228 da zona 0074, Lagoa Grande do Maranhão, MA) e 2.658 imagens do BU listadas no `aux.json` que o servidor responde com HTTP 404, todas em seções com status "Recebida". São lacunas a informar ao TSE, não evidência de adulteração; a relação está em [relatorio-tse-ocorrencias-2026.md](relatorio-tse-ocorrencias-2026.md). O catálogo com os hashes de cada um dos 1.999.485 arquivos está nos anexos da versão [v0.3.0](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0).
+Ficaram dois pontos de publicação, sem divergência de conteúdo: um RDV que a urna assinou e o TSE não publicou (seção 0228 da zona 0074, Lagoa Grande do Maranhão, MA) e 2.658 imagens do BU listadas no `aux.json` que o servidor responde com HTTP 404, todas em seções com status "Recebida". São lacunas a informar ao TSE, não evidência de adulteração; a relação está em [relatorio-tse-ocorrencias-2026.md](relatorio-tse-ocorrencias-2026.md). O catálogo com os hashes de cada um dos 1.999.485 arquivos está nos anexos da versão [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1).
 
 ## Reinícios de urna indicam problema?
 

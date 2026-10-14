@@ -17,7 +17,7 @@ O script:
 
 Uso:
     python3 scripts/ele2026/publicar_catalogo.py
-    python3 scripts/ele2026/publicar_catalogo.py --versao v0.3.0
+    python3 scripts/ele2026/publicar_catalogo.py --versao v0.2.1
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ RAIZ = Path(__file__).resolve().parents[2]
 PASTA = RAIZ / "data/parquet/2026/integridade"
 DIST = RAIZ / "dist/catalogo-integridade-2026"
 REPO = "alissonlinneker/DataUrnas-BR"
-VERSAO = "v0.3.0"
+VERSAO = "v0.2.1"
 MANIFESTO = "catalogo_manifest.json"
 PADRAO = re.compile(r"^arquivos_(?P<uf>[a-z]{2})(?:_[^/]+)?\.parquet$")
 

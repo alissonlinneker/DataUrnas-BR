@@ -1,7 +1,7 @@
 {
  "descricao": "Catálogo de hashes por arquivo das urnas de 2026, um anexo por UF.",
- "versao": "v0.3.0",
- "url_base": "https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.3.0",
+ "versao": "v0.2.1",
+ "url_base": "https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.2.1",
  "total_arquivos": 28,
  "total_bytes": 376069111,
  "total_linhas": 1999485,

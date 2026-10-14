@@ -104,7 +104,7 @@ def test_url_modelo_por_variavel(monkeypatch):
     assert ig.url_catalogo("arquivos_ac.parquet") == "https://espelho.invalid/c/arquivos_ac.parquet?dl=1"
     monkeypatch.delenv("DATAURNAS_CATALOGO_URL")
     assert ig.url_catalogo("arquivos_ac.parquet") == f"{ig.CATALOGO_URL_PADRAO}/arquivos_ac.parquet"
-    assert "releases/download/v0.3.0" in ig.CATALOGO_URL_PADRAO
+    assert "releases/download/v0.2.1" in ig.CATALOGO_URL_PADRAO
 
 
 def test_cache_corrompido_e_baixado_de_novo(publicado, tmp_path):

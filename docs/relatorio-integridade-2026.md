@@ -271,21 +271,21 @@ Cada modelo de urna tem uma única AC emissora e um único algoritmo.
 
 ## Catálogo de hashes por arquivo
 
-O catálogo completo (MD5, SHA-256, SHA-512 calculado, SHA-512 assinado, token e situação de cada arquivo) com 1.999.485 arquivos catalogados não fica no git. Ele está publicado como anexos da versão [v0.3.0](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0) do projeto, um Parquet por UF (`arquivos_<uf>.parquet`) e um `SHA256SUMS` (28 arquivos Parquet, 359 MB no total).
+O catálogo completo (MD5, SHA-256, SHA-512 calculado, SHA-512 assinado, token e situação de cada arquivo) com 1.999.485 arquivos catalogados não fica no git. Ele está publicado como anexos da versão [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1) do projeto, um Parquet por UF (`arquivos_<uf>.parquet`) e um `SHA256SUMS` (28 arquivos Parquet, 359 MB no total).
 
 Baixar e conferir a integridade dos anexos:
 
 ```bash
 mkdir -p catalogo-2026 && cd catalogo-2026
-gh release download v0.3.0 --repo alissonlinneker/DataUrnas-BR --pattern 'arquivos_*.parquet' --pattern SHA256SUMS
+gh release download v0.2.1 --repo alissonlinneker/DataUrnas-BR --pattern 'arquivos_*.parquet' --pattern SHA256SUMS
 sha256sum -c SHA256SUMS            # macOS: shasum -a 256 -c SHA256SUMS
 ```
 
 Sem o `gh`, baixe só a UF desejada e confira apenas ela:
 
 ```bash
-curl -LO https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.3.0/arquivos_ac.parquet
-curl -LO https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.3.0/SHA256SUMS
+curl -LO https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.2.1/arquivos_ac.parquet
+curl -LO https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.2.1/SHA256SUMS
 sha256sum -c --ignore-missing SHA256SUMS   # macOS: shasum -a 256 -c --ignore-missing SHA256SUMS
 ```
 

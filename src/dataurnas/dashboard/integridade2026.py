@@ -64,7 +64,7 @@ COLUNAS_ARQUIVO = CHAVE_SECAO + [
 LIMITE_CSV = 250_000
 
 # Catálogo por arquivo publicado como anexos da versão do projeto no GitHub
-CATALOGO_VERSAO = "v0.3.0"
+CATALOGO_VERSAO = "v0.2.1"
 CATALOGO_URL_PADRAO = (
     f"https://github.com/alissonlinneker/DataUrnas-BR/releases/download/{CATALOGO_VERSAO}"
 )

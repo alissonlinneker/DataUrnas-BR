@@ -6,7 +6,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não publicado]
 
-## [0.3.0] - 2026-10-14
+## [0.2.1] - 2026-10-14
 
 ### Adicionado
 
@@ -82,7 +82,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Banco DuckDB, exportação Parquet com ZSTD e painel Streamlit com filtros e exportação.
 - Deploy no Hugging Face Spaces via GitHub Actions.
 
-[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...v0.3.0
+[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.1.0

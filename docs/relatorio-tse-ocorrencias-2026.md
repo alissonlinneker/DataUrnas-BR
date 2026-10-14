@@ -119,4 +119,4 @@ Em 14 seções, o CN do certificado que assina o `.vsc` não é igual ao número
 
 ## 6. Como reproduzir
 
-Os dados e o código que fundamentam este documento estão no repositório do projeto. O catálogo com MD5, SHA-256 e SHA-512 de cada um dos 1.999.485 arquivos baixados está nos anexos da versão [v0.3.0](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.3.0), com `SHA256SUMS` para conferência. O [relatório de integridade](relatorio-integridade-2026.md) descreve o passo a passo para conferir qualquer seção com ferramentas comuns (`curl` e `shasum`).
+Os dados e o código que fundamentam este documento estão no repositório do projeto. O catálogo com MD5, SHA-256 e SHA-512 de cada um dos 1.999.485 arquivos baixados está nos anexos da versão [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1), com `SHA256SUMS` para conferência. O [relatório de integridade](relatorio-integridade-2026.md) descreve o passo a passo para conferir qualquer seção com ferramentas comuns (`curl` e `shasum`).
