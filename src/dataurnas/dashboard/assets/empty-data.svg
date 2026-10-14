@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" role="img" aria-labelledby="et">
+  <title id="et">Ilustração: nenhum dado para exibir</title>
+  <ellipse cx="110" cy="124" rx="78" ry="8" fill="#8A8F98" opacity=".18"/>
+  <rect x="52" y="22" width="116" height="90" rx="12" fill="#56B4E9" opacity=".16" stroke="#0072B2" stroke-opacity=".45" stroke-width="2"/>
+  <rect x="68" y="40" width="84" height="8" rx="4" fill="#0072B2" opacity=".35"/>
+  <rect x="68" y="56" width="60" height="8" rx="4" fill="#0072B2" opacity=".22"/>
+  <rect x="68" y="72" width="72" height="8" rx="4" fill="#0072B2" opacity=".22"/>
+  <circle cx="160" cy="92" r="20" fill="none" stroke="#E69F00" stroke-width="6"/>
+  <line x1="174" y1="106" x2="190" y2="122" stroke="#E69F00" stroke-width="7" stroke-linecap="round"/>
+</svg>

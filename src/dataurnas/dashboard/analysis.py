@@ -11,6 +11,7 @@ Cada função recebe (store, f) onde:
 """
 
 import math
+import re
 import textwrap
 from datetime import datetime
 from io import BytesIO
@@ -19,61 +20,29 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from dataurnas.dashboard import aggregates as _agg
+from dataurnas.dashboard.reference import ISSUE_DESCRICOES, oficial_resumo
+
+# Incrementar quando o resultado de alguma análise mudar de semântica: o valor
+# entra na chave do cache em disco do dashboard (state._run_analysis).
+# 2: score de confiança passa a tratar hashes não verificados.
+ANALYSIS_CACHE_VERSION = "2"
+
 # ============================================================
 # Constantes
 # ============================================================
 
 BENFORD_EXPECTED = {d: math.log10(1 + 1 / d) for d in range(1, 10)}
 
-# Benford 2o digito: P(d) = sum_{k=1}^{9} log10(1 + 1/(10k + d)), d = 0..9
+# Benford 2o dígito: P(d) = sum_{k=1}^{9} log10(1 + 1/(10k + d)), d = 0..9
 BENFORD_SECOND_EXPECTED = {}
 for _d in range(0, 10):
     _prob = sum(math.log10(1 + 1 / (10 * _k + _d)) for _k in range(1, 10))
     BENFORD_SECOND_EXPECTED[_d] = _prob
 
-# Resultados oficiais TSE 2022
-OFICIAL_1T = {
-    "turno": 1,
-    "eleitores_aptos": 156454011,
-    "comparecimento": 123682372,
-    "votos_validos": 118229719,
-    "lula_pct": 48.43,
-    "bolso_pct": 43.20,
-    "diferenca": 6187159,
-}
-
-OFICIAL_2T = {
-    "turno": 2,
-    "eleitores_aptos": 156454011,
-    "comparecimento": 124252796,
-    "votos_validos": 118556778,
-    "lula_pct": 50.90,
-    "bolso_pct": 49.10,
-    "diferenca": 2139645,
-}
-
-ISSUE_DESCRICOES = {
-    "C01": "Hash SHA-512 invalido",
-    "C05": "Total de votos > eleitores aptos",
-    "C06": "Reinicio durante votacao",
-    "A01": "Divergencia de eleitores aptos entre eleicoes",
-    "A02": "Votos > comparecimento",
-    "A03": "Divergencia de votos no log vs BU",
-    "A04": "Abertura muito tardia",
-    "A05": "Encerramento antes do horario",
-    "A06": "Comparecimento divergente entre cargos",
-    "I01": "Eventos de substituicao/contingencia",
-    "I02": "Alertas de mesario elevados",
-    "I03": "Proporcao elevada de nulos",
-    "I04": "Proporcao elevada de brancos",
-    "I05": "Abstencao acima de 30%",
-    "I06": "Urna nao padrao (reservaSecao)",
-    "M01": "Abertura antes do horario ajustado",
-    "M02": "Encerramento muito tarde",
-    "M04": "Numero elevado de erros no log",
-    "M05": "Ajustes de hora detectados",
-    "M06": "Alta taxa de liberacao sem biometria",
-}
+# Resultados oficiais e catálogo de issues: fonte única em reference.py
+OFICIAL_1T = oficial_resumo(1)
+OFICIAL_2T = oficial_resumo(2)
 
 _EMPTY_DF_CACHE = {}
 
@@ -86,8 +55,167 @@ def _empty_df(columns):
     return _EMPTY_DF_CACHE[key].copy()
 
 
+# Totais de Presidente por seção (agg_presidente_secao, alias p): ver aggregates.py
+_P13 = _agg.P13
+_P22 = _agg.P22
+_P_TEM_13_22 = _agg.P_TEM_13_22
+_pres_join = _agg.presidente_join
+
+
+# % de Lula entre 13 e 22 na seção, arredondado a 4 casas como no pandas
+# (Series.round usa rint(x * 10^4) / 10^4, isto é, meio para o par)
+_PCT_LULA_4 = (
+    f"ROUND_EVEN(CAST({_P13} AS DOUBLE) / CAST({_P13} + {_P22} AS DOUBLE) * CAST(100 AS DOUBLE)"
+    " * CAST(10000 AS DOUBLE), 0) / CAST(10000 AS DOUBLE)"
+)
+
+
+def votos_13_22_por_grupo(store, f, grupo_sql: str) -> pd.DataFrame:
+    """Votos nominais de 13 e 22 para Presidente por (grupo, candidato).
+
+    ``grupo_sql`` é uma expressão sobre as seções (alias ``s``). Um candidato
+    só aparece no grupo se houver registro dele em alguma seção do grupo, como
+    no GROUP BY original sobre a tabela votos.
+    """
+    where = f["where"]
+    params = list(f["params"])
+    origem = _pres_join(store)
+    return store.query_df(f"""
+        SELECT grupo, candidato, SUM(votos) AS votos
+        FROM (
+            SELECT {grupo_sql} AS grupo, 13 AS candidato, p.votos_13 AS votos
+            FROM {origem}
+            WHERE {where} AND p.n_13 > 0
+            UNION ALL
+            SELECT {grupo_sql} AS grupo, 22 AS candidato, p.votos_22 AS votos
+            FROM {origem}
+            WHERE {where} AND p.n_22 > 0
+        )
+        GROUP BY grupo, candidato
+        ORDER BY grupo, votos DESC
+    """, params + params)
+
+
+def _benford_counts(store, f, cubo: str, chaves: list[str], extra_where: str = "",
+                    extra_params: list | None = None) -> pd.DataFrame:
+    """Contagens de dígitos (coluna ``contagem``) agrupadas por ``chaves``.
+
+    Usa o cubo pré-calculado quando os filtros permitem; senão a fonte bruta
+    equivalente (mesmo resultado, só mais lenta).
+    """
+    src = _agg.cube_source(store, f["where"], cubo)
+    cols = ", ".join(f"s.{c}" for c in chaves)
+    df = store.query_df(f"""
+        SELECT {cols}, CAST(SUM(s.n) AS BIGINT) AS contagem
+        FROM {src.sql} s
+        WHERE {f['where']} {extra_where}
+        GROUP BY {cols}
+        ORDER BY {cols}
+    """, list(f["params"]) + list(extra_params or []))
+    for c in ("d1", "d2"):
+        if c in df.columns:
+            df[c] = df[c].astype("int64")
+    return df
+
+
+def presidente_votos_por_candidato(store, f) -> pd.DataFrame:
+    """Votos nominais para Presidente por candidato (todos os candidatos).
+
+    Returns:
+        DataFrame com: candidato, votos (ordem decrescente de votos)
+    """
+    src = _agg.cube_source(store, f["where"], "agg_votos_nominais")
+    return store.query_df(f"""
+        SELECT s.codigo_candidato AS candidato, SUM(s.votos) AS votos
+        FROM {src.sql} s
+        WHERE {f['where']} AND s.cargo = 'Presidente'
+        GROUP BY s.codigo_candidato
+        ORDER BY votos DESC
+    """, f["params"])
+
+
+def presidente_13_22_por_turno(store, f) -> pd.DataFrame:
+    """Votos de 13 e 22 para Presidente por turno, ignorando o filtro de turno.
+
+    Returns:
+        DataFrame com: turno, candidato, votos
+    """
+    base_where, base_params = _where_alias(f, "s", include_turno=False)
+    src = _agg.cube_source(store, base_where, "agg_votos_nominais")
+    return store.query_df(f"""
+        SELECT s.turno, s.codigo_candidato AS candidato, SUM(s.votos) AS votos
+        FROM {src.sql} s
+        WHERE {base_where}
+            AND s.cargo = 'Presidente'
+            AND s.codigo_candidato IN (13, 22)
+        GROUP BY s.turno, s.codigo_candidato
+        ORDER BY s.turno, votos DESC
+    """, base_params)
+
+
+def votos_por_candidato(store, f, cargo: str, limite: int = 20) -> pd.DataFrame:
+    """Os ``limite`` candidatos mais votados (votos nominais) de um cargo.
+
+    Returns:
+        DataFrame com: candidato, partido, votos, secoes
+    """
+    src = _agg.cube_source(store, f["where"], "agg_votos_nominais")
+    return store.query_df(f"""
+        SELECT
+            s.codigo_candidato AS candidato,
+            s.partido,
+            SUM(s.votos) AS votos,
+            {src.secoes_expr} AS secoes
+        FROM {src.sql} s
+        WHERE {f['where']}
+            AND s.cargo = ?
+            AND s.codigo_candidato IS NOT NULL
+        GROUP BY s.codigo_candidato, s.partido
+        ORDER BY votos DESC
+        LIMIT {int(limite)}
+    """, list(f["params"]) + [cargo])
+
+
+def presidente_13_22_por_modelo(store, f) -> pd.DataFrame:
+    """Votos de 13 e 22 para Presidente por modelo de urna.
+
+    Returns:
+        DataFrame com: modelo ('UE' + modelo), secoes, lula, bolsonaro, total
+    """
+    # Uma linha por seção: COUNT(*) conta as seções com voto em 13 ou 22
+    return store.query_df(f"""
+        SELECT
+            'UE' || s.modelo_urna AS modelo,
+            COUNT(*) AS secoes,
+            SUM({_P13}) AS lula,
+            SUM({_P22}) AS bolsonaro,
+            SUM({_P13} + {_P22}) AS total
+        FROM {_pres_join(store)}
+        WHERE {f['where']} AND {_P_TEM_13_22} AND s.modelo_urna IS NOT NULL
+        GROUP BY s.modelo_urna
+        ORDER BY s.modelo_urna
+    """, f["params"])
+
+
+def presidente_13_22_por_secao(store, f) -> pd.DataFrame:
+    """Votos de 13 e 22 por seção (seções com algum voto nesses candidatos).
+
+    Returns:
+        DataFrame com: secao_id, uf, votos_13, votos_22
+    """
+    return store.query_df(f"""
+        SELECT
+            s.id AS secao_id,
+            s.uf,
+            {_P13} AS votos_13,
+            {_P22} AS votos_22
+        FROM {_pres_join(store)}
+        WHERE {f['where']} AND ({_P13} + {_P22}) > 0
+    """, f["params"])
+
+
 def _cramers_v(chi2, n, k):
-    """Calcula Cramer's V a partir de chi2, n (total de observacoes), k (categorias).
+    """Calcula Cramer's V a partir de chi2, n (total de observações), k (categorias).
 
     V = sqrt(chi2 / (n * (k - 1)))
     """
@@ -100,9 +228,9 @@ def _benford_cramers_v_score(cramers_v_value):
     """Converte Cramer's V em score (0-100) para o confidence score.
 
     V < 0.05:  conforme     -> score 100
-    V < 0.10:  aceitavel    -> score 75
-    V < 0.20:  atencao      -> score 50
-    V >= 0.20: nao conforme -> score 0
+    V < 0.10:  aceitável    -> score 75
+    V < 0.20:  atenção      -> score 50
+    V >= 0.20: não conforme -> score 0
     """
     if cramers_v_value < 0.05:
         return 100.0
@@ -126,30 +254,13 @@ def benford_first_digit(store, f) -> pd.DataFrame:
     """
     cols = ["candidato", "digito", "contagem", "pct_observado", "pct_esperado"]
 
-    df = store.query_df(f"""
-        SELECT
-            v.codigo_candidato AS candidato,
-            v.quantidade
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.quantidade > 0
-    """, f["params"])
+    # Contagem por candidato e primeiro dígito (votos > 0), já agregada no banco
+    grouped = _benford_counts(store, f, "agg_benford_presidente", ["candidato", "d1"])
+    grouped = grouped.rename(columns={"d1": "digito"})
+    grouped = grouped[grouped["digito"].between(1, 9)]
 
-    if df.empty:
+    if grouped.empty:
         return _empty_df(cols)
-
-    # Extrair primeiro dígito
-    df["digito"] = df["quantidade"].astype(str).str[0].astype(int)
-    df = df[df["digito"].between(1, 9)]
-
-    if df.empty:
-        return _empty_df(cols)
-
-    # Contar por candidato e dígito
-    grouped = df.groupby(["candidato", "digito"]).size().reset_index(name="contagem")
 
     # Calcular percentual observado por candidato
     totals = grouped.groupby("candidato")["contagem"].transform("sum")
@@ -220,24 +331,11 @@ def benford_by_state(store, f) -> pd.DataFrame:
     """
     cols = ["uf", "chi2_13", "chi2_22", "conforme_13", "conforme_22"]
 
-    df = store.query_df(f"""
-        SELECT
-            s.uf,
-            v.codigo_candidato AS candidato,
-            v.quantidade
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.quantidade > 0
-            AND v.codigo_candidato IN (13, 22)
-    """, f["params"])
-
-    if df.empty:
-        return _empty_df(cols)
-
-    df["digito"] = df["quantidade"].astype(str).str[0].astype(int)
+    df = _benford_counts(
+        store, f, "agg_benford_presidente", ["uf", "candidato", "d1"],
+        extra_where="AND s.candidato IN (13, 22)",
+    )
+    df = df.rename(columns={"d1": "digito"})
     df = df[df["digito"].between(1, 9)]
 
     if df.empty:
@@ -253,7 +351,7 @@ def benford_by_state(store, f) -> pd.DataFrame:
                 row[f"conforme_{suffix}"] = None
                 continue
 
-            digit_counts = cand_data.groupby("digito").size()
+            digit_counts = cand_data.groupby("digito")["contagem"].sum()
             observed = np.array([digit_counts.get(d, 0) for d in range(1, 10)], dtype=float)
             total = observed.sum()
 
@@ -282,7 +380,7 @@ def benford_by_state(store, f) -> pd.DataFrame:
 
 
 # ============================================================
-# 1b. Lei de Benford — Segundo Dígito
+# 1b. Lei de Benford: Segundo Dígito
 # ============================================================
 
 def benford_second_digit(store, f) -> pd.DataFrame:
@@ -298,29 +396,14 @@ def benford_second_digit(store, f) -> pd.DataFrame:
     """
     cols = ["candidato", "digito", "quantidade", "percentual"]
 
-    df = store.query_df(f"""
-        SELECT
-            v.codigo_candidato AS candidato,
-            v.quantidade
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.quantidade >= 10
-    """, f["params"])
+    # Segundo dígito (posição [1] do número; d2 é NULL para votos < 10)
+    grouped = _benford_counts(
+        store, f, "agg_benford_presidente", ["candidato", "d2"], extra_where="AND s.d2 IS NOT NULL",
+    )
+    grouped = grouped.rename(columns={"d2": "digito", "contagem": "quantidade"})
 
-    if df.empty:
+    if grouped.empty:
         return _empty_df(cols)
-
-    # Extrair segundo dígito: posição [1] da representação string
-    df["digito"] = df["quantidade"].astype(str).str[1].astype(int)
-
-    if df.empty:
-        return _empty_df(cols)
-
-    # Contar por candidato e dígito
-    grouped = df.groupby(["candidato", "digito"]).size().reset_index(name="quantidade")
 
     # Calcular percentual observado por candidato
     totals = grouped.groupby("candidato")["quantidade"].transform("sum")
@@ -381,7 +464,7 @@ def benford_second_digit_chi(store, f) -> list:
         if len(sample) > 0:
             ks_result = stats.kstest(
                 sample,
-                lambda x: np.interp(x, np.arange(10), exp_cdf),
+                lambda x, cdf=exp_cdf: np.interp(x, np.arange(10), cdf),
             )
             p_ks = float(ks_result.pvalue)
         else:
@@ -415,21 +498,8 @@ def benford_all_offices(store, f) -> pd.DataFrame:
     """
     cols = ["cargo", "chi2", "p_value", "cramers_v", "conforme"]
 
-    df = store.query_df(f"""
-        SELECT
-            v.cargo,
-            v.quantidade
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.tipo_voto = 'nominal'
-            AND v.quantidade > 0
-    """, f["params"])
-
-    if df.empty:
-        return _empty_df(cols)
-
-    df["digito"] = df["quantidade"].astype(str).str[0].astype(int)
+    df = _benford_counts(store, f, "agg_benford_cargo", ["cargo", "d1"])
+    df = df.rename(columns={"d1": "digito"})
     df = df[df["digito"].between(1, 9)]
 
     if df.empty:
@@ -437,7 +507,7 @@ def benford_all_offices(store, f) -> pd.DataFrame:
 
     results = []
     for cargo, grp in df.groupby("cargo"):
-        digit_counts = grp.groupby("digito").size()
+        digit_counts = grp.groupby("digito")["contagem"].sum()
         observed = np.array(
             [digit_counts.get(d, 0) for d in range(1, 10)], dtype=float
         )
@@ -490,15 +560,19 @@ def zscore_outliers(store, f, threshold=3.0) -> pd.DataFrame:
 
     all_outliers = []
     for col_name, metric_label in metrics:
+        # O z-score usa média e desvio de todas as seções filtradas; só as
+        # linhas acima do limiar saem do banco
         df = store.query_df(f"""
-            SELECT
-                s.id, s.uf, s.municipio, s.zona, s.secao,
-                s.{col_name} AS value,
-                (s.{col_name} - AVG(s.{col_name}) OVER())
-                    / NULLIF(STDDEV(s.{col_name}) OVER(), 0) AS zscore
-            FROM secoes s
-            WHERE {f['where']} AND s.{col_name} IS NOT NULL
-        """, f["params"])
+            SELECT * FROM (
+                SELECT
+                    s.id, s.uf, s.municipio, s.zona, s.secao,
+                    s.{col_name} AS value,
+                    (s.{col_name} - AVG(s.{col_name}) OVER())
+                        / NULLIF(STDDEV(s.{col_name}) OVER(), 0) AS zscore
+                FROM secoes s
+                WHERE {f['where']} AND s.{col_name} IS NOT NULL
+            ) WHERE ABS(zscore) > ?
+        """, list(f["params"]) + [threshold])
 
         if df.empty:
             continue
@@ -553,20 +627,9 @@ def reboot_vote_distribution(store, f) -> pd.DataFrame:
     """
     cols = ["grupo", "candidato", "votos", "pct"]
 
-    df = store.query_df(f"""
-        SELECT
-            CASE WHEN s.reboots > 0 THEN 'Com Reboot' ELSE 'Sem Reboot' END AS grupo,
-            v.codigo_candidato AS candidato,
-            SUM(v.quantidade) AS votos
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY grupo, v.codigo_candidato
-        ORDER BY grupo, votos DESC
-    """, f["params"])
+    df = votos_13_22_por_grupo(
+        store, f, "CASE WHEN s.reboots > 0 THEN 'Com Reboot' ELSE 'Sem Reboot' END",
+    )
 
     if df.empty:
         return _empty_df(cols)
@@ -615,14 +678,10 @@ def reboot_by_state(store, f) -> pd.DataFrame:
         SELECT
             s.uf,
             CASE WHEN s.reboots > 0 THEN 'reboot' ELSE 'normal' END AS grupo,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
+            SUM({_P13}) AS lula,
+            SUM({_P13} + {_P22}) AS total
+        FROM {_pres_join(store)}
+        WHERE {f['where']} AND {_P_TEM_13_22}
         GROUP BY s.uf, grupo
     """, f["params"])
 
@@ -742,24 +801,25 @@ def reboot_patterns(store, f) -> pd.DataFrame:
 # 4. Consistência Entre Turnos
 # ============================================================
 
-def _build_cross_turno_base_where(f):
-    """Remove filtro de turno do WHERE para comparar ambos os turnos.
+def _where_alias(f, alias="s", include_turno=False):
+    """WHERE das seções com outro alias de tabela, opcionalmente sem o turno.
 
-    Retorna (where_clause, params) sem restrição de turno.
+    Com ``Filters`` (dashboard) o SQL é montado a partir das condições
+    estruturadas. Para dicionários legados, só é aceito o caso trivial.
     """
-    base_where = f["where"]
-    base_params = list(f["params"])
+    if hasattr(f, "where_sql"):
+        return f.where_sql(include_turno=include_turno, alias=alias)
+    if f.get("turno") is not None and not include_turno:
+        raise ValueError("Filtros legados com turno exigem dataurnas.dashboard.filters.Filters")
+    where = f["where"]
+    if alias != "s":
+        where = re.sub(r"\bs\.", f"{alias}.", where)
+    return where, list(f["params"])
 
-    if f.get("turno") is not None:
-        # Remover "s.turno = ? AND " ou "s.turno = ?" isolado
-        base_where = base_where.replace("s.turno = ? AND ", "")
-        base_where = base_where.replace("s.turno = ?", "1=1")
-        # Remover o parâmetro de turno
-        turno_val = f["turno"]
-        if turno_val in base_params:
-            base_params.remove(turno_val)
 
-    return base_where, base_params
+def _build_cross_turno_base_where(f):
+    """WHERE sem a condição de turno (para comparar os dois turnos)."""
+    return _where_alias(f, "s", include_turno=False)
 
 
 def cross_turno_attendance(store, f) -> pd.DataFrame:
@@ -772,7 +832,7 @@ def cross_turno_attendance(store, f) -> pd.DataFrame:
     """
     cols = ["uf", "secoes_pareadas", "comp_t1", "comp_t2", "variacao_pct"]
 
-    base_where, base_params = _build_cross_turno_base_where(f)
+    _, base_params = _build_cross_turno_base_where(f)
 
     df = store.query_df(f"""
         SELECT
@@ -793,7 +853,7 @@ def cross_turno_attendance(store, f) -> pd.DataFrame:
             AND t1.secao = t2.secao
             AND t1.turno = 1
             AND t2.turno = 2
-        WHERE {base_where.replace('s.', 't1.')}
+        WHERE {_where_alias(f, 't1')[0]}
         GROUP BY t1.uf
         ORDER BY t1.uf
     """, base_params)
@@ -812,7 +872,7 @@ def cross_turno_missing(store, f) -> pd.DataFrame:
     """
     cols = ["turno_presente", "uf", "count"]
 
-    base_where, base_params = _build_cross_turno_base_where(f)
+    _, base_params = _build_cross_turno_base_where(f)
 
     # Seções no T1 sem T2
     only_t1 = store.query_df(f"""
@@ -829,7 +889,7 @@ def cross_turno_missing(store, f) -> pd.DataFrame:
             AND t2.turno = 2
         WHERE t1.turno = 1
             AND t2.id IS NULL
-            AND {base_where.replace('s.', 't1.')}
+            AND {_where_alias(f, 't1')[0]}
         GROUP BY t1.uf
     """, base_params)
 
@@ -848,7 +908,7 @@ def cross_turno_missing(store, f) -> pd.DataFrame:
             AND t1.turno = 1
         WHERE t2.turno = 2
             AND t1.id IS NULL
-            AND {base_where.replace('s.', 't2.')}
+            AND {_where_alias(f, 't2')[0]}
         GROUP BY t2.uf
     """, base_params)
 
@@ -870,20 +930,19 @@ def cross_turno_vote_migration(store, f) -> pd.DataFrame:
 
     base_where, base_params = _build_cross_turno_base_where(f)
 
+    src = _agg.cube_source(store, base_where, "agg_votos_nominais")
     df = store.query_df(f"""
         WITH votos_turno AS (
             SELECT
                 s.uf,
                 s.turno,
-                SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-                SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS bolso,
-                SUM(v.quantidade) AS total
-            FROM votos v
-            JOIN secoes s ON v.secao_id = s.id
+                SUM(CASE WHEN s.codigo_candidato = 13 THEN s.votos ELSE 0 END) AS lula,
+                SUM(CASE WHEN s.codigo_candidato = 22 THEN s.votos ELSE 0 END) AS bolso,
+                SUM(s.votos) AS total
+            FROM {src.sql} s
             WHERE {base_where}
-                AND v.cargo = 'Presidente'
-                AND v.tipo_voto = 'nominal'
-                AND v.codigo_candidato IN (13, 22)
+                AND s.cargo = 'Presidente'
+                AND s.codigo_candidato IN (13, 22)
             GROUP BY s.uf, s.turno
         )
         SELECT
@@ -963,18 +1022,17 @@ def geographic_issue_vs_result(store, f) -> pd.DataFrame:
     if density_df.empty:
         return _empty_df(cols)
 
+    src = _agg.cube_source(store, f["where"], "agg_votos_nominais")
     votos_df = store.query_df(f"""
         SELECT
             s.uf,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
+            SUM(CASE WHEN s.codigo_candidato = 13 THEN s.votos ELSE 0 END) AS lula,
+            SUM(CASE WHEN s.codigo_candidato = 22 THEN s.votos ELSE 0 END) AS bolso,
+            SUM(s.votos) AS total
+        FROM {src.sql} s
         WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
+            AND s.cargo = 'Presidente'
+            AND s.codigo_candidato IN (13, 22)
         GROUP BY s.uf
     """, f["params"])
 
@@ -1014,9 +1072,9 @@ def a03_by_turno(store, f) -> pd.DataFrame:
     """
     cols = ["turno", "count", "pct_of_secoes"]
 
-    # Build a WHERE clause for the subquery that counts total secoes per turno,
+    # Build a WHERE clause for the subquery that counts total seções per turno,
     # applying the same filters (with s2. alias instead of s.)
-    sub_where = f['where'].replace('s.', 's2.')
+    sub_where, _ = _where_alias(f, 's2', include_turno=True)
 
     df = store.query_df(f"""
         SELECT
@@ -1124,11 +1182,19 @@ def biometry_vs_vote(store, f) -> pd.DataFrame:
     """
     cols = ["quartil", "secoes", "pct_bio_media", "pct_lula", "pct_bolso"]
 
+    # Atributo de todas as seções (para os quartis) e, na mesma consulta, os
+    # votos de 13/22 de cada uma (NULL se a seção não tem esses votos)
     df = store.query_df(f"""
         SELECT
             s.id,
-            s.pct_biometria
+            s.pct_biometria,
+            v.v_secao_id AS secao_id, v.lula, v.bolso, v.total
         FROM secoes s
+        LEFT JOIN (
+            SELECT p.secao_id AS v_secao_id, {_P13} AS lula, {_P22} AS bolso, {_P13} + {_P22} AS total
+            FROM {_agg.presidente_secao_source(store)} p
+            WHERE {_P_TEM_13_22}
+        ) v ON v.v_secao_id = s.id
         WHERE {f['where']} AND s.pct_biometria IS NOT NULL
     """, f["params"])
 
@@ -1145,28 +1211,8 @@ def biometry_vs_vote(store, f) -> pd.DataFrame:
         # Se não há variação suficiente para 4 quartis
         return _empty_df(cols)
 
-    secao_quartil = df[["id", "quartil", "pct_biometria"]]
-
-    # Buscar votos para Presidente
-    votos_df = store.query_df(f"""
-        SELECT
-            v.secao_id,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY v.secao_id
-    """, f["params"])
-
-    if votos_df.empty:
-        return _empty_df(cols)
-
-    merged = secao_quartil.merge(votos_df, left_on="id", right_on="secao_id", how="inner")
+    # Equivale ao merge interno com os votos por seção
+    merged = df[df["secao_id"].notna()]
 
     if merged.empty:
         return _empty_df(cols)
@@ -1235,17 +1281,19 @@ def abnormal_duration_sections(store, f) -> pd.DataFrame:
     cols = ["id", "uf", "municipio", "zona", "secao", "duracao_min", "zscore"]
 
     df = store.query_df(f"""
-        SELECT
-            s.id,
-            s.uf,
-            s.municipio,
-            s.zona,
-            s.secao,
-            s.duracao_min,
-            (s.duracao_min - AVG(s.duracao_min) OVER())
-                / NULLIF(STDDEV(s.duracao_min) OVER(), 0) AS zscore
-        FROM secoes s
-        WHERE {f['where']} AND s.duracao_min IS NOT NULL
+        SELECT * FROM (
+            SELECT
+                s.id,
+                s.uf,
+                s.municipio,
+                s.zona,
+                s.secao,
+                s.duracao_min,
+                (s.duracao_min - AVG(s.duracao_min) OVER())
+                    / NULLIF(STDDEV(s.duracao_min) OVER(), 0) AS zscore
+            FROM secoes s
+            WHERE {f['where']} AND s.duracao_min IS NOT NULL
+        ) WHERE ABS(zscore) > 3.0
     """, f["params"])
 
     if df.empty:
@@ -1271,8 +1319,14 @@ def duration_vs_vote(store, f) -> pd.DataFrame:
     df = store.query_df(f"""
         SELECT
             s.id,
-            s.duracao_min
+            s.duracao_min,
+            v.v_secao_id AS secao_id, v.lula, v.bolso, v.total
         FROM secoes s
+        LEFT JOIN (
+            SELECT p.secao_id AS v_secao_id, {_P13} AS lula, {_P22} AS bolso, {_P13} + {_P22} AS total
+            FROM {_agg.presidente_secao_source(store)} p
+            WHERE {_P_TEM_13_22}
+        ) v ON v.v_secao_id = s.id
         WHERE {f['where']} AND s.duracao_min IS NOT NULL
     """, f["params"])
 
@@ -1287,27 +1341,7 @@ def duration_vs_vote(store, f) -> pd.DataFrame:
     except ValueError:
         return _empty_df(cols)
 
-    secao_quartil = df[["id", "quartil", "duracao_min"]]
-
-    votos_df = store.query_df(f"""
-        SELECT
-            v.secao_id,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY v.secao_id
-    """, f["params"])
-
-    if votos_df.empty:
-        return _empty_df(cols)
-
-    merged = secao_quartil.merge(votos_df, left_on="id", right_on="secao_id", how="inner")
+    merged = df[df["secao_id"].notna()]
 
     if merged.empty:
         return _empty_df(cols)
@@ -1387,23 +1421,18 @@ def model_vote_pattern(store, f) -> pd.DataFrame:
     """
     cols = ["modelo", "secoes", "pct_lula", "pct_bolso", "pct_brancos", "pct_nulos"]
 
+    # Uma linha por seção com voto para Presidente (COUNT(*) = seções distintas)
     df = store.query_df(f"""
         SELECT
             s.modelo_urna AS modelo,
-            COUNT(DISTINCT s.id) AS secoes,
-            SUM(CASE WHEN v.codigo_candidato = 13 AND v.tipo_voto = 'nominal'
-                THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 AND v.tipo_voto = 'nominal'
-                THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(CASE WHEN v.tipo_voto = 'branco'
-                THEN v.quantidade ELSE 0 END) AS brancos,
-            SUM(CASE WHEN v.tipo_voto = 'nulo'
-                THEN v.quantidade ELSE 0 END) AS nulos,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
+            COUNT(*) AS secoes,
+            SUM({_P13}) AS lula,
+            SUM({_P22}) AS bolso,
+            SUM(COALESCE(p.brancos, 0)) AS brancos,
+            SUM(COALESCE(p.nulos, 0)) AS nulos,
+            SUM(p.total) AS total
+        FROM {_pres_join(store)}
         WHERE {f['where']}
-            AND v.cargo = 'Presidente'
             AND s.modelo_urna IS NOT NULL
         GROUP BY s.modelo_urna
         ORDER BY s.modelo_urna
@@ -1444,40 +1473,55 @@ def null_blank_by_section(store, f) -> pd.DataFrame:
         "pct_nulos", "pct_brancos", "zscore_nulos", "zscore_brancos",
     ]
 
+    # Média e desvio padrão amostral por cargo são calculados no banco sobre
+    # todas as linhas filtradas; só candidatas a outlier (|z| perto de 3 ou
+    # mais) são trazidas, e o z-score final é arredondado aqui como antes.
     df = store.query_df(f"""
-        SELECT
-            t.secao_id,
-            s.uf,
-            t.cargo,
-            t.comparecimento,
-            t.nulos,
-            t.brancos,
-            ROUND(t.nulos * 100.0 / NULLIF(t.total, 0), 4) AS pct_nulos,
-            ROUND(t.brancos * 100.0 / NULLIF(t.total, 0), 4) AS pct_brancos
-        FROM totais_cargo t
-        JOIN secoes s ON t.secao_id = s.id
-        WHERE {f['where']} AND t.total > 0
+        WITH base AS MATERIALIZED (
+            SELECT
+                t.secao_id,
+                s.uf,
+                t.cargo,
+                t.comparecimento,
+                t.nulos,
+                t.brancos,
+                ROUND(t.nulos * 100.0 / NULLIF(t.total, 0), 4) AS pct_nulos,
+                ROUND(t.brancos * 100.0 / NULLIF(t.total, 0), 4) AS pct_brancos
+            FROM totais_cargo t
+            JOIN secoes s ON t.secao_id = s.id
+            WHERE {f['where']} AND t.total > 0
+        ),
+        est AS (
+            SELECT
+                cargo,
+                AVG(pct_nulos) AS mean_nulos,
+                STDDEV_SAMP(pct_nulos) AS std_nulos,
+                AVG(pct_brancos) AS mean_brancos,
+                STDDEV_SAMP(pct_brancos) AS std_brancos
+            FROM base
+            GROUP BY cargo
+        )
+        SELECT b.*, e.mean_nulos, e.std_nulos, e.mean_brancos, e.std_brancos
+        FROM base b JOIN est e ON b.cargo = e.cargo
+        WHERE (e.std_nulos > 0 AND ABS(b.pct_nulos - e.mean_nulos) > 2.999 * e.std_nulos)
+           OR (e.std_brancos > 0 AND ABS(b.pct_brancos - e.mean_brancos) > 2.999 * e.std_brancos)
+        ORDER BY b.cargo, b.secao_id
     """, f["params"])
 
     if df.empty:
         return _empty_df(cols)
 
     all_outliers = []
-    for cargo, grp in df.groupby("cargo"):
-        mean_nulos = grp["pct_nulos"].mean()
-        std_nulos = grp["pct_nulos"].std()
-        mean_brancos = grp["pct_brancos"].mean()
-        std_brancos = grp["pct_brancos"].std()
-
+    for _cargo, grp in df.groupby("cargo"):
         grp = grp.copy()
         grp["zscore_nulos"] = np.where(
-            std_nulos > 0,
-            ((grp["pct_nulos"] - mean_nulos) / std_nulos).round(4),
+            grp["std_nulos"] > 0,
+            ((grp["pct_nulos"] - grp["mean_nulos"]) / grp["std_nulos"]).round(4),
             0.0,
         )
         grp["zscore_brancos"] = np.where(
-            std_brancos > 0,
-            ((grp["pct_brancos"] - mean_brancos) / std_brancos).round(4),
+            grp["std_brancos"] > 0,
+            ((grp["pct_brancos"] - grp["mean_brancos"]) / grp["std_brancos"]).round(4),
             0.0,
         )
 
@@ -1549,9 +1593,15 @@ def null_blank_vs_result(store, f) -> pd.DataFrame:
     df = store.query_df(f"""
         SELECT
             t.secao_id,
-            ROUND(t.nulos * 100.0 / NULLIF(t.total, 0), 4) AS pct_nulos
+            ROUND(t.nulos * 100.0 / NULLIF(t.total, 0), 4) AS pct_nulos,
+            v.v_secao_id, v.lula, v.bolso, v.total
         FROM totais_cargo t
         JOIN secoes s ON t.secao_id = s.id
+        LEFT JOIN (
+            SELECT p.secao_id AS v_secao_id, {_P13} AS lula, {_P22} AS bolso, {_P13} + {_P22} AS total
+            FROM {_agg.presidente_secao_source(store)} p
+            WHERE {_P_TEM_13_22}
+        ) v ON v.v_secao_id = t.secao_id
         WHERE {f['where']}
             AND t.cargo = 'Presidente'
             AND t.total > 0
@@ -1575,27 +1625,8 @@ def null_blank_vs_result(store, f) -> pd.DataFrame:
         for q, row in quartil_stats.iterrows()
     }
 
-    secao_quartil = df[["secao_id", "quartil"]]
-
-    votos_df = store.query_df(f"""
-        SELECT
-            v.secao_id,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY v.secao_id
-    """, f["params"])
-
-    if votos_df.empty:
-        return _empty_df(cols)
-
-    merged = secao_quartil.merge(votos_df, on="secao_id", how="inner")
+    # Equivale ao merge interno com os votos de 13/22 por seção
+    merged = df[df["v_secao_id"].notna()]
     if merged.empty:
         return _empty_df(cols)
 
@@ -1606,7 +1637,8 @@ def null_blank_vs_result(store, f) -> pd.DataFrame:
         total=("total", "sum"),
     ).reset_index()
 
-    result["faixa"] = result["quartil"].map(faixas).fillna("")
+    # astype(str): no pandas 2.x o map de um Categorical devolve Categorical
+    result["faixa"] = result["quartil"].astype(str).map(faixas).fillna("")
     result["pct_lula"] = np.where(
         result["total"] > 0,
         (result["lula"] / result["total"] * 100).round(2),
@@ -1637,40 +1669,42 @@ def candidate_section_distribution(store, f) -> pd.DataFrame:
         "votos_13", "votos_22", "pct_lula", "zscore",
     ]
 
+    # Média e desvio amostral por UF calculados no banco sobre todas as seções;
+    # só as candidatas a outlier saem do banco e o z-score final é feito aqui
     df = store.query_df(f"""
-        SELECT
-            s.id AS secao_id,
-            s.uf,
-            s.municipio,
-            s.zona,
-            s.secao,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS votos_13,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS votos_22
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY s.id, s.uf, s.municipio, s.zona, s.secao
-        HAVING (SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END)
-              + SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END)) > 0
+        WITH base AS MATERIALIZED (
+            SELECT
+                s.id AS secao_id,
+                s.uf,
+                s.municipio,
+                s.zona,
+                s.secao,
+                {_P13} AS votos_13,
+                {_P22} AS votos_22,
+                {_PCT_LULA_4} AS pct_lula
+            FROM {_pres_join(store)}
+            WHERE {f['where']} AND ({_P13} + {_P22}) > 0
+        ),
+        est AS (
+            SELECT uf, AVG(pct_lula) AS mean_pct, STDDEV_SAMP(pct_lula) AS std_pct
+            FROM base
+            GROUP BY uf
+        )
+        SELECT b.*, e.mean_pct, e.std_pct
+        FROM base b JOIN est e ON b.uf = e.uf
+        WHERE e.std_pct > 0 AND ABS(b.pct_lula - e.mean_pct) > 2.999 * e.std_pct
+        ORDER BY b.uf, b.secao_id
     """, f["params"])
 
     if df.empty:
         return _empty_df(cols)
 
-    df["pct_lula"] = (df["votos_13"] / (df["votos_13"] + df["votos_22"]) * 100).round(4)
-
     all_outliers = []
-    for uf, grp in df.groupby("uf"):
-        mean_pct = grp["pct_lula"].mean()
-        std_pct = grp["pct_lula"].std()
-
+    for _uf, grp in df.groupby("uf"):
         grp = grp.copy()
         grp["zscore"] = np.where(
-            std_pct > 0,
-            ((grp["pct_lula"] - mean_pct) / std_pct).round(4),
+            grp["std_pct"] > 0,
+            ((grp["pct_lula"] - grp["mean_pct"]) / grp["std_pct"]).round(4),
             0.0,
         )
 
@@ -1705,17 +1739,13 @@ def candidate_extreme_sections(store, f) -> pd.DataFrame:
             s.uf,
             s.municipio,
             s.comparecimento,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS votos_13,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS votos_22
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY s.id, s.uf, s.municipio, s.comparecimento
-        HAVING (SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END)
-              + SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END)) > 0
+            {_P13} AS votos_13,
+            {_P22} AS votos_22
+        FROM {_pres_join(store)}
+        WHERE {f['where']} AND ({_P13} + {_P22}) > 0
+            -- pré-filtro com folga; o corte exato (95% e 5%, 2 casas) é feito abaixo
+            AND (CAST({_P13} AS DOUBLE) * 100 >= 94.99 * CAST({_P13} + {_P22} AS DOUBLE)
+                 OR CAST({_P13} AS DOUBLE) * 100 <= 5.01 * CAST({_P13} + {_P22} AS DOUBLE))
     """, f["params"])
 
     if df.empty:
@@ -1750,35 +1780,25 @@ def candidate_distribution_by_state(store, f) -> pd.DataFrame:
     """
     cols = ["uf", "media", "mediana", "std", "min", "max", "secoes"]
 
-    df = store.query_df(f"""
+    result = store.query_df(f"""
         SELECT
-            s.uf,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS votos_13,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS votos_22
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
-        GROUP BY s.id, s.uf
-        HAVING (SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END)
-              + SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END)) > 0
+            uf,
+            AVG(pct_lula) AS media,
+            MEDIAN(pct_lula) AS mediana,
+            STDDEV_SAMP(pct_lula) AS std,
+            MIN(pct_lula) AS min,
+            MAX(pct_lula) AS max,
+            COUNT(*) AS secoes
+        FROM (
+            SELECT s.uf, {_PCT_LULA_4} AS pct_lula
+            FROM {_pres_join(store)}
+            WHERE {f['where']} AND ({_P13} + {_P22}) > 0
+        )
+        GROUP BY uf
     """, f["params"])
 
-    if df.empty:
+    if result.empty:
         return _empty_df(cols)
-
-    df["pct_lula"] = (df["votos_13"] / (df["votos_13"] + df["votos_22"]) * 100).round(4)
-
-    result = df.groupby("uf")["pct_lula"].agg(
-        media="mean",
-        mediana="median",
-        std="std",
-        min="min",
-        max="max",
-        secoes="count",
-    ).reset_index()
 
     result["media"] = result["media"].round(2)
     result["mediana"] = result["mediana"].round(2)
@@ -1883,18 +1903,17 @@ def map_state_votes(store, f) -> pd.DataFrame:
     """
     cols = ["uf", "votos_13", "votos_22", "pct_lula", "pct_bolso"]
 
+    src = _agg.cube_source(store, f["where"], "agg_votos_nominais")
     df = store.query_df(f"""
         SELECT
             s.uf,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS votos_13,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS votos_22,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
+            SUM(CASE WHEN s.codigo_candidato = 13 THEN s.votos ELSE 0 END) AS votos_13,
+            SUM(CASE WHEN s.codigo_candidato = 22 THEN s.votos ELSE 0 END) AS votos_22,
+            SUM(s.votos) AS total
+        FROM {src.sql} s
         WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
+            AND s.cargo = 'Presidente'
+            AND s.codigo_candidato IN (13, 22)
         GROUP BY s.uf
         ORDER BY s.uf
     """, f["params"])
@@ -2006,20 +2025,14 @@ def reserve_vote_pattern(store, f) -> pd.DataFrame:
     df = store.query_df(f"""
         SELECT
             s.tipo_urna AS tipo,
-            COUNT(DISTINCT s.id) AS secoes,
-            SUM(CASE WHEN v.codigo_candidato = 13 AND v.tipo_voto = 'nominal'
-                THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 AND v.tipo_voto = 'nominal'
-                THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(CASE WHEN v.tipo_voto = 'nulo'
-                THEN v.quantidade ELSE 0 END) AS nulos,
-            SUM(CASE WHEN v.tipo_voto = 'branco'
-                THEN v.quantidade ELSE 0 END) AS brancos,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
+            COUNT(*) AS secoes,
+            SUM({_P13}) AS lula,
+            SUM({_P22}) AS bolso,
+            SUM(COALESCE(p.nulos, 0)) AS nulos,
+            SUM(COALESCE(p.brancos, 0)) AS brancos,
+            SUM(p.total) AS total
+        FROM {_pres_join(store)}
         WHERE {f['where']}
-            AND v.cargo = 'Presidente'
             AND s.tipo_urna IS NOT NULL
         GROUP BY s.tipo_urna
         ORDER BY s.tipo_urna
@@ -2101,16 +2114,12 @@ def substitution_vs_result(store, f) -> pd.DataFrame:
                 THEN 'com_substituição'
                 ELSE 'sem_substituição'
             END AS grupo,
-            COUNT(DISTINCT s.id) AS secoes,
-            SUM(CASE WHEN v.codigo_candidato = 13 THEN v.quantidade ELSE 0 END) AS lula,
-            SUM(CASE WHEN v.codigo_candidato = 22 THEN v.quantidade ELSE 0 END) AS bolso,
-            SUM(v.quantidade) AS total
-        FROM votos v
-        JOIN secoes s ON v.secao_id = s.id
-        WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-            AND v.codigo_candidato IN (13, 22)
+            COUNT(*) AS secoes,
+            SUM({_P13}) AS lula,
+            SUM({_P22}) AS bolso,
+            SUM({_P13} + {_P22}) AS total
+        FROM {_pres_join(store)}
+        WHERE {f['where']} AND {_P_TEM_13_22}
         GROUP BY grupo
         ORDER BY grupo
     """, f["params"])
@@ -2331,7 +2340,7 @@ def section_risk_score(store, secao_id) -> dict:
     Returns:
         dict com:
         - score: int (0-100, onde 100 = mais risco)
-        - nivel: str ('OK' | 'ATENÇÃO' | 'ALTO')
+        - nível: str ('OK' | 'ATENÇÃO' | 'ALTO')
         - detalhes: list de strings
     """
     info_df = store.query_df("""
@@ -2498,17 +2507,19 @@ def zscore_outliers_by_state(store, f, threshold=3.0) -> pd.DataFrame:
     all_outliers = []
     for col_name, metric_label in metrics:
         df = store.query_df(f"""
-            SELECT
-                s.id AS secao_id,
-                s.uf,
-                s.{col_name} AS valor,
-                AVG(s.{col_name}) OVER(PARTITION BY s.uf) AS media_uf,
-                STDDEV(s.{col_name}) OVER(PARTITION BY s.uf) AS std_uf,
-                (s.{col_name} - AVG(s.{col_name}) OVER(PARTITION BY s.uf))
-                    / NULLIF(STDDEV(s.{col_name}) OVER(PARTITION BY s.uf), 0) AS zscore
-            FROM secoes s
-            WHERE {f['where']} AND s.{col_name} IS NOT NULL
-        """, f["params"])
+            SELECT * FROM (
+                SELECT
+                    s.id AS secao_id,
+                    s.uf,
+                    s.{col_name} AS valor,
+                    AVG(s.{col_name}) OVER(PARTITION BY s.uf) AS media_uf,
+                    STDDEV(s.{col_name}) OVER(PARTITION BY s.uf) AS std_uf,
+                    (s.{col_name} - AVG(s.{col_name}) OVER(PARTITION BY s.uf))
+                        / NULLIF(STDDEV(s.{col_name}) OVER(PARTITION BY s.uf), 0) AS zscore
+                FROM secoes s
+                WHERE {f['where']} AND s.{col_name} IS NOT NULL
+            ) WHERE ABS(zscore) > ?
+        """, list(f["params"]) + [threshold])
 
         if df.empty:
             continue
@@ -2644,14 +2655,14 @@ def biometry_histogram_data(store, f) -> pd.DataFrame:
 # ============================================================
 
 def generate_excel_report(store, f) -> BytesIO:
-    """Gera relatorio Excel em memoria (BytesIO) com multiplas planilhas.
+    """Gera relatório Excel em memória (BytesIO) com múltiplas planilhas.
 
     Planilhas:
-        - Resumo: KPIs gerais (secoes, votos, reboots, issues, comparecimento)
-        - Por Estado: metricas por UF
-        - Issues: todas as issues (secao_id, codigo, severidade, descricao)
-        - Outliers: secoes outliers (z-score > 3)
-        - Reboots: secoes com reboots > 0
+        - Resumo: KPIs gerais (seções, votos, reboots, issues, comparecimento)
+        - Por Estado: métricas por UF
+        - Issues: todas as issues (secao_id, código, severidade, descrição)
+        - Outliers: seções outliers (z-score > 3)
+        - Reboots: seções com reboots > 0
 
     Returns:
         BytesIO com o arquivo Excel pronto para download.
@@ -2688,19 +2699,19 @@ def generate_excel_report(store, f) -> BytesIO:
                 "ufs_cobertas": 0,
             }])
 
-        # Transpor para formato de KPIs (metrica / valor)
+        # Transpor para formato de KPIs (métrica / valor)
         row = resumo_df.iloc[0]
         kpis = pd.DataFrame({
-            "Metrica": [
-                "Total de Secoes",
+            "Métrica": [
+                "Total de Seções",
                 "UFs Cobertas",
                 "Eleitores Aptos",
                 "Comparecimento",
                 "% Comparecimento",
                 "Total de Votos",
                 "Total de Reboots",
-                "Secoes com Reboot",
-                "Secoes com Issues",
+                "Seções com Reboot",
+                "Seções com Issues",
             ],
             "Valor": [
                 int(row["total_secoes"]),
@@ -2715,12 +2726,12 @@ def generate_excel_report(store, f) -> BytesIO:
             ],
         })
 
-        # Adicionar data/hora de geracao
+        # Adicionar data/hora de geração
         meta = pd.DataFrame({
-            "Metrica": ["Data de Geracao", "Filtros Aplicados"],
+            "Métrica": ["Data de Geração", "Filtros Aplicados"],
             "Valor": [
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                f"Turno: {f.get('turno', 'Ambos')} | WHERE: {f['where']}",
+                f"Turno: {f.get('turno') or 'Ambos'} | WHERE: {f['where']}",
             ],
         })
         resumo_final = pd.concat([kpis, meta], ignore_index=True)
@@ -2834,10 +2845,10 @@ def generate_excel_report(store, f) -> BytesIO:
 
 
 def generate_text_report(store, f) -> str:
-    """Gera relatorio em texto formatado para download como .txt.
+    """Gera relatório em texto formatado para download como .txt.
 
     Inclui:
-        - Score de confianca e veredicto
+        - Score de confiança e veredicto
         - KPIs resumidos
         - Categorias de risco
         - Top issues
@@ -2850,13 +2861,13 @@ def generate_text_report(store, f) -> str:
     sep = "=" * 72
 
     lines.append(sep)
-    lines.append("RELATORIO DE AUDITORIA ELEITORAL - ELEICOES 2022")
-    lines.append(f"Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append(f"Turno: {f.get('turno', 'Ambos')}")
+    lines.append("RELATÓRIO DE AUDITORIA ELEITORAL - ELEIÇÕES 2022")
+    lines.append(f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+    lines.append(f"Turno: {f.get('turno') or 'Ambos'}")
     lines.append(sep)
     lines.append("")
 
-    # --- Score de confianca ---
+    # --- Score de confiança ---
     try:
         confidence = compute_confidence_score(store, f)
     except Exception:
@@ -2870,12 +2881,18 @@ def generate_text_report(store, f) -> str:
         justificativa = confidence.get("justificativa", "")
         vulnerabilidades = confidence.get("vulnerabilidades", [])
         categorias = confidence.get("categorias", [])
+        nota_integridade = confidence.get("nota_integridade")
 
-        lines.append("1. SCORE DE CONFIANCA")
+        lines.append("1. SCORE DE CONFIANÇA")
         lines.append("-" * 40)
         lines.append(f"   Score: {score:.1f}/100")
-        lines.append(f"   Nivel: {nivel}")
+        lines.append(f"   Nível: {nivel}")
         lines.append("")
+        if nota_integridade:
+            lines.append("   Nota sobre integridade de hash:")
+            for line in textwrap.wrap(nota_integridade, width=65):
+                lines.append(f"   {line}")
+            lines.append("")
 
         if veredicto_votos:
             lines.append("   Veredicto sobre os votos:")
@@ -2906,7 +2923,8 @@ def generate_text_report(store, f) -> str:
                 peso = cat.get("peso", 0)
                 status = cat.get("status", "?")
                 detalhe = cat.get("detalhe", "")
-                lines.append(f"   [{status:>12s}] {nome}: {cat_score:.0f}/100 (peso {peso}%)")
+                valor = "Não verificado" if cat_score is None else f"{cat_score:.0f}/100"
+                lines.append(f"   [{status:>12s}] {nome}: {valor} (peso {peso}%)")
                 if detalhe:
                     for line in textwrap.wrap(detalhe, width=60):
                         lines.append(f"               {line}")
@@ -2922,7 +2940,7 @@ def generate_text_report(store, f) -> str:
             lines.append("")
 
     else:
-        lines.append("Score de confianca nao disponivel.")
+        lines.append("Score de confiança não disponível.")
         lines.append("")
 
     # --- KPIs resumidos ---
@@ -2951,14 +2969,14 @@ def generate_text_report(store, f) -> str:
         secoes_issues = int(r["secoes_issues"])
         pct_comp = total_comp / int(r["eleitores"]) * 100 if int(r["eleitores"]) > 0 else 0
 
-        lines.append(f"   Secoes analisadas:     {total_secoes:>12,}")
+        lines.append(f"   Seções analisadas:     {total_secoes:>12,}")
         lines.append(f"   UFs cobertas:          {int(r['ufs']):>12}")
         lines.append(f"   Eleitores aptos:       {int(r['eleitores']):>12,}")
         lines.append(f"   Comparecimento:        {total_comp:>12,} ({pct_comp:.1f}%)")
         lines.append(f"   Total de reboots:      {total_reboots:>12,}")
-        lines.append(f"   Secoes com reboot:     {secoes_reboot:>12,} "
+        lines.append(f"   Seções com reboot:     {secoes_reboot:>12,} "
                      f"({secoes_reboot / total_secoes * 100:.1f}%)")
-        lines.append(f"   Secoes com issues:     {secoes_issues:>12,} "
+        lines.append(f"   Seções com issues:     {secoes_issues:>12,} "
                      f"({secoes_issues / total_secoes * 100:.1f}%)")
     else:
         lines.append("   Sem dados para os filtros selecionados.")
@@ -2967,7 +2985,7 @@ def generate_text_report(store, f) -> str:
 
     # --- Top issues ---
     lines.append("")
-    lines.append("5. TOP ISSUES POR FREQUENCIA")
+    lines.append("5. TOP ISSUES POR FREQUÊNCIA")
     lines.append("-" * 40)
 
     top_issues = store.query_df(f"""
@@ -2985,7 +3003,7 @@ def generate_text_report(store, f) -> str:
     """, f["issue_params"])
 
     if not top_issues.empty:
-        lines.append(f"   {'Codigo':<8} {'Severidade':<12} {'Total':>8} {'Secoes':>8}  Descricao")
+        lines.append(f"   {'Código':<8} {'Severidade':<12} {'Total':>8} {'Seções':>8}  Descrição")
         lines.append(f"   {'------':<8} {'----------':<12} {'-----':>8} {'------':>8}  ---------")
         for _, row in top_issues.iterrows():
             codigo = row["codigo"]
@@ -3005,14 +3023,14 @@ def generate_text_report(store, f) -> str:
     lines.append("-" * 40)
 
     sig = signature_integrity_summary(store, f)
-    lines.append(f"   Total de secoes:       {sig['total_secoes']:>12,}")
+    lines.append(f"   Total de seções:       {sig['total_secoes']:>12,}")
     lines.append(f"   Hash OK:               {sig['secoes_hash_ok']:>12,}")
     lines.append(f"   Hash com falha:        {sig['secoes_hash_falha']:>12,}")
-    lines.append(f"   % de secoes integras:  {sig['pct_ok']:>11.2f}%")
+    lines.append(f"   % de seções íntegras:  {sig['pct_ok']:>11.2f}%")
 
     lines.append("")
     lines.append(sep)
-    lines.append("FIM DO RELATORIO")
+    lines.append("FIM DO RELATÓRIO")
     lines.append(sep)
 
     return "\n".join(lines)
@@ -3022,47 +3040,77 @@ def generate_text_report(store, f) -> str:
 # 19. Score de Confiança
 # ============================================================
 
+NOTA_HASH_NAO_VERIFICADO = (
+    "A verificação de hashes SHA-512 não foi executada na construção desta base "
+    "(verify_hashes desativado). A ausência de issues C01 não comprova a integridade "
+    "dos arquivos, por isso o componente de integridade de hash aparece como "
+    "\"Não verificado\" e fica fora do score: os pesos dos demais componentes são "
+    "renormalizados para manter a escala de 0 a 100."
+)
+
+
+def hash_verification_status(store) -> dict:
+    """Informa se a base passou pela verificação de hashes SHA-512.
+
+    Ordem de decisão:
+    1. tabela ``metadados`` com a chave ``verify_hashes`` (gravada por
+       ``dataurnas db build`` e ``scripts/build_db.py``): valor autoritativo;
+    2. sem esse registro, a existência de qualquer issue C01 ou E01 na base
+       inteira indica que a verificação rodou (só ela gera esses códigos);
+    3. caso contrário, a base é tratada como NÃO verificada.
+
+    Returns:
+        dict com ``verificado`` (bool) e ``fonte`` ("metadados", "issues"
+        ou "ausente").
+    """
+    try:
+        tem_tabela = store.query_df(
+            "SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_name = 'metadados'"
+        )
+        if not tem_tabela.empty and int(tem_tabela.iloc[0]["n"]) > 0:
+            meta = store.query_df(
+                "SELECT valor FROM metadados WHERE chave = 'verify_hashes'"
+            )
+            if not meta.empty:
+                valor = str(meta.iloc[0]["valor"]).strip().lower()
+                if valor in ("true", "false"):
+                    return {"verificado": valor == "true", "fonte": "metadados"}
+    except Exception:  # store sem information_schema: segue para a inferência
+        pass
+
+    try:
+        n = store.query_df(
+            "SELECT COUNT(*) AS n FROM issues WHERE codigo IN ('C01', 'E01')"
+        )
+        if not n.empty and int(n.iloc[0]["n"]) > 0:
+            return {"verificado": True, "fonte": "issues"}
+    except Exception:
+        pass
+    return {"verificado": False, "fonte": "ausente"}
+
+
 def compute_confidence_score(store, f) -> dict:
     """Calcula score de confiança 0-100 com detalhamento por categoria.
 
     Usa Cramér's V para avaliação de Benford (robusto a amostras grandes).
-    Quando turno=None, calcula média ponderada dos dados oficiais T1+T2
-    para o veredicto_votos.
+    Quando turno=None, cada turno é comparado com o resultado oficial do
+    mesmo turno no veredicto_votos (o desvio informado é o maior).
 
     Returns:
         dict com:
         - score: float (0-100)
-        - nivel: str (ALTA/MODERADA/BAIXA)
+        - nível: str (ALTA/MODERADA/BAIXA)
         - categorias: list of dicts com {nome, score, peso, status, detalhe}
         - veredicto_votos: str
         - veredicto_auditoria: str
         - justificativa: str
         - vulnerabilidades: list of str
     """
-    turno = f.get("turno")
 
-    # Quando turno=None, usar média ponderada T1+T2 para referência oficial
-    if turno is None:
-        total_votos_validos = OFICIAL_1T["votos_validos"] + OFICIAL_2T["votos_validos"]
-        OFICIAL = {
-            "turno": None,
-            "eleitores_aptos": OFICIAL_1T["eleitores_aptos"],
-            "comparecimento": OFICIAL_1T["comparecimento"] + OFICIAL_2T["comparecimento"],
-            "votos_validos": total_votos_validos,
-            "lula_pct": (
-                OFICIAL_1T["lula_pct"] * OFICIAL_1T["votos_validos"]
-                + OFICIAL_2T["lula_pct"] * OFICIAL_2T["votos_validos"]
-            ) / total_votos_validos,
-            "bolso_pct": (
-                OFICIAL_1T["bolso_pct"] * OFICIAL_1T["votos_validos"]
-                + OFICIAL_2T["bolso_pct"] * OFICIAL_2T["votos_validos"]
-            ) / total_votos_validos,
-            "diferenca": OFICIAL_1T["diferenca"] + OFICIAL_2T["diferenca"],
-        }
-    elif turno == 2:
-        OFICIAL = OFICIAL_2T
-    else:
-        OFICIAL = OFICIAL_1T
+    # Referência oficial por turno. Com turno=None (ambos), cada turno da
+    # base é comparado com o resultado oficial do mesmo turno; somar votos
+    # de T1 e T2 ou fazer média dos percentuais não tem significado eleitoral.
+    OFICIAIS = {1: OFICIAL_1T, 2: OFICIAL_2T}
 
     categorias = []
     vulnerabilidades = []
@@ -3096,34 +3144,37 @@ def compute_confidence_score(store, f) -> dict:
     s = summary.iloc[0]
     total_secoes = int(s["secoes"])
     total_comp = int(s["comparecimento"])
-    total_reboots = int(s["total_reboots"])
     secoes_com_reboot = int(s["secoes_com_reboot"])
 
-    # Votos para Presidente
+    # Votos para Presidente, separados por turno
+    src = _agg.cube_source(store, f["where"], "agg_votos_nominais")
     votos_pres = store.query_df(f"""
         SELECT
-            v.codigo_candidato AS candidato,
-            SUM(v.quantidade) AS votos
-        FROM votos v JOIN secoes s ON v.secao_id = s.id
+            s.turno,
+            s.codigo_candidato AS candidato,
+            SUM(s.votos) AS votos
+        FROM {src.sql} s
         WHERE {f['where']}
-            AND v.cargo = 'Presidente'
-            AND v.tipo_voto = 'nominal'
-        GROUP BY v.codigo_candidato
-        ORDER BY votos DESC
+            AND s.cargo = 'Presidente'
+        GROUP BY s.turno, s.codigo_candidato
+        ORDER BY s.turno, votos DESC
     """, f["params"])
 
     total_nominais = int(votos_pres["votos"].sum()) if not votos_pres.empty else 0
 
-    pct_lula_am = 0.0
-    pct_bolso_am = 0.0
-    if not votos_pres.empty and total_nominais > 0:
-        for _, row in votos_pres.iterrows():
-            cand = int(row["candidato"])
-            pct = int(row["votos"]) / total_nominais * 100
-            if cand == 13:
-                pct_lula_am = pct
-            elif cand == 22:
-                pct_bolso_am = pct
+    # Desvio (p.p.) de cada turno presente em relação ao oficial do mesmo turno
+    desvios_turno = {}
+    if not votos_pres.empty:
+        for t, grupo in votos_pres.groupby("turno"):
+            total_t = int(grupo["votos"].sum())
+            ref = OFICIAIS.get(int(t))
+            if total_t == 0 or ref is None:
+                continue
+            por_cand = dict(zip(grupo["candidato"].astype(int), grupo["votos"].astype(int), strict=False))
+            desvios_turno[int(t)] = (
+                abs(por_cand.get(13, 0) / total_t * 100 - ref["lula_pct"]),
+                abs(por_cand.get(22, 0) / total_t * 100 - ref["bolso_pct"]),
+            )
 
     # Issues por código
     issues_by_code = store.query_df(f"""
@@ -3135,13 +3186,25 @@ def compute_confidence_score(store, f) -> dict:
 
     issue_counts = {}
     if not issues_by_code.empty:
-        issue_counts = dict(zip(issues_by_code["codigo"], issues_by_code["total"]))
+        issue_counts = dict(zip(issues_by_code["codigo"], issues_by_code["total"], strict=True))
 
     # ----------------------------------------------------------
     # Categoria 1: Integridade de hash (C01)
     # ----------------------------------------------------------
+    # Sem C01 só vale 100 se a verificação SHA-512 rodou; do contrário o
+    # componente fica sem score (None) e sai da média ponderada. Issues C01
+    # existentes contam sempre: são evidência concreta, verificada ou não a
+    # base inteira.
+    hashes_verificados = bool(hash_verification_status(store)["verificado"])
     c01_count = int(issue_counts.get("C01", 0))
-    if c01_count == 0:
+    if c01_count == 0 and not hashes_verificados:
+        cat1_score = None
+        cat1_status = "NAO_VERIFICADO"
+        cat1_detalhe = (
+            "Não verificado: a base foi construída sem verificação de hashes SHA-512; "
+            "componente excluído do score."
+        )
+    elif c01_count == 0:
         cat1_score = 100.0
         cat1_status = "OK"
         cat1_detalhe = "Nenhum hash SHA-512 inválido detectado."
@@ -3153,7 +3216,7 @@ def compute_confidence_score(store, f) -> dict:
 
     categorias.append({
         "nome": "Integridade hash (C01)",
-        "score": round(cat1_score, 1),
+        "score": None if cat1_score is None else round(cat1_score, 1),
         "peso": 25,
         "status": cat1_status,
         "detalhe": cat1_detalhe,
@@ -3194,7 +3257,7 @@ def compute_confidence_score(store, f) -> dict:
         else:
             # Calcular Cramér's V por candidato
             cramers_values = []
-            for candidato, grp in benford_digit_df.groupby("candidato"):
+            for _candidato, grp in benford_digit_df.groupby("candidato"):
                 full = pd.DataFrame({"digito": range(1, 10)})
                 merged = full.merge(
                     grp[["digito", "contagem"]], on="digito", how="left"
@@ -3447,9 +3510,12 @@ def compute_confidence_score(store, f) -> dict:
     # ----------------------------------------------------------
     # Score ponderado final
     # ----------------------------------------------------------
-    total_peso = sum(c["peso"] for c in categorias)
+    # Componentes sem score (não verificados) saem da média; dividir pela
+    # soma dos pesos avaliados renormaliza os demais para a escala 0-100.
+    avaliadas = [c for c in categorias if c["score"] is not None]
+    total_peso = sum(c["peso"] for c in avaliadas)
     if total_peso > 0:
-        score = sum(c["score"] * c["peso"] for c in categorias) / total_peso
+        score = sum(c["score"] * c["peso"] for c in avaliadas) / total_peso
     else:
         score = 0.0
 
@@ -3466,8 +3532,8 @@ def compute_confidence_score(store, f) -> dict:
     # ----------------------------------------------------------
     # Veredictos textuais
     # ----------------------------------------------------------
-    desvio_lula = abs(pct_lula_am - OFICIAL["lula_pct"]) if total_nominais > 0 else 0
-    desvio_bolso = abs(pct_bolso_am - OFICIAL["bolso_pct"]) if total_nominais > 0 else 0
+    desvio_lula = max((d[0] for d in desvios_turno.values()), default=0.0)
+    desvio_bolso = max((d[1] for d in desvios_turno.values()), default=0.0)
     desvio_max = max(desvio_lula, desvio_bolso)
 
     # Veredicto sobre votos
@@ -3475,28 +3541,29 @@ def compute_confidence_score(store, f) -> dict:
         veredicto_votos = "Sem dados de votação para avaliar consistência."
     elif desvio_max < 1.0:
         veredicto_votos = (
-            f"Resultados da amostra consistentes com o oficial TSE "
+            f"Resultados dos boletins de urna consistentes com o oficial TSE "
             f"(desvio máximo: {desvio_max:.2f} p.p.)."
         )
     elif desvio_max < 3.0:
         veredicto_votos = (
-            f"Desvio moderado entre amostra e oficial "
+            f"Desvio moderado entre os dados das urnas e o oficial "
             f"(Lula: {desvio_lula:.2f} p.p., Bolsonaro: {desvio_bolso:.2f} p.p.). "
-            f"Pode refletir composição da amostra."
+            f"Com filtros, pode refletir o recorte selecionado."
         )
     else:
         veredicto_votos = (
-            f"Desvio significativo entre amostra e oficial "
+            f"Desvio significativo entre os dados das urnas e o oficial "
             f"(Lula: {desvio_lula:.2f} p.p., Bolsonaro: {desvio_bolso:.2f} p.p.). "
-            f"Verificar viés na amostragem."
+            f"Verificar os filtros aplicados e a integridade da base."
         )
 
-    # Nota sobre referência oficial quando turno=None
-    if turno is None and total_nominais > 0:
-        veredicto_votos += (
-            " Referência oficial: média ponderada T1+T2 "
-            f"(Lula: {OFICIAL['lula_pct']:.2f}%, Bolsonaro: {OFICIAL['bolso_pct']:.2f}%)."
+    # Com os dois turnos, o desvio informado é o maior entre eles
+    if len(desvios_turno) > 1:
+        detalhes = "; ".join(
+            f"{t}º turno: Lula {d[0]:.2f} p.p., Bolsonaro {d[1]:.2f} p.p."
+            for t, d in sorted(desvios_turno.items())
         )
+        veredicto_votos += f" Comparação feita turno a turno com o oficial ({detalhes})."
 
     # Veredicto de auditoria
     if score >= 85:
@@ -3519,14 +3586,22 @@ def compute_confidence_score(store, f) -> dict:
     n_criticos = sum(1 for c in categorias if c["status"] == "CRITICO")
     n_altos = sum(1 for c in categorias if c["status"] == "ALTO")
     n_ok = sum(1 for c in categorias if c["status"] == "OK")
+    n_nao_verif = len(categorias) - len(avaliadas)
 
     justificativa_parts = []
+    if n_nao_verif:
+        justificativa_parts.append(
+            f"Score baseado em {len(avaliadas)} de {len(categorias)} categorias de análise "
+            f"({n_ok} OK, {n_criticos} críticas, {n_altos} altas; "
+            f"{n_nao_verif} não verificada, com pesos renormalizados)."
+        )
+    else:
+        justificativa_parts.append(
+            f"Score baseado em {len(categorias)} categorias de análise "
+            f"({n_ok} OK, {n_criticos} críticas, {n_altos} altas)."
+        )
     justificativa_parts.append(
-        f"Score baseado em {len(categorias)} categorias de análise "
-        f"({n_ok} OK, {n_criticos} críticas, {n_altos} altas)."
-    )
-    justificativa_parts.append(
-        f"Amostra de {total_secoes:,} seções "
+        f"Base de {total_secoes:,} seções "
         f"({total_comp:,} votos, {int(s['ufs'])} UFs)."
     )
     if total_nominais > 0:
@@ -3547,4 +3622,6 @@ def compute_confidence_score(store, f) -> dict:
         "veredicto_auditoria": veredicto_auditoria,
         "justificativa": justificativa,
         "vulnerabilidades": vulnerabilidades,
+        "hashes_verificados": hashes_verificados,
+        "nota_integridade": None if hashes_verificados else NOTA_HASH_NAO_VERIFICADO,
     }

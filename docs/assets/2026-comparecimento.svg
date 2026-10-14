@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="908" viewBox="0 0 1000 908" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Comparecimento por UF: 1º turno de 2022 x 2026</title>
+<desc id="descricao">Gráfico de halteres com o comparecimento de cada UF. Brasil: 79,3% em 2022 e 79,2% em 2026; Ceará (CE): 82,6% em 2022 e 84,5% em 2026; Roraima (RR): 83,6% em 2022 e 82,9% em 2026; Piauí (PI): 82,4% em 2022 e 82,8% em 2026; Sergipe (SE): 81,8% em 2022 e 82,7% em 2026; Paraíba (PB): 82,9% em 2022 e 82,6% em 2026; Amapá (AP): 80,6% em 2022 e 82,6% em 2026; Pernambuco (PE): 81,9% em 2022 e 81,8% em 2026; Tocantins (TO): 81,6% em 2022 e 81,7% em 2026; Rio Grande do Norte (RN): 82,0% em 2022 e 81,6% em 2026; Distrito Federal (DF): 83,0% em 2022 e 81,1% em 2026; Santa Catarina (SC): 81,8% em 2022 e 81,1% em 2026; Pará (PA): 78,8% em 2022 e 80,9% em 2026; Maranhão (MA): 77,8% em 2022 e 80,3% em 2026; Bahia (BA): 78,7% em 2022 e 80,0% em 2026; Amazonas (AM): 80,0% em 2022 e 79,8% em 2026; Acre (AC): 77,6% em 2022 e 79,6% em 2026; Paraná (PR): 80,7% em 2022 e 79,4% em 2026; Alagoas (AL): 77,7% em 2022 e 79,4% em 2026; Rio Grande do Sul (RS): 80,3% em 2022 e 78,6% em 2026; Espírito Santo (ES): 79,4% em 2022 e 78,6% em 2026; Rondônia (RO): 75,4% em 2022 e 78,3% em 2026; Goiás (GO): 78,4% em 2022 e 78,2% em 2026; Mato Grosso (MT): 76,7% em 2022 e 77,8% em 2026; São Paulo (SP): 78,5% em 2022 e 77,5% em 2026; Minas Gerais (MG): 77,8% em 2022 e 77,2% em 2026; Rio de Janeiro (RJ): 77,4% em 2022 e 76,7% em 2026; Mato Grosso do Sul (MS): 78,0% em 2022 e 76,1% em 2026.</desc>
+<rect x="1" y="1" width="998" height="906" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Comparecimento por UF: 1º turno de 2022 x 2026</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Eleitores que votaram sobre o eleitorado apto; variação em pontos percentuais (exterior não incluído)</text>
+<circle cx="56" cy="104" r="7" fill="#56B4E9" stroke="#0072B2" stroke-width="1.5"/>
+<text x="70.0" y="109.0" font-size="13.5" font-weight="400" fill="#0B3A5B" text-anchor="start">1º turno de 2022</text>
+<circle cx="206" cy="104" r="7" fill="#0B3A5B"/>
+<text x="220.0" y="109.0" font-size="13.5" font-weight="400" fill="#0B3A5B" text-anchor="start">1º turno de 2026</text>
+<text x="860.0" y="109.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">Variação</text>
+<text x="940.0" y="109.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">2026</text>
+<line x1="291.4" y1="140" x2="291.4" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="291.4" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">74%</text>
+<line x1="374.3" y1="140" x2="374.3" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="374.3" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">76%</text>
+<line x1="457.1" y1="140" x2="457.1" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="457.1" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">78%</text>
+<line x1="540.0" y1="140" x2="540.0" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="540.0" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">80%</text>
+<line x1="622.9" y1="140" x2="622.9" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="622.9" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">82%</text>
+<line x1="705.7" y1="140" x2="705.7" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="705.7" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">84%</text>
+<line x1="788.6" y1="140" x2="788.6" y2="828" stroke="#D9E3EB" stroke-width="1"/>
+<text x="788.6" y="134.0" font-size="11.5" font-weight="400" fill="#4F6B80" text-anchor="middle">86%</text>
+<rect x="24.0" y="147.0" width="952.0" height="26.0" rx="8" fill="#F2F6F9"/>
+<text x="236.0" y="164.5" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="end">Brasil</text>
+<line x1="511.6" y1="160" x2="505.1" y2="160" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="511.6" cy="160" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="505.1" cy="160" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="164.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,2 p.p.</text>
+<text x="940.0" y="164.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">79,2%</text>
+<text x="236.0" y="194.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Ceará (CE)</text>
+<line x1="648.4" y1="190" x2="725.5" y2="190" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="648.4" cy="190" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="725.5" cy="190" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="194.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+1,9 p.p.</text>
+<text x="940.0" y="194.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">84,5%</text>
+<text x="236.0" y="218.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Roraima (RR)</text>
+<line x1="688.4" y1="214" x2="659.2" y2="214" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="688.4" cy="214" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="659.2" cy="214" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="218.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,7 p.p.</text>
+<text x="940.0" y="218.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">82,9%</text>
+<text x="236.0" y="242.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Piauí (PI)</text>
+<line x1="638.0" y1="238" x2="658.1" y2="238" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="638.0" cy="238" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="658.1" cy="238" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="242.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+0,5 p.p.</text>
+<text x="940.0" y="242.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">82,8%</text>
+<text x="236.0" y="266.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Sergipe (SE)</text>
+<line x1="613.2" y1="262" x2="651.8" y2="262" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="613.2" cy="262" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="651.8" cy="262" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="266.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+0,9 p.p.</text>
+<text x="940.0" y="266.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">82,7%</text>
+<text x="236.0" y="290.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Paraíba (PB)</text>
+<line x1="659.0" y1="286" x2="648.6" y2="286" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="659.0" cy="286" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="648.6" cy="286" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="290.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,3 p.p.</text>
+<text x="940.0" y="290.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">82,6%</text>
+<text x="236.0" y="314.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Amapá (AP)</text>
+<line x1="565.4" y1="310" x2="647.5" y2="310" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="565.4" cy="310" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="647.5" cy="310" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="314.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+2,0 p.p.</text>
+<text x="940.0" y="314.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">82,6%</text>
+<text x="236.0" y="338.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Pernambuco (PE)</text>
+<line x1="617.7" y1="334" x2="615.9" y2="334" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="617.7" cy="334" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="615.9" cy="334" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="338.5" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">0,0 p.p.</text>
+<text x="940.0" y="338.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">81,8%</text>
+<text x="236.0" y="362.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Tocantins (TO)</text>
+<line x1="607.1" y1="358" x2="608.6" y2="358" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="607.1" cy="358" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="608.6" cy="358" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="362.5" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">0,0 p.p.</text>
+<text x="940.0" y="362.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">81,7%</text>
+<text x="236.0" y="386.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Rio Grande do Norte (RN)</text>
+<line x1="622.1" y1="382" x2="607.2" y2="382" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="622.1" cy="382" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="607.2" cy="382" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="386.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,4 p.p.</text>
+<text x="940.0" y="386.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">81,6%</text>
+<text x="236.0" y="410.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Distrito Federal (DF)</text>
+<line x1="662.5" y1="406" x2="585.4" y2="406" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="662.5" cy="406" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="585.4" cy="406" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="410.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−1,9 p.p.</text>
+<text x="940.0" y="410.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">81,1%</text>
+<text x="236.0" y="434.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Santa Catarina (SC)</text>
+<line x1="615.8" y1="430" x2="583.7" y2="430" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="615.8" cy="430" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="583.7" cy="430" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="434.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,8 p.p.</text>
+<text x="940.0" y="434.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">81,1%</text>
+<text x="236.0" y="458.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Pará (PA)</text>
+<line x1="492.0" y1="454" x2="577.4" y2="454" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="492.0" cy="454" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="577.4" cy="454" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="458.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+2,1 p.p.</text>
+<text x="940.0" y="458.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">80,9%</text>
+<text x="236.0" y="482.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Maranhão (MA)</text>
+<line x1="450.4" y1="478" x2="551.1" y2="478" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="450.4" cy="478" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="551.1" cy="478" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="482.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+2,4 p.p.</text>
+<text x="940.0" y="482.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">80,3%</text>
+<text x="236.0" y="506.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Bahia (BA)</text>
+<line x1="487.0" y1="502" x2="541.2" y2="502" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="487.0" cy="502" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="541.2" cy="502" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="506.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+1,3 p.p.</text>
+<text x="940.0" y="506.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">80,0%</text>
+<text x="236.0" y="530.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Amazonas (AM)</text>
+<line x1="538.6" y1="526" x2="533.6" y2="526" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="538.6" cy="526" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="533.6" cy="526" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="530.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,1 p.p.</text>
+<text x="940.0" y="530.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">79,8%</text>
+<text x="236.0" y="554.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Acre (AC)</text>
+<line x1="442.1" y1="550" x2="522.0" y2="550" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="442.1" cy="550" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="522.0" cy="550" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="554.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+1,9 p.p.</text>
+<text x="940.0" y="554.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">79,6%</text>
+<text x="236.0" y="578.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Paraná (PR)</text>
+<line x1="567.1" y1="574" x2="516.2" y2="574" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="567.1" cy="574" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="516.2" cy="574" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="578.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−1,2 p.p.</text>
+<text x="940.0" y="578.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">79,4%</text>
+<text x="236.0" y="602.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Alagoas (AL)</text>
+<line x1="446.6" y1="598" x2="514.1" y2="598" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="446.6" cy="598" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="514.1" cy="598" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="602.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+1,6 p.p.</text>
+<text x="940.0" y="602.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">79,4%</text>
+<text x="236.0" y="626.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Rio Grande do Sul (RS)</text>
+<line x1="551.8" y1="622" x2="484.0" y2="622" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="551.8" cy="622" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="484.0" cy="622" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="626.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−1,6 p.p.</text>
+<text x="940.0" y="626.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">78,6%</text>
+<text x="236.0" y="650.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Espírito Santo (ES)</text>
+<line x1="514.0" y1="646" x2="483.2" y2="646" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="514.0" cy="646" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="483.2" cy="646" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="650.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,7 p.p.</text>
+<text x="940.0" y="650.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">78,6%</text>
+<text x="236.0" y="674.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Rondônia (RO)</text>
+<line x1="350.5" y1="670" x2="469.2" y2="670" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="350.5" cy="670" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="469.2" cy="670" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="674.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+2,9 p.p.</text>
+<text x="940.0" y="674.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">78,3%</text>
+<text x="236.0" y="698.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Goiás (GO)</text>
+<line x1="472.9" y1="694" x2="464.3" y2="694" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="472.9" cy="694" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="464.3" cy="694" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="698.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,2 p.p.</text>
+<text x="940.0" y="698.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">78,2%</text>
+<text x="236.0" y="722.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Mato Grosso (MT)</text>
+<line x1="404.7" y1="718" x2="448.7" y2="718" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="404.7" cy="718" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="448.7" cy="718" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="722.5" font-size="13" font-weight="700" fill="#009E73" text-anchor="start">+1,1 p.p.</text>
+<text x="940.0" y="722.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">77,8%</text>
+<text x="236.0" y="746.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">São Paulo (SP)</text>
+<line x1="477.6" y1="742" x2="434.8" y2="742" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="477.6" cy="742" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="434.8" cy="742" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="746.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−1,0 p.p.</text>
+<text x="940.0" y="746.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">77,5%</text>
+<text x="236.0" y="770.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Minas Gerais (MG)</text>
+<line x1="448.0" y1="766" x2="423.4" y2="766" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="448.0" cy="766" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="423.4" cy="766" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="770.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,6 p.p.</text>
+<text x="940.0" y="770.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">77,2%</text>
+<text x="236.0" y="794.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Rio de Janeiro (RJ)</text>
+<line x1="430.7" y1="790" x2="402.6" y2="790" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="430.7" cy="790" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="402.6" cy="790" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="794.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−0,7 p.p.</text>
+<text x="940.0" y="794.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">76,7%</text>
+<text x="236.0" y="818.5" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="end">Mato Grosso do Sul (MS)</text>
+<line x1="458.2" y1="814" x2="379.7" y2="814" stroke="#9FB8CB" stroke-width="3" stroke-linecap="round"/>
+<circle cx="458.2" cy="814" r="5.5" fill="#56B4E9" stroke="#0072B2" stroke-width="1.3"/>
+<circle cx="379.7" cy="814" r="5.5" fill="#0B3A5B"/>
+<text x="860.0" y="818.5" font-size="13" font-weight="700" fill="#B07800" text-anchor="start">−1,9 p.p.</text>
+<text x="940.0" y="818.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">76,1%</text>
+<line x1="32" y1="862" x2="968" y2="862" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="886.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: TSE, resultados oficiais do 1º turno de 2026; 2022: boletins de urna por seção</text>
+<text x="968.0" y="886.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>

@@ -1,11 +1,11 @@
-"""Navegacao da API hierarquica do TSE."""
+"""Navegação da API hierárquica do TSE."""
 
 import logging
 from dataclasses import dataclass
 from typing import Optional
 
 from ..config import TSE_BASE_URL, TSE_CONFIG_URL
-from ..models import Election, Section, SpecVersion, UrnaMeta
+from ..models import Section, UrnaMeta
 from .client import TSEClient
 
 logger = logging.getLogger(__name__)
@@ -13,20 +13,20 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class StateConfig:
-    """Configuracao de um estado com seus municipios, zonas e secoes."""
+    """Configuração de um estado com seus municípios, zonas e seções."""
     uf: str
     nome: str
     municipios: list[dict]  # Lista crua do JSON do TSE
 
 
 class TSEApi:
-    """Interface de navegacao da API hierarquica do TSE."""
+    """Interface de navegação da API hierárquica do TSE."""
 
     def __init__(self, client: TSEClient):
         self._client = client
 
     async def list_elections(self) -> list[dict]:
-        """Nivel 0: Lista todas as eleicoes disponiveis."""
+        """Nível 0: Lista todas as eleições disponíveis."""
         data = await self._client.fetch_json(TSE_CONFIG_URL)
         if not data:
             return []
@@ -35,7 +35,7 @@ class TSEApi:
     async def get_state_config(
         self, ciclo: str, pleito: str, uf: str
     ) -> Optional[StateConfig]:
-        """Nivel 1: Obtem municipios, zonas e secoes de um estado."""
+        """Nível 1: Obtém municípios, zonas e seções de um estado."""
         uf = uf.lower()
         url = (
             f"{TSE_BASE_URL}/{ciclo}/arquivo-urna/{pleito}"
@@ -43,7 +43,7 @@ class TSEApi:
         )
         data = await self._client.fetch_json(url)
         if not data or "abr" not in data or not data["abr"]:
-            logger.error("Dados de estado nao encontrados para %s", uf)
+            logger.error("Dados de estado não encontrados para %s", uf)
             return None
 
         estado = data["abr"][0]
@@ -56,7 +56,7 @@ class TSEApi:
     async def get_section_meta(
         self, ciclo: str, pleito: str, section: Section
     ) -> list[UrnaMeta]:
-        """Nivel 2: Obtem metadados das urnas de uma secao."""
+        """Nível 2: Obtém metadados das urnas de uma seção."""
         uf = section.uf.lower()
         mun = section.municipio_codigo
         zona = section.zona
@@ -99,7 +99,7 @@ class TSEApi:
     def build_file_url(
         self, ciclo: str, pleito: str, section: Section, hash_val: str, filename: str
     ) -> str:
-        """Nivel 3: Constroi URL de download de um arquivo de urna."""
+        """Nível 3: Constrói URL de download de um arquivo de urna."""
         uf = section.uf.lower()
         return (
             f"{TSE_BASE_URL}/{ciclo}/arquivo-urna/{pleito}"
@@ -108,7 +108,7 @@ class TSEApi:
         )
 
     def iter_sections(self, state_config: StateConfig):
-        """Itera sobre todas as secoes de um estado."""
+        """Itera sobre todas as seções de um estado."""
         uf = state_config.uf
         for mun in state_config.municipios:
             mun_cd = mun["cd"]
@@ -126,7 +126,7 @@ class TSEApi:
                     )
 
     def count_sections(self, state_config: StateConfig) -> int:
-        """Conta total de secoes em um estado."""
+        """Conta total de seções em um estado."""
         total = 0
         for mun in state_config.municipios:
             for zona in mun.get("zon", []):

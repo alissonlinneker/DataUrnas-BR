@@ -1,26 +1,25 @@
-"""Analise estatistica de dados de votacao."""
+"""Análise estatística de dados de votação."""
 
 import logging
 import math
 from collections import defaultdict
-from typing import Optional
 
 from ..models import BoletimUrna, Issue, IssueSeverity
 
 logger = logging.getLogger(__name__)
 
-# Limiares para deteccao de anomalias
-LIMIAR_NULOS_PCT = 15.0  # % de nulos acima disso e anomalo
-LIMIAR_BRANCOS_PCT = 10.0  # % de brancos acima disso e anomalo
-LIMIAR_ABSTENCAO_PCT = 40.0  # % de abstencao acima disso para alertar
-LIMIAR_BIOMETRIA_PCT = 30.0  # % de liberacao por codigo (sem biometria) acima disso
+# Limiares para detecção de anomalias
+LIMIAR_NULOS_PCT = 15.0  # % de nulos acima disso e anômalo
+LIMIAR_BRANCOS_PCT = 10.0  # % de brancos acima disso e anômalo
+LIMIAR_ABSTENCAO_PCT = 40.0  # % de abstenção acima disso para alertar
+LIMIAR_BIOMETRIA_PCT = 30.0  # % de liberação por código (sem biometria) acima disso
 
 
 class StatisticalAnalyzer:
-    """Analise estatistica de padroes de votacao."""
+    """Análise estatística de padrões de votação."""
 
     def analyze_bu(self, bu: BoletimUrna) -> list[Issue]:
-        """Analisa um BU individual para padroes anomalos."""
+        """Analisa um BU individual para padrões anômalos."""
         issues = []
         issues.extend(self._check_nulos_brancos(bu))
         issues.extend(self._check_biometria(bu))
@@ -28,7 +27,7 @@ class StatisticalAnalyzer:
         return issues
 
     def _check_nulos_brancos(self, bu: BoletimUrna) -> list[Issue]:
-        """Verifica proporcao de votos nulos e brancos."""
+        """Verifica proporção de votos nulos e brancos."""
         issues = []
 
         for eleicao in bu.resultados_por_eleicao:
@@ -55,7 +54,7 @@ class StatisticalAnalyzer:
                             codigo="I03",
                             severidade=IssueSeverity.INFO,
                             descricao=(
-                                f"Proporcao elevada de nulos: {pct_nulos:.1f}% "
+                                f"Proporção elevada de nulos: {pct_nulos:.1f}% "
                                 f"para {resultado.nome_cargo} "
                                 f"({nulos}/{total})"
                             ),
@@ -78,7 +77,7 @@ class StatisticalAnalyzer:
                             codigo="I04",
                             severidade=IssueSeverity.INFO,
                             descricao=(
-                                f"Proporcao elevada de brancos: {pct_brancos:.1f}% "
+                                f"Proporção elevada de brancos: {pct_brancos:.1f}% "
                                 f"para {resultado.nome_cargo} "
                                 f"({brancos}/{total})"
                             ),
@@ -98,7 +97,7 @@ class StatisticalAnalyzer:
         return issues
 
     def _check_biometria(self, bu: BoletimUrna) -> list[Issue]:
-        """Verifica proporcao de liberacao por codigo vs biometria."""
+        """Verifica proporção de liberação por código vs biometria."""
         issues = []
 
         lib_codigo = bu.qtd_eleitores_lib_codigo
@@ -116,7 +115,7 @@ class StatisticalAnalyzer:
                     codigo="M06",
                     severidade=IssueSeverity.MEDIUM,
                     descricao=(
-                        f"Alta taxa de liberacao por codigo (sem biometria): "
+                        f"Alta taxa de liberação por código (sem biometria): "
                         f"{pct_codigo:.1f}% ({lib_codigo}/{total})"
                     ),
                     uf=str(bu.uf),
@@ -129,14 +128,14 @@ class StatisticalAnalyzer:
                         "total": total,
                         "percentual": round(pct_codigo, 2),
                     },
-                    base_legal="Resolucao TSE 23.669/2021 - Biometria obrigatoria",
+                    base_legal="Resolução TSE 23.669/2021: biometria obrigatória",
                 )
             )
 
         return issues
 
     def _check_abstencao(self, bu: BoletimUrna) -> list[Issue]:
-        """Verifica taxa de abstencao."""
+        """Verifica taxa de abstenção."""
         issues = []
 
         for eleicao in bu.resultados_por_eleicao:
@@ -161,8 +160,8 @@ class StatisticalAnalyzer:
                         codigo="I05",
                         severidade=IssueSeverity.INFO,
                         descricao=(
-                            f"Alta taxa de abstencao: {abstencao:.1f}% "
-                            f"({aptos - max_comp}/{aptos}) na eleicao {eleicao.id_eleicao}"
+                            f"Alta taxa de abstenção: {abstencao:.1f}% "
+                            f"({aptos - max_comp}/{aptos}) na eleição {eleicao.id_eleicao}"
                         ),
                         uf=str(bu.uf),
                         municipio=str(bu.municipio),
@@ -180,18 +179,46 @@ class StatisticalAnalyzer:
         return issues
 
 
+# Cargos cujo número de candidato é único no país inteiro
+_CARGOS_NACIONAIS = {1, 2}  # Presidente, Vice-Presidente
+# Cargos municipais: número só é único dentro do município
+_CARGOS_MUNICIPAIS = {11, 12, 13}  # Prefeito, Vice-Prefeito, Vereador
+
+
+def escopo_candidatura(codigo_cargo: int, uf: str = "", municipio="") -> str:
+    """Circunscrição em que o número do candidato é único.
+
+    Presidente: "BR". Governador, Senador e Deputados: a UF. Cargos
+    municipais: "UF/municipio". Sem UF conhecida, cargos não nacionais
+    ficam em "??" para nunca serem somados com outra circunscrição.
+    """
+    if codigo_cargo in _CARGOS_NACIONAIS:
+        return "BR"
+    uf_key = (uf or "??").lower()
+    if codigo_cargo in _CARGOS_MUNICIPAIS:
+        return f"{uf_key}/{municipio or '??'}"
+    return uf_key
+
+
 class VoteAggregator:
-    """Agrega votos por candidato atraves de multiplas secoes."""
+    """Agrega votos por candidato através de múltiplas seções.
+
+    A chave de agregação é (turno, circunscrição, cargo, número): o número
+    de Governador, Senador e Deputados só é único dentro da UF, e votos do
+    1º e do 2º turno nunca podem ser somados.
+    """
 
     def __init__(self):
-        self._votos: dict[int, dict[str, dict]] = defaultdict(
+        # (turno, escopo, cargo) -> código -> info
+        self._votos: dict[tuple[int, str, str], dict[str, dict]] = defaultdict(
             lambda: defaultdict(lambda: {
                 "votos": 0,
                 "partido": None,
                 "secoes": 0,
             })
         )
-        self._totais_cargo: dict[str, dict] = defaultdict(
+        # (turno, cargo) -> totais
+        self._totais_cargo: dict[tuple[int, str], dict] = defaultdict(
             lambda: {
                 "nominais": 0,
                 "brancos": 0,
@@ -202,58 +229,62 @@ class VoteAggregator:
                 "secoes": 0,
             }
         )
-        self._por_uf: dict[str, dict[str, dict[str, int]]] = defaultdict(
-            lambda: defaultdict(lambda: defaultdict(int))
-        )
 
-    def add_bu(self, bu: BoletimUrna, uf: str = ""):
-        """Adiciona dados de um BU a agregacao."""
+    def add_bu(self, bu: BoletimUrna, uf: str = "", turno: int = 1, municipio=""):
+        """Adiciona dados de um BU à agregação."""
+        uf = uf or bu.uf or ""
+        municipio = municipio or bu.municipio or ""
         for eleicao in bu.resultados_por_eleicao:
             for resultado in eleicao.resultados:
                 cargo = resultado.nome_cargo
-                self._totais_cargo[cargo]["comparecimento"] += resultado.comparecimento
-                self._totais_cargo[cargo]["secoes"] += 1
+                escopo = escopo_candidatura(resultado.codigo_cargo, uf, municipio)
+                totais = self._totais_cargo[(turno, cargo)]
+                totais["comparecimento"] += resultado.comparecimento
+                totais["secoes"] += 1
 
                 for voto in resultado.votos:
                     tipo = voto.tipo_voto.value
                     qtd = voto.quantidade
-                    self._totais_cargo[cargo]["total"] += qtd
+                    totais["total"] += qtd
 
                     if tipo == "nominal":
-                        self._totais_cargo[cargo]["nominais"] += qtd
-                        cod = voto.codigo_votavel or 0
-                        self._votos[cargo][str(cod)]["votos"] += qtd
-                        self._votos[cargo][str(cod)]["partido"] = voto.partido
-                        self._votos[cargo][str(cod)]["secoes"] += 1
-
-                        if uf:
-                            self._por_uf[uf][cargo][str(cod)] += qtd
+                        totais["nominais"] += qtd
+                        cod = str(voto.codigo_votavel or 0)
+                        info = self._votos[(turno, escopo, cargo)][cod]
+                        info["votos"] += qtd
+                        if info["partido"] is None:
+                            info["partido"] = voto.partido
+                        info["secoes"] += 1
                     elif tipo == "branco":
-                        self._totais_cargo[cargo]["brancos"] += qtd
+                        totais["brancos"] += qtd
                     elif tipo == "nulo":
-                        self._totais_cargo[cargo]["nulos"] += qtd
+                        totais["nulos"] += qtd
                     elif tipo == "legenda":
-                        self._totais_cargo[cargo]["legenda"] += qtd
+                        totais["legenda"] += qtd
 
     def get_results(self) -> dict:
-        """Retorna resultados agregados."""
-        results = {
+        """Retorna resultados agregados.
+
+        Estrutura:
+            totais_por_cargo[turno][cargo] -> totais
+            votos_por_candidato[turno][escopo][cargo] -> lista ordenada
+        """
+        results: dict = {
             "totais_por_cargo": {},
             "votos_por_candidato": {},
-            "votos_por_uf": {},
         }
 
-        for cargo, totais in sorted(self._totais_cargo.items()):
-            results["totais_por_cargo"][cargo] = dict(totais)
+        for (turno, cargo), totais in sorted(self._totais_cargo.items()):
+            results["totais_por_cargo"].setdefault(turno, {})[cargo] = dict(totais)
 
-        for cargo, candidatos in sorted(self._votos.items()):
-            # Ordenar por votos (descendente)
+        for (turno, escopo, cargo), candidatos in sorted(self._votos.items()):
             sorted_cands = sorted(
                 candidatos.items(),
                 key=lambda x: x[1]["votos"],
                 reverse=True,
             )
-            results["votos_por_candidato"][cargo] = [
+            por_escopo = results["votos_por_candidato"].setdefault(turno, {})
+            por_escopo.setdefault(escopo, {})[cargo] = [
                 {
                     "codigo": cod,
                     "partido": info["partido"],
@@ -263,34 +294,25 @@ class VoteAggregator:
                 for cod, info in sorted_cands
             ]
 
-        # Agregacao por UF - top candidatos por cargo
-        for uf, cargos in sorted(self._por_uf.items()):
-            results["votos_por_uf"][uf] = {}
-            for cargo, candidatos in sorted(cargos.items()):
-                sorted_cands = sorted(
-                    candidatos.items(),
-                    key=lambda x: x[1],
-                    reverse=True,
-                )
-                results["votos_por_uf"][uf][cargo] = [
-                    {"codigo": cod, "votos": qtd}
-                    for cod, qtd in sorted_cands[:10]
-                ]
-
         return results
 
 
 def compute_outlier_scores(values: list[float]) -> list[float]:
-    """Calcula z-scores para deteccao de outliers.
+    """Calcula z-scores para detecção de outliers.
+
+    Usa desvio padrão populacional. Série constante (desvio zero) devolve
+    zeros: nenhum ponto se destaca dos demais.
 
     Returns:
-        Lista de z-scores (abs). Valores > 2.0 sao potenciais outliers.
+        Lista de z-scores (abs). Valores > 2.0 são potenciais outliers.
     """
     if len(values) < 3:
         return [0.0] * len(values)
 
     mean = sum(values) / len(values)
     variance = sum((x - mean) ** 2 for x in values) / len(values)
-    std = math.sqrt(variance) if variance > 0 else 1.0
+    if variance == 0:
+        return [0.0] * len(values)
+    std = math.sqrt(variance)
 
     return [abs((x - mean) / std) for x in values]

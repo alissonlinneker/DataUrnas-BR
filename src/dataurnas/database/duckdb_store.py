@@ -1,28 +1,38 @@
-"""Camada de persistencia DuckDB para dados eleitorais."""
+"""Camada de persistência DuckDB para dados eleitorais."""
 
 import logging
+from collections.abc import Callable, Iterable
 from pathlib import Path
+from typing import Optional
 
 import duckdb
 
-from ..config import DB_DIR, RAW_DIR, REGIOES, TIMEZONE_OFFSETS
+from ..config import DB_DIR, RAW_DIR, TIMEZONE_OFFSETS  # noqa: F401 (reexport legado)
+from . import metadados as _meta
+from .rows import SECOES_COLUMNS, UF_REGIAO, SectionRows, extract_rows
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_DB_PATH = DB_DIR / "eleicoes_2022.duckdb"
 
-# Mapeamento UF -> Regiao
-_UF_REGIAO = {}
-for regiao, ufs in REGIOES.items():
-    for uf in ufs:
-        _UF_REGIAO[uf] = regiao
+# Mantido por compatibilidade com scripts antigos
+_UF_REGIAO = UF_REGIAO
+
+_UPSERT_SECAO_SQL = (
+    f"INSERT INTO secoes ({', '.join(SECOES_COLUMNS)}) "
+    f"VALUES ({', '.join('?' for _ in SECOES_COLUMNS)}) "
+    "ON CONFLICT (id) DO UPDATE SET "
+    + ", ".join(f"{c} = excluded.{c}" for c in SECOES_COLUMNS if c != "id")
+)
 
 
 class DuckDBStore:
-    """Gerencia persistencia e consultas em DuckDB."""
+    """Gerencia persistência e consultas em DuckDB."""
 
     def __init__(self, db_path: Path = DEFAULT_DB_PATH, read_only: bool = False):
-        db_path.parent.mkdir(parents=True, exist_ok=True)
+        db_path = Path(db_path)
+        if not read_only:
+            db_path.parent.mkdir(parents=True, exist_ok=True)
         self._db_path = db_path
         self._read_only = read_only
         self._conn = duckdb.connect(str(db_path), read_only=read_only)
@@ -116,6 +126,7 @@ class DuckDBStore:
 
             CREATE SEQUENCE IF NOT EXISTS issue_seq START 1;
         """)
+        self._conn.execute(_meta.DDL)
 
     def clear(self):
         """Limpa todos os dados (para rebuild)."""
@@ -123,240 +134,224 @@ class DuckDBStore:
         self._conn.execute("DELETE FROM issues")
         self._conn.execute("DELETE FROM totais_cargo")
         self._conn.execute("DELETE FROM secoes")
+        self._conn.execute(f"DELETE FROM {_meta.TABELA}")  # o flag vale para os dados apagados
         self._conn.execute("DROP SEQUENCE IF EXISTS issue_seq")
         self._conn.execute("CREATE SEQUENCE issue_seq START 1")
 
-    def build_from_analysis(self, batch_results: dict):
-        """Popula o banco a partir dos resultados do BatchAnalyzer.
+    # ============================================================
+    # Escrita
+    # ============================================================
+
+    def existing_ids(self) -> set[str]:
+        """IDs de seções já presentes no banco."""
+        return {r[0] for r in self._conn.execute("SELECT id FROM secoes").fetchall()}
+
+    def insert_rows(self, batch: Iterable[SectionRows]) -> int:
+        """Insere (ou substitui) um lote de seções em uma única transação.
+
+        Idempotente: se uma seção já existe, suas linhas filhas (votos,
+        issues, totais_cargo) são apagadas antes da reinserção, e a linha
+        em seções e atualizada no lugar (sem violar as FKs).
+        Em caso de erro, o lote inteiro e desfeito.
+
+        Returns:
+            Quantidade de seções gravadas.
+        """
+        batch = list(batch)
+        if not batch:
+            return 0
+
+        # Última ocorrência vence se o mesmo id aparecer duas vezes no lote
+        by_id = {rows.secao_id: rows for rows in batch}
+        ids = list(by_id)
+
+        self._conn.execute("BEGIN TRANSACTION")
+        try:
+            existentes = [
+                r[0] for r in self._conn.execute(
+                    "SELECT id FROM secoes WHERE id IN (SELECT UNNEST(?::VARCHAR[]))",
+                    [ids],
+                ).fetchall()
+            ]
+            if existentes:
+                for tabela in ("votos", "issues", "totais_cargo"):
+                    self._conn.execute(
+                        f"DELETE FROM {tabela} "  # noqa: S608 (tabela e constante)
+                        "WHERE secao_id IN (SELECT UNNEST(?::VARCHAR[]))",
+                        [existentes],
+                    )
+
+            self._conn.executemany(_UPSERT_SECAO_SQL, [r.secao for r in by_id.values()])
+
+            issue_rows = [i for r in by_id.values() for i in r.issues]
+            if issue_rows:
+                self._conn.executemany(
+                    "INSERT INTO issues VALUES (nextval('issue_seq'), ?, ?, ?, ?, ?, ?)",
+                    issue_rows,
+                )
+            voto_rows = [v for r in by_id.values() for v in r.votos]
+            if voto_rows:
+                self._conn.executemany(
+                    "INSERT INTO votos VALUES (?, ?, ?, ?, ?, ?, ?, ?)", voto_rows
+                )
+            totais_rows = [t for r in by_id.values() for t in r.totais]
+            if totais_rows:
+                self._conn.executemany(
+                    "INSERT INTO totais_cargo VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    totais_rows,
+                )
+            self._conn.execute("COMMIT")
+        except Exception:
+            self._conn.execute("ROLLBACK")
+            raise
+        return len(by_id)
+
+    def build_from_bu_files(
+        self,
+        analyzer,
+        bu_files: Iterable[Path],
+        batch_size: int = 500,
+        skip_ids: Optional[set[str]] = None,
+        progress: Optional[Callable[[int, int, int], None]] = None,
+    ) -> tuple[int, int]:
+        """Analisa e grava BUs em lotes transacionais.
 
         Args:
-            batch_results: dict retornado por BatchAnalyzer.analyze_all()
+            analyzer: BatchAnalyzer.
+            bu_files: arquivos BU a processar.
+            batch_size: seções por transação.
+            skip_ids: secao_ids a pular ANTES do parse (modo incremental).
+            progress: callback(processados, gravados, erros).
+
+        Returns:
+            (gravados, erros)
         """
-        self.clear()
-        logger.info("Populando DuckDB com %d secoes...", batch_results["total_secoes"])
+        batch: list[SectionRows] = []
+        gravados = erros = processados = 0
+        for bu_file in bu_files:
+            processados += 1
+            if skip_ids:
+                secao_id = analyzer.secao_id_for(bu_file)
+                if secao_id and secao_id in skip_ids:
+                    continue
+            try:
+                result = analyzer.analyze_section(bu_file.parent, bu_file=bu_file)
+                batch.append(extract_rows(result))
+            except Exception as e:
+                erros += 1
+                if erros <= 20:
+                    logger.warning("Erro ao processar %s: %s", bu_file, e)
+                continue
 
-        from ..analyzer.batch import BatchAnalyzer
+            if len(batch) >= batch_size:
+                gravados += self.insert_rows(batch)
+                batch = []
+                if progress:
+                    progress(processados, gravados, erros)
 
-        analyzer = BatchAnalyzer(raw_dir=RAW_DIR)
-        bu_files = analyzer.find_bu_files()
-
-        for i, bu_file in enumerate(bu_files):
-            if (i + 1) % 100 == 0:
-                logger.info("DuckDB: %d/%d BUs", i + 1, len(bu_files))
-            self._process_section(analyzer, bu_file.parent, bu_file=bu_file)
-
+        if batch:
+            gravados += self.insert_rows(batch)
         self._conn.execute("CHECKPOINT")
-        count = self._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0]
-        logger.info("DuckDB populado: %d secoes", count)
+        if progress:
+            progress(processados, gravados, erros)
+        return gravados, erros
 
-    def build_from_raw(self):
-        """Popula o banco re-analisando todos os dados brutos."""
+    # ============================================================
+    # Metadados de construção
+    # ============================================================
+    def metadados(self) -> dict[str, str]:
+        """Metadados de construção gravados no banco (vazio se ausentes)."""
+        return _meta.ler_metadados(self._conn)
+
+    def hashes_verificados(self) -> Optional[bool]:
+        """True/False conforme registrado; None se o banco não registrou."""
+        return _meta.texto_para_bool(self.metadados().get(_meta.CHAVE_VERIFY_HASHES))
+
+    def registrar_verificacao_hashes(
+        self,
+        verificado: bool,
+        incremental: bool = False,
+        secoes_anteriores: int = 0,
+        origem: str = "raw",
+    ) -> bool:
+        """Registra se a verificação SHA-512 foi executada na construção.
+
+        Em modo incremental, o banco só conta como verificado se a carga atual
+        verificou E o registro anterior também, ou se não havia seções antes da
+        carga (``secoes_anteriores``): uma base mista não pode ser apresentada
+        como integralmente verificada.
+
+        Returns:
+            o valor efetivamente gravado.
+        """
+        efetivo = bool(verificado)
+        if incremental and efetivo and secoes_anteriores > 0:
+            efetivo = self.hashes_verificados() is True
+        _meta.gravar_verificacao_hashes(self._conn, efetivo, origem)
+        return efetivo
+
+    def build_from_raw(
+        self, raw_dir: Path = RAW_DIR, batch_size: int = 500, verify_hashes: bool = False,
+    ) -> int:
+        """Popula o banco do zero re-analisando todos os dados brutos."""
         from ..analyzer.batch import BatchAnalyzer
 
         self.clear()
-        analyzer = BatchAnalyzer(raw_dir=RAW_DIR)
+        analyzer = BatchAnalyzer(raw_dir=raw_dir, verify_hashes=verify_hashes)
         bu_files = analyzer.find_bu_files()
         logger.info("Processando %d arquivos BU para DuckDB...", len(bu_files))
+        _, erros = self.build_from_bu_files(analyzer, bu_files, batch_size=batch_size)
+        self.registrar_verificacao_hashes(analyzer.verify_hashes)
 
-        for i, bu_file in enumerate(bu_files):
-            if (i + 1) % 100 == 0:
-                logger.info("DuckDB: %d/%d BUs", i + 1, len(bu_files))
-            self._process_section(analyzer, bu_file.parent, bu_file=bu_file)
-
-        self._conn.execute("CHECKPOINT")
-        count = self._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0]
-        t1 = self._conn.execute("SELECT COUNT(*) FROM secoes WHERE turno=1").fetchone()[0]
-        t2 = self._conn.execute("SELECT COUNT(*) FROM secoes WHERE turno=2").fetchone()[0]
-        logger.info("DuckDB populado: %d seções (1T: %d, 2T: %d)", count, t1, t2)
+        count, t1, t2 = self._contagem_turnos()
+        logger.info("DuckDB populado: %d seções (1T: %d, 2T: %d, %d erros)",
+                    count, t1, t2, erros)
         return count
 
-    def build_incremental(self):
-        """Compila apenas BUs novos (não presentes no banco).
-
-        Muito mais rápido que build_from_raw() para atualizações parciais,
-        pois pula seções já compiladas.
-        """
+    def build_incremental(
+        self, raw_dir: Path = RAW_DIR, batch_size: int = 500, verify_hashes: bool = False,
+    ) -> int:
+        """Compila apenas BUs novos (não presentes no banco), sem reparsear os demais."""
         from ..analyzer.batch import BatchAnalyzer
 
-        # Pegar secao_ids existentes
-        existing = set()
-        rows = self._conn.execute("SELECT id FROM secoes").fetchall()
-        for row in rows:
-            existing.add(row[0])
+        existing = self.existing_ids()
         logger.info("DuckDB tem %d seções existentes", len(existing))
-
-        analyzer = BatchAnalyzer(raw_dir=RAW_DIR)
-        all_bu_files = analyzer.find_bu_files()
-        logger.info("Total de BUs no disco: %d", len(all_bu_files))
-
-        # Filtrar apenas novos
-        new_bu_files = []
-        for bu_file in all_bu_files:
-            secao_id = self._bu_file_to_secao_id(bu_file, analyzer)
-            if secao_id and secao_id not in existing:
-                new_bu_files.append(bu_file)
-
-        logger.info("BUs novos para compilar: %d (pulando %d existentes)",
-                     len(new_bu_files), len(all_bu_files) - len(new_bu_files))
-
-        if not new_bu_files:
-            logger.info("Nenhum BU novo. Banco já está atualizado.")
-            count = self._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0]
-            return count
-
-        processed = 0
-        errors = 0
-        for i, bu_file in enumerate(new_bu_files):
-            if (i + 1) % 100 == 0:
-                logger.info("DuckDB incremental: %d/%d novos BUs", i + 1, len(new_bu_files))
-            try:
-                self._process_section(analyzer, bu_file.parent, bu_file=bu_file)
-                processed += 1
-            except Exception as e:
-                errors += 1
-                if errors <= 10:
-                    logger.warning("Erro ao processar %s: %s", bu_file, e)
-
-            # Checkpoint a cada 1000 seções para não acumular WAL
-            if (i + 1) % 1000 == 0:
-                self._conn.execute("CHECKPOINT")
-
-        self._conn.execute("CHECKPOINT")
-        count = self._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0]
-        t1 = self._conn.execute("SELECT COUNT(*) FROM secoes WHERE turno=1").fetchone()[0]
-        t2 = self._conn.execute("SELECT COUNT(*) FROM secoes WHERE turno=2").fetchone()[0]
+        analyzer = BatchAnalyzer(raw_dir=raw_dir, verify_hashes=verify_hashes)
+        bu_files = analyzer.find_bu_files()
+        gravados, erros = self.build_from_bu_files(
+            analyzer, bu_files, batch_size=batch_size, skip_ids=existing,
+        )
+        self.registrar_verificacao_hashes(
+            analyzer.verify_hashes, incremental=True, secoes_anteriores=len(existing),
+        )
+        count, t1, t2 = self._contagem_turnos()
         logger.info("DuckDB incremental: +%d seções (%d erros). Total: %d (1T: %d, 2T: %d)",
-                     processed, errors, count, t1, t2)
+                    gravados, erros, count, t1, t2)
         return count
 
+    def _contagem_turnos(self) -> tuple[int, int, int]:
+        row = self._conn.execute(
+            "SELECT COUNT(*), COUNT(*) FILTER (WHERE turno = 1), "
+            "COUNT(*) FILTER (WHERE turno = 2) FROM secoes"
+        ).fetchone()
+        return int(row[0]), int(row[1]), int(row[2])
+
     @staticmethod
-    def _bu_file_to_secao_id(bu_file: Path, analyzer) -> str:
+    def _bu_file_to_secao_id(bu_file: Path, analyzer=None) -> str:
         """Calcula secao_id a partir do path do BU sem parsing ASN.1."""
-        # Path: data/raw/{uf}/{mun}/{zona}/{secao}/o00{pleito}-{mun}{zona}{secao}.bu
-        parts = bu_file.parent.parts
-        try:
-            # Encontrar 'raw' no path e pegar os 4 componentes seguintes
-            raw_idx = parts.index("raw")
-            uf = parts[raw_idx + 1]
-            mun = parts[raw_idx + 2]
-            zona = parts[raw_idx + 3]
-            secao = parts[raw_idx + 4]
-        except (ValueError, IndexError):
-            return ""
+        if analyzer is None:
+            from ..analyzer.batch import BatchAnalyzer
 
-        pleito = analyzer.extract_pleito_from_filename(bu_file)
-        turno = analyzer.pleito_to_turno(pleito)
-        return f"{turno}T/{uf}/{mun}/{zona}/{secao}"
+            analyzer = BatchAnalyzer()
+        secao_id = analyzer.secao_id_for(bu_file)
+        if not secao_id:
+            logger.warning("Não foi possível derivar secao_id de %s", bu_file)
+        return secao_id
 
-    def _process_section(self, analyzer, section_dir: Path, bu_file: Path = None):
-        """Processa uma secao e insere no DuckDB."""
-        result = analyzer._analyze_section(section_dir, bu_file=bu_file)
-        uf = result["uf"]
-        turno = result.get("turno", 1)
-        secao_id = f"{turno}T/{uf}/{result['municipio']}/{result['zona']}/{result['secao']}"
-
-        # Dados basicos
-        regiao = _UF_REGIAO.get(uf.lower(), "desconhecida")
-        fuso = TIMEZONE_OFFSETS.get(uf.lower(), 0)
-        bu_info = result.get("bu")
-        timing = result.get("log_timing") or {}
-        log_events = result.get("log_events") or {}
-
-        eleitores_aptos = 0
-        comparecimento = 0
-        if bu_info:
-            eleicoes = bu_info.get("eleicoes", [])
-            if eleicoes:
-                eleitores_aptos = eleicoes[0].get("aptos", 0)
-                for el in eleicoes:
-                    for c in el.get("cargos", []):
-                        comp = c.get("comparecimento", 0)
-                        if comp > comparecimento:
-                            comparecimento = comp
-
-        lib_codigo = bu_info.get("lib_codigo", 0) if bu_info else 0
-        comp_bio = bu_info.get("comp_biometrico", 0) if bu_info else 0
-        total_bio = lib_codigo + comp_bio
-        pct_bio = round((comp_bio / total_bio * 100), 2) if total_bio > 0 else None
-        pct_abs = round(((eleitores_aptos - comparecimento) / eleitores_aptos * 100), 2) if eleitores_aptos > 0 else None
-
-        duracao = timing.get("duracao_votacao_min")
-        is_reserva = result.get("tipo_urna") == "reservaSecao"
-        issues = result.get("issues", [])
-
-        self._conn.execute("""
-            INSERT OR REPLACE INTO secoes VALUES (
-                ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?,
-                ?, ?, ?, ?, ?,
-                ?, ?, ?
-            )
-        """, [
-            secao_id, turno,
-            uf, regiao, result["municipio"], result["zona"], result["secao"],
-            result.get("modelo"), result.get("tipo_urna"), result.get("versao_sw"),
-            fuso,
-            bu_info.get("emissao") if bu_info else None,
-            eleitores_aptos, comparecimento, lib_codigo, comp_bio, pct_bio, pct_abs,
-            timing.get("hora_abertura"), timing.get("hora_encerramento"), duracao,
-            log_events.get("reboots", 0), log_events.get("erros", 0),
-            log_events.get("alertas_mesario", 0), log_events.get("votos_computados", 0),
-            log_events.get("substituicoes", 0),
-            is_reserva, len(issues) > 0, len(issues),
-        ])
-
-        # Issues
-        for issue in issues:
-            self._conn.execute("""
-                INSERT INTO issues VALUES (
-                    nextval('issue_seq'), ?, ?, ?, ?, ?, ?
-                )
-            """, [
-                secao_id, issue.codigo, issue.severidade.value,
-                issue.descricao, issue.base_legal,
-                str(issue.detalhes) if issue.detalhes else None,
-            ])
-
-        # Votos e totais por cargo
-        bu_obj = result.get("bu_obj")
-        if bu_obj:
-            for eleicao in bu_obj.resultados_por_eleicao:
-                for cargo in eleicao.resultados:
-                    nominais = 0
-                    brancos = 0
-                    nulos = 0
-                    legenda = 0
-
-                    for voto in cargo.votos:
-                        tipo = voto.tipo_voto.value
-                        self._conn.execute("""
-                            INSERT INTO votos VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        """, [
-                            secao_id, eleicao.id_eleicao,
-                            cargo.nome_cargo, cargo.codigo_cargo,
-                            tipo, voto.codigo_votavel, voto.partido,
-                            voto.quantidade,
-                        ])
-
-                        if tipo == "nominal":
-                            nominais += voto.quantidade
-                        elif tipo == "branco":
-                            brancos += voto.quantidade
-                        elif tipo == "nulo":
-                            nulos += voto.quantidade
-                        elif tipo == "legenda":
-                            legenda += voto.quantidade
-
-                    total = nominais + brancos + nulos + legenda
-                    self._conn.execute("""
-                        INSERT INTO totais_cargo VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, [
-                        secao_id, eleicao.id_eleicao,
-                        cargo.nome_cargo, cargo.codigo_cargo,
-                        cargo.comparecimento, nominais, brancos, nulos, legenda, total,
-                    ])
+    def _process_section(self, analyzer, section_dir: Path, bu_file: Optional[Path] = None):
+        """Processa uma seção e grava no DuckDB (uma transação)."""
+        result = analyzer.analyze_section(section_dir, bu_file=bu_file)
+        self.insert_rows([extract_rows(result)])
 
     # ============================================================
     # Consultas para o Dashboard
@@ -366,27 +361,39 @@ class DuckDBStore:
         """Executa query e retorna como lista de dicts."""
         result = self._conn.execute(sql, params or [])
         cols = [desc[0] for desc in result.description]
-        return [dict(zip(cols, row)) for row in result.fetchall()]
+        return [dict(zip(cols, row, strict=True)) for row in result.fetchall()]
 
     def query_df(self, sql: str, params=None):
         """Executa query e retorna como DataFrame."""
         return self._conn.execute(sql, params or []).fetchdf()
 
     def get_summary(self) -> dict:
-        """Resumo geral para a pagina principal do BI."""
+        """Resumo geral para a página principal do BI (uma consulta por tabela)."""
+        row = self._conn.execute("""
+            SELECT
+                COUNT(*),
+                COUNT(*) FILTER (WHERE NOT has_issues),
+                COUNT(*) FILTER (WHERE has_issues),
+                COALESCE(SUM(eleitores_aptos), 0),
+                COALESCE(SUM(comparecimento), 0),
+                COALESCE(SUM(reboots), 0),
+                COUNT(DISTINCT uf)
+            FROM secoes
+        """).fetchone()
+        total_issues = self._conn.execute("SELECT COUNT(*) FROM issues").fetchone()[0]
         return {
-            "total_secoes": self._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0],
-            "total_issues": self._conn.execute("SELECT COUNT(*) FROM issues").fetchone()[0],
-            "secoes_ok": self._conn.execute("SELECT COUNT(*) FROM secoes WHERE NOT has_issues").fetchone()[0],
-            "secoes_com_issues": self._conn.execute("SELECT COUNT(*) FROM secoes WHERE has_issues").fetchone()[0],
-            "total_eleitores": self._conn.execute("SELECT COALESCE(SUM(eleitores_aptos),0) FROM secoes").fetchone()[0],
-            "total_comparecimento": self._conn.execute("SELECT COALESCE(SUM(comparecimento),0) FROM secoes").fetchone()[0],
-            "total_reboots": self._conn.execute("SELECT COALESCE(SUM(reboots),0) FROM secoes").fetchone()[0],
-            "ufs": self._conn.execute("SELECT COUNT(DISTINCT uf) FROM secoes").fetchone()[0],
+            "total_secoes": row[0],
+            "total_issues": total_issues,
+            "secoes_ok": row[1],
+            "secoes_com_issues": row[2],
+            "total_eleitores": row[3],
+            "total_comparecimento": row[4],
+            "total_reboots": row[5],
+            "ufs": row[6],
         }
 
     def get_filter_options(self) -> dict:
-        """Opcoes disponiveis para filtros do dashboard."""
+        """Opções disponíveis para filtros do dashboard."""
         return {
             "turnos": [r[0] for r in self._conn.execute("SELECT DISTINCT turno FROM secoes ORDER BY turno").fetchall()],
             "ufs": [r[0] for r in self._conn.execute("SELECT DISTINCT uf FROM secoes ORDER BY uf").fetchall()],

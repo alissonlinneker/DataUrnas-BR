@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Eleições 2022: cobertura completa da auditoria</title>
+<desc id="descricao">Infográfico: 941.987 seções (470.986 no 1º turno e 471.001 no 2º), 27 UFs, 72.943.229 registros de votos, modelos de urna UE2009: 93.214, UE2010: 187.954, UE2011: 54.422, UE2013: 49.658, UE2015: 171.408, UE2020: 385.331. 511.121 ocorrências: Alta 70.231, Média 115.059, Informativa 325.831.</desc>
+<rect x="1" y="1" width="998" height="558" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Eleições 2022: cobertura completa da auditoria</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Todos os boletins de urna e logs publicados pelo TSE para Presidente, 1º e 2º turnos</text>
+<rect x="32.0" y="100.0" width="222.0" height="112.0" rx="12" fill="#F2F6F9"/>
+<rect x="32.0" y="100.0" width="5.0" height="112.0" rx="2.5" fill="#0072B2"/>
+<text x="52.0" y="146.0" font-size="30" font-weight="800" fill="#0B3A5B" text-anchor="start">941.987</text>
+<text x="52.0" y="172.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">seções auditadas</text>
+<text x="52.0" y="194.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">dois turnos da eleição presidencial</text>
+<rect x="267.0" y="100.0" width="222.0" height="112.0" rx="12" fill="#F2F6F9"/>
+<rect x="267.0" y="100.0" width="5.0" height="112.0" rx="2.5" fill="#009E73"/>
+<text x="287.0" y="146.0" font-size="30" font-weight="800" fill="#0B3A5B" text-anchor="start">27</text>
+<text x="287.0" y="172.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">UFs</text>
+<text x="287.0" y="194.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">todas as unidades da federação</text>
+<rect x="502.0" y="100.0" width="222.0" height="112.0" rx="12" fill="#F2F6F9"/>
+<rect x="502.0" y="100.0" width="5.0" height="112.0" rx="2.5" fill="#56B4E9"/>
+<text x="522.0" y="146.0" font-size="30" font-weight="800" fill="#0B3A5B" text-anchor="start">72.943.229</text>
+<text x="522.0" y="172.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">registros de votos</text>
+<text x="522.0" y="194.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">por seção, cargo e candidato</text>
+<rect x="737.0" y="100.0" width="222.0" height="112.0" rx="12" fill="#F2F6F9"/>
+<rect x="737.0" y="100.0" width="5.0" height="112.0" rx="2.5" fill="#E69F00"/>
+<text x="757.0" y="146.0" font-size="30" font-weight="800" fill="#0B3A5B" text-anchor="start">511.121</text>
+<text x="757.0" y="172.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">ocorrências</text>
+<text x="757.0" y="194.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">indicadores para investigação</text>
+<text x="32.0" y="252.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Seções por turno</text>
+<rect x="32.0" y="266.0" width="466.0" height="34.0" rx="6" fill="#0072B2"/>
+<rect x="502.0" y="266.0" width="466.0" height="34.0" rx="6" fill="#56B4E9"/>
+<text x="46.0" y="289.0" font-size="13.5" font-weight="700" fill="#FFFFFF" text-anchor="start">1º turno, 02/10/2022: 470.986</text>
+<text x="516.0" y="289.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">2º turno, 30/10/2022: 471.001</text>
+<text x="32.0" y="340.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Modelo da urna (seções)</text>
+<rect x="32.0" y="354.0" width="90.6" height="34.0" rx="4" fill="#0B3A5B"/>
+<text x="78.3" y="370.0" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">UE2009</text>
+<text x="78.3" y="384.0" font-size="11" font-weight="400" fill="#E8F3FA" text-anchor="middle">9,9%</text>
+<rect x="124.6" y="354.0" width="184.8" height="34.0" rx="4" fill="#0F5A8A"/>
+<text x="218.0" y="370.0" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">UE2010</text>
+<text x="218.0" y="384.0" font-size="11" font-weight="400" fill="#E8F3FA" text-anchor="middle">20,0%</text>
+<rect x="311.4" y="354.0" width="52.1" height="34.0" rx="4" fill="#0072B2"/>
+<text x="338.4" y="376.0" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">UE2011</text>
+<rect x="365.5" y="354.0" width="47.3" height="34.0" rx="4" fill="#3C97CC"/>
+<text x="390.1" y="376.0" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">UE2013</text>
+<rect x="414.8" y="354.0" width="168.3" height="34.0" rx="4" fill="#56B4E9"/>
+<text x="500.0" y="370.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="middle">UE2015</text>
+<text x="500.0" y="384.0" font-size="11" font-weight="400" fill="#0B3A5B" text-anchor="middle">18,2%</text>
+<rect x="585.1" y="354.0" width="380.9" height="34.0" rx="4" fill="#A9D3EE"/>
+<text x="776.6" y="370.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="middle">UE2020</text>
+<text x="776.6" y="384.0" font-size="11" font-weight="400" fill="#0B3A5B" text-anchor="middle">40,9%</text>
+<text x="32.0" y="410.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Software de votação 8.26.0.0 (Onça-pintada) em todas as seções</text>
+<text x="32.0" y="444.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Ocorrências por severidade</text>
+<text x="32.0" y="474.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">Alta</text>
+<text x="322.0" y="474.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="end">70.231 (13,7%)</text>
+<rect x="32.0" y="484.0" width="290.0" height="10.0" rx="5" fill="#F2F6F9"/>
+<rect x="32.0" y="484.0" width="62.5" height="10.0" rx="5" fill="#E69F00"/>
+<text x="348.0" y="474.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">Média</text>
+<text x="638.0" y="474.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="end">115.059 (22,5%)</text>
+<rect x="348.0" y="484.0" width="290.0" height="10.0" rx="5" fill="#F2F6F9"/>
+<rect x="348.0" y="484.0" width="102.4" height="10.0" rx="5" fill="#56B4E9"/>
+<text x="664.0" y="474.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">Informativa</text>
+<text x="954.0" y="474.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="end">325.831 (63,7%)</text>
+<rect x="664.0" y="484.0" width="290.0" height="10.0" rx="5" fill="#F2F6F9"/>
+<rect x="664.0" y="484.0" width="290.0" height="10.0" rx="5" fill="#9FB8CB"/>
+<line x1="32" y1="514" x2="968" y2="514" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="538.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: TSE, arquivos de urna das eleições de 2022 (compilação DataUrnas-BR)</text>
+<text x="968.0" y="538.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>

@@ -1,10 +1,12 @@
-"""Analise em lote de todas as secoes baixadas."""
+"""Análise em lote de todas as seções baixadas."""
 
 import logging
 from collections import defaultdict
 from pathlib import Path
+from typing import Optional
 
-from ..config import RAW_DIR
+from ..config import ELECTIONS, RAW_DIR
+from ..models import BoletimUrna, Issue, IssueSeverity, TipoVoto
 from ..parsers.bu import BUParser
 from ..parsers.log import LogParser
 from ..parsers.signature import SignatureParser
@@ -14,12 +16,47 @@ from .statistical import StatisticalAnalyzer, VoteAggregator
 
 logger = logging.getLogger(__name__)
 
+# Datas de votação por pleito (DD/MM/YYYY), usadas para filtrar logs do T2,
+# que acumulam eventos do T1.
+_PLEITO_DATAS = {
+    "406": "02/10/2022",
+    "407": "30/10/2022",
+    "452": "06/10/2024",
+    "453": "27/10/2024",
+}
+
+
+def _pleito_turnos() -> dict[str, int]:
+    """Mapa pleito -> turno a partir de config.ELECTIONS."""
+    mapping: dict[str, int] = {}
+    for info in ELECTIONS.values():
+        if info.get("pleito_1t"):
+            mapping[str(info["pleito_1t"])] = 1
+        if info.get("pleito_2t"):
+            mapping[str(info["pleito_2t"])] = 2
+    return mapping
+
+
+def _soma_tipo(votos, tipo: TipoVoto) -> int:
+    return sum(v.quantidade for v in votos if v.tipo_voto == tipo)
+
+
+def _tag_issues(issues: list[Issue], result: dict) -> list[Issue]:
+    """Preenche a localização da seção nas issues."""
+    for issue in issues:
+        issue.uf = result["uf"]
+        issue.municipio = result["municipio"]
+        issue.zona = result["zona"]
+        issue.secao = result["secao"]
+    return issues
+
 
 class BatchAnalyzer:
-    """Executa analise em lote em todas as secoes baixadas."""
+    """Executa análise em lote em todas as seções baixadas."""
 
-    def __init__(self, raw_dir: Path = RAW_DIR):
-        self._raw_dir = raw_dir
+    def __init__(self, raw_dir: Path = RAW_DIR, verify_hashes: bool = False):
+        self._raw_dir = Path(raw_dir)
+        self._verify_hashes = verify_hashes
         self._bu_parser = BUParser()
         self._log_parser = LogParser()
         self._sig_parser = SignatureParser()
@@ -27,34 +64,24 @@ class BatchAnalyzer:
         self._integrity = IntegrityAnalyzer()
         self._log_analyzer = LogAnalyzer()
         self._statistical = StatisticalAnalyzer()
-        self._vote_aggregator = VoteAggregator()
 
-    def find_sections(self, uf: str = None) -> list[Path]:
-        """Encontra todas as secoes baixadas (diretórios únicos)."""
-        sections = []
+    @property
+    def verify_hashes(self) -> bool:
+        """Se a verificação SHA-512 dos arquivos é executada em cada seção."""
+        return self._verify_hashes
+
+    def find_sections(self, uf: Optional[str] = None) -> list[Path]:
+        """Encontra todas as seções baixadas (diretórios únicos, ordenados)."""
+        sections = {bu_file.parent for bu_file in self.find_bu_files(uf)}
+        return sorted(sections)
+
+    def find_bu_files(self, uf: Optional[str] = None) -> list[Path]:
+        """Encontra todos os arquivos BU individuais (um por turno/secao)."""
         base = self._raw_dir
         if uf:
             base = base / uf.lower()
 
-        # Estrutura: data/raw/{uf}/{mun}/{zona}/{secao}/
-        for bu_file in sorted(base.rglob("*.bu")):
-            sections.append(bu_file.parent)
-
-        # V2 format
-        for bu_file in sorted(base.rglob("*-bu.dat")):
-            if bu_file.parent not in sections:
-                sections.append(bu_file.parent)
-
-        return list(set(sections))
-
-    def find_bu_files(self, uf: str = None) -> list[Path]:
-        """Encontra todos os arquivos BU individuais (um por turno/seção)."""
-        bu_files = []
-        base = self._raw_dir
-        if uf:
-            base = base / uf.lower()
-
-        bu_files.extend(sorted(base.rglob("*.bu")))
+        bu_files = sorted(base.rglob("*.bu"))
         bu_files.extend(sorted(base.rglob("*-bu.dat")))
         return bu_files
 
@@ -73,26 +100,61 @@ class BatchAnalyzer:
 
     @staticmethod
     def pleito_to_turno(pleito: str) -> int:
-        """Converte código de pleito para número do turno."""
-        mapping = {"406": 1, "407": 2, "452": 1, "453": 2}
-        return mapping.get(pleito, 1)
+        """Converte código de pleito para número do turno.
+
+        Pleito vazio (nome de arquivo sem prefixo) assume 1º turno. Pleito
+        desconhecido também assume 1, mas registra aviso: o mapeamento deve
+        ser adicionado em config.ELECTIONS.
+        """
+        if not pleito:
+            return 1
+        turno = _pleito_turnos().get(str(pleito))
+        if turno is None:
+            logger.warning("Pleito %s desconhecido; assumindo 1º turno", pleito)
+            return 1
+        return turno
 
     @staticmethod
     def pleito_to_date(pleito: str) -> str:
         """Converte código de pleito para data do turno (DD/MM/YYYY).
 
-        Necessario para filtrar logs do T2, que acumulam eventos do T1.
+        Necessário para filtrar logs do T2, que acumulam eventos do T1.
         """
-        mapping = {"406": "02/10/2022", "407": "30/10/2022"}
-        return mapping.get(pleito, "")
+        return _PLEITO_DATAS.get(str(pleito), "")
 
-    def analyze_all(self, uf: str = None) -> dict:
-        """Analisa todas as secoes e gera relatorio completo."""
-        sections = self.find_sections(uf)
-        logger.info("Encontradas %d secoes para analise", len(sections))
+    def locate(self, section_dir: Path) -> dict:
+        """Extrai uf/municipio/zona/secao do caminho da seção.
+
+        Estrutura: {raw_dir}/{uf}/{mun}/{zona}/{secao}/
+        """
+        section_dir = Path(section_dir)
+        try:
+            parts = section_dir.resolve().relative_to(self._raw_dir.resolve()).parts
+        except ValueError:
+            parts = ()
+        if len(parts) < 4:
+            # Fora de raw_dir: usar os 4 últimos componentes
+            parts = section_dir.parts[-4:]
+        parts = ("",) * (4 - len(parts)) + tuple(parts)
+        uf, municipio, zona, secao = parts[-4:]
+        return {"uf": uf, "municipio": municipio, "zona": zona, "secao": secao}
+
+    def secao_id_for(self, bu_file: Path) -> str:
+        """Calcula o secao_id ({turno}T/uf/mun/zona/secao) sem parsing ASN.1."""
+        loc = self.locate(Path(bu_file).parent)
+        if not all(loc.values()):
+            return ""
+        turno = self.pleito_to_turno(self.extract_pleito_from_filename(Path(bu_file)))
+        return f"{turno}T/{loc['uf']}/{loc['municipio']}/{loc['zona']}/{loc['secao']}"
+
+    def analyze_all(self, uf: Optional[str] = None) -> dict:
+        """Analisa todas as seções (um BU por turno) e gera relatório completo."""
+        bu_files = self.find_bu_files(uf)
+        logger.info("Encontrados %d BUs para análise", len(bu_files))
+        aggregator = VoteAggregator()
 
         results = {
-            "total_secoes": len(sections),
+            "total_secoes": len(bu_files),
             "secoes_ok": 0,
             "secoes_com_issues": 0,
             "total_issues": 0,
@@ -117,16 +179,23 @@ class BatchAnalyzer:
             "issues": [],
         }
 
-        for i, section_dir in enumerate(sections):
+        for i, bu_file in enumerate(bu_files):
             if (i + 1) % 50 == 0:
-                logger.info("Progresso: %d/%d secoes", i + 1, len(sections))
+                logger.info("Progresso: %d/%d seções", i + 1, len(bu_files))
 
-            section_result = self._analyze_section(section_dir)
+            section_result = self.analyze_section(bu_file.parent, bu_file=bu_file)
             self._aggregate(results, section_result)
+            if section_result["bu_obj"] is not None:
+                aggregator.add_bu(
+                    section_result["bu_obj"],
+                    uf=section_result["uf"],
+                    turno=section_result["turno"],
+                    municipio=section_result["municipio"],
+                )
 
         results["abstencao_por_uf"] = self._calc_abstencao(results)
         results["biometria_por_uf_pct"] = self._calc_biometria_pct(results)
-        results["votacao"] = self._vote_aggregator.get_results()
+        results["votacao"] = aggregator.get_results()
 
         # Converter defaultdicts para dicts
         for key in ["issues_por_severidade", "issues_por_codigo", "issues_por_uf",
@@ -137,49 +206,35 @@ class BatchAnalyzer:
 
         return results
 
-    def _analyze_section(self, section_dir: Path, bu_file: Path = None) -> dict:
-        """Analisa uma secao individual com todos os analyzers.
+    def analyze_section(self, section_dir: Path, bu_file: Optional[Path] = None) -> dict:
+        """Analisa uma seção individual com todos os analyzers.
 
         Args:
             section_dir: Diretório da seção.
-            bu_file: Arquivo BU específico. Se None, usa o primeiro encontrado.
+            bu_file: Arquivo BU específico (define o turno). Se None, usa o
+                primeiro encontrado.
         """
-        # Extrair UF/mun/zona/secao do caminho
-        parts = section_dir.parts
-        raw_idx = None
-        for i, p in enumerate(parts):
-            if p == "raw":
-                raw_idx = i
-                break
+        section_dir = Path(section_dir)
+        loc = self.locate(section_dir)
 
-        if raw_idx is not None and len(parts) > raw_idx + 4:
-            uf = parts[raw_idx + 1]
-            municipio = parts[raw_idx + 2]
-            zona = parts[raw_idx + 3]
-            secao = parts[raw_idx + 4]
-        else:
-            uf = parts[-4] if len(parts) >= 4 else ""
-            municipio = parts[-3] if len(parts) >= 3 else ""
-            zona = parts[-2] if len(parts) >= 2 else ""
-            secao = parts[-1] if len(parts) >= 1 else ""
+        if bu_file is None:
+            candidatos = sorted(section_dir.glob("*.bu")) + sorted(section_dir.glob("*-bu.dat"))
+            bu_file = candidatos[0] if candidatos else None
 
-        # Determinar turno a partir do arquivo BU
         turno = 1
         turno_date = ""
         file_prefix = None
-        if bu_file:
+        if bu_file is not None:
             pleito = self.extract_pleito_from_filename(bu_file)
             turno = self.pleito_to_turno(pleito)
             turno_date = self.pleito_to_date(pleito)
-            # Prefixo para encontrar arquivos correspondentes (log, vscmr, etc.)
-            file_prefix = bu_file.stem  # ex: o00406-9701200170097
+            # Prefixo para achar os arquivos do mesmo turno (log, vscmr, etc.)
+            file_prefix = bu_file.name[: -len("-bu.dat")] if bu_file.name.endswith(
+                "-bu.dat") else bu_file.stem
 
         result = {
             "dir": str(section_dir),
-            "uf": uf,
-            "municipio": municipio,
-            "zona": zona,
-            "secao": secao,
+            **loc,
             "turno": turno,
             "bu": None,
             "bu_obj": None,
@@ -191,153 +246,144 @@ class BatchAnalyzer:
             "log_events": None,
         }
 
-        # === Parse BU ===
-        if bu_file is None:
-            bu_files = list(section_dir.glob("*.bu")) + list(section_dir.glob("*-bu.dat"))
-            bu_file = bu_files[0] if bu_files else None
+        bu = self._parse_bu(bu_file, result) if bu_file is not None else None
+        result["modelo"] = self._modelo_assinatura(section_dir, file_prefix)
+        self._analyze_log(section_dir, file_prefix, bu, turno_date, result)
 
-        bu = None
-        if bu_file and bu_file.exists():
-            try:
-                bu = self._bu_parser.parse(bu_file)
-                result["bu_obj"] = bu
-                result["tipo_urna"] = bu.tipo_urna
-                result["versao_sw"] = bu.versao_votacao
-                result["bu"] = {
-                    "municipio": bu.municipio,
-                    "zona": bu.zona,
-                    "secao": bu.secao,
-                    "tipo_urna": bu.tipo_urna,
-                    "versao": bu.versao_votacao,
-                    "emissao": bu.data_hora_emissao,
-                    "lib_codigo": bu.qtd_eleitores_lib_codigo,
-                    "comp_biometrico": bu.qtd_eleitores_comp_biometrico,
-                    "eleicoes": [],
-                }
-                for eleicao in bu.resultados_por_eleicao:
-                    el_info = {
-                        "id": eleicao.id_eleicao,
-                        "aptos": eleicao.eleitores_aptos,
-                        "cargos": [],
-                    }
-                    for cargo in eleicao.resultados:
-                        nominais = sum(
-                            v.quantidade for v in cargo.votos
-                            if v.tipo_voto.value == "nominal"
-                        )
-                        brancos = sum(
-                            v.quantidade for v in cargo.votos
-                            if v.tipo_voto.value == "branco"
-                        )
-                        nulos = sum(
-                            v.quantidade for v in cargo.votos
-                            if v.tipo_voto.value == "nulo"
-                        )
-                        legenda = sum(
-                            v.quantidade for v in cargo.votos
-                            if v.tipo_voto.value == "legenda"
-                        )
-                        total_votos = nominais + brancos + nulos + legenda
-                        el_info["cargos"].append({
-                            "cargo": cargo.nome_cargo,
-                            "codigo": cargo.codigo_cargo,
-                            "comparecimento": cargo.comparecimento,
-                            "total_votos": total_votos,
-                            "nominais": nominais,
-                            "brancos": brancos,
-                            "nulos": nulos,
-                            "legenda": legenda,
-                        })
-                    result["bu"]["eleicoes"].append(el_info)
-
-                # Consistencia
-                issues = self._consistency.full_analysis(bu)
-                for issue in issues:
-                    issue.uf = result["uf"]
-                    issue.municipio = result["municipio"]
-                    issue.zona = result["zona"]
-                    issue.secao = result["secao"]
-                result["issues"].extend(issues)
-
-                # Analise estatistica
-                stat_issues = self._statistical.analyze_bu(bu)
-                for issue in stat_issues:
-                    issue.uf = result["uf"]
-                    issue.municipio = result["municipio"]
-                    issue.zona = result["zona"]
-                    issue.secao = result["secao"]
-                result["issues"].extend(stat_issues)
-
-                # Agregar votos por candidato
-                self._vote_aggregator.add_bu(bu, uf=uf)
-
-            except Exception as e:
-                logger.error("Erro ao parsear BU em %s: %s", section_dir, e)
-
-        # === Modelo da urna: prioridade signature > log ===
-        if file_prefix:
-            sig_files = list(section_dir.glob(f"{file_prefix}.vscmr")) + \
-                        list(section_dir.glob(f"{file_prefix}-vota.vsc"))
-        else:
-            sig_files = list(section_dir.glob("*.vscmr")) + list(section_dir.glob("*-vota.vsc"))
-        if sig_files:
-            try:
-                sig_data = self._sig_parser.parse(sig_files[0])
-                modelo_sig = sig_data.get("modeloUrna", "")
-                if modelo_sig:
-                    # Normalizar: "ue2010" -> "2010"
-                    modelo_clean = modelo_sig.lower().replace("ue", "").strip()
-                    result["modelo"] = modelo_clean
-            except Exception as e:
-                logger.debug("Erro ao extrair modelo de signature em %s: %s", section_dir, e)
-
-        # === Parse Log ===
-        if file_prefix:
-            log_files = list(section_dir.glob(f"{file_prefix}.logjez")) + \
-                        list(section_dir.glob(f"{file_prefix}-log.jez"))
-        else:
-            log_files = list(section_dir.glob("*.logjez")) + list(section_dir.glob("*-log.jez"))
-        if log_files:
-            try:
-                log_result = self._log_analyzer.analyze_log(
-                    log_files[0], bu, uf=uf,
-                    turno_date=turno_date or None,
-                )
-                events = log_result["events"]
-                result["log_events"] = {
-                    "modelo": events.get("modelo"),
-                    "votos_computados": events.get("votos_computados", 0),
-                    "erros": len(events.get("erros", [])),
-                    "alertas_mesario": len(events.get("alertas_mesario", [])),
-                    "substituicoes": len(events.get("substituicoes", [])),
-                    "reboots": events.get("reboots", 0),
-                    "severidades": events.get("severidades", {}),
-                }
-                result["log_timing"] = log_result["timing"]
-
-                # Modelo do log como fallback
-                if not result["modelo"] and events.get("modelo"):
-                    result["modelo"] = events["modelo"]
-
-                # Issues do log
-                for issue in log_result["issues"]:
-                    issue.uf = result["uf"]
-                    issue.municipio = result["municipio"]
-                    issue.zona = result["zona"]
-                    issue.secao = result["secao"]
-                result["issues"].extend(log_result["issues"])
-
-            except Exception as e:
-                logger.debug("Erro ao analisar log em %s: %s", section_dir, e)
-
-        # === Hashes (desativado por padrao para performance) ===
-        # h_issues = self._integrity.verify_section_hashes(section_dir)
-        # result["issues"].extend(h_issues)
+        if self._verify_hashes:
+            result["issues"].extend(
+                _tag_issues(self._integrity.verify_section_hashes(section_dir), result)
+            )
 
         return result
 
+    # Compatibilidade: scripts antigos chamam o método privado
+    _analyze_section = analyze_section
+
+    def _parse_bu(self, bu_file: Path, result: dict) -> Optional[BoletimUrna]:
+        """Parseia o BU e preenche result; falha vira issue E02."""
+        if not bu_file.exists():
+            return None
+        try:
+            bu = self._bu_parser.parse(bu_file)
+        except Exception as e:
+            logger.error("Erro ao parsear BU %s: %s", bu_file, e)
+            result["issues"].append(
+                _tag_issues([
+                    Issue(
+                        codigo="E02",
+                        severidade=IssueSeverity.MEDIUM,
+                        descricao=(
+                            "BU não pôde ser decodificado; seção excluída dos "
+                            f"totais ({type(e).__name__})"
+                        ),
+                        uf="", municipio="", zona="", secao="",
+                        detalhes={"arquivo": bu_file.name, "erro": str(e)[:300]},
+                    )
+                ], result)[0]
+            )
+            return None
+
+        result["bu_obj"] = bu
+        result["tipo_urna"] = bu.tipo_urna
+        result["versao_sw"] = bu.versao_votacao
+        result["bu"] = {
+            "municipio": bu.municipio,
+            "zona": bu.zona,
+            "secao": bu.secao,
+            "tipo_urna": bu.tipo_urna,
+            "versao": bu.versao_votacao,
+            "emissao": bu.data_hora_emissao,
+            "lib_codigo": bu.qtd_eleitores_lib_codigo,
+            "comp_biometrico": bu.qtd_eleitores_comp_biometrico,
+            "eleicoes": [],
+        }
+        for eleicao in bu.resultados_por_eleicao:
+            el_info = {"id": eleicao.id_eleicao, "aptos": eleicao.eleitores_aptos, "cargos": []}
+            for cargo in eleicao.resultados:
+                nominais = _soma_tipo(cargo.votos, TipoVoto.NOMINAL)
+                brancos = _soma_tipo(cargo.votos, TipoVoto.BRANCO)
+                nulos = _soma_tipo(cargo.votos, TipoVoto.NULO)
+                legenda = _soma_tipo(cargo.votos, TipoVoto.LEGENDA)
+                el_info["cargos"].append({
+                    "cargo": cargo.nome_cargo,
+                    "codigo": cargo.codigo_cargo,
+                    "comparecimento": cargo.comparecimento,
+                    "total_votos": nominais + brancos + nulos + legenda,
+                    "nominais": nominais,
+                    "brancos": brancos,
+                    "nulos": nulos,
+                    "legenda": legenda,
+                })
+            result["bu"]["eleicoes"].append(el_info)
+
+        result["issues"].extend(_tag_issues(self._consistency.full_analysis(bu), result))
+        result["issues"].extend(_tag_issues(self._statistical.analyze_bu(bu), result))
+        return bu
+
+    def _modelo_assinatura(self, section_dir: Path, file_prefix: Optional[str]) -> Optional[str]:
+        """Modelo da urna a partir do arquivo de assinatura (.vscmr / -vota.vsc)."""
+        if file_prefix:
+            sig_files = sorted(section_dir.glob(f"{file_prefix}.vscmr")) + \
+                sorted(section_dir.glob(f"{file_prefix}-vota.vsc"))
+        else:
+            sig_files = sorted(section_dir.glob("*.vscmr")) + \
+                sorted(section_dir.glob("*-vota.vsc"))
+        if not sig_files:
+            return None
+        modelo = self._sig_parser.get_model(sig_files[0])
+        if modelo and modelo.upper().startswith("UE"):
+            # Normalizar: "UE2010" -> "2010" (mesmo formato do modelo vindo do log)
+            return modelo[2:]
+        return modelo
+
+    def _analyze_log(
+        self,
+        section_dir: Path,
+        file_prefix: Optional[str],
+        bu: Optional[BoletimUrna],
+        turno_date: str,
+        result: dict,
+    ) -> None:
+        """Analisa o log da urna e preenche result."""
+        if file_prefix:
+            log_files = sorted(section_dir.glob(f"{file_prefix}.logjez")) + \
+                sorted(section_dir.glob(f"{file_prefix}-log.jez"))
+        else:
+            log_files = sorted(section_dir.glob("*.logjez")) + \
+                sorted(section_dir.glob("*-log.jez"))
+        if not log_files:
+            return
+        try:
+            log_result = self._log_analyzer.analyze_log(
+                log_files[0], bu, uf=result["uf"],
+                turno_date=turno_date or None,
+                municipio=result["municipio"],
+            )
+        except Exception as e:
+            logger.warning("Erro ao analisar log %s: %s", log_files[0], e)
+            return
+
+        events = log_result["events"]
+        result["log_events"] = {
+            "modelo": events.get("modelo"),
+            "votos_computados": events.get("votos_computados", 0),
+            "erros": len(events.get("erros", [])),
+            "alertas_mesario": len(events.get("alertas_mesario", [])),
+            "substituicoes": len(events.get("substituicoes", [])),
+            "reboots": events.get("reboots", 0),
+            "severidades": events.get("severidades", {}),
+        }
+        result["log_timing"] = log_result["timing"]
+
+        # Modelo do log como fallback
+        if not result["modelo"] and events.get("modelo"):
+            result["modelo"] = events["modelo"]
+
+        result["issues"].extend(_tag_issues(log_result["issues"], result))
+
     def _aggregate(self, results: dict, section_result: dict):
-        """Agrega resultado de uma secao no resumo geral."""
+        """Agrega resultado de uma seção no resumo geral."""
         uf = section_result["uf"]
         issues = section_result["issues"]
 
@@ -362,7 +408,7 @@ class BatchAnalyzer:
         else:
             results["secoes_ok"] += 1
 
-        # Modelo de urna (agora vem do .vscmr ou log, nao do BU)
+        # Modelo de urna (agora vem do .vscmr ou log, não do BU)
         modelo = section_result.get("modelo")
         if modelo:
             results["modelos_urna"][str(modelo)] += 1
@@ -372,7 +418,7 @@ class BatchAnalyzer:
         if tipo_urna:
             results["tipos_urna"][str(tipo_urna)] += 1
 
-        # Versao de SW
+        # Versão de SW
         versao = section_result.get("versao_sw")
         if versao:
             results["versoes_sw"][str(versao)] += 1
@@ -380,10 +426,10 @@ class BatchAnalyzer:
         # Votos e eleitores (corrigido: sem double-counting)
         bu_info = section_result.get("bu")
         if bu_info:
-            # Aptos: pegar da primeira eleicao (e o mesmo caderno)
+            # Aptos: pegar da primeira eleição (e o mesmo caderno)
             eleicoes = bu_info.get("eleicoes", [])
             if eleicoes:
-                # Usar aptos da primeira eleicao (mesmo caderno para todos os cargos)
+                # Usar aptos da primeira eleição (mesmo caderno para todos os cargos)
                 results["eleitores_por_uf"][uf]["aptos"] += eleicoes[0]["aptos"]
                 results["eleitores_por_uf"][uf]["secoes"] += 1
 
@@ -423,7 +469,7 @@ class BatchAnalyzer:
         })
 
     def _calc_abstencao(self, results: dict) -> dict:
-        """Calcula taxa de abstencao por UF."""
+        """Calcula taxa de abstenção por UF."""
         abstencao = {}
         for uf, dados in results["eleitores_por_uf"].items():
             if dados["aptos"] > 0:
@@ -433,7 +479,7 @@ class BatchAnalyzer:
         return abstencao
 
     def _calc_biometria_pct(self, results: dict) -> dict:
-        """Calcula percentual de liberacao por codigo (sem biometria) por UF."""
+        """Calcula percentual de liberação por código (sem biometria) por UF."""
         bio_pct = {}
         for uf, dados in results["biometria_por_uf"].items():
             total = dados["lib_codigo"] + dados["comp_biometrico"]
@@ -449,22 +495,22 @@ class BatchAnalyzer:
         return bio_pct
 
     def print_report(self, results: dict):
-        """Imprime relatorio completo no terminal."""
+        """Imprime relatório completo no terminal."""
         print("=" * 70)
-        print("RELATORIO DE AUDITORIA - ELEICOES PRESIDENCIAIS 2022")
+        print("RELATÓRIO DE AUDITORIA: DADOS DE URNA")
         print("=" * 70)
         print()
 
         # Resumo geral
-        print(f"Total de secoes analisadas: {results['total_secoes']}")
-        print(f"Secoes sem inconsistencias: {results['secoes_ok']}")
-        print(f"Secoes com inconsistencias: {results['secoes_com_issues']}")
-        print(f"Total de inconsistencias: {results['total_issues']}")
+        print(f"Total de seções analisadas: {results['total_secoes']}")
+        print(f"Seções sem inconsistências: {results['secoes_ok']}")
+        print(f"Seções com inconsistências: {results['secoes_com_issues']}")
+        print(f"Total de inconsistências: {results['total_issues']}")
         print()
 
-        # Inconsistencias por severidade
+        # Inconsistências por severidade
         if results.get("issues_por_severidade"):
-            print("--- Inconsistencias por Severidade ---")
+            print("--- Inconsistências por severidade ---")
             order = {"critica": 0, "alta": 1, "media": 2, "informativa": 3}
             for sev, count in sorted(
                 results["issues_por_severidade"].items(),
@@ -473,32 +519,32 @@ class BatchAnalyzer:
                 print(f"  {sev.upper()}: {count}")
             print()
 
-        # Inconsistencias por codigo
+        # Inconsistências por código
         if results.get("issues_por_codigo"):
-            print("--- Inconsistencias por Codigo ---")
+            print("--- Inconsistências por código ---")
             for cod, count in sorted(results["issues_por_codigo"].items()):
                 print(f"  {cod}: {count}")
             print()
 
         # Modelos de urna
         if results.get("modelos_urna"):
-            print("--- Modelos de Urna ---")
+            print("--- Modelos de urna ---")
             total_urnas = sum(results["modelos_urna"].values())
             for modelo, count in sorted(results["modelos_urna"].items()):
                 pct = (count / total_urnas * 100) if total_urnas > 0 else 0
                 print(f"  UE{modelo}: {count} urnas ({pct:.1f}%)")
             print()
 
-        # Versoes de software
+        # Versões de software
         if results.get("versoes_sw"):
-            print("--- Versoes de Software ---")
+            print("--- Versões de software ---")
             for versao, count in sorted(results["versoes_sw"].items()):
                 print(f"  {versao}: {count} urnas")
             print()
 
         # Eleitores por UF
         if results.get("eleitores_por_uf"):
-            print("--- Eleitores por UF (amostra) ---")
+            print("--- Eleitores por UF ---")
             total_aptos = 0
             total_comp = 0
             for uf in sorted(results["eleitores_por_uf"]):
@@ -511,12 +557,12 @@ class BatchAnalyzer:
                 total_comp += comp
                 print(
                     f"  {uf.upper()}: {aptos:>6} aptos, {comp:>6} comp. "
-                    f"(abstencao {abstencao:.1f}%) [{secoes} secoes]"
+                    f"(abstenção {abstencao:.1f}%) [{secoes} seções]"
                 )
             if total_aptos > 0:
                 total_abs = (1 - total_comp / total_aptos) * 100
                 print(f"  TOTAL: {total_aptos:>6} aptos, {total_comp:>6} comp. "
-                      f"(abstencao {total_abs:.1f}%)")
+                      f"(abstenção {total_abs:.1f}%)")
             print()
 
         # Biometria por UF
@@ -527,7 +573,7 @@ class BatchAnalyzer:
                 dados = bio_pct[uf]
                 print(
                     f"  {uf.upper()}: biometria {dados['pct_biometria']:.1f}%, "
-                    f"codigo {dados['pct_codigo']:.1f}%"
+                    f"código {dados['pct_codigo']:.1f}%"
                 )
             print()
 
@@ -538,18 +584,20 @@ class BatchAnalyzer:
             avg_dur = sum(duracoes) / len(duracoes)
             min_dur = min(duracoes)
             max_dur = max(duracoes)
-            print("--- Timing de Votacao ---")
-            print(f"  Duracao media: {avg_dur:.0f} min ({avg_dur/60:.1f}h)")
-            print(f"  Menor duracao: {min_dur} min ({min_dur/60:.1f}h)")
-            print(f"  Maior duracao: {max_dur} min ({max_dur/60:.1f}h)")
+            print("--- Duração da votação ---")
+            print(f"  Duração média: {avg_dur:.0f} min ({avg_dur/60:.1f}h)")
+            print(f"  Menor duração: {min_dur} min ({min_dur/60:.1f}h)")
+            print(f"  Maior duração: {max_dur} min ({max_dur/60:.1f}h)")
             print()
 
-        # Votos por candidato (Presidente)
+        # Votos por candidato (Presidente), separados por turno
         votacao = results.get("votacao", {})
-        votos_cand = votacao.get("votos_por_candidato", {})
-        if "Presidente" in votos_cand:
-            print("--- Votacao para Presidente (amostra) ---")
-            totais = votacao.get("totais_por_cargo", {}).get("Presidente", {})
+        for turno, por_escopo in sorted(votacao.get("votos_por_candidato", {}).items()):
+            cands = por_escopo.get("BR", {}).get("Presidente")
+            if not cands:
+                continue
+            print(f"--- Votação para Presidente ({turno}º turno) ---")
+            totais = votacao.get("totais_por_cargo", {}).get(turno, {}).get("Presidente", {})
             if totais:
                 print(
                     f"  Total: {totais.get('total', 0)} votos "
@@ -557,18 +605,18 @@ class BatchAnalyzer:
                     f"brancos: {totais.get('brancos', 0)}, "
                     f"nulos: {totais.get('nulos', 0)})"
                 )
-            for cand in votos_cand["Presidente"][:10]:
-                total_nom = totais.get("nominais", 1) or 1
-                pct = (cand["votos"] / total_nom * 100)
+            total_nom = totais.get("nominais", 0) or 1
+            for cand in cands[:10]:
+                pct = cand["votos"] / total_nom * 100
                 print(
                     f"  Candidato {cand['codigo']} "
                     f"(partido {cand['partido']}): "
                     f"{cand['votos']} votos ({pct:.1f}%) "
-                    f"[{cand['secoes']} secoes]"
+                    f"[{cand['secoes']} seções]"
                 )
             print()
 
-        # Detalhes das inconsistencias
+        # Detalhes das inconsistências
         issues = results.get("issues", [])
         if issues:
             # Agrupar por severidade
@@ -578,23 +626,23 @@ class BatchAnalyzer:
             infos = [i for i in issues if i.get("severidade") == "informativa"]
 
             if criticas:
-                print("--- INCONSISTENCIAS CRITICAS ---")
+                print("--- INCONSISTÊNCIAS CRÍTICAS ---")
                 for issue in criticas:
                     self._print_issue(issue)
                 print()
 
             if altas:
-                print("--- INCONSISTENCIAS ALTAS ---")
+                print("--- INCONSISTÊNCIAS ALTAS ---")
                 for issue in altas:
                     self._print_issue(issue)
                 print()
 
             if medias:
-                print("--- INCONSISTENCIAS MEDIAS ---")
+                print("--- INCONSISTÊNCIAS MÉDIAS ---")
                 for issue in medias[:20]:
                     self._print_issue(issue)
                 if len(medias) > 20:
-                    print(f"  ... e mais {len(medias) - 20} inconsistencias medias")
+                    print(f"  ... e mais {len(medias) - 20} inconsistências médias")
                 print()
 
             if infos:

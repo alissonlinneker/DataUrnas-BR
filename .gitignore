@@ -1,4 +1,4 @@
-# Data (banco compilado e dados brutos)
+# Dados (banco compilado e dados brutos)
 data/raw/
 data/json/
 data/db/
@@ -20,6 +20,10 @@ dist/
 build/
 .eggs/
 *.egg
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Ambiente
 .env
@@ -27,24 +31,27 @@ build/
 venv/
 env/
 
-# IDE e ferramentas locais
+# IDE
 .vscode/
 .idea/
-.claude/
 *.swp
 *.swo
 
-# OS
+# Sistema operacional
 .DS_Store
 Thumbs.db
 
 # Notebooks
 .ipynb_checkpoints/
 
-# Temporarios
-test_*.py
+# Temporários
+/test_*.py
 scripts/features/
 *.log
 nohup.out
-CLAUDE.md
 ARCHITECTURE.md
+
+# Intermediários da coleta por seção (2026)
+data/parquet/2026/secoes_parts/
+data/parquet/2026/secoes_checkpoint.txt
+data/parquet/2026/secoes_erros.txt

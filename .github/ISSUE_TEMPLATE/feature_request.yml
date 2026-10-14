@@ -1,0 +1,34 @@
+name: Sugerir melhoria
+description: Proponha uma nova verificação, análise, página ou melhoria.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema ou motivação
+      description: Que pergunta sobre os dados isso ajuda a responder?
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+      description: Como deveria funcionar. Para novas verificações, inclua o critério e, se houver, a base legal.
+    validations:
+      required: true
+  - type: textarea
+    id: dados
+    attributes:
+      label: Dados necessários
+      description: Quais arquivos ou campos públicos do TSE seriam usados.
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas consideradas
+  - type: checkboxes
+    id: neutralidade
+    attributes:
+      label: Neutralidade
+      options:
+        - label: A proposta é técnica e pode ser verificada por qualquer pessoa a partir dos dados públicos.
+          required: true

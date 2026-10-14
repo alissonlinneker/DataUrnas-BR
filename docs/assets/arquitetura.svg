@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="590" viewBox="0 0 1200 590" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Arquitetura do DataUrnas-BR</title>
+<desc id="descricao">Diagrama de fluxo em cinco etapas: a API pública do TSE alimenta o downloader e a coleta de 2026; os arquivos são decodificados (BU e RDV em ASN.1, log 7z e assinatura com hashes SHA-512); as verificações de integridade, consistência, log e estatística geram ocorrências; os resultados ficam em DuckDB e Parquet ZSTD e são exibidos no painel Streamlit.</desc>
+<rect x="1" y="1" width="1198" height="588" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Arquitetura do DataUrnas-BR</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Dos arquivos públicos da urna ao painel: cada etapa é reproduzível a partir dos dados do TSE</text>
+<defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4F6B80"/></marker></defs>
+<rect x="32.0" y="100.0" width="190.0" height="430.0" rx="14" fill="#F2F6F9"/>
+<text x="46.0" y="124.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">1. Fonte</text>
+<rect x="242.0" y="100.0" width="200.0" height="430.0" rx="14" fill="#F2F6F9"/>
+<text x="256.0" y="124.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">2. Coleta</text>
+<rect x="462.0" y="100.0" width="230.0" height="430.0" rx="14" fill="#F2F6F9"/>
+<text x="476.0" y="124.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">3. Decodificação</text>
+<rect x="712.0" y="100.0" width="210.0" height="430.0" rx="14" fill="#F2F6F9"/>
+<text x="726.0" y="124.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">4. Análise</text>
+<rect x="942.0" y="100.0" width="226.0" height="430.0" rx="14" fill="#F2F6F9"/>
+<text x="956.0" y="124.0" font-size="13" font-weight="700" fill="#4F6B80" text-anchor="start">5. Dados e painel</text>
+<rect x="44.0" y="220.0" width="166.0" height="150.0" rx="12" fill="#FFFFFF" stroke="#0B3A5B" stroke-width="2"/>
+<rect x="44.0" y="220.0" width="166.0" height="34.0" rx="12" fill="#0B3A5B"/>
+<rect x="44.0" y="240.0" width="166.0" height="14.0" rx="0" fill="#0B3A5B"/>
+<text x="58.0" y="243.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">API do TSE</text>
+<text x="58.0" y="276.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">resultados.tse.jus.br</text>
+<text x="58.0" y="295.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">config, UF, seção,</text>
+<text x="58.0" y="314.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">aux.json e arquivos</text>
+<text x="58.0" y="333.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">da urna</text>
+<rect x="254.0" y="150.0" width="176.0" height="132.0" rx="12" fill="#FFFFFF" stroke="#0072B2" stroke-width="2"/>
+<rect x="254.0" y="150.0" width="176.0" height="34.0" rx="12" fill="#0072B2"/>
+<rect x="254.0" y="170.0" width="176.0" height="14.0" rx="0" fill="#0072B2"/>
+<text x="268.0" y="173.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">downloader</text>
+<text x="268.0" y="206.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">httpx assíncrono</text>
+<text x="268.0" y="225.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">backoff e Retry-After</text>
+<text x="268.0" y="244.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">escrita atômica</text>
+<rect x="254.0" y="310.0" width="176.0" height="132.0" rx="12" fill="#FFFFFF" stroke="#0072B2" stroke-width="2"/>
+<rect x="254.0" y="310.0" width="176.0" height="34.0" rx="12" fill="#0072B2"/>
+<rect x="254.0" y="330.0" width="176.0" height="14.0" rx="0" fill="#0072B2"/>
+<text x="268.0" y="333.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">ele2026</text>
+<text x="268.0" y="366.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">resultados agregados</text>
+<text x="268.0" y="385.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">BU por seção</text>
+<text x="268.0" y="404.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">com checkpoint</text>
+<rect x="474.0" y="140.0" width="206.0" height="100.0" rx="12" fill="#FFFFFF" stroke="#009E73" stroke-width="2"/>
+<rect x="474.0" y="140.0" width="206.0" height="34.0" rx="12" fill="#009E73"/>
+<rect x="474.0" y="160.0" width="206.0" height="14.0" rx="0" fill="#009E73"/>
+<text x="488.0" y="163.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">BU e RDV</text>
+<text x="488.0" y="196.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">ASN.1/BER, spec v1 e v2</text>
+<text x="488.0" y="215.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">asn1tools</text>
+<rect x="474.0" y="256.0" width="206.0" height="100.0" rx="12" fill="#FFFFFF" stroke="#009E73" stroke-width="2"/>
+<rect x="474.0" y="256.0" width="206.0" height="34.0" rx="12" fill="#009E73"/>
+<rect x="474.0" y="276.0" width="206.0" height="14.0" rx="0" fill="#009E73"/>
+<text x="488.0" y="279.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">Log da urna</text>
+<text x="488.0" y="312.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">.logjez (7z, texto)</text>
+<text x="488.0" y="331.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">filtro pela data do turno</text>
+<rect x="474.0" y="372.0" width="206.0" height="100.0" rx="12" fill="#FFFFFF" stroke="#009E73" stroke-width="2"/>
+<rect x="474.0" y="372.0" width="206.0" height="34.0" rx="12" fill="#009E73"/>
+<rect x="474.0" y="392.0" width="206.0" height="14.0" rx="0" fill="#009E73"/>
+<text x="488.0" y="395.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">Assinatura</text>
+<text x="488.0" y="428.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">.vscmr / -vota.vsc</text>
+<text x="488.0" y="447.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">hashes SHA-512</text>
+<rect x="724.0" y="160.0" width="186.0" height="290.0" rx="12" fill="#FFFFFF" stroke="#E69F00" stroke-width="2"/>
+<rect x="724.0" y="160.0" width="186.0" height="34.0" rx="12" fill="#E69F00"/>
+<rect x="724.0" y="180.0" width="186.0" height="14.0" rx="0" fill="#E69F00"/>
+<text x="738.0" y="183.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">Verificações</text>
+<text x="738.0" y="216.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">4 eixos por seção:</text>
+<text x="738.0" y="235.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">integridade</text>
+<text x="738.0" y="254.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">consistência</text>
+<text x="738.0" y="273.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">log e horários</text>
+<text x="738.0" y="292.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">estatística</text>
+<text x="738.0" y="311.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start"></text>
+<text x="738.0" y="330.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">cada achado vira</text>
+<text x="738.0" y="349.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">ocorrência com</text>
+<text x="738.0" y="368.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">código e severidade</text>
+<rect x="954.0" y="150.0" width="202.0" height="128.0" rx="12" fill="#FFFFFF" stroke="#0B3A5B" stroke-width="2"/>
+<rect x="954.0" y="150.0" width="202.0" height="34.0" rx="12" fill="#0B3A5B"/>
+<rect x="954.0" y="170.0" width="202.0" height="14.0" rx="0" fill="#0B3A5B"/>
+<text x="968.0" y="173.0" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="start">DuckDB + Parquet</text>
+<text x="968.0" y="206.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">secoes, votos, issues,</text>
+<text x="968.0" y="225.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">totais_cargo</text>
+<text x="968.0" y="244.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Parquet ZSTD</text>
+<rect x="954.0" y="318.0" width="202.0" height="128.0" rx="12" fill="#FFFFFF" stroke="#56B4E9" stroke-width="2"/>
+<rect x="954.0" y="318.0" width="202.0" height="34.0" rx="12" fill="#56B4E9"/>
+<rect x="954.0" y="338.0" width="202.0" height="14.0" rx="0" fill="#56B4E9"/>
+<text x="968.0" y="341.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">Painel Streamlit</text>
+<text x="968.0" y="374.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">páginas temáticas</text>
+<text x="968.0" y="393.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">filtros e exportação</text>
+<text x="968.0" y="412.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">2022 e 2026</text>
+<path d="M210.0,270.0 L252.0,216.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M210.0,320.0 L252.0,376.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M430,216 H451 M451,190 V422 M680,190 H701 M680,422 H701 M701,190 V422" stroke="#4F6B80" stroke-width="2" fill="none"/>
+<path d="M451.0,190.0 L472.0,190.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M451.0,306.0 L472.0,306.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M451.0,422.0 L472.0,422.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M680.0,306.0 L722.0,306.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M910.0,260.0 L952.0,214.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M1055.0,278.0 L1055.0,316.0" stroke="#4F6B80" stroke-width="2" fill="none" marker-end="url(#seta)"/>
+<path d="M342,442 V500 H1172 V214 H1158" stroke="#4F6B80" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#seta)"/>
+<rect x="560.0" y="488.0" width="330.0" height="24.0" rx="12" fill="#FFFFFF" stroke="#D9E3EB"/>
+<text x="725.0" y="505.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">2026: totais oficiais seguem direto para Parquet</text>
+<line x1="32" y1="544" x2="1168" y2="544" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="568.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Código aberto, licença MIT</text>
+<text x="1168.0" y="568.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>

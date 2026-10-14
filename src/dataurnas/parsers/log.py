@@ -1,6 +1,5 @@
-"""Parser de logs da urna eletronica (.logjez / .jez)."""
+"""Parser de logs da urna eletrônica (.logjez / .jez)."""
 
-import io
 import logging
 import re
 from pathlib import Path
@@ -16,7 +15,7 @@ _LOG_LINE_PATTERN = re.compile(
     r"^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})\t(\w+)\t(\d+)\t(\w+)\t(.+?)\t([A-Fa-f0-9]+)\s*$"
 )
 
-# Padroes de eventos relevantes
+# Padrões de eventos relevantes
 PATTERN_MODELO_URNA = re.compile(r"(?:Modelo de [Uu]rna|Modelo UE|UE)[\s:]*(\d{4})")
 PATTERN_MODELO_VST = re.compile(r"avusrlibue(\d{4})\.vst")
 PATTERN_ABERTURA = re.compile(r"Urna pronta para receber votos")
@@ -32,9 +31,12 @@ PATTERN_DESLIGADA = re.compile(r"Urna desligada")
 PATTERN_CARGA = re.compile(r"Modo de carga da UE")
 PATTERN_REBOOT = re.compile(r"In[ií]cio das opera[çc][oõ]es do logd")
 
+# Limite de segurança para o log descompactado (logs reais têm poucos MB)
+MAX_LOG_BYTES = 256 * 1024 * 1024
+
 
 class LogParser:
-    """Parser de logs da urna eletronica."""
+    """Parser de logs da urna eletrônica."""
 
     def parse(self, file_path: Path) -> list[LogEntry]:
         """Parseia um arquivo de log da urna.
@@ -48,6 +50,7 @@ class LogParser:
             return []
 
         entries = []
+        ignoradas = 0
         for line in text.splitlines():
             line = line.strip()
             if not line:
@@ -55,28 +58,50 @@ class LogParser:
             entry = self._parse_line(line)
             if entry:
                 entries.append(entry)
+            else:
+                ignoradas += 1
 
+        if ignoradas:
+            logger.debug(
+                "%s: %d linha(s) fora do formato esperado ignoradas", file_path, ignoradas
+            )
         return entries
 
     def _extract_text(self, file_path: Path) -> Optional[str]:
-        """Extrai texto do arquivo 7-zip."""
+        """Extrai em memória o texto do arquivo 7-zip.
+
+        Le o primeiro arquivo do pacote (geralmente logd.dat), sem gravar
+        nada em disco. Pacotes acima de MAX_LOG_BYTES (descompactados) são
+        recusados: o conteúdo vem de fonte externa e não pode esgotar a
+        memória.
+        """
         try:
             import py7zr
-            import tempfile
-            with tempfile.TemporaryDirectory() as tmpdir:
-                with py7zr.SevenZipFile(file_path, mode="r") as archive:
-                    archive.extractall(path=tmpdir)
-                # Ler o arquivo extraido (geralmente logd.dat)
-                tmppath = Path(tmpdir)
-                for extracted in tmppath.iterdir():
-                    return extracted.read_bytes().decode("latin-1", errors="replace")
+            from py7zr.io import BytesIOFactory
         except ImportError:
-            logger.error("py7zr nao instalado. Execute: pip install py7zr")
+            logger.error("py7zr não instalado. Execute: pip install py7zr")
             return None
+
+        try:
+            with py7zr.SevenZipFile(file_path, mode="r") as archive:
+                infos = [i for i in archive.list() if not i.is_directory]
+                if not infos:
+                    return None
+                total = sum(i.uncompressed or 0 for i in infos)
+                if total > MAX_LOG_BYTES:
+                    logger.error(
+                        "Log %s excede o limite (%d bytes descompactados)", file_path, total
+                    )
+                    return None
+                alvo = sorted(i.filename for i in infos)[0]
+                factory = BytesIOFactory(MAX_LOG_BYTES)
+                archive.extract(targets=[alvo], factory=factory)
+            buf = factory.get(alvo)
+            buf.seek(0)
+            return buf.read().decode("latin-1", errors="replace")
         except Exception as e:
             logger.error("Erro ao extrair log de %s: %s", file_path, e)
             return None
-        return None
 
     def _parse_line(self, line: str) -> Optional[LogEntry]:
         """Parseia uma linha do log."""
@@ -91,7 +116,7 @@ class LogParser:
                 descricao=match.group(6),
                 mac=match.group(7),
             )
-        # Linhas que nao seguem o padrao sao ignoradas silenciosamente
+        # Linhas que não seguem o padrão são ignoradas silenciosamente
         return None
 
     def extract_model(self, entries: list[LogEntry]) -> Optional[str]:
@@ -102,14 +127,22 @@ class LogParser:
                 return match.group(1)
         return None
 
-    def extract_events(self, entries: list[LogEntry], turno_date: str = None) -> dict:
+    def extract_events(
+        self, entries: list[LogEntry], turno_date: Optional[str] = None
+    ) -> dict:
         """Extrai eventos relevantes do log.
+
+        Critérios (assimetria intencional):
+            - abertura: PRIMEIRA ocorrência de "Urna pronta para receber votos"
+              no dia; as demais contam como reinicializações.
+            - encerramento: ÚLTIMA ocorrência de "Início do Encerramento", que é
+              o encerramento efetivo quando o procedimento é repetido.
 
         Args:
             entries: Lista de entradas do log.
             turno_date: Data do turno (DD/MM/YYYY) para filtrar entradas.
-                Se fornecido, apenas entradas dessa data sao consideradas.
-                Necessario para T2, pois o .logjez acumula eventos do T1.
+                Se fornecido, apenas entradas dessa data são consideradas.
+                Necessário para T2, pois o .logjez acumula eventos do T1.
         """
         # Filtrar por data do turno (corrige T2 que acumula eventos do T1)
         if turno_date:
@@ -128,7 +161,7 @@ class LogParser:
             "votos_computados": 0,
             "ligada": None,
             "desligadas": [],
-            "reboots": 0,  # Reinicializacoes durante votacao
+            "reboots": 0,  # Reinicializações durante votação
             "total_entries": len(entries),
             "severidades": {},
         }
@@ -140,7 +173,7 @@ class LogParser:
             sev = entry.severidade.upper() if entry.severidade else "UNKNOWN"
             events["severidades"][sev] = events["severidades"].get(sev, 0) + 1
 
-            # Modelo - tentar padrao principal e depois vst
+            # Modelo - tentar padrão principal e depois vst
             if not events["modelo"]:
                 m = PATTERN_MODELO_URNA.search(desc)
                 if m:
@@ -185,7 +218,7 @@ class LogParser:
             if PATTERN_DESLIGADA.search(desc):
                 events["desligadas"].append(entry)
 
-        # Calcular reboots: multiplas aberturas = reinicializacoes
+        # Calcular reboots: múltiplas aberturas = reinicializações
         events["reboots"] = max(0, len(events["aberturas"]) - 1)
 
         return events

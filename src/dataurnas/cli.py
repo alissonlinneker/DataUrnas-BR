@@ -3,11 +3,14 @@
 import asyncio
 import json
 import logging
+import subprocess
+import sys
 from pathlib import Path
 
 import click
 
-from .config import JSON_DIR
+from . import __version__
+from .config import ESTADOS, JSON_DIR
 from .downloader.client import TSEClient
 from .downloader.tse_api import TSEApi
 from .downloader.manager import DownloadManager
@@ -26,6 +29,7 @@ def setup_logging(verbose: bool = False):
 
 
 @click.group()
+@click.version_option(__version__, prog_name="dataurnas", message="%(prog)s %(version)s")
 @click.option("-v", "--verbose", is_flag=True, help="Modo verboso")
 def main(verbose):
     """DataUrnas-BR: Auditoria dos dados eleitorais brasileiros."""
@@ -44,14 +48,14 @@ def download():
 
 @download.command("list")
 def download_list():
-    """Lista eleicoes disponiveis no TSE."""
+    """Lista eleições disponíveis no TSE."""
 
     async def _run():
         async with TSEClient() as client:
             api = TSEApi(client)
             data = await api.list_elections()
             if not data:
-                click.echo("Erro: nao foi possivel acessar a API do TSE")
+                click.echo("Erro: não foi possível acessar a API do TSE")
                 return
 
             click.echo(f"Ciclo atual: {data.get('c', '?')}")
@@ -64,7 +68,7 @@ def download_list():
                 click.echo(f"  Data: {pleito.get('dt', '?')}")
                 for eleicao in pleito.get("e", []):
                     click.echo(
-                        f"  Eleicao {eleicao.get('cd', '?')}: {eleicao.get('nm', '?')} "
+                        f"  Eleição {eleicao.get('cd', '?')}: {eleicao.get('nm', '?')} "
                         f"(turno {eleicao.get('t', '?')})"
                     )
                 click.echo()
@@ -72,16 +76,20 @@ def download_list():
     asyncio.run(_run())
 
 
+_UF_CHOICE = click.Choice(ESTADOS, case_sensitive=False)
+
+
 @download.command("state")
-@click.argument("uf")
-@click.option("--ciclo", default="ele2022", help="Ciclo eleitoral (default: ele2022)")
-@click.option("--pleito", default="406", help="Codigo do pleito (default: 406 = Pres. 2022 1T)")
+@click.argument("uf", type=_UF_CHOICE)
+@click.option("--ciclo", default="ele2022", help="Ciclo eleitoral (padrão: ele2022)")
+@click.option("--pleito", default="406", help="Código do pleito (padrão: 406 = Presidente 2022, 1º turno)")
 @click.option("--tipo", multiple=True, help="Tipos de arquivo: bu, rdv, logjez, imgbu, vscmr")
-@click.option("--max-secoes", type=int, default=None, help="Maximo de secoes (amostra)")
-@click.option("--municipio", multiple=True, help="Filtrar por codigo de municipio")
+@click.option("--max-secoes", type=int, default=None, help="Máximo de seções (amostra)")
+@click.option("--municipio", multiple=True, help="Filtrar por código de município")
 def download_state(uf, ciclo, pleito, tipo, max_secoes, municipio):
     """Baixa dados de um estado. Ex: dataurnas download state df"""
 
+    uf = uf.lower()
     file_types = list(tipo) if tipo else None
     mun_filter = list(municipio) if municipio else None
 
@@ -102,18 +110,21 @@ def download_state(uf, ciclo, pleito, tipo, max_secoes, municipio):
 
 @download.command("sample")
 @click.option("--ciclo", default="ele2022", help="Ciclo eleitoral")
-@click.option("--pleito", default="406", help="Codigo do pleito")
-@click.option("--secoes", default=20, help="Secoes por estado")
+@click.option("--pleito", default="406", help="Código do pleito")
+@click.option("--secoes", default=20, help="Seções por estado")
 @click.option("--tipo", multiple=True, help="Tipos de arquivo")
 @click.option(
     "--estados",
     default="ac,ce,df,sp,rs",
-    help="Estados separados por virgula",
+    help="Estados separados por vírgula",
 )
 def download_sample(ciclo, pleito, secoes, tipo, estados):
-    """Baixa amostra de dados de multiplos estados."""
+    """Baixa amostra de dados de múltiplos estados."""
 
-    states = [s.strip() for s in estados.split(",")]
+    states = [s.strip().lower() for s in estados.split(",") if s.strip()]
+    invalidos = [s for s in states if s not in ESTADOS]
+    if invalidos:
+        raise click.BadParameter(f"UF inválida: {', '.join(invalidos)}", param_hint="--estados")
     file_types = list(tipo) if tipo else None
 
     async def _run():
@@ -131,44 +142,44 @@ def download_sample(ciclo, pleito, secoes, tipo, estados):
 
 
 @download.command("info")
-@click.argument("uf")
+@click.argument("uf", type=_UF_CHOICE)
 @click.option("--ciclo", default="ele2022", help="Ciclo eleitoral")
-@click.option("--pleito", default="406", help="Codigo do pleito")
+@click.option("--pleito", default="406", help="Código do pleito")
 def download_info(uf, ciclo, pleito):
-    """Mostra informacoes de um estado (municipios, zonas, secoes)."""
+    """Mostra informações de um estado (municípios, zonas, seções)."""
 
     async def _run():
         async with TSEClient() as client:
             api = TSEApi(client)
-            state = await api.get_state_config(ciclo, pleito, uf)
+            state = await api.get_state_config(ciclo, pleito, uf.lower())
             if not state:
-                click.echo(f"Erro: estado {uf} nao encontrado")
+                click.echo(f"Erro: estado {uf} não encontrado")
                 return
 
             total = api.count_sections(state)
             click.echo(f"Estado: {state.nome} ({state.uf})")
-            click.echo(f"Municipios: {len(state.municipios)}")
-            click.echo(f"Total de secoes: {total}")
+            click.echo(f"Municípios: {len(state.municipios)}")
+            click.echo(f"Total de seções: {total}")
             click.echo()
             for mun in state.municipios[:20]:
                 n_secoes = sum(len(z.get("sec", [])) for z in mun.get("zon", []))
                 click.echo(
                     f"  {mun['cd']} {mun['nm']}: "
-                    f"{len(mun.get('zon', []))} zonas, {n_secoes} secoes"
+                    f"{len(mun.get('zon', []))} zonas, {n_secoes} seções"
                 )
             if len(state.municipios) > 20:
-                click.echo(f"  ... e mais {len(state.municipios) - 20} municipios")
+                click.echo(f"  ... e mais {len(state.municipios) - 20} municípios")
 
     asyncio.run(_run())
 
 
 # ============================================================
-# Comandos de analise
+# Comandos de análise
 # ============================================================
 
 @main.group()
 def analyze():
-    """Comandos de analise de dados."""
+    """Comandos de análise de dados."""
     pass
 
 
@@ -186,14 +197,14 @@ def analyze_bu(path, raw):
         return
 
     bu = parser.parse(file_path)
-    click.echo(f"Municipio: {bu.municipio} | Zona: {bu.zona} | Secao: {bu.secao}")
+    click.echo(f"Município: {bu.municipio} | Zona: {bu.zona} | Seção: {bu.secao}")
     click.echo(f"Modelo: {bu.modelo_urna} | Fase: {bu.fase.name}")
-    click.echo(f"Emissao: {bu.data_hora_emissao}")
+    click.echo(f"Emissão: {bu.data_hora_emissao}")
     click.echo(f"Spec: {bu.spec_version.value}")
     click.echo()
 
     for eleicao in bu.resultados_por_eleicao:
-        click.echo(f"Eleicao {eleicao.id_eleicao}: {eleicao.eleitores_aptos} eleitores aptos")
+        click.echo(f"Eleição {eleicao.id_eleicao}: {eleicao.eleitores_aptos} eleitores aptos")
         for resultado in eleicao.resultados:
             click.echo(f"  {resultado.nome_cargo} (comparecimento: {resultado.comparecimento})")
             for voto in resultado.votos:
@@ -206,26 +217,26 @@ def analyze_bu(path, raw):
                     click.echo(f"    {voto.tipo_voto.value.upper()}: {voto.quantidade}")
         click.echo()
 
-    # Analise de consistencia
+    # Análise de consistência
     analyzer = ConsistencyAnalyzer()
     issues = analyzer.full_analysis(bu)
     if issues:
-        click.echo("=== INCONSISTENCIAS DETECTADAS ===")
+        click.echo("=== INCONSISTÊNCIAS DETECTADAS ===")
         for issue in issues:
             click.echo(f"  [{issue.severidade.value}] {issue.codigo}: {issue.descricao}")
     else:
-        click.echo("Nenhuma inconsistencia detectada.")
+        click.echo("Nenhuma inconsistência detectada.")
 
 
 @analyze.command("hashes")
 @click.argument("section_dir")
 def analyze_hashes(section_dir):
-    """Verifica hashes SHA-512 de uma secao."""
+    """Verifica hashes SHA-512 de uma seção."""
     analyzer = IntegrityAnalyzer()
     issues = analyzer.verify_section_hashes(Path(section_dir))
 
     if not issues:
-        click.echo("Todos os hashes estao corretos.")
+        click.echo("Todos os hashes verificáveis estão corretos.")
     else:
         for issue in issues:
             click.echo(f"[{issue.severidade.value}] {issue.codigo}: {issue.descricao}")
@@ -243,7 +254,7 @@ def analyze_log(path):
     events = parser.extract_events(entries)
 
     click.echo(f"Total de entradas: {len(entries)}")
-    click.echo(f"Modelo da urna: {events['modelo'] or 'nao identificado'}")
+    click.echo(f"Modelo da urna: {events['modelo'] or 'não identificado'}")
 
     if events["abertura"]:
         e = events["abertura"]
@@ -257,57 +268,48 @@ def analyze_log(path):
         click.echo(f"  [{err.hora}] {err.descricao[:100]}")
 
     if events["substituicoes"]:
-        click.echo(f"Eventos de substituicao: {len(events['substituicoes'])}")
+        click.echo(f"Eventos de substituição: {len(events['substituicoes'])}")
     if events["ajustes_hora"]:
         click.echo(f"Ajustes de hora: {len(events['ajustes_hora'])}")
 
 
 @analyze.command("section")
-@click.argument("section_dir")
-def analyze_section(section_dir):
-    """Analise completa de uma secao (BU + hashes + log)."""
-    section_path = Path(section_dir)
+@click.argument("section_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@click.option("--hashes/--no-hashes", default=True, help="Verificar hashes SHA-512")
+def analyze_section(section_dir, hashes):
+    """Análise completa de uma seção (BU + log + hashes), um resultado por turno."""
+    from .analyzer.batch import BatchAnalyzer
 
-    # BU
-    bu_files = list(section_path.glob("*.bu")) + list(section_path.glob("*-bu.dat"))
-    if bu_files:
-        parser = BUParser()
-        bu = parser.parse(bu_files[0])
-        click.echo(f"=== BU: Mun {bu.municipio} / Zona {bu.zona} / Secao {bu.secao} ===")
-        click.echo(f"Modelo: {bu.modelo_urna} | Emissao: {bu.data_hora_emissao}")
-        for eleicao in bu.resultados_por_eleicao:
-            click.echo(f"Eleicao {eleicao.id_eleicao}: {eleicao.eleitores_aptos} aptos")
-            for r in eleicao.resultados:
-                total = sum(v.quantidade for v in r.votos)
-                click.echo(f"  {r.nome_cargo}: {total} votos, {r.comparecimento} comp.")
+    analyzer = BatchAnalyzer(verify_hashes=hashes)
+    bu_files = sorted(section_dir.glob("*.bu")) + sorted(section_dir.glob("*-bu.dat"))
+    if not bu_files:
+        click.echo("Arquivo BU não encontrado.")
+        return
 
-        # Consistencia
-        consistency = ConsistencyAnalyzer()
-        c_issues = consistency.full_analysis(bu)
-    else:
-        c_issues = []
-        click.echo("Arquivo BU nao encontrado.")
+    for bu_file in bu_files:
+        result = analyzer.analyze_section(section_dir, bu_file=bu_file)
+        bu = result["bu_obj"]
+        click.echo(f"=== {bu_file.name} ({result['turno']}º turno) ===")
+        if bu is not None:
+            click.echo(f"Mun {bu.municipio} / Zona {bu.zona} / Seção {bu.secao}")
+            click.echo(f"Modelo: {result['modelo']} | Emissão: {bu.data_hora_emissao}")
+            for eleicao in bu.resultados_por_eleicao:
+                click.echo(f"Eleição {eleicao.id_eleicao}: {eleicao.eleitores_aptos} aptos")
+                for r in eleicao.resultados:
+                    total = sum(v.quantidade for v in r.votos)
+                    click.echo(f"  {r.nome_cargo}: {total} votos, {r.comparecimento} comp.")
+        log_events = result["log_events"]
+        if log_events:
+            click.echo(
+                f"Log: modelo {log_events['modelo']}, {log_events['erros']} erros, "
+                f"{log_events['reboots']} reinício(s)"
+            )
 
-    # Hashes
-    integrity = IntegrityAnalyzer()
-    h_issues = integrity.verify_section_hashes(section_path)
-
-    # Log
-    log_files = list(section_path.glob("*.logjez")) + list(section_path.glob("*-log.jez"))
-    log_issues = []
-    if log_files:
-        log_parser = LogParser()
-        entries = log_parser.parse(log_files[0])
-        events = log_parser.extract_events(entries)
-        click.echo(f"\n=== LOG: {len(entries)} entradas, modelo {events['modelo']} ===")
-        if events["erros"]:
-            click.echo(f"  {len(events['erros'])} erros registrados")
-
-    # Resumo
-    all_issues = c_issues + h_issues
-    click.echo(f"\n=== RESULTADO: {len(all_issues)} inconsistencia(s) ===")
-    for issue in all_issues:
-        click.echo(f"  [{issue.severidade.value}] {issue.codigo}: {issue.descricao}")
+        issues = result["issues"]
+        click.echo(f"Resultado: {len(issues)} inconsistência(s)")
+        for issue in issues:
+            click.echo(f"  [{issue.severidade.value}] {issue.codigo}: {issue.descricao}")
+        click.echo()
 
 
 @analyze.command("batch")
@@ -315,19 +317,19 @@ def analyze_section(section_dir):
 @click.option("--output", "-o", default=None, help="Salvar JSON em arquivo")
 @click.option("--hashes", is_flag=True, help="Verificar hashes SHA-512 (lento)")
 def analyze_batch(uf, output, hashes):
-    """Analise em lote de todas as secoes baixadas."""
+    """Análise em lote de todas as seções baixadas."""
     from .analyzer.batch import BatchAnalyzer
 
-    analyzer = BatchAnalyzer()
+    analyzer = BatchAnalyzer(verify_hashes=hashes)
     results = analyzer.analyze_all(uf=uf)
     analyzer.print_report(results)
 
     out_path = output or str(JSON_DIR / "relatorio_2022.json")
     serializable = json.loads(json.dumps(results, default=str))
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
+    with open(out_path, "w", encoding="utf-8") as f:
         json.dump(serializable, f, indent=2, ensure_ascii=False)
-    click.echo(f"\nRelatorio salvo em: {out_path}")
+    click.echo(f"\nRelatório salvo em: {out_path}")
 
 
 # ============================================================
@@ -341,14 +343,24 @@ def db():
 
 
 @db.command("build")
-def db_build():
+@click.option("--incremental", is_flag=True, help="Compilar apenas seções ainda ausentes")
+@click.option("--batch-size", default=500, show_default=True, help="Seções por transação")
+@click.option("--hashes/--no-hashes", default=False, show_default=True,
+              help="Verificar hashes SHA-512 de cada seção (lento). O resultado fica "
+                   "registrado na tabela metadados (verify_hashes).")
+def db_build(incremental, batch_size, hashes):
     """Compila todos os dados brutos em DuckDB."""
     from .database.duckdb_store import DuckDBStore
 
     click.echo("Compilando dados para DuckDB...")
     with DuckDBStore() as store:
-        count = store.build_from_raw()
-        click.echo(f"Banco compilado: {count} secoes")
+        if incremental:
+            count = store.build_incremental(batch_size=batch_size, verify_hashes=hashes)
+        else:
+            count = store.build_from_raw(batch_size=batch_size, verify_hashes=hashes)
+        click.echo(f"Banco compilado: {count} seções")
+        verificado = store.hashes_verificados()
+        click.echo(f"  Hashes SHA-512 verificados: {'sim' if verificado else 'não'}")
         summary = store.get_summary()
         click.echo(f"  Eleitores: {summary['total_eleitores']}")
         click.echo(f"  Comparecimento: {summary['total_comparecimento']}")
@@ -359,18 +371,18 @@ def db_build():
 
 @db.command("stats")
 def db_stats():
-    """Mostra estatisticas do banco compilado."""
-    from .database.duckdb_store import DuckDBStore, DEFAULT_DB_PATH
+    """Mostra estatísticas do banco compilado (somente leitura)."""
+    from .database.duckdb_store import DEFAULT_DB_PATH, DuckDBStore
 
     if not DEFAULT_DB_PATH.exists():
-        click.echo("Banco nao encontrado. Execute: dataurnas db build")
+        click.echo("Banco não encontrado. Execute: dataurnas db build")
         return
 
-    with DuckDBStore() as store:
+    with DuckDBStore(DEFAULT_DB_PATH, read_only=True) as store:
         s = store.get_summary()
-        click.echo(f"Total de secoes: {s['total_secoes']}")
-        click.echo(f"Secoes OK: {s['secoes_ok']}")
-        click.echo(f"Secoes com issues: {s['secoes_com_issues']}")
+        click.echo(f"Total de seções: {s['total_secoes']}")
+        click.echo(f"Seções OK: {s['secoes_ok']}")
+        click.echo(f"Seções com issues: {s['secoes_com_issues']}")
         click.echo(f"Total issues: {s['total_issues']}")
         click.echo(f"Eleitores: {s['total_eleitores']}")
         click.echo(f"Comparecimento: {s['total_comparecimento']}")
@@ -385,14 +397,14 @@ def db_stats():
 @click.option("--port", default=8501, help="Porta do servidor")
 def run_dashboard(port):
     """Inicia o dashboard web (Streamlit)."""
-    import subprocess
     dashboard_path = Path(__file__).parent / "dashboard" / "app.py"
     click.echo(f"Iniciando dashboard em http://localhost:{port}")
-    subprocess.run([
-        "streamlit", "run", str(dashboard_path),
+    proc = subprocess.run([
+        sys.executable, "-m", "streamlit", "run", str(dashboard_path),
         "--server.port", str(port),
         "--server.headless", "true",
     ])
+    sys.exit(proc.returncode)
 
 
 def _serialize(obj):

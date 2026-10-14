@@ -1,7 +1,9 @@
-"""Download + compilacao DuckDB em tempo real - ambos os turnos.
+"""Download + compilação DuckDB em tempo real - ambos os turnos.
 
 Baixa seções e compila no banco de dados imediatamente após o download.
-Usa no máximo 500 Mbps de banda (100 conexões concorrentes, 500 req/s).
+Concorrência e taxa configuráveis por variável de ambiente
+(DATAURNAS_MAX_CONCURRENT, DATAURNAS_RATE_LIMIT), com padrão conservador
+para não sobrecarregar a infraestrutura pública do TSE.
 
 ARQUITETURA:
 - O builder mantém conexão write exclusiva ao DB principal.
@@ -11,6 +13,7 @@ ARQUITETURA:
 
 import asyncio
 import logging
+import os
 import shutil
 import sys
 import time
@@ -24,6 +27,7 @@ from dataurnas.downloader.client import TSEClient
 from dataurnas.downloader.tse_api import TSEApi
 from dataurnas.downloader.manager import DownloadManager
 from dataurnas.database.duckdb_store import DuckDBStore, DEFAULT_DB_PATH
+from dataurnas.database.rows import extract_rows
 from dataurnas.analyzer.batch import BatchAnalyzer
 from dataurnas.config import RAW_DIR
 
@@ -34,9 +38,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("download_and_build")
 
-# Limites para 500 Mbps (maximizar banda disponível)
-MAX_CONCURRENT = 500
-RATE_LIMIT = 3000
+# Limites de download (requisições a um serviço público: manter conservador)
+MAX_CONCURRENT = int(os.environ.get("DATAURNAS_MAX_CONCURRENT", "50"))
+RATE_LIMIT = int(os.environ.get("DATAURNAS_RATE_LIMIT", "200"))
 
 # Compilação e snapshot
 BATCH_SIZE = 200
@@ -69,7 +73,7 @@ def create_snapshot(store):
         # Copiar o arquivo principal (sem WAL)
         shutil.copy2(str(DEFAULT_DB_PATH), str(tmp_snap))
         # Mover atomicamente (rename é atômico no mesmo filesystem)
-        tmp_snap.rename(SNAPSHOT_PATH)
+        os.replace(tmp_snap, SNAPSHOT_PATH)
         # Remover WAL do snapshot se existir
         wal = SNAPSHOT_PATH.with_suffix(".duckdb.wal")
         wal.unlink(missing_ok=True)
@@ -133,22 +137,26 @@ class RealtimeBuilder:
             if not batch:
                 continue
 
-            with self._lock:
-                for section_dir, bu_file, secao_id in batch:
-                    if secao_id in self._existing:
-                        continue
-                    try:
-                        self._store._process_section(
-                            self._analyzer, section_dir, bu_file=bu_file
-                        )
-                        self._existing.add(secao_id)
-                        self._compiled += 1
-                    except Exception as e:
-                        self._errors += 1
-                        if self._errors <= 20:
-                            logger.warning("Builder erro %s: %s", secao_id, e)
+            rows = []
+            for section_dir, bu_file, secao_id in batch:
+                if secao_id in self._existing:
+                    continue
+                try:
+                    result = self._analyzer.analyze_section(section_dir, bu_file=bu_file)
+                    rows.append(extract_rows(result))
+                except Exception as e:
+                    self._errors += 1
+                    if self._errors <= 20:
+                        logger.warning("Builder erro %s: %s", secao_id, e)
 
-                # Checkpoint para persistir
+            with self._lock:
+                try:
+                    # Lote inteiro em uma transação (idempotente por secao_id)
+                    self._compiled += self._store.insert_rows(rows)
+                    self._existing.update(r.secao_id for r in rows)
+                except Exception as e:
+                    self._errors += len(rows)
+                    logger.warning("Builder: lote descartado (%d seções): %s", len(rows), e)
                 self._store._conn.execute("CHECKPOINT")
 
             logger.info(
@@ -182,6 +190,10 @@ class RealtimeBuilder:
 
         # Snapshot final
         with self._lock:
+            self._store.registrar_verificacao_hashes(
+                self._analyzer.verify_hashes, incremental=True,
+                secoes_anteriores=len(self._existing),
+            )
             create_snapshot(self._store)
 
         count = self._store._conn.execute("SELECT COUNT(*) FROM secoes").fetchone()[0]
@@ -218,7 +230,7 @@ async def download_state_task(builder: RealtimeBuilder, pleito: str, turno_label
                 max_sections=None,
             )
             logger.info(
-                "%s ESTADO %s CONCLUIDO: %d secoes, %d downloads, %d erros",
+                "%s ESTADO %s CONCLUÍDO: %d seções, %d downloads, %d erros",
                 turno_label, uf.upper(),
                 stats.get("sections_processed", 0),
                 stats.get("downloaded", 0),
@@ -249,7 +261,7 @@ async def download_turno(builder: RealtimeBuilder, pleito: str, turno_label: str
         await asyncio.gather(*tasks)
 
         elapsed = time.time() - start
-        logger.info("%s LOTE CONCLUIDO em %.0f min | DB: %s", turno_label, elapsed / 60, builder.stats)
+        logger.info("%s LOTE CONCLUÍDO em %.0f min | DB: %s", turno_label, elapsed / 60, builder.stats)
 
     elapsed = time.time() - start
     logger.info("=" * 60)

@@ -1,1 +1,1 @@
-"""Modulo de analise de inconsistencias."""
+"""Módulo de análise de inconsistências."""

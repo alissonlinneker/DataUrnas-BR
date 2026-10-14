@@ -1,2 +1,15 @@
-# Auto detect text files and perform LF normalization
+# Normalização de fim de linha para arquivos de texto
 * text=auto
+
+# Binários: sem conversão de fim de linha nem diff textual.
+# Os Parquet ficam no git comum (cada arquivo tem menos de 100 MB, limite do
+# GitHub). O deploy para o Hugging Face os envia por Git LFS no próprio workflow.
+*.parquet binary
+*.duckdb  binary
+*.png     binary
+*.jpg     binary
+*.ico     binary
+*.7z      binary
+
+# Dados derivados não contam nas estatísticas de linguagem do GitHub
+data/** linguist-generated=true
