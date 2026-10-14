@@ -1018,6 +1018,8 @@ def executar_todas(args) -> int:
     bloco["acs"] = descrever_acs(ac_dir) if ac_dir else []
     bloco["ultima_execucao"] = st
     if args.fracao:
+        if bloco["secoes_processadas"] >= len(secoes):
+            bloco["situacao"] = f"concluído (amostra de {args.fracao:.0%})"
         bloco["amostra_fracao"] = args.fracao
         bloco["amostra_criterio"] = "SHA-256 da chave uf/cd_mun/zona/secao abaixo do limiar"
     atualizar_resumo(Path(args.saida), bloco)
