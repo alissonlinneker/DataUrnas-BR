@@ -133,6 +133,8 @@ Cada urna grava, ao encerrar a votação, o BU, o RDV e o log, e assina com a pr
 
 Totais, tabela por UF, divergências e o passo a passo para conferir qualquer seção manualmente estão no [relatório de integridade](docs/relatorio-integridade-2026.md) (gerado por `python scripts/docs/gerar_relatorio_integridade.py`). No painel, a página **Integridade dos arquivos (2026)** permite consultar cada seção e baixar o catálogo de hashes em CSV.
 
+**Certificados das urnas** (em andamento). O certificado que acompanha cada `.vsc` também é conferido (`scripts/ele2026/analisar_certificados.py`). No catálogo parcial de 14/10/2026 (5 UFs, 50.699 seções com certificado), cada urna tem um certificado próprio, nenhum certificado, chave pública ou par emissor e número de série se repete entre urnas, o CN do certificado (`UEAO` + 8 dígitos) é igual ao número interno da urna registrado no BU em todas as seções, e o emissor e o algoritmo são coerentes com o modelo: AC URNA com ECDSA P-521 para UE2013 e UE2015, AC UE2020 e AC UE2022 com Ed521 para os modelos de mesmo nome. Os certificados públicos das AC intermediárias estão em [`data/certificados/`](data/certificados/README.md), com origem e impressões digitais; os da AC UE2020 e AC UE2022 conferem byte a byte com o SHA-512 publicado pelo TSE no resumo digital de 2026. Numa amostra de 400 arquivos `.vsc`, estratificada por modelo e emissor, e num teste com 200 seções de Roraima, a assinatura de todos os certificados de urna conferiu com a chave da AC emissora e todos estavam válidos no dia da eleição. A cadeia vai **até a AC intermediária**: os certificados das raízes (AC RAIZ UE e AC RAIZ UE v2) e da AC URNA v2 não estão disponíveis publicamente para download. Uma observação a esclarecer com o TSE: o certificado publicado da AC URNA venceu em 18/07/2026, e há certificado de urna emitido depois disso que confere com a mesma chave; a explicação mais provável é um certificado renovado da AC URNA, com a mesma chave, que não foi publicado. Não é indício de adulteração. O modo `--todas` do script estende essa conferência a todas as seções e grava `data/parquet/2026/integridade/certificados.parquet`.
+
 ---
 
 ## Eleições 2022: cobertura completa
@@ -563,7 +565,7 @@ DataUrnas-BR/
 
 ## Limitações
 
-- O projeto trabalha **somente com os arquivos públicos**. Ele não tem acesso às urnas, ao código-fonte compilado nem às chaves privadas, e não verifica a cadeia de certificados das assinaturas.
+- O projeto trabalha **somente com os arquivos públicos**. Ele não tem acesso às urnas, ao código-fonte compilado nem às chaves privadas. Em 2026 a cadeia de certificados das urnas é conferida até a AC intermediária (AC URNA, AC UE2020 e AC UE2022), não até a raiz, cujos certificados não estão publicados; a assinatura de software (CEPESC) usa algoritmo não publicado e não é verificada.
 - Uma ocorrência é um **indicador para investigação**, não uma conclusão. Reinícios, horários e proporções atípicas costumam ter explicação operacional.
 - Testes estatísticos como Benford têm alcance limitado em dados eleitorais, cuja distribuição depende do tamanho das seções. Por isso o projeto usa medidas de efeito (V de Cramér) além do p-valor.
 - Em 2026, a coleta por seção ainda não terminou; até lá, as análises por seção desse ano cobrem apenas as UFs já coletadas.

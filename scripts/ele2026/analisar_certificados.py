@@ -20,12 +20,22 @@ abre os .vsc e confere também: validade do certificado no dia da eleição
 igual ao CN e, com --ac DIR, a assinatura do certificado da urna pela chave
 da AC emissora (Ed521 ou ECDSA). Funciona com o catálogo parcial.
 
+Com --todas, lê em fluxo o .vsc de TODAS as seções com status ok de
+secoes_2026.parquet (sem gravar arquivo bruto em disco), valida cada
+certificado contra as AC de data/certificados/ac/ e sobe a cadeia até onde os
+certificados disponíveis permitem (nivel_cadeia "intermediaria" ou "raiz").
+Concorrência educada (padrão 8, taxa adaptativa em 429), retomável: cada lote
+vira uma parte em certificados_partes/ e a próxima execução pula as seções já
+feitas. Saída: certificados.parquet (uma linha por seção) e a seção "todas"
+de certificados_resumo.json.
+
 Saída: data/parquet/2026/integridade/certificados_resumo.json (pequeno).
 
 Uso:
   python3 scripts/ele2026/analisar_certificados.py
   python3 scripts/ele2026/analisar_certificados.py --amostra 300 --vsc-dir /tmp/vsc
   python3 scripts/ele2026/analisar_certificados.py --vsc-dir /tmp/vsc --ac certs/
+  python3 scripts/ele2026/analisar_certificados.py --todas [--uf rr --limite 50]
 """
 
 from __future__ import annotations
@@ -34,6 +44,7 @@ import argparse
 import asyncio
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -55,8 +66,21 @@ from dataurnas.parsers import signature as S  # noqa: E402
 DIR_INTEGRIDADE = ROOT / "data" / "parquet" / "2026" / "integridade"
 BU_PADRAO = ROOT / "data" / "parquet" / "2026" / "secoes_2026.parquet"
 SAIDA_PADRAO = DIR_INTEGRIDADE / "certificados_resumo.json"
+AC_PADRAO = ROOT / "data" / "certificados" / "ac"
 DIA_ELEICAO = datetime(2026, 10, 4, 12, 0, tzinfo=timezone.utc)
 MAX_EXEMPLOS = 50
+
+# SHA-512 (base64) dos arquivos de certificado de AC publicados pelo TSE no
+# resumo digital do sistema HOLOCRON (Eleições Gerais 2026, 02/09/2026),
+# pasta D:\Aplic\SEVIN\Holocron\certificados. Serve para conferir, byte a
+# byte, os PEM guardados em data/certificados/ac/ (ver o README de lá).
+RESUMO_OFICIAL_SHA512 = {
+    "acraiz-ue.pem": "O/LBooMqsk+Zx//zxVwXr0lboFIPwvgVj/nILBlZQaC+HZtQ1PuAFEdaWga458oPijiuUl5umAjVO+2bIcgt0g==",
+    "acraizuev2.cer": "2a/T+2kuy0njwNLrSgqlAkala9p7FF6PL8x3327/M+xY9RHeQTytbeSSBEqib40aFS0q0Ir9HuL0LVwhRi6ozw==",
+    "acurnav2.cer": "OTL7MHgqDbasQvSjBMWk5SkqBf5UTV7V3YjQ/kWqe8ZYZfayRLLJRJAtnS9USj4MIVg5ejiWM5ZGKiAJ1usOgw==",
+    "acue2020.cer": "LLveJWbhgUEiPfm/WlQL2b1Y0UtSdzvLlKB+tDAhM60rQ869y7/iEw3yQKSkMKVVN3goJsmB/m21MASvdxKhzg==",
+    "acue2022.cer": "nawawQDNRHwS4X5kYuMNZhn+aTv/ZDxzdIhbMP0mQ6rqGZ6Q5YkiTjeRSmhEEUztze7D94pBvHQAkXdI28eYeQ==",
+}
 
 # Algoritmo da chave esperado por modelo (observado nos arquivos de 2026:
 # UE2009 a UE2015 com ECDSA P-521, UE2020 e UE2022 com Ed521).
@@ -390,14 +414,80 @@ def validar_cadeia(info: dict, acs: list) -> tuple[Optional[bool], str, object]:
     """(True/False/None, descrição, certificado da AC que assinou ou None).
     None: nenhuma AC candidata no diretório. Confere só o elo urna -> AC."""
     c = info["_cert"]
-    cand = [a for a in acs if a.subject == c.issuer
-            or (info["aki"] and _ski(a) == info["aki"])]
+    cand = _candidatas(c, info["aki"], acs)
     if not cand:
         return None, "AC emissora ausente", None
     for a in cand:
         if assinado_por(c, a):
             return True, a.subject.rfc4514_string(), a
     return False, "assinatura do certificado não confere com a AC", None
+
+
+def _candidatas(cert, aki: Optional[str], acs: list) -> list:
+    """AC que podem ter emitido o certificado (mesmo nome ou SKI = AKI)."""
+    return [a for a in acs if a is not cert and (
+        a.subject == cert.issuer or (aki and _ski(a) == aki))]
+
+
+def _cn_cert(c) -> str:
+    s = c.subject.rfc4514_string()
+    return cn_de_subject(s) or s
+
+
+def subir_cadeia(ac, acs: list, max_niveis: int = 6) -> tuple[str, list[str]]:
+    """Sobe a partir da AC que assinou o certificado da urna, conferindo cada
+    assinatura, até uma raiz autoassinada. ("raiz", caminho) quando a raiz
+    está entre os certificados e sua autoassinatura confere; senão
+    ("intermediaria", caminho até onde foi possível conferir)."""
+    atual, caminho = ac, [_cn_cert(ac)]
+    for _ in range(max_niveis):
+        if atual.issuer == atual.subject:
+            return ("raiz" if assinado_por(atual, atual) else "intermediaria"), caminho
+        pai = next((a for a in _candidatas(atual, _aki(atual), acs)
+                    if assinado_por(atual, a)), None)
+        if pai is None:
+            return "intermediaria", caminho
+        atual = pai
+        caminho.append(_cn_cert(pai))
+    return "intermediaria", caminho
+
+
+def conferir_resumo_oficial(raw: bytes) -> Optional[str]:
+    """Nome do arquivo do resumo digital do TSE cujo SHA-512 é igual ao do
+    arquivo, ou None."""
+    import base64
+    h = base64.b64encode(hashlib.sha512(raw).digest()).decode()
+    return next((n for n, v in RESUMO_OFICIAL_SHA512.items() if v == h), None)
+
+
+def descrever_acs(d: Path, dia: datetime = DIA_ELEICAO) -> list[dict]:
+    """Ficha de cada certificado de AC do diretório (para o resumo)."""
+    from cryptography.hazmat.primitives import serialization
+    acs = carregar_acs(d)
+    arquivos = {}
+    for p in sorted(Path(d).iterdir()):
+        if p.is_file():
+            arquivos[p.name] = p.read_bytes()
+    out = []
+    for a in acs:
+        der = a.public_bytes(serialization.Encoding.DER)
+        nome = next((n for n, b in arquivos.items()
+                     if der in b or a.public_bytes(serialization.Encoding.PEM) in b), None)
+        nivel, caminho = subir_cadeia(a, acs)
+        ini, fim = a.not_valid_before_utc, a.not_valid_after_utc
+        out.append({
+            "arquivo": nome, "cn": _cn_cert(a), "emissor": cn_de_subject(
+                a.issuer.rfc4514_string()),
+            "serial": format(a.serial_number, "x"),
+            "sha256_der": hashlib.sha256(der).hexdigest(),
+            "nao_antes": ini.isoformat(), "nao_depois": fim.isoformat(),
+            "valida_no_dia_da_eleicao": bool(ini <= dia <= fim),
+            "ski": _ski(a), "aki": _aki(a),
+            "cadeia_conferida": caminho, "nivel": nivel,
+            "confere_resumo_oficial_tse": conferir_resumo_oficial(arquivos[nome])
+            if nome else None,
+        })
+    return out
 
 
 def analisar_vscs(infos: dict[str, dict], cat: pd.DataFrame, anom: Anomalias,
@@ -542,6 +632,388 @@ async def baixar_amostra(amostra: pd.DataFrame, dest: Path, concorrencia: int = 
 
 
 # ---------------------------------------------------------------------------
+# Modo completo (--todas): todas as seções, em fluxo, sem arquivo bruto
+# ---------------------------------------------------------------------------
+
+COLS_TABELA = CHAVE + [
+    "modelo", "cn", "cn_confere_usuario", "cert_sha256", "chave_sha256", "emissor",
+    "serial", "not_before", "not_after", "valido_na_eleicao", "cadeia_ok",
+    "nivel_cadeia", "cadeia_caminho", "ac_valida_na_eleicao", "ac_not_after",
+    "origem", "motivo", "coletado_em",
+]
+
+# AC carregadas em cada processo de verificação (o Ed521 é Python puro e
+# custa cerca de 0,2 s por certificado, por isso a verificação vai para um
+# pool de processos).
+_ACS_PROC: list = []
+_NIVEL_AC: dict[str, tuple[str, list[str]]] = {}
+
+
+def _init_worker(ac_dir: Optional[str]) -> None:
+    _ACS_PROC[:] = carregar_acs(Path(ac_dir)) if ac_dir else []
+    _NIVEL_AC.clear()
+
+
+def _nivel_da_ac(ac) -> tuple[str, list[str]]:
+    from cryptography.hazmat.primitives import serialization
+    k = hashlib.sha256(ac.public_bytes(serialization.Encoding.DER)).hexdigest()
+    if k not in _NIVEL_AC:
+        _NIVEL_AC[k] = subir_cadeia(ac, _ACS_PROC)
+    return _NIVEL_AC[k]
+
+
+def avaliar_vsc(raw: bytes, dia_iso: str = DIA_ELEICAO.isoformat()) -> dict:
+    """Uma linha da tabela (sem a chave da seção) a partir dos bytes do .vsc.
+    Usa as AC de _ACS_PROC (ver _init_worker)."""
+    from dataurnas.downloader.ele2026 import MODELOS
+
+    dia = datetime.fromisoformat(dia_iso)
+    try:
+        i = info_vsc(raw)
+    except Exception as e:  # noqa: BLE001 - arquivo ilegível vira linha com motivo
+        return {"motivo": f"vsc ilegível: {e}"[:200]}
+    if "erro" in i:
+        return {"motivo": i["erro"]}
+    ini = datetime.fromisoformat(i["nao_antes"])
+    fim = datetime.fromisoformat(i["nao_depois"])
+    motivos = []
+    linha = {
+        "modelo": MODELOS.get(i["modelo_cod"], str(i["modelo_cod"])),
+        "cn": i["cn"],
+        "cn_confere_usuario": (i["cn"] or "").upper() == (i["usuario"] or "").upper(),
+        "cert_sha256": i["sha256"], "chave_sha256": i["chave_sha256"],
+        "emissor": cn_de_subject(i["issuer"]) or i["issuer"],
+        "serial": str(i["serial"]), "not_before": ini, "not_after": fim,
+        "valido_na_eleicao": bool(ini <= dia <= fim),
+    }
+    if not linha["valido_na_eleicao"]:
+        motivos.append("certificado fora da validade no dia da eleição")
+    if not linha["cn_confere_usuario"]:
+        motivos.append(f"CN {i['cn']} difere do usuário da assinatura {i['usuario']}")
+    ok, desc, ac = validar_cadeia(i, _ACS_PROC) if _ACS_PROC else (
+        None, "AC emissora ausente", None)
+    linha["cadeia_ok"] = ok
+    if ok is not True:
+        motivos.append(desc)
+    if ac is not None:
+        nivel, caminho = _nivel_da_ac(ac)
+        linha["nivel_cadeia"] = nivel
+        linha["cadeia_caminho"] = " > ".join([i["cn"] or "?"] + caminho)
+        a_ini, a_fim = ac.not_valid_before_utc, ac.not_valid_after_utc
+        linha["ac_valida_na_eleicao"] = bool(a_ini <= dia <= a_fim)
+        linha["ac_not_after"] = a_fim
+        if not linha["ac_valida_na_eleicao"]:
+            motivos.append(f"observação: certificado publicado da {caminho[0]} "
+                           f"válido até {a_fim.date().isoformat()}")
+        if not a_ini <= ini <= a_fim:
+            motivos.append(f"observação: emitido em {ini.date().isoformat()}, fora da "
+                           f"validade publicada da {caminho[0]}")
+    linha["motivo"] = "; ".join(motivos) or None
+    return linha
+
+
+def nome_vsc(uf: str, mun: str, zona: str, secao: str, fase: str = "o",
+             pleito: Optional[str] = None) -> str:
+    """Nome do -vota.vsc no padrão de 2026 (ex.: o03220ac0100700090001-vota.vsc)."""
+    from dataurnas.downloader import ele2026 as E
+    p = int(pleito or E.PLEITO)
+    return f"{fase}{p:05d}{uf.lower()}{mun}{zona}{secao}-vota.vsc"
+
+
+async def baixar_vsc(fetcher, r, via_aux: bool = False) -> tuple[Optional[bytes], str]:
+    """(bytes, origem). Tenta o caminho direto com o hash já conhecido
+    (secoes_2026.parquet) e, se faltar o hash ou vier 404, lê o -aux.json para
+    descobrir hash e nome. Bytes None quando o arquivo não existe."""
+    from dataurnas.downloader import ele2026 as E
+
+    h = getattr(r, "hash", None)
+    fase = {"oficial": "o"}.get(getattr(r, "fase", "oficial") or "oficial")
+    if not via_aux and isinstance(h, str) and h and h != "0" and fase:
+        raw = await fetcher.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, h,
+                                              nome_vsc(r.uf, r.cd_mun, r.zona, r.secao, fase)))
+        if raw is not None:
+            return raw, "direto"
+    aux = await fetcher.get_json(E.url_aux(r.uf, r.cd_mun, r.zona, r.secao))
+    esc = E.escolher_hash(aux) if aux else None
+    if not esc:
+        return None, "aux sem hash"
+    nm = esc["arquivos"].get("vota") or next(
+        (v for v in esc["arquivos"].values() if v.endswith(".vsc")), None)
+    if not nm:
+        return None, "aux sem .vsc"
+    raw = await fetcher.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, esc["hash"], nm))
+    return raw, ("aux" if raw is not None else "vsc ausente (404)")
+
+
+def carregar_secoes_ok(path: Path, ufs: Optional[list[str]] = None,
+                       limite: Optional[int] = None) -> tuple[pd.DataFrame, int]:
+    """Seções com status ok (ordenadas) e o total nacional de seções ok."""
+    cols = CHAVE + ["status", "hash", "fase"]
+    import pyarrow.parquet as pq
+    disp = pq.read_schema(path).names
+    df = pd.read_parquet(path, columns=[c for c in cols if c in disp])
+    df = df[df["status"] == "ok"]
+    total = int(len(df))
+    if ufs:
+        df = df[df["uf"].isin([u.lower() for u in ufs])]
+    df = df.sort_values(CHAVE).reset_index(drop=True)
+    if limite:
+        df = df.head(limite)
+    return df, total
+
+
+def partes_de(tabela: Path) -> Path:
+    return tabela.with_name(tabela.stem + "_partes")
+
+
+def chaves_feitas(partes: Path) -> set[tuple]:
+    import pyarrow.parquet as pq
+    feitas: set[tuple] = set()
+    for p in sorted(partes.glob("parte-*.parquet")):
+        try:
+            t = pq.read_table(p, columns=CHAVE).to_pandas()
+        except Exception:  # noqa: BLE001 - parte truncada por interrupção
+            continue
+        feitas.update(map(tuple, t[CHAVE].itertuples(index=False, name=None)))
+    return feitas
+
+
+def _gravar_parte(partes: Path, linhas: list[dict]) -> None:
+    if not linhas:
+        return
+    partes.mkdir(parents=True, exist_ok=True)
+    df = pd.DataFrame(linhas).reindex(columns=COLS_TABELA)
+    nome = partes / f"parte-{time.time_ns()}.parquet"
+    tmp = nome.with_suffix(".tmp")
+    df.to_parquet(tmp, index=False)
+    tmp.replace(nome)  # parte só aparece completa
+
+
+def consolidar(tabela: Path) -> pd.DataFrame:
+    """Une as partes em certificados.parquet (uma linha por seção)."""
+    partes = sorted(partes_de(tabela).glob("parte-*.parquet"))
+    frames = []
+    for p in partes:
+        try:
+            frames.append(pd.read_parquet(p))
+        except Exception:  # noqa: BLE001
+            continue
+    if not frames:
+        return pd.DataFrame(columns=COLS_TABELA)
+    df = pd.concat(frames, ignore_index=True).reindex(columns=COLS_TABELA)
+    df = df.drop_duplicates(CHAVE, keep="last").sort_values(CHAVE).reset_index(drop=True)
+    tabela.parent.mkdir(parents=True, exist_ok=True)
+    tmp = tabela.with_suffix(".tmp")
+    df.to_parquet(tmp, index=False)
+    tmp.replace(tabela)
+    return df
+
+
+async def coletar_todas(secoes: pd.DataFrame, fetcher, tabela: Path,
+                        ac_dir: Optional[Path], processos: int = 0,
+                        lote: int = 1000, intervalo: float = 30.0,
+                        via_aux: bool = False, tarefas: int = 16, log=print) -> dict:
+    """Baixa e avalia o .vsc de cada seção ainda não feita. processos = 0
+    avalia no próprio processo (testes); > 0 usa um pool de processos."""
+    from concurrent.futures import ProcessPoolExecutor
+
+    partes = partes_de(tabela)
+    feitas = chaves_feitas(partes)
+    pend = [r for r in secoes.itertuples(index=False)
+            if (r.uf, r.cd_mun, r.zona, r.secao) not in feitas]
+    st = {"secoes_alvo": int(len(secoes)), "ja_feitas": int(len(secoes) - len(pend)),
+          "processadas": 0, "falhas_rede": 0, "origem": Counter(), "inicio": time.time()}
+    log(f"seções: {len(secoes)}; já feitas: {st['ja_feitas']}; pendentes: {len(pend)}")
+    pool = None
+    if processos > 0:
+        pool = ProcessPoolExecutor(processos, initializer=_init_worker,
+                                   initargs=(str(ac_dir) if ac_dir else None,))
+    else:
+        _init_worker(str(ac_dir) if ac_dir else None)
+    loop = asyncio.get_running_loop()
+    buf: list[dict] = []
+    fila: asyncio.Queue = asyncio.Queue()
+    for r in pend:
+        fila.put_nowait(r)
+
+    async def worker() -> None:
+        while True:
+            try:
+                r = fila.get_nowait()
+            except asyncio.QueueEmpty:
+                return
+            try:
+                raw, origem = await baixar_vsc(fetcher, r, via_aux)
+            except Exception as e:  # noqa: BLE001 - fica pendente para a próxima
+                st["falhas_rede"] += 1
+                if st["falhas_rede"] <= 5:
+                    log(f"falha de rede em {r.uf}-{r.cd_mun}-{r.zona}-{r.secao}: {e}")
+                continue
+            st["origem"][origem] += 1
+            if raw is None:
+                linha = {"motivo": origem}
+            elif pool is not None:
+                linha = await loop.run_in_executor(pool, avaliar_vsc, raw)
+            else:
+                linha = avaliar_vsc(raw)
+            linha.update(uf=r.uf, cd_mun=r.cd_mun, zona=r.zona, secao=r.secao,
+                         origem=origem, coletado_em=datetime.now(timezone.utc))
+            buf.append(linha)
+            st["processadas"] += 1
+            if len(buf) >= lote:
+                _gravar_parte(partes, buf[:])
+                buf.clear()
+
+    async def progresso() -> None:
+        while True:
+            await asyncio.sleep(intervalo)
+            dt_ = time.time() - st["inicio"]
+            v = st["processadas"] / dt_ if dt_ else 0.0
+            falta = len(pend) - st["processadas"] - st["falhas_rede"]
+            eta = falta / v / 3600 if v else float("nan")
+            taxa = fetcher.rate_info() if hasattr(fetcher, "rate_info") else "-"
+            log(f"[{dt_ / 60:6.1f} min] {st['processadas']}/{len(pend)} "
+                f"({v:.1f} seções/s, {taxa}, http {getattr(fetcher, 'stats', {})}) "
+                f"ETA {eta:.1f} h")
+
+    prog = asyncio.create_task(progresso())
+    try:
+        await asyncio.gather(*[worker() for _ in range(max(1, tarefas))])
+    finally:
+        prog.cancel()
+        _gravar_parte(partes, buf)
+        if pool is not None:
+            pool.shutdown(wait=True, cancel_futures=True)
+    st["segundos"] = round(time.time() - st["inicio"], 1)
+    st["secoes_por_segundo"] = round(st["processadas"] / st["segundos"], 2) \
+        if st["segundos"] else None
+    st["origem"] = dict(st["origem"])
+    del st["inicio"]
+    return st
+
+
+def _datas(s: pd.Series) -> tuple[Optional[str], Optional[str]]:
+    s = pd.to_datetime(s, utc=True).dropna()
+    return (s.min().isoformat(), s.max().isoformat()) if len(s) else (None, None)
+
+
+def _contagem(s: pd.Series) -> dict:
+    def rot(v) -> str:
+        return "indeterminado" if v is None or (isinstance(v, float) and pd.isna(v)) \
+            else str(v)
+    return {k: int(v) for k, v in s.astype(object).map(rot).value_counts().items()}
+
+
+def resumir_tabela(df: pd.DataFrame, total_ok: int) -> dict:
+    """Resumo de certificados.parquet para certificados_resumo.json."""
+    com = df[df["cert_sha256"].notna()]
+    out: dict = {
+        "secoes_ok_no_pais": int(total_ok),
+        "secoes_processadas": int(len(df)),
+        "cobertura_pct": round(100 * len(df) / total_ok, 2) if total_ok else None,
+        "situacao": "concluído" if total_ok and len(df) >= total_ok else "em andamento",
+        "ufs": sorted(df["uf"].dropna().unique().tolist()),
+        "com_certificado": int(len(com)),
+        "sem_certificado_por_motivo": {str(k): int(v) for k, v in
+                                       df[df["cert_sha256"].isna()]["motivo"]
+                                       .fillna("?").value_counts().items()},
+        "valido_na_eleicao": _contagem(com["valido_na_eleicao"]),
+        "cadeia_ok": _contagem(com["cadeia_ok"]),
+        "nivel_cadeia": _contagem(com["nivel_cadeia"]),
+        "cn_confere_usuario": _contagem(com["cn_confere_usuario"]),
+        "certificados_distintos": int(com["cert_sha256"].nunique()),
+        "certificados_em_mais_de_uma_secao": int(
+            (com["cert_sha256"].value_counts() > 1).sum()),
+        "chaves_publicas_distintas": int(com["chave_sha256"].nunique()),
+        "chaves_em_urnas_diferentes": int(
+            (com.groupby("chave_sha256")["cn"].nunique() > 1).sum()),
+    }
+    por = {}
+    for (em, mod), g in com.groupby(["emissor", "modelo"], dropna=False):
+        nb, nb2 = _datas(g["not_before"])
+        na, na2 = _datas(g["not_after"])
+        por.setdefault(str(em), {})[str(mod)] = {
+            "secoes": int(len(g)), "nao_antes_min": nb, "nao_antes_max": nb2,
+            "nao_depois_min": na, "nao_depois_max": na2,
+            "cadeia_ok": _contagem(g["cadeia_ok"]),
+            "ac_valida_na_eleicao": _contagem(g["ac_valida_na_eleicao"]),
+            "caminhos": {str(k): int(v) for k, v in
+                         g["cadeia_caminho"].fillna("?").str.replace(
+                             r"^[^>]*> ", "", regex=True).value_counts().items()},
+        }
+    out["por_emissor_e_modelo"] = por
+    ac_ate = pd.to_datetime(com["ac_not_after"], utc=True)
+    nb = pd.to_datetime(com["not_before"], utc=True)
+    apos = com[ac_ate.notna() & (nb > ac_ate)]
+    out["emitidos_apos_validade_publicada_da_ac"] = {
+        "n": int(len(apos)),
+        "exemplos": [f"{r.uf}-{r.cd_mun}-{r.zona}-{r.secao} ({r.modelo}, "
+                     f"{pd.Timestamp(r.not_before).date()})"
+                     for r in apos.head(MAX_EXEMPLOS).itertuples()],
+    }
+    prob = com[(com["cadeia_ok"] != True) | (com["valido_na_eleicao"] != True)  # noqa: E712
+               | (com["cn_confere_usuario"] != True)]  # noqa: E712
+    out["problemas"] = {
+        "n": int(len(prob)),
+        "exemplos": [{"secao_id": f"{r.uf}-{r.cd_mun}-{r.zona}-{r.secao}",
+                      "motivo": r.motivo} for r in prob.head(MAX_EXEMPLOS).itertuples()],
+    }
+    return out
+
+
+def atualizar_resumo(saida: Path, bloco: dict, chave: str = "todas") -> dict:
+    """Grava o bloco no resumo existente, preservando o restante."""
+    res = {}
+    if saida.exists():
+        try:
+            res = json.loads(saida.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            res = {}
+    res[chave] = bloco
+    saida.parent.mkdir(parents=True, exist_ok=True)
+    saida.write_text(json.dumps(res, ensure_ascii=False, indent=1, default=str) + "\n",
+                     encoding="utf-8")
+    return res
+
+
+def executar_todas(args) -> int:
+    from dataurnas.downloader import ele2026 as E
+
+    ufs = [u.strip() for u in args.uf.split(",")] if args.uf else None
+    secoes, total_ok = carregar_secoes_ok(Path(args.bu), ufs, args.limite)
+    tabela = Path(args.tabela)
+    ac_dir = Path(args.ac) if args.ac else (AC_PADRAO if AC_PADRAO.exists() else None)
+    procs = args.processos if args.processos is not None else max(1, (os.cpu_count() or 2) // 2)
+    c = args.concorrencia
+
+    async def rodar() -> dict:
+        f = E.HttpFetcher(concurrency=c, http2=False, rate=float(args.taxa or 2 * c),
+                          rate_max=float(args.taxa_max or 5 * c))
+        try:
+            return await coletar_todas(secoes, f, tabela, ac_dir, procs,
+                                       via_aux=args.via_aux, tarefas=2 * c)
+        finally:
+            st_http = dict(f.stats)
+            await f.close()
+            print(f"http: {st_http}")
+
+    st = asyncio.run(rodar())
+    df = consolidar(tabela)
+    bloco = resumir_tabela(df, total_ok)
+    bloco["gerado_em"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+    bloco["acs"] = descrever_acs(ac_dir) if ac_dir else []
+    bloco["ultima_execucao"] = st
+    atualizar_resumo(Path(args.saida), bloco)
+    print(f"execução: {st}")
+    print(f"tabela: {tabela} ({len(df)} seções); situação: {bloco['situacao']} "
+          f"({bloco['cobertura_pct']}% das {total_ok} seções ok)")
+    print(f"cadeia_ok: {bloco['cadeia_ok']}; nível: {bloco['nivel_cadeia']}; "
+          f"válido na eleição: {bloco['valido_na_eleicao']}")
+    print(f"resumo: {args.saida}")
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # Execução
 # ---------------------------------------------------------------------------
 
@@ -606,13 +1078,34 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--vsc-dir", help="diretório com vsc_<uf>_m<mun>_z<zona>_s<secao>.bin")
     ap.add_argument("--amostra", type=int, default=0,
                     help="baixa o .vsc de N seções (estratificado) para --vsc-dir")
-    ap.add_argument("--concorrencia", type=int, default=4)
-    ap.add_argument("--ac", help="diretório com certificados das AC (PEM/DER)")
-    return ap.parse_args(argv)
+    ap.add_argument("--concorrencia", type=int, default=None,
+                    help="requisições simultâneas (padrão 4 na amostra, 8 em --todas)")
+    ap.add_argument("--ac", help="diretório com certificados das AC (PEM/DER); "
+                    "padrão data/certificados/ac em --todas")
+    ap.add_argument("--todas", action="store_true",
+                    help="lê em fluxo o .vsc de todas as seções ok (retomável)")
+    ap.add_argument("--uf", help="em --todas: só estas UFs (ex.: rr,ac)")
+    ap.add_argument("--limite", type=int, help="em --todas: no máximo N seções")
+    ap.add_argument("--tabela", help="em --todas: parquet de saída "
+                    "(padrão <integridade>/certificados.parquet)")
+    ap.add_argument("--processos", type=int, default=None,
+                    help="em --todas: processos de verificação (padrão metade dos núcleos)")
+    ap.add_argument("--taxa", type=float, help="em --todas: req/s inicial (padrão 2x conc.)")
+    ap.add_argument("--taxa-max", type=float, help="em --todas: teto de req/s (padrão 5x conc.)")
+    ap.add_argument("--via-aux", action="store_true",
+                    help="em --todas: sempre lê o -aux.json antes do .vsc")
+    args = ap.parse_args(argv)
+    if args.concorrencia is None:
+        args.concorrencia = 8 if args.todas else 4
+    if args.tabela is None:
+        args.tabela = str(Path(args.integridade) / "certificados.parquet")
+    return args
 
 
 def main(argv: Optional[list[str]] = None) -> int:
     args = parse_args(argv)
+    if args.todas:
+        return executar_todas(args)
     cat, fonte = carregar_catalogo(Path(args.integridade))
     bu = carregar_bu(Path(args.bu)) if Path(args.bu).exists() else None
     infos = None
@@ -627,7 +1120,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         infos = ler_vsc_dir(Path(args.vsc_dir))
     acs = carregar_acs(Path(args.ac)) if args.ac else None
     res = analisar(cat, bu, infos, acs, fonte)
+    if args.ac:
+        res["acs"] = descrever_acs(Path(args.ac))
     saida = Path(args.saida)
+    if saida.exists():  # preserva o bloco do modo --todas
+        try:
+            antigo = json.loads(saida.read_text(encoding="utf-8"))
+            if "todas" in antigo:
+                res["todas"] = antigo["todas"]
+        except json.JSONDecodeError:
+            pass
     saida.parent.mkdir(parents=True, exist_ok=True)
     saida.write_text(json.dumps(res, ensure_ascii=False, indent=1, default=str) + "\n",
                      encoding="utf-8")

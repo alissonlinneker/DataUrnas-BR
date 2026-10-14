@@ -315,3 +315,204 @@ def test_ac_vencida_no_dia_e_emissao_fora_da_validade(A, tmp_path):
     assert out["cadeia"]["valida"] == 1
     assert r["ac_emissora_fora_da_validade_no_dia"]["n"] == 1
     assert r["certificado_emitido_fora_da_validade_da_ac"]["n"] == 1
+
+
+# --- modo completo (--todas), sem rede ----------------------------------------
+
+AC_REPO = ROOT / "data" / "certificados" / "ac"
+
+
+def test_ac_do_repositorio_conferem_resumo_oficial(A):
+    """Os PEM das AC UE2020 e UE2022 são byte a byte os arquivos do resumo digital do TSE."""
+    assert A.conferir_resumo_oficial((AC_REPO / "acue2020.pem").read_bytes()) == "acue2020.cer"
+    assert A.conferir_resumo_oficial((AC_REPO / "acue2022.pem").read_bytes()) == "acue2022.cer"
+    assert A.conferir_resumo_oficial(b"outro") is None
+    fichas = {f["cn"]: f for f in A.descrever_acs(AC_REPO)}
+    assert set(fichas) == {"AC URNA", "AC UE2020", "AC UE2022"}
+    assert fichas["AC URNA"]["valida_no_dia_da_eleicao"] is False
+    assert fichas["AC UE2022"]["aki"] == fichas["AC UE2020"]["aki"]  # mesma AC URNA v2
+    assert all(f["nivel"] == "intermediaria" for f in fichas.values())
+
+
+def test_avaliar_vsc_fixtures(A):
+    A._init_worker(None)
+    sem = A.avaliar_vsc(VSC_AC.read_bytes())
+    assert sem["cadeia_ok"] is None and "AC emissora ausente" in sem["motivo"]
+    A._init_worker(str(AC_REPO))
+    ac = A.avaliar_vsc(VSC_AC.read_bytes())
+    assert ac["cadeia_ok"] is True and ac["nivel_cadeia"] == "intermediaria"
+    assert ac["emissor"] == "AC UE2022" and ac["modelo"] == "UE2022"
+    assert ac["valido_na_eleicao"] and ac["ac_valida_na_eleicao"] and ac["motivo"] is None
+    assert ac["cadeia_caminho"] == "UEAO02293919 > AC UE2022"
+    am = A.avaliar_vsc(VSC_AM.read_bytes())
+    assert am["cadeia_ok"] is True and am["emissor"] == "AC URNA"
+    assert am["ac_valida_na_eleicao"] is False
+    assert am["motivo"].startswith("observação: certificado publicado da AC URNA")
+    assert A.avaliar_vsc(b"\x30\x00")["motivo"]
+    A._init_worker(None)
+
+
+def test_subir_cadeia_ate_a_raiz(A):
+    from cryptography.hazmat.primitives.asymmetric import ec
+
+    k_raiz, k_int, k_urna = (ec.generate_private_key(ec.SECP521R1()) for _ in range(3))
+    raiz = _cert("RAIZ", "RAIZ", k_raiz.public_key(), k_raiz, True)
+    inter = _cert("AC INTER", "RAIZ", k_int.public_key(), k_raiz, True)
+    urna = _cert("UEAO00000001", "AC INTER", k_urna.public_key(), k_int, False)
+    assert A.subir_cadeia(inter, [raiz, inter]) == ("raiz", ["AC INTER", "RAIZ"])
+    assert A.subir_cadeia(inter, [inter]) == ("intermediaria", ["AC INTER"])
+    ok, _, ac = A.validar_cadeia({"_cert": urna, "aki": None}, [raiz, inter])
+    assert ok is True and A._cn_cert(ac) == "AC INTER"
+    # raiz com o mesmo nome e outra chave não fecha a cadeia
+    k_falsa = ec.generate_private_key(ec.SECP521R1())
+    falsa = _cert("RAIZ", "RAIZ", k_falsa.public_key(), k_falsa, True)
+    assert A.subir_cadeia(inter, [falsa, inter])[0] == "intermediaria"
+
+
+def test_nome_vsc(A):
+    assert A.nome_vsc("AC", "01007", "0009", "0001") == "o03220ac0100700090001-vota.vsc"
+
+
+class FakeFetcher:
+    """Responde por URL; levanta erro nas URLs marcadas como falha de rede."""
+
+    def __init__(self, respostas, falhas=()):
+        self.respostas, self.falhas, self.urls = respostas, set(falhas), []
+        self.stats = {}
+
+    async def get(self, url):
+        self.urls.append(url)
+        if url in self.falhas:
+            raise RuntimeError("falha simulada")
+        return self.respostas.get(url)
+
+    async def get_json(self, url):
+        b = await self.get(url)
+        return None if b is None else json.loads(b)
+
+
+def test_coletar_todas_retomavel_sem_rede(A, tmp_path):
+    import asyncio
+
+    from dataurnas.downloader import ele2026 as E
+
+    sec = pd.DataFrame([
+        {"uf": "ac", "cd_mun": "01066", "zona": "0004", "secao": "0077", "status": "ok",
+         "hash": "aa11", "fase": "oficial"},          # caminho direto
+        {"uf": "am", "cd_mun": "02550", "zona": "0001", "secao": "0645", "status": "ok",
+         "hash": None, "fase": "oficial"},            # via -aux.json
+        {"uf": "rr", "cd_mun": "03018", "zona": "0001", "secao": "0001", "status": "ok",
+         "hash": "bb22", "fase": "oficial"},          # .vsc inexistente
+        {"uf": "rr", "cd_mun": "03018", "zona": "0001", "secao": "0002", "status": "ok",
+         "hash": "cc33", "fase": "oficial"},          # falha de rede: fica pendente
+    ])
+    aux_am = {"hashes": [{"hash": "dd44", "st": "Totalizado", "arq": [
+        {"nm": "o03220am0255000010645-vota.vsc", "tp": "vota"}]}]}
+    url_s4 = E.url_arquivo("rr", "03018", "0001", "0002", "cc33",
+                           A.nome_vsc("rr", "03018", "0001", "0002"))
+    resp = {
+        E.url_arquivo("ac", "01066", "0004", "0077", "aa11",
+                      A.nome_vsc("ac", "01066", "0004", "0077")): VSC_AC.read_bytes(),
+        E.url_aux("am", "02550", "0001", "0645"): json.dumps(aux_am).encode(),
+        E.url_arquivo("am", "02550", "0001", "0645", "dd44",
+                      "o03220am0255000010645-vota.vsc"): VSC_AM.read_bytes(),
+    }
+    f = FakeFetcher(resp, falhas=[url_s4])
+    tabela = tmp_path / "certificados.parquet"
+    logs = []
+    st = asyncio.run(A.coletar_todas(sec, f, tabela, AC_REPO, processos=0, lote=2,
+                                     tarefas=2, log=logs.append))
+    assert st["processadas"] == 3 and st["falhas_rede"] == 1
+    assert st["origem"] == {"direto": 1, "aux": 1, "aux sem hash": 1}
+    assert len(list(A.partes_de(tabela).glob("parte-*.parquet"))) == 2
+    df = A.consolidar(tabela)
+    assert list(df.columns) == A.COLS_TABELA and len(df) == 3
+    por = df.set_index("secao")
+    assert por.loc["0077", "cadeia_ok"] and por.loc["0077", "origem"] == "direto"
+    assert por.loc["0645", "emissor"] == "AC URNA" and por.loc["0645", "origem"] == "aux"
+    assert pd.isna(por.loc["0001", "cert_sha256"]) and por.loc["0001", "motivo"] == "aux sem hash"
+    # retomada: só a seção que falhou é tentada de novo
+    f2 = FakeFetcher(dict(resp, **{url_s4: VSC_AC.read_bytes()}))
+    st2 = asyncio.run(A.coletar_todas(sec, f2, tabela, AC_REPO, processos=0,
+                                      tarefas=2, log=logs.append))
+    assert st2["ja_feitas"] == 3 and st2["processadas"] == 1 and f2.urls == [url_s4]
+    df = A.consolidar(tabela)
+    assert len(df) == 4 and A.chaves_feitas(A.partes_de(tabela)) == {
+        tuple(r) for r in sec[A.CHAVE].itertuples(index=False, name=None)}
+
+    res = A.resumir_tabela(df, total_ok=10)
+    assert res["situacao"] == "em andamento" and res["cobertura_pct"] == 40.0
+    assert res["com_certificado"] == 3 and res["cadeia_ok"] == {"True": 3}
+    assert res["nivel_cadeia"] == {"intermediaria": 3}
+    assert res["sem_certificado_por_motivo"] == {"aux sem hash": 1}
+    # mesmo .vsc reaproveitado em 0002: certificado repetido, mas da mesma urna
+    assert res["certificados_em_mais_de_uma_secao"] == 1
+    assert res["chaves_em_urnas_diferentes"] == 0
+    assert res["por_emissor_e_modelo"]["AC URNA"]["UE2015"]["ac_valida_na_eleicao"] == {
+        "False": 1}
+    assert A.resumir_tabela(df, total_ok=4)["situacao"] == "concluído"
+
+
+def test_carregar_secoes_ok(A, tmp_path):
+    p = tmp_path / "s.parquet"
+    pd.DataFrame([
+        {"uf": "rr", "cd_mun": "1", "zona": "1", "secao": "2", "status": "ok", "hash": "x"},
+        {"uf": "rr", "cd_mun": "1", "zona": "1", "secao": "1", "status": "ok", "hash": "y"},
+        {"uf": "ac", "cd_mun": "1", "zona": "1", "secao": "1", "status": "ok", "hash": "z"},
+        {"uf": "rr", "cd_mun": "1", "zona": "1", "secao": "3", "status": "agregada",
+         "hash": None},
+    ]).to_parquet(p)
+    df, total = A.carregar_secoes_ok(p, ["RR"], limite=1)
+    assert total == 3 and df["secao"].tolist() == ["1"]
+
+
+def test_resumo_preserva_bloco_todas(A, tmp_path):
+    saida = tmp_path / "r.json"
+    A.atualizar_resumo(saida, {"situacao": "em andamento"})
+    base = tmp_path / "integ"
+    (base / "parts").mkdir(parents=True)
+    cat_ok().to_parquet(base / "parts" / "secoes-x-00001.parquet")
+    assert A.main(["--integridade", str(base), "--bu", str(tmp_path / "nao-existe.parquet"),
+                   "--saida", str(saida)]) == 0
+    res = json.loads(saida.read_text(encoding="utf-8"))
+    assert res["todas"] == {"situacao": "em andamento"} and "catalogo" in res
+    args = A.parse_args(["--todas", "--integridade", str(base)])
+    assert args.concorrencia == 8 and args.tabela == str(base / "certificados.parquet")
+
+
+def test_relatorio_secao_certificados(tmp_path):
+    p = ROOT / "scripts" / "docs" / "gerar_relatorio_integridade.py"
+    spec = importlib.util.spec_from_file_location("gerar_relatorio_integridade", p)
+    R = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(R)
+    assert "ainda não foi executada" in R.secao_certificados(tmp_path)
+    res = {
+        "catalogo": {"ufs": ["rr"], "secoes_com_certificado": 2,
+                     "unicidade": {"certificados_distintos": 2},
+                     "identidade": {"cn_igual_numero_interno_bu": 2, "comparados_com_bu": 2},
+                     "emissores_por_modelo": {"UE2022": [
+                         {"emissor": "AC UE2022", "algoritmo": "Ed521", "secoes": 2}]}},
+        "vsc": {"vsc_analisados": 2, "validade": {"cobre_dia_eleicao": 2},
+                "cadeia": {"acs_carregadas": 3, "valida": 2}},
+        "todas": {"situacao": "em andamento", "cobertura_pct": 0.01, "secoes_processadas": 50,
+                  "secoes_ok_no_pais": 499207, "cadeia_ok": {"True": 50},
+                  "nivel_cadeia": {"intermediaria": 50}, "valido_na_eleicao": {"True": 50},
+                  "por_emissor_e_modelo": {"AC UE2022": {"UE2022": {
+                      "secoes": 50, "nao_antes_min": "2023-08-13T16:16:10+00:00",
+                      "nao_antes_max": "2024-06-21T00:10:45+00:00",
+                      "cadeia_ok": {"True": 50}, "ac_valida_na_eleicao": {"True": 50}}}},
+                  "acs": [{"cn": "AC UE2022", "emissor": "AC URNA v2",
+                           "nao_antes": "2023-02-28T13:46:49+00:00",
+                           "nao_depois": "2039-02-24T13:46:49+00:00",
+                           "valida_no_dia_da_eleicao": True,
+                           "confere_resumo_oficial_tse": "acue2022.cer"}]},
+    }
+    (tmp_path / "certificados_resumo.json").write_text(json.dumps(res), encoding="utf-8")
+    md = R.secao_certificados(tmp_path)
+    assert md.startswith("## Certificados das urnas")
+    assert "**Em andamento.** Modo completo" in md and "ausente nesta cópia" in md
+    assert "| CN igual ao número interno da urna no BU | 2 de 2 |" in md
+    assert "validade no dia da eleição: válidos: 2" in md and "cadeia: conferida: 2" in md
+    assert "| AC UE2022 | UE2022 | 50 | 13/08/2023 a 21/06/2024 | sim: 50 | sim: 50 |" in md
+    assert "acue2022.cer" in md and "não indício de adulteração" in md
+    assert chr(0x2014) not in md and chr(0x2013) not in md

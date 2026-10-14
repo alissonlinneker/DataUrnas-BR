@@ -18,6 +18,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -159,8 +160,121 @@ def _exemplo(pasta: Path, secoes: pd.DataFrame) -> dict | None:
             "nome": a["nome"], "token": a["token_tse"], "sha512_assinado": a["sha512_assinado"]}
 
 
+def _contagem_txt(d: dict | None) -> str:
+    rot = {"True": "sim", "False": "não", "indeterminado": "indeterminado",
+           "intermediaria": "AC intermediária", "raiz": "raiz",
+           "cobre_dia_eleicao": "válidos", "fora_da_validade": "fora da validade",
+           "valida": "conferida", "invalida": "não conferida", "sem_ac": "sem AC"}
+    if not d:
+        return "-"
+    return "; ".join(f"{rot.get(k, k)}: {fmt_int(v)}" for k, v in sorted(d.items()))
+
+
+def _data(iso: str | None) -> str:
+    return datetime.fromisoformat(iso).strftime("%d/%m/%Y") if iso else "-"
+
+
+def secao_certificados(pasta: Path) -> str:
+    """Seção do relatório com a análise dos certificados das urnas, a partir de
+    certificados_resumo.json (e do bloco do modo completo, quando houver)."""
+    arq = pasta / "certificados_resumo.json"
+    p: list[str] = ["## Certificados das urnas\n"]
+    if not arq.exists():
+        p.append("A análise dos certificados ainda não foi executada "
+                 "(`python scripts/ele2026/analisar_certificados.py`).\n")
+        return "\n".join(p)
+    try:
+        res = json.loads(arq.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        p.append("O arquivo `certificados_resumo.json` está ilegível; gere-o de novo.\n")
+        return "\n".join(p)
+    todas = res.get("todas") or {}
+    tem_tabela = (pasta / "certificados.parquet").exists()
+    if todas.get("situacao") == "concluído":
+        p.append(f"> **Concluída.** Certificado de {fmt_int(todas['secoes_processadas'])} seções "
+                 "conferido no modo completo.\n")
+    elif todas:
+        p.append(f"> **Em andamento.** Modo completo em {fmt_pct(todas.get('cobertura_pct') or 0, 2)} "
+                 f"das seções ok ({fmt_int(todas['secoes_processadas'])} de "
+                 f"{fmt_int(todas['secoes_ok_no_pais'])}); os números do catálogo e da amostra abaixo "
+                 "são parciais.\n")
+    else:
+        p.append("> **Em andamento.** Números do catálogo parcial e de uma amostra de arquivos `.vsc`; "
+                 "o modo completo (`--todas`) ainda não gerou `certificados.parquet`.\n")
+    p.append("Cada `.vsc` traz o certificado de hardware da urna que o assinou. O script "
+             "`scripts/ele2026/analisar_certificados.py` confere a coerência desses certificados entre "
+             "si e com o BU e verifica, com a chave pública da autoridade certificadora (AC) emissora, "
+             "que cada certificado foi de fato emitido por ela. Os certificados públicos das AC usados "
+             "estão em [`data/certificados/`](../data/certificados/README.md).\n")
+    c = res.get("catalogo") or {}
+    if c:
+        u, i = c.get("unicidade", {}), c.get("identidade", {})
+        p.append(f"**Catálogo** ({', '.join(x.upper() for x in c.get('ufs', []))}):\n")
+        p.append(_tabela(["Métrica", "Valor"], [
+            ["Seções com certificado", fmt_int(c.get("secoes_com_certificado", 0))],
+            ["Certificados distintos", fmt_int(u.get("certificados_distintos", 0))],
+            ["Certificados em urnas diferentes", fmt_int(u.get("certificados_em_urnas_diferentes", 0))],
+            ["Urnas com mais de um certificado", fmt_int(u.get("urnas_com_mais_de_um_certificado", 0))],
+            ["Números de série repetidos na mesma AC", fmt_int(u.get("seriais_repetidos_na_emissora", 0))],
+            ["CN igual ao número interno da urna no BU",
+             f"{fmt_int(i.get('cn_igual_numero_interno_bu', 0))} de "
+             f"{fmt_int(i.get('comparados_com_bu', 0))}"],
+        ], ["---", "---:"]) + "\n")
+        linhas = [[mod, x["emissor"], x["algoritmo"], fmt_int(x["secoes"])]
+                  for mod, xs in sorted(c.get("emissores_por_modelo", {}).items()) for x in xs]
+        if linhas:
+            p.append(_tabela(["Modelo", "AC emissora", "Algoritmo", "Seções"], linhas,
+                             ["---", "---", "---", "---:"]) + "\n")
+    v = res.get("vsc") or {}
+    if v:
+        p.append(f"**Amostra de arquivos `.vsc`** ({fmt_int(v.get('vsc_analisados', 0))} arquivos): "
+                 f"validade no dia da eleição: {_contagem_txt(v.get('validade'))}; "
+                 f"chaves públicas em urnas diferentes: {fmt_int(v.get('chaves_em_urnas_diferentes', 0))}"
+                 + (f"; cadeia: {_contagem_txt({k: x for k, x in v['cadeia'].items() if k != 'acs_carregadas'})}"
+                    if v.get("cadeia") else "") + ".\n")
+    if todas:
+        p.append(f"**Todas as seções** (`certificados.parquet`{'' if tem_tabela else ', ausente nesta cópia'}): "
+                 f"assinatura do certificado conferida pela AC: {_contagem_txt(todas.get('cadeia_ok'))}; "
+                 f"nível da cadeia: {_contagem_txt(todas.get('nivel_cadeia'))}; certificado válido no dia "
+                 f"da eleição: {_contagem_txt(todas.get('valido_na_eleicao'))}; chaves públicas em urnas "
+                 f"diferentes: {fmt_int(todas.get('chaves_em_urnas_diferentes', 0))}.\n")
+        linhas = []
+        for em, mods in sorted((todas.get("por_emissor_e_modelo") or {}).items()):
+            for mod, x in sorted(mods.items()):
+                linhas.append([em, mod, fmt_int(x["secoes"]),
+                               f"{_data(x['nao_antes_min'])} a {_data(x['nao_antes_max'])}",
+                               _contagem_txt(x.get("cadeia_ok")),
+                               _contagem_txt(x.get("ac_valida_na_eleicao"))])
+        if linhas:
+            p.append(_tabela(["AC emissora", "Modelo", "Seções", "Emitidos entre", "Conferido pela AC",
+                              "AC válida no dia"], linhas,
+                             ["---", "---", "---:", "---", "---", "---"]) + "\n")
+    acs = todas.get("acs") or res.get("acs") or []
+    if acs:
+        linhas = [[a["cn"], a.get("emissor") or "-", f"{_data(a['nao_antes'])} a {_data(a['nao_depois'])}",
+                   "sim" if a.get("valida_no_dia_da_eleicao") else "não",
+                   a.get("confere_resumo_oficial_tse") or "não consta"] for a in acs]
+        p.append(_tabela(["AC", "Emitida por", "Validade", "Válida em 04/10/2026",
+                          "Confere com o resumo digital do TSE"], linhas,
+                         ["---", "---", "---", "---", "---"]) + "\n")
+    p.append("**Até onde vai a cadeia.** A conferência chega à AC intermediária (AC URNA, AC UE2020 e "
+             "AC UE2022). Os certificados das raízes (AC RAIZ UE e AC RAIZ UE v2) e da AC URNA v2 não "
+             "estão disponíveis publicamente para download; o SHA-512 deles, publicado pelo TSE, já está "
+             "no script, que sobe até a raiz assim que os arquivos forem colocados em "
+             "`data/certificados/ac/`.\n")
+    p.append("**Observação sobre a AC URNA.** O certificado publicado da AC URNA tem validade até "
+             "18/07/2026, antes da eleição, e há certificado de urna emitido depois dessa data cuja "
+             "assinatura confere com a chave dessa AC. A explicação mais provável é um certificado "
+             "renovado da AC URNA, com a mesma chave, que não foi publicado. É um ponto a esclarecer com "
+             "o TSE, não indício de adulteração.\n")
+    p.append("**Assinatura de software (CEPESC).** O `.vsc` traz também uma assinatura de software feita "
+             "com algoritmo de governo não publicado; ela não pode ser verificada com informação pública. "
+             "A conferência acima usa a assinatura de hardware de cada urna.\n")
+    return "\n".join(p)
+
+
 def relatorio_md(t: dict, tab: pd.DataFrame, div: pd.DataFrame, resumo: dict, exemplo: dict | None,
-                 nomes_mun: dict) -> str:
+                 nomes_mun: dict, certificados: str | None = None) -> str:
     agora = datetime.now().strftime("%d/%m/%Y %H:%M")
     concluida = t["cobertura_pct"] >= 100
     p: list[str] = []
@@ -207,8 +321,9 @@ def relatorio_md(t: dict, tab: pd.DataFrame, div: pd.DataFrame, resumo: dict, ex
     p.append(
         "**Não comprovado por esta verificação:**\n\n"
         "- que o software da urna é o oficial, nem que funcionou corretamente;\n"
-        "- que o certificado pertence à urna física daquela seção além do que os campos dele declaram, "
-        "salvo onde a cadeia de certificação for validada;\n"
+        "- que o certificado pertence à urna física daquela seção além do que os campos dele declaram "
+        "e do que a conferência com a AC emissora mostra (ver [Certificados das urnas]"
+        "(#certificados-das-urnas));\n"
         "- que os votos registrados correspondem à intenção dos eleitores;\n"
         "- nada sobre arquivos que a assinatura não cobre (imagem do BU, o próprio `.vsc` e outros).\n"
     )
@@ -265,6 +380,9 @@ def relatorio_md(t: dict, tab: pd.DataFrame, div: pd.DataFrame, resumo: dict, ex
         p.append(_tabela(["UF", "Município", "Código", "Zona", "Seção", "Problemas"], linhas,
                          ["---", "---", "---", "---", "---", "---"]) + "\n")
 
+    if certificados:
+        p.append(certificados)
+
     p.append("## Como conferir uma seção por conta própria\n")
     ex = exemplo or {"uf": "ac", "cd_mun": "01007", "zona": "0009", "secao": "0001",
                      "nome": "<nome do arquivo -bu.dat>", "token": "<token>", "sha512_assinado": None}
@@ -311,7 +429,7 @@ def gerar(pasta: Path | None = None, res_uf: pd.DataFrame | None = None, res_mun
     nomes = ({(u, m): str(n).title() for u, m, n in zip(res_mun["uf"], res_mun["cd_mun"], res_mun["nome"],
                                                         strict=False)} if not res_mun.empty else {})
     exemplo = _exemplo(pasta, dados.secoes) if not dados.vazio else None
-    md = relatorio_md(t, tab, div, ig.load_resumo(pasta), exemplo, nomes)
+    md = relatorio_md(t, tab, div, ig.load_resumo(pasta), exemplo, nomes, secao_certificados(Path(pasta)))
     if dados.vazio:
         md = md.replace("## Totais\n", "## Totais\n\nA verificação ainda não gravou dados: os totais abaixo estão "
                                         "zerados.\n", 1)
