@@ -298,6 +298,80 @@ def divergencias(secoes: pd.DataFrame) -> pd.DataFrame:
 
 
 # ----------------------------------------------------------------------
+# Contagens para o resumo por grupo de leitura (reference.GRUPOS)
+# ----------------------------------------------------------------------
+# Categorias que só existem no divergencias.jsonl (as demais saem de ``totais``)
+CATEGORIAS_SO_NO_JSONL = ("hash_assinado_ausente", "arquivo_ausente_tse")
+
+
+def contar_divergencias(pasta: Path | None = None) -> dict[str, int]:
+    """Divergências por categoria em ``divergencias.jsonl``, sem repetir.
+
+    Usa a mesma chave de deduplicação do resumo da coleta. O arquivo é gravado
+    durante a coleta: linhas incompletas ou ilegíveis são ignoradas.
+    """
+    path = (pasta or integ_dir()) / "divergencias.jsonl"
+    if not path.exists():
+        return {}
+    vistos: set[tuple] = set()
+    out: dict[str, int] = {}
+    try:
+        linhas = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return {}
+    for ln in linhas:
+        if not ln.strip():
+            continue
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue
+        if not isinstance(d, dict) or not d.get("categoria"):
+            continue
+        k = (d.get("uf"), d.get("cd_mun"), d.get("zona"), d.get("secao"),
+             d.get("arquivo"), d.get("categoria"), d.get("token_tse"))
+        if k in vistos:
+            continue
+        vistos.add(k)
+        out[d["categoria"]] = out.get(d["categoria"], 0) + 1
+    return out
+
+
+def contar_issues_auditoria(base: Path | None = None) -> dict[str, int]:
+    """Ocorrências por código da auditoria por seção de 2026 (``auditoria/issues_2026.parquet``)."""
+    path = (base or base_dir()) / "auditoria" / "issues_2026.parquet"
+    if not path.exists() or not _legivel(path):
+        return {}
+    con = duckdb.connect()
+    try:
+        rows = con.execute(
+            "SELECT codigo, COUNT(*) FROM read_parquet(?) GROUP BY codigo", [str(path)]
+        ).fetchall()
+    finally:
+        con.close()
+    return {str(c): int(n) for c, n in rows}
+
+
+def contagens_2026(t: dict, pasta: Path | None = None, base: Path | None = None) -> dict[str, int]:
+    """Totais por categoria de integridade e por código de inconsistência de 2026.
+
+    ``t`` é o resultado de ``totais``: hashes divergentes (por arquivo), assinaturas
+    inválidas e votos que não conferem (por seção) saem dele, para bater com os
+    indicadores da página. As outras duas categorias vêm do ``divergencias.jsonl``.
+    """
+    out = {
+        "hash_diverge": int(t.get("hash_diverge", 0)),
+        "assinatura_invalida": int(t.get("assinaturas_invalidas", 0)),
+        "votos_divergem": int(t.get("votos_divergem", 0)),
+    }
+    divs = contar_divergencias(pasta)
+    for cat in CATEGORIAS_SO_NO_JSONL:
+        out[cat] = int(divs.get(cat, 0))
+    out.update(contar_issues_auditoria(base))
+    return out
+
+
+# ----------------------------------------------------------------------
 # Consulta de uma seção e exportação do catálogo
 # ----------------------------------------------------------------------
 def _consulta_arquivos(pasta: Path | None, uf: str, cd_mun: str | None = None, zona: str | None = None,

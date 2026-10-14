@@ -23,6 +23,16 @@ Prova apenas o que pode ser conferido nos arquivos publicados:
 - **Não identifica eleitores.** Nenhum arquivo usado contém o voto associado a uma pessoa.
 - **Não substitui a totalização oficial.** O índice de confiança do painel resume indicadores do projeto e depende dos pesos escolhidos.
 
+## Todos os códigos indicam fraude?
+
+Não. Cada código é classificado em um de três grupos de leitura, conforme o que ele pode dizer sobre manipulação:
+
+1. **Indício direto de adulteração** (C01, C05, A02, A06 e, em 2026, hash divergente, assinatura inválida, arquivo publicado sem hash assinado e arquivo assinado ausente da publicação): não deveria ocorrer num sistema íntegro, e uma única ocorrência exige explicação. Mesmo assim é um indício a apurar, não uma prova.
+2. **Inconsistência a investigar** (A01, A03, E02, E03, M03 e, em 2026, votos do BU que não conferem com a coleta): há explicações legítimas conhecidas, como a troca de urna, que divide o log entre equipamentos (A03). Só o contexto da seção permite concluir algo.
+3. **Operacional ou estatístico** (C06, A04, A05, M01, M02, M04, M05, M06, I01 a I06, E01, Benford e outliers): descreve como o dia de votação transcorreu. Reinícios, atrasos, falhas de biometria e abstenção alta não são, sozinhos, evidência de manipulação, e os testes estatísticos têm alta taxa de falso positivo em dados eleitorais.
+
+Os arquivos públicos também têm um limite: mostram se o que foi publicado é o que a urna assinou e se os números são coerentes, mas não alcançam uma manipulação feita dentro da urna antes da assinatura. Essa hipótese é coberta por outros mecanismos (inspeção do código-fonte, cerimônia de assinatura digital e lacração, teste de integridade no dia da eleição e Teste Público de Segurança). Os critérios estão em [metodologia.md](metodologia.md#grupos-de-leitura); no painel, o grupo aparece ao lado de cada ocorrência e pode ser usado como filtro.
+
 ## Como reproduzir os resultados?
 
 Com Python 3.11 ou superior:

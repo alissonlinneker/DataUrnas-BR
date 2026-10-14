@@ -51,7 +51,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 - **Totalização paralela:** os votos são somados a partir dos BUs e reconciliados com os totais oficiais, UF por UF.
 - **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. A etapa é opcional (ativada com `--hashes`) e não fez parte da compilação da base de 2022 distribuída.
 - **Dados distribuídos em Parquet (ZSTD):** os 181 GB de arquivos brutos de 2022 viram cerca de 183 MB, prontos para consulta com DuckDB.
-- **Painel web** em Streamlit, com filtros por turno, região, UF, município, modelo de urna e severidade.
+- **Painel web** em Streamlit, com filtros por turno, região, UF, município, modelo de urna, severidade e grupo de leitura das inconsistências.
 
 ---
 
@@ -266,46 +266,66 @@ As exceções municipais ficam em `src/dataurnas/analyzer/timezones.py` e são r
 
 ## Códigos de inconsistência
 
-A letra indica a família do achado (C, A, M e I por gravidade; E para falhas de verificação). A severidade abaixo é a atribuída pelo código em `src/dataurnas/analyzer/`; a efetiva fica registrada em cada ocorrência. Os limites de horário são do horário de Brasília convertidos para o fuso local da seção.
+Cada código é classificado em um de três **grupos de leitura**, conforme o que ele pode dizer sobre manipulação. A severidade continua indicando a prioridade de investigar; o grupo indica que tipo de conclusão o achado admite. A classificação tem uma fonte única, `src/dataurnas/dashboard/reference.py` (`GRUPOS` e `ISSUE_CATALOGO`), e aparece no painel em todas as listas de ocorrências, com filtro próprio e um resumo de três quadros no veredicto e na página de 2026.
 
-### Críticas e altas
+A letra do código indica a família do achado (C, A, M e I por gravidade; E para falhas de verificação). A severidade abaixo é a atribuída pelo código em `src/dataurnas/analyzer/`; a efetiva fica registrada em cada ocorrência. Os limites de horário são do horário de Brasília convertidos para o fuso local da seção.
+
+| Grupo | O que significa |
+|---|---|
+| 1. Indício direto de adulteração | Não deveria ocorrer num sistema íntegro. Uma única ocorrência exige explicação. |
+| 2. Inconsistência a investigar | Tem explicações legítimas conhecidas e só ganha sentido com o contexto da seção. |
+| 3. Operacional ou estatístico | Descreve como o dia de votação transcorreu. Sozinho, não é evidência de manipulação. |
+
+### 1. Indício direto de adulteração
 
 | Código | Severidade | Regra | Referência registrada |
 |---|---|---|---|
 | C01 | Crítica | Hash SHA-512 de um arquivo diverge do hash assinado | Art. 59, Lei 9.504/97; Cerimônia de Lacração |
 | C05 | Crítica | Votos de um cargo excedem os eleitores aptos da seção | Art. 59, Lei 9.504/97 |
-| C06 | Média (1 reinício) ou alta (2 ou mais) | Reinício da urna durante a votação | Procedimento de contingência |
-| A01 | Alta | Eleitores aptos diferentes entre as eleições registradas no mesmo BU | Caderno de eleitores único por seção |
 | A02 | Alta | Votos computados de um cargo excedem o comparecimento | Integridade da contagem |
-| A03 | Alta | Votos registrados no log divergem do comparecimento do BU em mais de 2 | Consistência interna |
+| A06 | Alta | Comparecimento diferente entre cargos da mesma eleição na seção | Eleitor vota em todos os cargos na mesma sessão |
+
+Na auditoria de integridade de 2026 (arquivos publicados conferidos com o `.vsc` de cada urna), entram neste grupo as categorias `hash_diverge` (SHA-512 diferente do assinado, equivalente ao C01), `assinatura_invalida` (assinatura da urna inválida), `hash_assinado_ausente` (BU, RDV ou log publicado sem hash assinado) e `arquivo_ausente_tse` (arquivo assinado pela urna que não aparece na publicação).
+
+### 2. Inconsistência a investigar
+
+| Código | Severidade | Regra | Referência registrada | Explicação legítima conhecida |
+|---|---|---|---|---|
+| A01 | Alta | Eleitores aptos diferentes entre as eleições registradas no mesmo BU, já descontado o voto em trânsito | Caderno de eleitores único por seção | Sem o desconto do trânsito, explicava as 30.572 ocorrências de 2022 |
+| A03 | Alta | Votos registrados no log divergem do comparecimento do BU em mais de 2 | Consistência interna | Troca de urna divide o log entre equipamentos |
+| E02 | Média | BU não decodificável (por exemplo, tipo de voto ausente ou desconhecido); a seção é excluída dos totais | | Arquivo corrompido, formato novo ou limitação do decodificador |
+| E03 | Informativa | Duração negativa no log: encerramento registrado antes da abertura | | Ajuste de relógio ou log de outra urna da seção |
+| M03 | Média | Log com mais de 100 entradas e sem evento de abertura | | Log incompleto ou de urna substituída |
+
+Em 2026 entra aqui também `votos_divergem`: os votos do BU assinado não conferem com os do BU lido na coleta de resultados. São duas leituras do mesmo boletim, e a diferença pode vir de uma versão republicada ou de contingência.
+
+### 3. Operacional ou estatístico
+
+| Código | Severidade | Regra | Referência registrada |
+|---|---|---|---|
+| C06 | Média (1 reinício) ou alta (2 ou mais) | Reinício da urna durante a votação | Procedimento de contingência |
 | A04 | Alta | Abertura depois das 8h30 (tolerância de 30 min) | Art. 144 do Código Eleitoral (na base de 2022 consta "Art. 59, Lei 9.504/97") |
 | A05 | Alta | Encerramento antes das 17h | Art. 153, Código Eleitoral |
-| A06 | Alta | Comparecimento diferente entre cargos da mesma seção | Eleitor vota em todos os cargos na mesma sessão |
+| M01 | Média | Abertura antes das 7h, mais de 1 h antes do horário oficial | Art. 144 do Código Eleitoral |
+| M02 | Média | Encerramento depois das 22h | |
+| M04 | Média | Mais de 10 erros no log | |
+| M05 | Média | Ajustes de hora registrados no log | Integridade da linha do tempo de eventos |
+| M06 | Média | Mais de 30% dos eleitores liberados por código, sem biometria | Resolução TSE 23.669/2021 |
+| I01 | Informativa | Eventos de substituição ou contingência no log | |
+| I02 | Informativa | Mais de 20 alertas de mesário | |
+| I03 | Informativa | Nulos acima de 15% dos votos de um cargo | |
+| I04 | Informativa | Brancos acima de 10% dos votos de um cargo | |
+| I05 | Informativa | Abstenção acima de 40% | |
+| I06 | Informativa | Urna de reserva ou tipo diferente de seção | |
+| E01 | Informativa | Assinatura ou arquivo assinado não verificável (ausente ou ilegível); não é evidência de adulteração | |
 
-### Médias
+Abertura tardia, encerramento antecipado e reinícios afetam o acesso ao voto ou o andamento da seção, não a contagem dos votos registrados. As análises agregadas do painel (Lei de Benford e outliers estatísticos) também pertencem a este grupo: votos por seção não seguem Benford por natureza e seções atípicas existem em qualquer eleição, de modo que os dois testes têm alta taxa de falso positivo em dados eleitorais.
 
-| Código | Regra |
-|---|---|
-| M01 | Abertura antes das 7h, mais de 1 h antes do horário oficial |
-| M02 | Encerramento depois das 22h |
-| M03 | Log com mais de 100 entradas e sem evento de abertura |
-| M04 | Mais de 10 erros no log |
-| M05 | Ajustes de hora registrados no log |
-| M06 | Mais de 30% dos eleitores liberados por código, sem biometria |
-| E02 | BU não decodificável (por exemplo, tipo de voto ausente ou desconhecido); a seção é excluída dos totais |
+### O que os arquivos públicos permitem detectar
 
-### Informativas
+Os arquivos que o TSE publica permitem conferir se o que foi publicado é o que a urna assinou (hash e assinatura), se cada BU é coerente por dentro (aptos, comparecimento e votos) e se a soma dos BUs reproduz a totalização oficial. Uma alteração feita depois da assinatura, no caminho até a publicação ou na totalização, aparece no grupo 1 ou na reconciliação.
 
-| Código | Regra |
-|---|---|
-| I01 | Eventos de substituição ou contingência no log |
-| I02 | Mais de 20 alertas de mesário |
-| I03 | Nulos acima de 15% dos votos de um cargo |
-| I04 | Brancos acima de 10% dos votos de um cargo |
-| I05 | Abstenção acima de 40% |
-| I06 | Urna de reserva ou tipo diferente de seção |
-| E01 | Assinatura ou arquivo assinado não verificável (ausente ou ilegível); não é evidência de adulteração |
-| E03 | Duração negativa no log: encerramento registrado antes da abertura |
+Esses arquivos não alcançam uma manipulação feita dentro da urna antes da assinatura, porque nesse caso o BU, o RDV e o log já nasceriam coerentes entre si e corretamente assinados. Essa hipótese é tratada por outros mecanismos, fora do alcance deste projeto: a inspeção do código-fonte pelas entidades fiscalizadoras, a cerimônia de assinatura digital e lacração dos sistemas, o teste de integridade das urnas no dia da eleição e o Teste Público de Segurança. A conferência voto a voto do RDV com o BU de cada seção está no [roadmap](#status-do-projeto-e-roadmap).
 
 ### O que não é inconsistência
 
@@ -562,7 +582,7 @@ DataUrnas-BR/
 | 2026, Presidente, 1º turno: resultado oficial agregado (Brasil, UFs, exterior e municípios) | Concluído |
 | 2026, Presidente, 1º turno: BU por seção e reconciliação com o oficial | Concluído (diferença zero nas 28 UFs) |
 | 2026, Presidente, 2º turno | Planejado |
-| Decodificação do RDV (recontagem voto a voto) e da imagem do BU | Futuro |
+| Decodificação do RDV e conferência voto a voto do RDV com o BU de cada seção; imagem do BU | Futuro |
 
 As mudanças de cada versão ficam no [CHANGELOG](CHANGELOG.md).
 

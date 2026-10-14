@@ -5,9 +5,34 @@ Este documento descreve como o DataUrnas-BR transforma os arquivos públicos da 
 ## Princípios
 
 1. **Fonte única:** só são usados arquivos publicados pelo TSE. Nenhum dado é corrigido, imputado ou estimado.
-2. **Indicador, não conclusão:** cada achado vira uma ocorrência com código e severidade. A severidade expressa a importância de investigar, não a probabilidade de fraude.
+2. **Indicador, não conclusão:** cada achado vira uma ocorrência com código e severidade. A severidade expressa a importância de investigar, não a probabilidade de fraude; o [grupo de leitura](#grupos-de-leitura) diz o que o achado pode indicar sobre manipulação.
 3. **Falha de leitura não é evidência:** quando um arquivo está ausente ou não pode ser decodificado, o projeto registra que a verificação não foi possível (códigos E01 e E02), sem tratar isso como adulteração.
 4. **Reconciliação com o oficial:** a soma dos BUs é comparada com a totalização do TSE. Divergência é reportada; concordância também.
+
+## Grupos de leitura
+
+A severidade de um código diz a prioridade de investigar. O grupo de leitura diz que tipo de conclusão o achado admite. A classificação tem fonte única em `src/dataurnas/dashboard/reference.py` (`GRUPOS`, `ISSUE_CATALOGO` e `INTEGRIDADE_CATEGORIAS`) e aparece no painel e nas tabelas deste documento (coluna **Grupo**).
+
+| Grupo | Critério | Códigos e categorias |
+|---|---|---|
+| 1. Indício direto de adulteração | Não deveria ocorrer num sistema íntegro; uma única ocorrência exige explicação | C01, C05, A02, A06; em 2026, `hash_diverge`, `assinatura_invalida`, `hash_assinado_ausente` e `arquivo_ausente_tse` |
+| 2. Inconsistência a investigar | Há explicações legítimas conhecidas; o achado só ganha sentido com o contexto da seção | A01 (já sem o voto em trânsito), A03 (a troca de urna divide o log), E02, E03, M03; em 2026, `votos_divergem` |
+| 3. Operacional ou estatístico | Descreve como o dia de votação transcorreu; sozinho, não é evidência de manipulação | C06, A04, A05, M01, M02, M04, M05, M06, I01 a I06, E01, além das análises agregadas (Benford e outliers) |
+
+Critérios usados nos casos de fronteira:
+
+- **A06** fica no grupo 1 porque, numa mesma eleição, o eleitor vota em todos os cargos na mesma sessão; o comparecimento por cargo é o mesmo em qualquer BU íntegro. A comparação é feita dentro de cada eleição do BU, e por isso o voto em trânsito (que só vale para Presidente, outra eleição no BU) não a afeta.
+- **A01** fica no grupo 2: até o desconto do voto em trânsito, todas as ocorrências de 2022 eram explicadas por ele.
+- **E01** fica no grupo 3: significa que a verificação não pôde ser feita (arquivo ausente ou ilegível), não que ela falhou.
+- **`votos_divergem`** (2026) fica no grupo 2: compara o BU assinado com o BU lido na coleta de resultados, duas leituras do mesmo boletim; a diferença pode vir de versão republicada ou de contingência.
+- **`hash_assinado_ausente`** inclui o caso de um conjunto publicado sem `.vsc`. Fica no grupo 1 porque um BU, RDV ou log publicado sem cobertura da assinatura da urna não pode ser autenticado.
+- **Benford e outliers** ficam no grupo 3: votos por seção não seguem Benford por natureza e seções atípicas existem em qualquer eleição, de modo que os dois testes têm alta taxa de falso positivo em dados eleitorais.
+
+### O que os arquivos públicos permitem detectar
+
+Os arquivos publicados permitem conferir se o que foi publicado é o que a urna assinou, se cada BU é coerente por dentro e se a soma dos BUs reproduz a totalização oficial. Uma alteração feita depois da assinatura, no caminho até a publicação ou na totalização, aparece no grupo 1 ou na reconciliação.
+
+Eles não alcançam uma manipulação feita dentro da urna antes da assinatura: nesse caso o BU, o RDV e o log já nasceriam coerentes entre si e corretamente assinados. Essa hipótese é tratada por outros mecanismos, fora do alcance do projeto: a inspeção do código-fonte pelas entidades fiscalizadoras, a cerimônia de assinatura digital e lacração dos sistemas, o teste de integridade das urnas no dia da eleição e o Teste Público de Segurança. A conferência voto a voto do RDV com o BU de cada seção está no roadmap (ver o README).
 
 ## Arquivos da urna
 
@@ -25,11 +50,11 @@ A decodificação ASN.1 usa as especificações oficiais em `spec/v1` (2022) e `
 
 Para cada arquivo listado em `arquivosAssinados` no arquivo de assinatura, o projeto localiza o arquivo correspondente no diretório da seção, calcula o SHA-512 e compara com o hash assinado.
 
-| Situação | Código | Severidade |
-|---|---|---|
-| Hash calculado e igual ao assinado | nenhum | |
-| Hash calculado e diferente do assinado | C01 | crítica |
-| Arquivo assinado ausente ou assinatura ilegível | E01 | informativa |
+| Situação | Código | Severidade | Grupo |
+|---|---|---|:---:|
+| Hash calculado e igual ao assinado | nenhum | | |
+| Hash calculado e diferente do assinado | C01 | crítica | 1 |
+| Arquivo assinado ausente ou assinatura ilegível | E01 | informativa | 3 |
 
 A conferência é opcional por ser custosa (`dataurnas analyze batch --hashes`). Nessa conferência (usada em 2022) o projeto **não** verifica a cadeia de certificados nem a assinatura digital em si: verifica que os arquivos publicados correspondem aos hashes que a própria urna assinou. Em 2026 a assinatura também é verificada (ver [Integridade em 2026](#integridade-em-2026)).
 
@@ -51,14 +76,14 @@ MD5 e SHA-256 não fazem parte do mecanismo da urna: ficam no catálogo para fac
 
 ## Consistência do BU
 
-| Código | Severidade | Regra |
-|---|---|---|
-| C05 | crítica | Para algum cargo, total de votos maior que os eleitores aptos da seção |
-| A02 | alta | Votos computados maiores que o comparecimento |
-| A06 | alta | Comparecimento diferente entre cargos da mesma seção |
-| A01 | alta | Eleitores aptos diferentes entre eleições registradas na mesma urna |
-| I06 | informativa | Urna de reserva ou tipo diferente de `secao` |
-| E02 | média | BU não decodificável, inclusive `tipoVoto` ausente ou desconhecido; a seção sai dos totais |
+| Código | Severidade | Regra | Grupo |
+|---|---|---|:---:|
+| C05 | crítica | Para algum cargo, total de votos maior que os eleitores aptos da seção | 1 |
+| A02 | alta | Votos computados maiores que o comparecimento | 1 |
+| A06 | alta | Comparecimento diferente entre cargos da mesma seção | 1 |
+| A01 | alta | Eleitores aptos diferentes entre eleições registradas na mesma urna | 2 |
+| I06 | informativa | Urna de reserva ou tipo diferente de `secao` | 3 |
+| E02 | média | BU não decodificável, inclusive `tipoVoto` ausente ou desconhecido; a seção sai dos totais | 2 |
 
 O caso E02 merece nota: versões anteriores assumiam "nominal" quando o tipo de voto não era reconhecido, o que poderia atribuir votos a candidatos indevidamente. Agora o BU é rejeitado e a seção é listada para conferência manual.
 
@@ -71,20 +96,20 @@ O log é extraído em memória, com limite de tamanho descompactado, e as linhas
 - **Reinícios:** cada abertura adicional no mesmo dia conta como um reinício (C06: severidade média com 1, alta com 2 ou mais).
 - **Filtro por turno:** no 2º turno de 2022 o log acumula os eventos do 1º. Só são considerados eventos da data do turno (02/10/2022 ou 30/10/2022).
 
-| Código | Severidade | Regra (horários de Brasília convertidos para o fuso local) |
-|---|---|---|
-| M01 | média | Abertura antes das 7h, mais de 1 h antes do horário oficial |
-| A04 | alta | Abertura depois das 8h30 (tolerância de 30 min) |
-| A05 | alta | Encerramento antes das 17h |
-| M02 | média | Encerramento depois das 22h |
-| M03 | média | Log com mais de 100 entradas e sem evento de abertura |
-| C06 | média ou alta | Reinícios durante a votação (ver acima) |
-| M04 | média | Mais de 10 erros |
-| M05 | média | Ajustes de hora registrados |
-| I01 | informativa | Eventos de substituição ou contingência |
-| I02 | informativa | Mais de 20 alertas de mesário |
-| A03 | alta | Votos contados no log diferem do comparecimento do BU em mais de 2 |
-| E03 | informativa | Encerramento registrado antes da abertura (duração negativa) |
+| Código | Severidade | Regra (horários de Brasília convertidos para o fuso local) | Grupo |
+|---|---|---|:---:|
+| M01 | média | Abertura antes das 7h, mais de 1 h antes do horário oficial | 3 |
+| A04 | alta | Abertura depois das 8h30 (tolerância de 30 min) | 3 |
+| A05 | alta | Encerramento antes das 17h | 3 |
+| M02 | média | Encerramento depois das 22h | 3 |
+| M03 | média | Log com mais de 100 entradas e sem evento de abertura | 2 |
+| C06 | média ou alta | Reinícios durante a votação (ver acima) | 3 |
+| M04 | média | Mais de 10 erros | 3 |
+| M05 | média | Ajustes de hora registrados | 3 |
+| I01 | informativa | Eventos de substituição ou contingência | 3 |
+| I02 | informativa | Mais de 20 alertas de mesário | 3 |
+| A03 | alta | Votos contados no log diferem do comparecimento do BU em mais de 2 | 2 |
+| E03 | informativa | Encerramento registrado antes da abertura (duração negativa) | 2 |
 
 ### Fusos
 
@@ -98,12 +123,12 @@ O fuso é resolvido por município quando há exceção conhecida (`analyzer/tim
 
 ## Indicadores estatísticos por seção
 
-| Código | Severidade | Regra |
-|---|---|---|
-| I03 | informativa | Nulos acima de 15% dos votos de um cargo |
-| I04 | informativa | Brancos acima de 10% dos votos de um cargo |
-| I05 | informativa | Abstenção acima de 40% |
-| M06 | média | Mais de 30% dos eleitores liberados sem biometria |
+| Código | Severidade | Regra | Grupo |
+|---|---|---|:---:|
+| I03 | informativa | Nulos acima de 15% dos votos de um cargo | 3 |
+| I04 | informativa | Brancos acima de 10% dos votos de um cargo | 3 |
+| I05 | informativa | Abstenção acima de 40% | 3 |
+| M06 | média | Mais de 30% dos eleitores liberados sem biometria | 3 |
 
 ## Análises agregadas
 

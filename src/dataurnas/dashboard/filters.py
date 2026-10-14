@@ -16,7 +16,7 @@ from dataclasses import dataclass, field, replace
 import streamlit as st
 
 from dataurnas.config import REGIOES
-from dataurnas.dashboard.reference import ISSUE_DESCRICOES, issue_label
+from dataurnas.dashboard.reference import GRUPOS_ORDEM, ISSUE_DESCRICOES, codigos_do_grupo, grupo_nome, issue_label
 
 Condition = tuple[str, tuple]  # (fragmento SQL com alias "s.", parâmetros)
 
@@ -57,6 +57,7 @@ class Filters(Mapping):
         apenas_issues: bool = False,
         severidades=(),
         codigos=(),
+        grupos=(),
     ) -> Filters:
         conds: list[Condition] = []
         if ufs:
@@ -77,6 +78,12 @@ class Filters(Mapping):
         issue_conds: list[Condition] = []
         if severidades:
             issue_conds.append(_in("i.severidade", severidades))
+        if grupos:
+            # Grupo de leitura vira lista de códigos; com códigos escolhidos, vale a interseção
+            do_grupo = set(codigos_do_grupo(grupos))
+            codigos = sorted(do_grupo & set(codigos)) if codigos else sorted(do_grupo)
+            if not codigos:
+                issue_conds.append(("FALSE", ()))
         if codigos:
             issue_conds.append(_in("i.codigo", codigos))
         return cls(turno=turno, conditions=tuple(conds), issue_conditions=tuple(issue_conds))
@@ -216,6 +223,11 @@ def render_sidebar(store) -> Filters:
             "Código da inconsistência", codigos, key=f"{KEY_PREFIX}codigos",
             format_func=lambda c: issue_label(c) if c in ISSUE_DESCRICOES else c,
         )
+        grupos_sel = st.multiselect(
+            "Grupo de leitura", list(GRUPOS_ORDEM), key=f"{KEY_PREFIX}grupos", format_func=grupo_nome,
+            help="O que o código pode dizer sobre manipulação: indício direto de adulteração, "
+                 "inconsistência a investigar ou registro operacional/estatístico.",
+        )
 
     return Filters.build(
         turno=turno,
@@ -227,4 +239,5 @@ def render_sidebar(store) -> Filters:
         apenas_issues=apenas_issues,
         severidades=sev_sel,
         codigos=codigos_sel,
+        grupos=grupos_sel,
     )

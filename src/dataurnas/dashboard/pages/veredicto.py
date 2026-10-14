@@ -4,9 +4,9 @@ import streamlit as st
 import pandas as pd
 
 from dataurnas.dashboard.components.errors import show_error
-from dataurnas.dashboard.components.ui import severity_line
+from dataurnas.dashboard.components.ui import grupos_resumo, severity_line
 from dataurnas.dashboard.filters import TURNO_LABELS
-from dataurnas.dashboard.reference import TSE_2022
+from dataurnas.dashboard.reference import TSE_2022, contar_por_grupo
 from dataurnas.dashboard.state import analysis
 from dataurnas.dashboard.components.formatting import fmt_int, fmt_num, fmt_pct
 from dataurnas.dashboard.components.tables import show_df
@@ -167,6 +167,20 @@ def tab_veredicto(store, f):
     st.markdown("---")
     st.markdown("### 3. Análise de Risco e Vulnerabilidades")
 
+    por_codigo = store.query_df(f"""
+        SELECT i.codigo, COUNT(*) AS total
+        FROM issues i JOIN secoes s ON i.secao_id = s.id
+        WHERE {f['issue_where']}
+        GROUP BY i.codigo
+    """, f["issue_params"])
+    st.markdown("**O que as ocorrências podem dizer sobre manipulação**")
+    grupos_resumo(contar_por_grupo(dict(zip(por_codigo["codigo"], por_codigo["total"], strict=False))))
+    st.caption(
+        "Grupo 1 reúne o que não deveria ocorrer num sistema íntegro; grupo 2, inconsistências com "
+        "explicações legítimas conhecidas; grupo 3, registros de operação e estatística. A classificação "
+        "de cada código está na página Inconsistências e no README."
+    )
+
     # Issues por severidade
     issues_sev = store.query_df(f"""
         SELECT i.severidade, COUNT(*) as total, COUNT(DISTINCT i.secao_id) as secoes
@@ -183,7 +197,7 @@ def tab_veredicto(store, f):
     issues_voto = store.query_df(f"""
         SELECT i.codigo, COUNT(*) as total, COUNT(DISTINCT i.secao_id) as secoes
         FROM issues i JOIN secoes s ON i.secao_id = s.id
-        WHERE {f['issue_where']} AND i.codigo IN ('C01','C05','A02','A03')
+        WHERE {f['issue_where']} AND i.codigo IN ('C01','C05','A02','A06','A03')
         GROUP BY i.codigo ORDER BY total DESC
     """, f["issue_params"])
 
@@ -193,7 +207,7 @@ def tab_veredicto(store, f):
         FROM secoes s
         WHERE {f['where']} AND s.id IN (
             SELECT DISTINCT i.secao_id FROM issues i
-            WHERE i.codigo IN ('C01','C05','A02','A03')
+            WHERE i.codigo IN ('C01','C05','A02','A06','A03')
         )
     """, f["params"])
 
@@ -270,7 +284,7 @@ def tab_veredicto(store, f):
     st.markdown("**Cenário hipotético extremo:**")
     st.markdown(
         f"Se **todos os {fmt_int(comp_afetado)} votos** das seções com issues críticas "
-        f"(C01, C05, A02, A03) fossem completamente invalidados, isso representaria "
+        f"(C01, C05, A02 e A06, do grupo 1, mais A03, do grupo 2) fossem completamente invalidados, isso representaria "
         f"apenas **{fmt_pct(pct_afetado, 2)}** dos votos da base analisada."
     )
 

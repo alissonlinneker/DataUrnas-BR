@@ -9,6 +9,7 @@ from dataurnas.dashboard.components.charts import C_BLUE, C_GREEN, C_ORANGE, C_V
 from dataurnas.dashboard.components.errors import show_error
 from dataurnas.dashboard.components.formatting import fmt_int, fmt_pct
 from dataurnas.dashboard.components.tables import show_df
+from dataurnas.dashboard.reference import grupo_label
 
 
 def tab_drilldown(store, f):
@@ -204,7 +205,8 @@ def tab_drilldown(store, f):
     st.markdown("### Inconsistências (Issues)")
     issues_df = detail["issues"]
     if not issues_df.empty:
-        display_cols = ["codigo", "severidade", "descricao", "base_legal"]
+        issues_df = issues_df.assign(grupo=[grupo_label(c) for c in issues_df["codigo"]])
+        display_cols = ["codigo", "grupo", "severidade", "descricao", "base_legal"]
         available_cols = [c for c in display_cols if c in issues_df.columns]
         show_df(
             issues_df[available_cols].reset_index(drop=True),

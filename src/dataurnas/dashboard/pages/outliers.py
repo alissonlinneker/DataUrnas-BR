@@ -8,12 +8,14 @@ from dataurnas.dashboard.components.charts import show_chart
 from dataurnas.dashboard.components.errors import show_error
 from dataurnas.dashboard.components.formatting import fmt_int
 from dataurnas.dashboard.components.tables import show_df
+from dataurnas.dashboard.components.ui import nota_grupo_analise
 
 
 def tab_outliers(store, f):
     """Aba Outliers Estatísticos."""
     st.subheader("Outliers Estatísticos")
     st.caption("Seções com valores extremos (z-score > 3) em abstenção, biometria e duração")
+    nota_grupo_analise("outliers")
 
     # Métricas resumo
     try:

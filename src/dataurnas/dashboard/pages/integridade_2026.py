@@ -19,7 +19,16 @@ from dataurnas.dashboard.components.errors import safe_section
 from dataurnas.dashboard.components.formatting import fmt_int, fmt_pct, pct
 from dataurnas.dashboard.components.geo import FONTE_GEOJSON, brazil_geojson
 from dataurnas.dashboard.components.tables import show_df
-from dataurnas.dashboard.components.ui import empty_state, header, kpi_cards, progress_bar
+from dataurnas.dashboard.components.ui import empty_state, grupos_resumo, header, kpi_cards, progress_bar
+from dataurnas.dashboard.reference import (
+    GRUPO_ADULTERACAO,
+    GRUPO_INVESTIGAR,
+    INTEGRIDADE_CATEGORIAS,
+    ISSUE_DESCRICOES,
+    contar_por_grupo,
+    grupo_label,
+    grupo_nome,
+)
 
 TTL_COLETA = 300
 
@@ -69,6 +78,11 @@ def _contar(sig: tuple, uf: str, cd_mun: str | None, zona: str | None, divergent
     return ig.contar_catalogo(uf, cd_mun, zona, divergentes)
 
 
+@st.cache_data(ttl=TTL_COLETA, show_spinner=False)
+def _contagens(sig: tuple, t_itens: tuple) -> dict[str, int]:
+    return ig.contagens_2026(dict(t_itens))
+
+
 @st.cache_data(ttl=TTL_COLETA, max_entries=4, show_spinner="Gerando o CSV...")
 def _csv(sig: tuple, uf: str, cd_mun: str | None, zona: str | None, divergentes: bool) -> bytes:
     return ig.catalogo_csv(uf, cd_mun, zona, divergentes)
@@ -104,6 +118,8 @@ def render() -> None:
         _cobertura(t, dados, resumo)
     with safe_section("os indicadores de integridade"):
         _kpis(t)
+    with safe_section("a leitura por grupo"):
+        secao_grupos(sig, t)
     with safe_section("o resumo por UF"):
         _por_uf(dados.secoes, res_uf)
     with safe_section("as divergências"):
@@ -156,6 +172,30 @@ def _kpis(t: dict) -> None:
         {"label": "Cobertura", "value": fmt_pct(t["cobertura_pct"], 1),
          "help": f"de {fmt_int(t['instaladas'])} seções instaladas", "tone": "grey"},
     ])
+
+
+def secao_grupos(sig: tuple, t: dict, detalhe: bool = True) -> None:
+    """Resumo em três grupos de leitura (integridade dos arquivos e auditoria por seção de 2026)."""
+    st.markdown("### O que as ocorrências podem dizer sobre manipulação")
+    cont = _contagens(sig, tuple(sorted(t.items())))
+    grupos_resumo(contar_por_grupo(cont), unidade="registro(s)")
+    st.caption(
+        "Grupo 1: divergências de hash ou de assinatura e arquivos fora da assinatura. Grupo 2: votos do BU "
+        "assinado que não conferem com a coleta de boletins e inconsistências como A03. Grupo 3: registros "
+        "de operação (reinícios, horários, biometria) e indicadores estatísticos da auditoria por seção. "
+        "Hashes divergentes contam arquivos; assinaturas e votos contam seções; códigos contam ocorrências. "
+        "Números parciais enquanto a coleta roda."
+    )
+    if not detalhe:
+        return
+    linhas = [{"chave": k, "descricao": v[0], "grupo": grupo_nome(v[1]), "total": int(cont.get(k, 0))}
+              for k, v in INTEGRIDADE_CATEGORIAS.items()]
+    linhas += [{"chave": k, "descricao": ISSUE_DESCRICOES.get(k, ""), "grupo": grupo_label(k), "total": n}
+               for k, n in sorted(cont.items()) if k not in INTEGRIDADE_CATEGORIAS and n]
+    with st.expander("Detalhe por categoria de integridade e código de inconsistência"):
+        show_df(pd.DataFrame(linhas).sort_values(["grupo", "chave"]), hide_index=True,
+                column_config={"chave": "Categoria ou código", "descricao": "Descrição", "grupo": "Grupo",
+                               "total": st.column_config.NumberColumn("Total", format="localized")})
 
 
 def _por_uf(secoes: pd.DataFrame, res_uf: pd.DataFrame) -> None:
@@ -242,11 +282,18 @@ def _divergencias(secoes: pd.DataFrame, t: dict, res_mun: pd.DataFrame) -> None:
     tab = div.copy()
     tab["municipio"] = [nomes.get((u, m), m) for u, m in zip(tab["uf"], tab["cd_mun"], strict=False)]
     tab["uf"] = tab["uf"].str.upper()
+    adulteracao = (tab["n_hash_diverge"] > 0) | tab["assinatura_valida"].eq(False).fillna(False)
+    tab["grupo"] = [grupo_nome(GRUPO_ADULTERACAO) if a else grupo_nome(GRUPO_INVESTIGAR) for a in adulteracao]
     st.warning(f"{fmt_int(len(tab))} seção(ões) com divergência entre {fmt_int(t['verificadas'])} verificadas. "
                "Use a consulta por seção abaixo para ver os arquivos e os hashes envolvidos.")
-    show_df(tab[["uf", "municipio", "cd_mun", "zona", "secao", "problemas", "modelo_urna", "motivo"]],
-            hide_index=True, column_config={"cd_mun": "Cód. município", "problemas": "Problemas",
-                                            "motivo": "Observação"})
+    grupos_presentes = sorted(set(tab["grupo"]))
+    if len(grupos_presentes) > 1:
+        escolhidos = st.multiselect("Grupo de leitura", grupos_presentes, default=grupos_presentes,
+                                    key="integ_div_grupos")
+        tab = tab[tab["grupo"].isin(escolhidos)]
+    show_df(tab[["uf", "municipio", "cd_mun", "zona", "secao", "grupo", "problemas", "modelo_urna", "motivo"]],
+            hide_index=True, column_config={"cd_mun": "Cód. município", "grupo": "Grupo",
+                                            "problemas": "Problemas", "motivo": "Observação"})
 
 
 def _consulta(sig: tuple, secoes: pd.DataFrame, res_mun: pd.DataFrame) -> None:
