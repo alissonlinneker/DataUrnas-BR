@@ -76,13 +76,13 @@ class SignatureParser:
             if not conteudo:
                 continue
 
-            # Decodificar o conteudo auto-assinado como Assinatura
+            # Decodificar o conteúdo auto-assinado como Assinatura
             spec_version = detect_spec_version(file_path)
             compiler = get_compiler(spec_version, "assinatura")
             try:
                 assinatura = compiler.decode("Assinatura", bytearray(conteudo))
                 # Campo da spec: arquivosAssinados (o nome antigo nunca casava,
-                # e a verificacao de hash nao comparava arquivo algum)
+                # e a verificação de hash não comparava arquivo algum)
                 arquivos = assinatura.get("arquivosAssinados") or assinatura.get(
                     "assinaturaArquivos", []
                 )
@@ -103,10 +103,10 @@ class SignatureParser:
 
         Args:
             signature_path: Caminho do arquivo .vscmr ou .vsc
-            data_dir: Diretorio contendo os arquivos de dados da urna
+            data_dir: Diretório contendo os arquivos de dados da urna
 
         Returns:
-            Lista de resultados de verificacao
+            Lista de resultados de verificação
         """
         expected_hashes = self.extract_file_hashes(signature_path)
         results = []
@@ -141,8 +141,8 @@ class SignatureParser:
     def get_model(self, file_path: Path) -> Optional[str]:
         """Extrai o modelo da urna do arquivo de assinatura (ex.: "UE2020").
 
-        Tenta a decodificacao pela spec (2022: modeloUrna; spec v2 publicada:
-        modeloEquipamento no inicio). Se falhar, le o BER diretamente, o que
+        Tenta a decodificação pela spec (2022: modeloUrna; spec v2 publicada:
+        modeloEquipamento no início). Se falhar, lê o BER diretamente, o que
         cobre os .vsc de 2026, em que o modelo vem num bloco no final.
         """
         file_path = Path(file_path)
@@ -163,12 +163,12 @@ class SignatureParser:
 
         nome = _nome_modelo(modelo_codigo_from_bytes(raw))
         if nome is None:
-            logger.warning("Modelo da urna nao encontrado em %s", file_path)
+            logger.warning("Modelo da urna não encontrado em %s", file_path)
         return nome
 
 
 def _nome_modelo(model_raw) -> Optional[str]:
-    """Normaliza o modelo (enum por nome, por codigo ou tupla) para "UE2020"."""
+    """Normaliza o modelo (enum por nome, por código ou tupla) para "UE2020"."""
     if isinstance(model_raw, tuple):
         model_raw = model_raw[1] if len(model_raw) > 1 else model_raw[0]
     if model_raw is None or model_raw == "":
@@ -179,7 +179,7 @@ def _nome_modelo(model_raw) -> Optional[str]:
 
 
 def _ber_tlv(b: bytes, i: int) -> tuple[int, int, int]:
-    """Le tag/len BER em b[i]; retorna (tag, inicio_conteudo, tamanho)."""
+    """Lê tag/len BER em b[i]; retorna (tag, inicio_conteudo, tamanho)."""
     tag = b[i]
     i += 1
     ln = b[i]
@@ -187,14 +187,14 @@ def _ber_tlv(b: bytes, i: int) -> tuple[int, int, int]:
     if ln & 0x80:
         n = ln & 0x7F
         if n == 0 or n > 4:
-            raise ValueError("comprimento BER nao suportado")
+            raise ValueError("comprimento BER não suportado")
         ln = int.from_bytes(b[i:i + n], "big")
         i += n
     return tag, i, ln
 
 
 def modelo_codigo_from_bytes(raw: bytes) -> Optional[int]:
-    """Codigo do modelo da urna lido direto do BER do arquivo de assinatura.
+    """Código do modelo da urna lido direto do BER do arquivo de assinatura.
 
     Formatos tratados:
         - 2022 (.vscmr) e spec v2 publicada: SEQUENCE { ENUMERATED modelo,

@@ -1,4 +1,4 @@
-"""Parser de logs da urna eletronica (.logjez / .jez)."""
+"""Parser de logs da urna eletrônica (.logjez / .jez)."""
 
 import logging
 import re
@@ -15,7 +15,7 @@ _LOG_LINE_PATTERN = re.compile(
     r"^(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})\t(\w+)\t(\d+)\t(\w+)\t(.+?)\t([A-Fa-f0-9]+)\s*$"
 )
 
-# Padroes de eventos relevantes
+# Padrões de eventos relevantes
 PATTERN_MODELO_URNA = re.compile(r"(?:Modelo de [Uu]rna|Modelo UE|UE)[\s:]*(\d{4})")
 PATTERN_MODELO_VST = re.compile(r"avusrlibue(\d{4})\.vst")
 PATTERN_ABERTURA = re.compile(r"Urna pronta para receber votos")
@@ -36,7 +36,7 @@ MAX_LOG_BYTES = 256 * 1024 * 1024
 
 
 class LogParser:
-    """Parser de logs da urna eletronica."""
+    """Parser de logs da urna eletrônica."""
 
     def parse(self, file_path: Path) -> list[LogEntry]:
         """Parseia um arquivo de log da urna.
@@ -68,12 +68,12 @@ class LogParser:
         return entries
 
     def _extract_text(self, file_path: Path) -> Optional[str]:
-        """Extrai em memoria o texto do arquivo 7-zip.
+        """Extrai em memória o texto do arquivo 7-zip.
 
         Le o primeiro arquivo do pacote (geralmente logd.dat), sem gravar
-        nada em disco. Pacotes acima de MAX_LOG_BYTES (descompactados) sao
-        recusados: o conteudo vem de fonte externa e nao pode esgotar a
-        memoria.
+        nada em disco. Pacotes acima de MAX_LOG_BYTES (descompactados) são
+        recusados: o conteúdo vem de fonte externa e não pode esgotar a
+        memória.
         """
         try:
             import py7zr
@@ -116,7 +116,7 @@ class LogParser:
                 descricao=match.group(6),
                 mac=match.group(7),
             )
-        # Linhas que nao seguem o padrao sao ignoradas silenciosamente
+        # Linhas que não seguem o padrão são ignoradas silenciosamente
         return None
 
     def extract_model(self, entries: list[LogEntry]) -> Optional[str]:
@@ -141,8 +141,8 @@ class LogParser:
         Args:
             entries: Lista de entradas do log.
             turno_date: Data do turno (DD/MM/YYYY) para filtrar entradas.
-                Se fornecido, apenas entradas dessa data sao consideradas.
-                Necessario para T2, pois o .logjez acumula eventos do T1.
+                Se fornecido, apenas entradas dessa data são consideradas.
+                Necessário para T2, pois o .logjez acumula eventos do T1.
         """
         # Filtrar por data do turno (corrige T2 que acumula eventos do T1)
         if turno_date:
@@ -161,7 +161,7 @@ class LogParser:
             "votos_computados": 0,
             "ligada": None,
             "desligadas": [],
-            "reboots": 0,  # Reinicializacoes durante votacao
+            "reboots": 0,  # Reinicializações durante votação
             "total_entries": len(entries),
             "severidades": {},
         }
@@ -173,7 +173,7 @@ class LogParser:
             sev = entry.severidade.upper() if entry.severidade else "UNKNOWN"
             events["severidades"][sev] = events["severidades"].get(sev, 0) + 1
 
-            # Modelo - tentar padrao principal e depois vst
+            # Modelo - tentar padrão principal e depois vst
             if not events["modelo"]:
                 m = PATTERN_MODELO_URNA.search(desc)
                 if m:
@@ -218,7 +218,7 @@ class LogParser:
             if PATTERN_DESLIGADA.search(desc):
                 events["desligadas"].append(entry)
 
-        # Calcular reboots: multiplas aberturas = reinicializacoes
+        # Calcular reboots: múltiplas aberturas = reinicializações
         events["reboots"] = max(0, len(events["aberturas"]) - 1)
 
         return events

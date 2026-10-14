@@ -36,7 +36,7 @@ def _unwrap_choice(val):
     return None, val
 
 
-# Mapeamento de nomes de cargo ASN.1 para codigo numerico
+# Mapeamento de nomes de cargo ASN.1 para código numérico
 _CARGO_NAME_MAP = {
     "presidente": 1,
     "vicePresidente": 2,
@@ -60,7 +60,7 @@ _TIPO_VOTO_MAP = {
     "nulo": TipoVoto.NULO,
     "legenda": TipoVoto.LEGENDA,
     "cargoSemCandidato": TipoVoto.CARGO_SEM_CANDIDATO,
-    # Mapeamento numerico (quando numeric_enums=True nao e usado)
+    # Mapeamento numérico (quando numeric_enums=True não e usado)
     1: TipoVoto.NOMINAL,
     2: TipoVoto.BRANCO,
     3: TipoVoto.NULO,
@@ -113,8 +113,8 @@ class BUParser:
     def _build_bu(
         self, envelope: dict, bu: dict, spec_version: SpecVersion
     ) -> BoletimUrna:
-        """Constroi BoletimUrna a partir dos dicts decodificados."""
-        # Identificacao da secao
+        """Constrói BoletimUrna a partir dos dicts decodificados."""
+        # Identificação da seção
         ident = envelope.get("identificacao", (None, {}))
         ident_data = ident[1] if isinstance(ident, tuple) else ident
         mz = ident_data.get("municipioZona", {})
@@ -136,7 +136,7 @@ class BUParser:
                 codigo_carga = str(carga.get("codigoCarga", "")) if carga else None
                 numero_interno = carga.get("numeroInternoUrna", None) if carga else None
 
-            # tipoUrna e o tipo (secao/reservaSecao/contingencia), NAO o modelo de hardware
+            # tipoUrna e o tipo (secao/reservaSecao/contingencia), NÃO o modelo de hardware
             tipo_urna_raw = urna_data.get("tipoUrna", None)
             if isinstance(tipo_urna_raw, tuple):
                 tipo_urna = tipo_urna_raw[0] if isinstance(tipo_urna_raw[0], str) else str(tipo_urna_raw[1])
@@ -168,12 +168,12 @@ class BUParser:
         hora_abertura = dados_sa.get("dataHoraAbertura", None)
         hora_encerramento = dados_sa.get("dataHoraEncerramento", None)
 
-        # Resultados por eleicao
+        # Resultados por eleição
         resultados = []
         for res_eleicao in bu.get("resultadosVotacaoPorEleicao", []):
             resultados.append(self._parse_resultado_eleicao(res_eleicao, spec_version))
 
-        # UF nao esta diretamente no envelope V1, extrair do path se possivel
+        # UF não esta diretamente no envelope V1, extrair do path se possível
         uf = ident_data.get("uf", "")
         if not uf or not isinstance(uf, str):
             uf = ""
@@ -184,7 +184,7 @@ class BUParser:
             zona=mz.get("zona", 0),
             secao=ident_data.get("secao", 0),
             local_votacao=ident_data.get("localVotacao", None),
-            modelo_urna=None,  # Modelo vem do arquivo .vscmr ou log, nao do BU
+            modelo_urna=None,  # Modelo vem do arquivo .vscmr ou log, não do BU
             numero_serie=numero_serie,
             numero_interno=numero_interno,
             codigo_carga=codigo_carga,
@@ -205,7 +205,7 @@ class BUParser:
     def _parse_resultado_eleicao(
         self, res: dict, spec_version: SpecVersion
     ) -> ResultadoEleicao:
-        """Parseia resultado de uma eleicao dentro do BU."""
+        """Parseia resultado de uma eleição dentro do BU."""
         resultados_cargo = []
         for res_votacao in res.get("resultadosVotacao", []):
             for totais in res_votacao.get("totaisVotosCargo", []):
@@ -214,7 +214,7 @@ class BUParser:
                     # Pode ser ('cargoConstitucional', 'presidente') ou ('cargoConstitucional', 1)
                     cargo_val = codigo_cargo_raw[1]
                     if isinstance(cargo_val, str):
-                        # Mapear nome para codigo numerico
+                        # Mapear nome para código numérico
                         codigo_cargo = _CARGO_NAME_MAP.get(cargo_val, 0)
                     else:
                         codigo_cargo = cargo_val
@@ -264,7 +264,7 @@ class BUParser:
         )
 
     def parse_to_dict(self, file_path: Path) -> dict:
-        """Parseia BU e retorna como dicionario (para debug/exploracao)."""
+        """Parseia BU e retorna como dicionário (para debug/exploracao)."""
         file_path = Path(file_path)
         spec_version = detect_spec_version(file_path)
 

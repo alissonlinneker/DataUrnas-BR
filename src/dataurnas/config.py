@@ -1,8 +1,8 @@
-"""Configuracoes globais e constantes do sistema."""
+"""Configurações globais e constantes do sistema."""
 
 from pathlib import Path
 
-# Diretorios
+# Diretórios
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
@@ -47,11 +47,11 @@ ELECTIONS = {
     },
 }
 
-# Eleicao geral de 2026 (1o turno em 04/10/2026). Spec ASN.1 v2 (arquivos -bu.dat).
+# Eleição geral de 2026 (1º turno em 04/10/2026). Spec ASN.1 v2 (arquivos -bu.dat).
 ELE2026 = {
     "ciclo": "ele2026",
     "pleito_1t": "3220",
-    "eleicao_1t": "6257",  # Eleicao Ordinaria Federal 2026 1o Turno (Presidente)
+    "eleicao_1t": "6257",  # Eleição Ordinária Federal 2026 1º Turno (Presidente)
     "eleicao_2t": "6258",
     "data_1t": "04/10/2026",
     "cargo_presidente": 1,
@@ -75,7 +75,7 @@ ESTADOS = [
     "rs", "ro", "rr", "sc", "sp", "se", "to",
 ]
 
-# Regioes para amostragem
+# Regiões para amostragem
 REGIOES = {
     "norte": ["ac", "am", "ap", "pa", "ro", "rr", "to"],
     "nordeste": ["al", "ba", "ce", "ma", "pb", "pe", "pi", "rn", "se"],
@@ -112,14 +112,14 @@ FILE_TYPES_V2 = {
     "vsc": "-vota.vsc",
 }
 
-# Severidades de inconsistencia
+# Severidades de inconsistência
 class Severity:
     CRITICAL = "critica"
     HIGH = "alta"
     MEDIUM = "media"
     INFO = "informativa"
 
-# Codigos de cargo
+# Códigos de cargo
 CARGOS = {
     1: "Presidente",
     3: "Governador",
@@ -130,9 +130,9 @@ CARGOS = {
     13: "Vereador",
 }
 
-# Offsets de fuso horario em relacao a Brasilia (UTC-3)
-# Logs de urna usam hora local. Votacao e das 8h-17h Brasilia.
-# Offset negativo = esta atras de Brasilia.
+# Offsets de fuso horário em relação a Brasília (UTC-3)
+# Logs de urna usam hora local. A votação ocorre das 8h às 17h de Brasília.
+# Offset negativo = está atrás de Brasília.
 TIMEZONE_OFFSETS = {
     "ac": -2,  # UTC-5 (Acre Time)
     "am": -1,  # UTC-4 (Amazon Time) - exceto leste AM
@@ -140,7 +140,7 @@ TIMEZONE_OFFSETS = {
     "ms": -1,  # UTC-4
     "ro": -1,  # UTC-4
     "rr": -1,  # UTC-4
-    # Fernando de Noronha (PE): +1, mas poucas secoes
-    # Demais estados: 0 (UTC-3 = Brasilia)
+    # Fernando de Noronha (PE): +1, mas poucas seções
+    # Demais estados: 0 (UTC-3 = Brasília)
 }
 

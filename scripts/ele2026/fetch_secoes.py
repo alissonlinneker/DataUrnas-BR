@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Baixa e decodifica o BU de cada secao (Presidente, 1o turno de 2026).
+"""Baixa e decodifica o BU de cada seção (Presidente, 1º turno de 2026).
 
-Fluxo por secao, sem gravar arquivo bruto em disco:
+Fluxo por seção, sem gravar arquivo bruto em disco:
   aux.json -> escolhe hash -> baixa -bu.dat (e -vota.vsc se --modelo)
   -> decodifica com o parser do projeto (pool de processos) -> linhas.
 
-As linhas sao gravadas em lotes (partes Parquet ZSTD) em
+As linhas são gravadas em lotes (partes Parquet ZSTD) em
 data/parquet/2026/secoes_parts/ e cada lote gravado e anotado no checkpoint
-(secoes_checkpoint.txt). Ao rodar de novo, secoes ja anotadas sao puladas.
-No final as partes sao consolidadas (com deduplicacao) em
+(secoes_checkpoint.txt). Ao rodar de novo, seções já anotadas são puladas.
+No final as partes são consolidadas (com deduplicação) em
 secoes_2026.parquet e votos_presidente_2026.parquet.
 
 Uso:
@@ -48,7 +48,7 @@ SECOES_SCHEMA = pa.schema([
     ("uf", pa.string()), ("cd_mun", pa.string()), ("nm_mun", pa.string()),
     ("zona", pa.string()), ("secao", pa.string()),
     ("status", pa.string()),  # ok | agregada | nao_instalada | sem_aux | sem_bu
-    ("origem_bu", pa.string()),  # bu (urna) | busa (Sistema de Apuracao)
+    ("origem_bu", pa.string()),  # bu (urna) | busa (Sistema de Apuração)
     ("secao_principal", pa.string()), ("secoes_agregadas", pa.string()),
     ("st_secao", pa.string()), ("hash", pa.string()), ("st_hash", pa.string()),
     ("n_hashes", pa.int16()),
@@ -131,7 +131,7 @@ class Writer:
             fh.write("\n".join(self.keys) + "\n")
             fh.flush()
             os.fsync(fh.fileno())
-        log.info("lote %s gravado: %d secoes, %d votos", lote, len(self.keys), len(self.votos))
+        log.info("lote %s gravado: %d seções, %d votos", lote, len(self.keys), len(self.votos))
         self.secoes, self.votos, self.keys = [], [], []
 
 
@@ -149,7 +149,7 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor,
     h = E.escolher_hash(aux)
     row["st_secao"] = aux.get("st")
     arqs = h["arquivos"] if h else {}
-    # BU da urna (-bu.dat) ou, na falta, BU do Sistema de Apuracao (-busa.dat)
+    # BU da urna (-bu.dat) ou, na falta, BU do Sistema de Apuração (-busa.dat)
     tp_bu = "bu" if "bu" in arqs else ("busa" if "busa" in arqs else None)
     tp_vsc = "vota" if "vota" in arqs else ("sa" if "sa" in arqs else None)
     if not h or not tp_bu:
@@ -186,7 +186,7 @@ async def run(args: argparse.Namespace) -> int:
     out.mkdir(parents=True, exist_ok=True)
     w = Writer(out, args.lote)
     done = w.done_keys()
-    log.info("checkpoint: %d secoes ja processadas", len(done))
+    log.info("checkpoint: %d seções já processadas", len(done))
     f = E.HttpFetcher(concurrency=args.concorrencia, http2=args.http2,
                       connections=args.conexoes,
                       rate=args.taxa, rate_max=args.taxa_max)
@@ -199,12 +199,12 @@ async def run(args: argparse.Namespace) -> int:
         for uf in args.ufs:
             cs = await f.get_json(E.url_secoes_uf(uf))
             if not cs:
-                log.error("sem lista de secoes para %s", uf)
+                log.error("sem lista de seções para %s", uf)
                 erros.append(f"{uf}:sem_cs")
                 continue
             secoes = [s for s in E.iter_secoes_cs(cs)
                       if E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"]) not in done]
-            log.info("UF %s: %d secoes pendentes", uf, len(secoes))
+            log.info("UF %s: %d seções pendentes", uf, len(secoes))
             q: asyncio.Queue = asyncio.Queue()
             for s in secoes:
                 q.put_nowait(s)
@@ -221,7 +221,7 @@ async def run(args: argparse.Namespace) -> int:
                     key = E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"])
                     try:
                         row, votos = await processar_secao(f, pool, s, args.modelo)
-                    except Exception as e:  # noqa: BLE001 - registrado e refeito no proximo run
+                    except Exception as e:  # noqa: BLE001 - registrado e refeito no próximo run
                         erros.append(f"{key}:{e!r}"[:300])
                         log.warning("erro em %s: %r", key, e)
                         continue
@@ -230,20 +230,20 @@ async def run(args: argparse.Namespace) -> int:
                     n_ok += 1
                     if n_ok % 2000 == 0:
                         el = time.time() - t0
-                        log.info("progresso: %d secoes em %.0fs (%.1f/s) | taxa %s | http %s",
+                        log.info("progresso: %d seções em %.0fs (%.1f/s) | taxa %s | http %s",
                                  n_ok, el, n_ok / el, f.rate_info(), f.stats)
 
             await asyncio.gather(*[worker() for _ in range(args.concorrencia)])
             w.flush()
             el = time.time() - t_uf
-            log.info("UF %s concluida: %d secoes em %.0fs (%.1f/s)", uf, n_uf, el,
+            log.info("UF %s concluída: %d seções em %.0fs (%.1f/s)", uf, n_uf, el,
                      n_uf / el if el else 0)
     finally:
         w.flush()
         await f.close()
         pool.shutdown(wait=True)
     el = time.time() - t0
-    log.info("fim: %d secoes em %.0fs (%.1f/s), %d erros, taxa final %s, http %s",
+    log.info("fim: %d seções em %.0fs (%.1f/s), %d erros, taxa final %s, http %s",
              n_ok, el, n_ok / el if el else 0, len(erros), f.rate_info(), f.stats)
     if erros:
         (out / "secoes_erros.txt").write_text("\n".join(erros) + "\n", encoding="utf-8")
@@ -255,7 +255,7 @@ async def run(args: argparse.Namespace) -> int:
 
 def consolidar(out: Path) -> None:
     """Junta as partes em dois Parquet finais, mantendo o lote mais recente
-    de cada secao (protege contra duplicatas de execucoes interrompidas)."""
+    de cada seção (protege contra duplicatas de execuções interrompidas)."""
     import duckdb
 
     parts = out / "secoes_parts"
@@ -290,22 +290,29 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--ufs", default=",".join(TODAS_UFS),
-                    help="lista separada por virgula (padrao: 27 UFs + zz)")
-    ap.add_argument("--concorrencia", type=int, default=96)
-    ap.add_argument("--workers", type=int, default=max(2, (os.cpu_count() or 4) // 2))
-    ap.add_argument("--lote", type=int, default=5000)
+                    help="lista de UFs separadas por vírgula (padrão: 27 UFs + zz)")
+    ap.add_argument("--concorrencia", type=int, default=96,
+                    help="seções processadas em paralelo (padrão: 96)")
+    ap.add_argument("--workers", type=int, default=max(2, (os.cpu_count() or 4) // 2),
+                    help="processos que decodificam os BUs (padrão: metade dos núcleos, mínimo 2)")
+    ap.add_argument("--lote", type=int, default=5000,
+                    help="seções por parte Parquet gravada e anotada no checkpoint (padrão: 5000)")
     ap.add_argument("--modelo", action=argparse.BooleanOptionalAction, default=True,
-                    help="baixa -vota.vsc (~60 KB) para extrair o modelo da urna")
+                    help="baixa o -vota.vsc (~60 KB) para extrair o modelo da urna (padrão: ativado)")
     ap.add_argument("--http2", action=argparse.BooleanOptionalAction, default=True,
-                    help="HTTP/1.1 (--no-http2) foi bem mais lento nos testes")
+                    help="usa HTTP/2 (padrão: ativado); HTTP/1.1 (--no-http2) foi bem mais lento nos testes")
     ap.add_argument("--taxa", type=float, default=50.0,
-                    help="taxa inicial (req/s); reduzida automaticamente em HTTP 429")
-    ap.add_argument("--taxa-max", type=float, default=90.0)
+                    help="taxa inicial em req/s, reduzida automaticamente em HTTP 429 (padrão: 50)")
+    ap.add_argument("--taxa-max", type=float, default=90.0,
+                    help="teto da taxa adaptativa, em req/s (padrão: 90)")
     ap.add_argument("--conexoes", type=int, default=4,
-                    help="clientes HTTP/2 em rodizio (cada um com janela de fluxo propria)")
-    ap.add_argument("--saida", default=str(PARQUET_2026_DIR))
-    ap.add_argument("--sem-consolidar", action="store_true")
-    ap.add_argument("--so-consolidar", action="store_true")
+                    help="clientes HTTP/2 em rodízio (cada um com janela de fluxo própria; padrão: 4)")
+    ap.add_argument("--saida", default=str(PARQUET_2026_DIR),
+                    help="diretório de saída das partes e dos Parquet finais (padrão: data/parquet/2026)")
+    ap.add_argument("--sem-consolidar", action="store_true",
+                    help="não consolida as partes ao final da coleta")
+    ap.add_argument("--so-consolidar", action="store_true",
+                    help="apenas consolida as partes já gravadas, sem baixar nada")
     a = ap.parse_args(argv)
     a.ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()]
     return a

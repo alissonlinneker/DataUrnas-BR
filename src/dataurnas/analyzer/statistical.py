@@ -1,4 +1,4 @@
-"""Analise estatistica de dados de votacao."""
+"""Análise estatística de dados de votação."""
 
 import logging
 import math
@@ -8,18 +8,18 @@ from ..models import BoletimUrna, Issue, IssueSeverity
 
 logger = logging.getLogger(__name__)
 
-# Limiares para deteccao de anomalias
-LIMIAR_NULOS_PCT = 15.0  # % de nulos acima disso e anomalo
-LIMIAR_BRANCOS_PCT = 10.0  # % de brancos acima disso e anomalo
-LIMIAR_ABSTENCAO_PCT = 40.0  # % de abstencao acima disso para alertar
-LIMIAR_BIOMETRIA_PCT = 30.0  # % de liberacao por codigo (sem biometria) acima disso
+# Limiares para detecção de anomalias
+LIMIAR_NULOS_PCT = 15.0  # % de nulos acima disso e anômalo
+LIMIAR_BRANCOS_PCT = 10.0  # % de brancos acima disso e anômalo
+LIMIAR_ABSTENCAO_PCT = 40.0  # % de abstenção acima disso para alertar
+LIMIAR_BIOMETRIA_PCT = 30.0  # % de liberação por código (sem biometria) acima disso
 
 
 class StatisticalAnalyzer:
-    """Analise estatistica de padroes de votacao."""
+    """Análise estatística de padrões de votação."""
 
     def analyze_bu(self, bu: BoletimUrna) -> list[Issue]:
-        """Analisa um BU individual para padroes anomalos."""
+        """Analisa um BU individual para padrões anômalos."""
         issues = []
         issues.extend(self._check_nulos_brancos(bu))
         issues.extend(self._check_biometria(bu))
@@ -27,7 +27,7 @@ class StatisticalAnalyzer:
         return issues
 
     def _check_nulos_brancos(self, bu: BoletimUrna) -> list[Issue]:
-        """Verifica proporcao de votos nulos e brancos."""
+        """Verifica proporção de votos nulos e brancos."""
         issues = []
 
         for eleicao in bu.resultados_por_eleicao:
@@ -97,7 +97,7 @@ class StatisticalAnalyzer:
         return issues
 
     def _check_biometria(self, bu: BoletimUrna) -> list[Issue]:
-        """Verifica proporcao de liberacao por codigo vs biometria."""
+        """Verifica proporção de liberação por código vs biometria."""
         issues = []
 
         lib_codigo = bu.qtd_eleitores_lib_codigo
@@ -135,7 +135,7 @@ class StatisticalAnalyzer:
         return issues
 
     def _check_abstencao(self, bu: BoletimUrna) -> list[Issue]:
-        """Verifica taxa de abstencao."""
+        """Verifica taxa de abstenção."""
         issues = []
 
         for eleicao in bu.resultados_por_eleicao:
@@ -209,7 +209,7 @@ class VoteAggregator:
     """
 
     def __init__(self):
-        # (turno, escopo, cargo) -> codigo -> info
+        # (turno, escopo, cargo) -> código -> info
         self._votos: dict[tuple[int, str, str], dict[str, dict]] = defaultdict(
             lambda: defaultdict(lambda: {
                 "votos": 0,
@@ -298,13 +298,13 @@ class VoteAggregator:
 
 
 def compute_outlier_scores(values: list[float]) -> list[float]:
-    """Calcula z-scores para deteccao de outliers.
+    """Calcula z-scores para detecção de outliers.
 
-    Usa desvio padrao populacional. Serie constante (desvio zero) devolve
+    Usa desvio padrão populacional. Série constante (desvio zero) devolve
     zeros: nenhum ponto se destaca dos demais.
 
     Returns:
-        Lista de z-scores (abs). Valores > 2.0 sao potenciais outliers.
+        Lista de z-scores (abs). Valores > 2.0 são potenciais outliers.
     """
     if len(values) < 3:
         return [0.0] * len(values)

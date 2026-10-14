@@ -1,4 +1,4 @@
-"""Testes das funcoes puras de coleta da eleicao de 2026 (sem rede)."""
+"""Testes das funções puras de coleta da eleição de 2026 (sem rede)."""
 
 from pathlib import Path
 

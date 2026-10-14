@@ -56,7 +56,7 @@ def test_agregador_nao_mistura_ufs_nem_turnos():
 
 def test_analise_estatistica_limiares():
     codigos = {i.codigo for i in StatisticalAnalyzer().analyze_bu(_bu(aptos=200, lib=40, bio=40))}
-    # nulos 25% (>15), brancos 12.5% (>10), abstencao 60% (>40), sem biometria 50% (>30)
+    # nulos 25% (>15), brancos 12.5% (>10), abstenção 60% (>40), sem biometria 50% (>30)
     assert codigos == {"I03", "I04", "I05", "M06"}
 
 

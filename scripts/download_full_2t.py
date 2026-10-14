@@ -1,4 +1,4 @@
-"""Download completo de todas as secoes eleitorais - 2o turno 2022."""
+"""Download completo de todas as seções eleitorais - 2º turno 2022."""
 
 import asyncio
 import logging
@@ -20,13 +20,13 @@ logging.basicConfig(
 logger = logging.getLogger("download_full_2t")
 
 CICLO = "ele2022"
-PLEITO = "407"  # 2o turno
+PLEITO = "407"  # 2º turno
 
-# Ordem: estados menores primeiro para progresso rapido
+# Ordem: estados menores primeiro para progresso rápido
 ESTADOS_ORDENADOS = [
-    # Pequenos (<5k secoes)
+    # Pequenos (<5k seções)
     "df", "ac", "ap", "rr", "ro", "to", "se",
-    # Medios (5k-15k)
+    # Médios (5k-15k)
     "al", "am", "ms", "mt", "pb", "pi", "rn", "es", "ma",
     # Grandes (15k-35k)
     "go", "sc", "pe", "ce", "pa", "pr", "rs", "rj", "ba",
@@ -61,7 +61,7 @@ async def download_all():
 
             elapsed = time.time() - start
             logger.info(
-                "2T ACUMULADO: %d secoes, %d downloads, %d erros | Tempo: %.0f min",
+                "2T ACUMULADO: %d seções, %d downloads, %d erros | Tempo: %.0f min",
                 total_stats["sections_processed"],
                 total_stats["downloaded"],
                 total_stats["errors"],
@@ -71,7 +71,7 @@ async def download_all():
     elapsed = time.time() - start
     logger.info("=" * 60)
     logger.info("DOWNLOAD 2T COMPLETO!")
-    logger.info("Total: %d secoes processadas", total_stats["sections_processed"])
+    logger.info("Total: %d seções processadas", total_stats["sections_processed"])
     logger.info("Downloads: %d | Skipped: %d | Erros: %d",
                 total_stats["downloaded"], total_stats["skipped"], total_stats["errors"])
     logger.info("Tempo total: %.1f horas", elapsed / 3600)

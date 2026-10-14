@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Baixa o resultado agregado de Presidente (1o turno de 2026) do TSE.
+"""Baixa o resultado agregado de Presidente (1º turno de 2026) do TSE.
 
-Niveis: Brasil, cada UF (27 + ZZ exterior) e cada municipio (inclusive
+Níveis: Brasil, cada UF (27 + ZZ exterior) e cada município (inclusive
 cidades do exterior). Grava em data/parquet/2026/:
   candidatos.parquet, resultado_uf.parquet, resultado_municipio.parquet,
   resumo_br.json
@@ -48,7 +48,7 @@ async def main(args: argparse.Namespace) -> int:
     try:
         br = await f.get_json(E.url_resultado("br"))
         if not br:
-            log.error("resultado nacional indisponivel")
+            log.error("resultado nacional indisponível")
             return 1
         candidatos = E.parse_candidatos(br)
         numeros = [c["numero"] for c in candidatos]
@@ -57,7 +57,7 @@ async def main(args: argparse.Namespace) -> int:
         cm = await f.get_json(E.url_municipios())
         municipios = list(E.iter_municipios(cm))
         ufs = sorted({m["uf"] for m in municipios})
-        log.info("%d UFs, %d municipios", len(ufs), len(municipios))
+        log.info("%d UFs, %d municípios", len(ufs), len(municipios))
 
         # UFs
         uf_jsons = await asyncio.gather(*[f.get_json(E.url_resultado(uf)) for uf in ufs])
@@ -69,7 +69,7 @@ async def main(args: argparse.Namespace) -> int:
             uf_rows.append(E.resultado_row(d, numeros, uf=uf))
         write_parquet(uf_rows, out / "resultado_uf.parquet")
 
-        # Municipios
+        # Municípios
         done = 0
 
         async def um(m: dict):
@@ -77,7 +77,7 @@ async def main(args: argparse.Namespace) -> int:
             d = await f.get_json(E.url_resultado(f"{m['uf']}{m['cd_mun']}"))
             done += 1
             if done % 500 == 0:
-                log.info("municipios: %d/%d", done, len(municipios))
+                log.info("municípios: %d/%d", done, len(municipios))
             return m, d
 
         res = await asyncio.gather(*[um(m) for m in municipios], return_exceptions=True)
@@ -124,7 +124,7 @@ async def main(args: argparse.Namespace) -> int:
             json.dumps(resumo, ensure_ascii=False, indent=2), encoding="utf-8")
         log.info("resumo: %s", json.dumps(resumo["checagem"]))
         if faltando:
-            log.warning("%d municipios sem resultado: %s", len(faltando), faltando[:10])
+            log.warning("%d municípios sem resultado: %s", len(faltando), faltando[:10])
             return 2
         return 0
     finally:
@@ -133,8 +133,10 @@ async def main(args: argparse.Namespace) -> int:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--concorrencia", type=int, default=16)
-    ap.add_argument("--saida", default=str(PARQUET_2026_DIR))
+    ap.add_argument("--concorrencia", type=int, default=16,
+                    help="máximo de requisições HTTP simultâneas (padrão: 16)")
+    ap.add_argument("--saida", default=str(PARQUET_2026_DIR),
+                    help="diretório de saída dos Parquet (padrão: data/parquet/2026)")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     sys.exit(asyncio.run(main(ap.parse_args())))

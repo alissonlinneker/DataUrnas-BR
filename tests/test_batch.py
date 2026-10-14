@@ -66,7 +66,7 @@ def test_analyze_all_agrega_por_turno(raw_tree, capsys):
     assert cand[1]["sp"]["Governador"][0]["votos"] == 150
     an.print_report(res)
     out = capsys.readouterr().out
-    assert "Presidente (1o turno)" in out and "Presidente (2o turno)" in out
+    assert "Presidente (1º turno)" in out and "Presidente (2º turno)" in out
 
 
 def test_verify_hashes_opcional(raw_tree, monkeypatch):

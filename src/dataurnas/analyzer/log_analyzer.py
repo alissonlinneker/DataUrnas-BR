@@ -1,4 +1,4 @@
-"""Analise de logs da urna eletronica."""
+"""Análise de logs da urna eletrônica."""
 
 import logging
 from datetime import datetime
@@ -11,16 +11,16 @@ from .timezones import get_tz_offset
 
 logger = logging.getLogger(__name__)
 
-# Horarios esperados de votacao (eleicao 2022)
-# Votacao e das 8h-17h BRASILIA. Logs usam hora LOCAL.
-# As constantes abaixo referem-se ao horario de Brasilia;
+# Horários esperados de votação (eleição 2022)
+# A votação ocorre das 8h às 17h de Brasília. Logs usam hora LOCAL.
+# As constantes abaixo referem-se ao horário de Brasília;
 # _adjust_for_tz() converte para hora local antes de comparar.
-HORA_ABERTURA_BRT = (8, 0)   # 08:00 Brasilia
-HORA_ABERTURA_TOL = 30       # Tolerancia em minutos apos 08:00
-HORA_ENCERRAMENTO_BRT = (17, 0)  # 17:00 Brasilia
-HORA_ENCERRAMENTO_MAX_BRT = (22, 0)  # Maximo razoavel
+HORA_ABERTURA_BRT = (8, 0)   # 08:00 Brasília
+HORA_ABERTURA_TOL = 30       # Tolerância em minutos após 08:00
+HORA_ENCERRAMENTO_BRT = (17, 0)  # 17:00 Brasília
+HORA_ENCERRAMENTO_MAX_BRT = (22, 0)  # Máximo razoável
 
-# Limiar para alertas de mesario (indagacao frequente pode indicar problemas)
+# Limiar para alertas de mesário (indagação frequente pode indicar problemas)
 LIMIAR_ALERTAS_MESARIO = 20
 
 
@@ -47,7 +47,7 @@ def _entry_datetime(entry: LogEntry) -> Optional[datetime]:
 
 
 def _local_limits(uf: str, municipio=None) -> dict:
-    """Retorna horarios limites em hora LOCAL para uma seção."""
+    """Retorna horários limites em hora LOCAL para uma seção."""
     offset = get_tz_offset(uf, municipio)
 
     ab_h, ab_m = HORA_ABERTURA_BRT
@@ -63,7 +63,7 @@ def _local_limits(uf: str, municipio=None) -> dict:
 
 
 class LogAnalyzer:
-    """Analisa logs da urna para deteccao de anomalias."""
+    """Analisa logs da urna para detecção de anomalias."""
 
     def __init__(self):
         self._parser = LogParser()
@@ -80,15 +80,15 @@ class LogAnalyzer:
 
         Args:
             log_path: Caminho do arquivo .logjez/.jez.
-            bu: Boletim de Urna parseado (para comparacao votos).
-            uf: Sigla do estado (para ajuste de fuso horario).
-            municipio: Codigo TSE do municipio (fusos que diferem da UF,
+            bu: Boletim de Urna parseado (para comparação votos).
+            uf: Sigla do estado (para ajuste de fuso horário).
+            municipio: Código TSE do município (fusos que diferem da UF,
                 como o oeste do Amazonas e Fernando de Noronha).
             turno_date: Data do turno (DD/MM/YYYY) para filtrar entradas.
-                Necessario para T2, cujo .logjez acumula eventos do T1.
+                Necessário para T2, cujo .logjez acumula eventos do T1.
 
         Returns:
-            Dict com eventos, issues, e metricas de timing.
+            Dict com eventos, issues, e métricas de timing.
         """
         entries = self._parser.parse(log_path)
         events = self._parser.extract_events(entries, turno_date=turno_date)
@@ -110,10 +110,10 @@ class LogAnalyzer:
         }
 
     def _check_timing(self, events: dict, uf: str = "", municipio=None) -> list[Issue]:
-        """Verifica horarios de abertura e encerramento.
+        """Verifica horários de abertura e encerramento.
 
-        Ajusta os limites para o fuso horario do estado.
-        Logs usam hora local. Votacao e das 8h-17h Brasilia.
+        Ajusta os limites para o fuso horário do estado.
+        Logs usam hora local. A votação ocorre das 8h às 17h de Brasília.
         """
         issues = []
         limits = _local_limits(uf, municipio)
@@ -139,7 +139,7 @@ class LogAnalyzer:
                                 "data": abertura.data,
                                 "fuso_offset": offset,
                             },
-                            base_legal="Art. 59 da Lei 9.504/97: abertura às 8h BRT",
+                            base_legal="Art. 144 do Código Eleitoral: votação das 8h às 17h (BRT)",
                         )
                     )
                 elif ab_min > limits["abertura_max"]:
@@ -157,7 +157,7 @@ class LogAnalyzer:
                                 "data": abertura.data,
                                 "fuso_offset": offset,
                             },
-                            base_legal="Art. 59 da Lei 9.504/97",
+                            base_legal="Art. 144 do Código Eleitoral: votação das 8h às 17h (BRT)",
                         )
                     )
             except (ValueError, IndexError):
@@ -220,7 +220,7 @@ class LogAnalyzer:
                 )
             )
 
-        # Reinicializacoes durante votacao
+        # Reinicializações durante votação
         reboots = events.get("reboots", 0)
         if reboots > 0:
             aberturas = events.get("aberturas", [])
@@ -267,7 +267,7 @@ class LogAnalyzer:
                 )
             )
 
-        # Substituicoes de urna
+        # Substituições de urna
         substituicoes = events.get("substituicoes", [])
         if substituicoes:
             issues.append(
@@ -309,7 +309,7 @@ class LogAnalyzer:
         return issues
 
     def _check_mesario_alerts(self, events: dict) -> list[Issue]:
-        """Verifica quantidade de alertas de mesario."""
+        """Verifica quantidade de alertas de mesário."""
         issues = []
         alertas = events.get("alertas_mesario", [])
 
@@ -346,7 +346,7 @@ class LogAnalyzer:
 
         if max_comparecimento > 0 and votos_log != max_comparecimento:
             diff = abs(votos_log - max_comparecimento)
-            if diff > 2:  # Tolerancia de 2 por possivel contagem dupla no log
+            if diff > 2:  # Tolerância de 2 por possível contagem dupla no log
                 issues.append(
                     Issue(
                         codigo="A03",
@@ -370,7 +370,7 @@ class LogAnalyzer:
         return issues
 
     def _extract_timing(self, events: dict) -> dict:
-        """Extrai metricas de timing do log."""
+        """Extrai métricas de timing do log."""
         timing = {
             "hora_abertura": None,
             "hora_encerramento": None,
@@ -390,9 +390,9 @@ class LogAnalyzer:
         if ligada:
             timing["hora_ligada"] = f"{ligada.data} {ligada.hora}"
 
-        # Duracao: datetime completo (data + hora + segundos), o que cobre
-        # votacao que atravessa a meia-noite. Valores negativos indicam linha
-        # do tempo inconsistente e sao descartados (ver _check_timeline).
+        # Duração: datetime completo (data + hora + segundos), o que cobre
+        # votação que atravessa a meia-noite. Valores negativos indicam linha
+        # do tempo inconsistente e são descartados (ver _check_timeline).
         if abertura and encerramento:
             inicio = _entry_datetime(abertura)
             fim = _entry_datetime(encerramento)

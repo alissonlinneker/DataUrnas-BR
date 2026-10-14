@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 
-from dataurnas import cli
+from dataurnas import __version__, cli
 
 
 @pytest.fixture
@@ -14,6 +14,12 @@ def test_help(runner):
     assert res.exit_code == 0
     for cmd in ("download", "analyze", "db", "dashboard"):
         assert cmd in res.output
+
+
+def test_version(runner):
+    res = runner.invoke(cli.main, ["--version"])
+    assert res.exit_code == 0
+    assert res.output.strip() == f"dataurnas {__version__}"
 
 
 def test_uf_invalida_e_rejeitada(runner):

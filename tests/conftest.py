@@ -16,7 +16,7 @@ from dataurnas.models import SpecVersion  # noqa: E402
 from dataurnas.parsers.asn1_helper import get_compiler  # noqa: E402
 
 DEFAULT_VOTOS = {
-    # cargo -> lista de (tipoVoto, quantidade, partido, codigo)
+    # cargo -> lista de (tipoVoto, quantidade, partido, código)
     "presidente": [
         ("nominal", 120, 13, 13),
         ("nominal", 100, 22, 22),

@@ -1,4 +1,4 @@
-"""Modulo de parsing de arquivos de urna."""
+"""Módulo de parsing de arquivos de urna."""
 
 from .bu import BUParser
 from .signature import SignatureParser

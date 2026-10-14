@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Confere se a soma dos BUs por secao bate com o resultado oficial da UF.
+"""Confere se a soma dos BUs por seção bate com o resultado oficial da UF.
 
 Compara, por UF presente em secoes_2026.parquet:
   - votos por candidato (BU) x vap do resultado_uf.parquet
   - brancos, nulos, comparecimento e votos nominais
-  - numero de secoes com BU x secoes totalizadas
+  - número de seções com BU x seções totalizadas
 
 Uso:
   python3 scripts/ele2026/reconcile.py [--ufs ac,rr]
-Sai com codigo 1 se houver divergencia.
+Sai com código 1 se houver divergência.
 """
 
 from __future__ import annotations
@@ -56,8 +56,8 @@ def reconciliar(base: Path, ufs: list[str] | None = None) -> tuple[list[dict], b
         por_cand = dict(con.execute(f"""
             SELECT numero, sum(votos) FROM read_parquet('{vot}')
             WHERE uf = ? AND tipo_voto = 'nominal' GROUP BY 1""", [uf]).fetchall())
-        # Voto nominal no BU para numero que nao e candidato valido (registro
-        # indeferido/cancelado) e contado pelo TSE como "nulo tecnico" (vnt).
+        # Voto nominal no BU para número que não e candidato válido (registro
+        # indeferido/cancelado) e contado pelo TSE como "nulo técnico" (vnt).
         nulos_tecnicos = sum(int(v) for n, v in por_cand.items() if n not in numeros)
         nominais_validos = int(bu[6]) - nulos_tecnicos
         checks = [
@@ -81,9 +81,12 @@ def reconciliar(base: Path, ufs: list[str] | None = None) -> tuple[list[dict], b
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--ufs", default="")
-    ap.add_argument("--base", default=str(PARQUET_2026_DIR))
-    ap.add_argument("--so-divergencias", action="store_true")
+    ap.add_argument("--ufs", default="",
+                    help="UFs separadas por vírgula (padrão: todas as presentes nos dados)")
+    ap.add_argument("--base", default=str(PARQUET_2026_DIR),
+                    help="diretório com os Parquet de 2026 (padrão: data/parquet/2026)")
+    ap.add_argument("--so-divergencias", action="store_true",
+                    help="mostra apenas as linhas com diferença")
     a = ap.parse_args()
     ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()] or None
     linhas, ok = reconciliar(Path(a.base), ufs)
@@ -92,7 +95,7 @@ def main() -> int:
         if a.so_divergencias and r["ok"]:
             continue
         print(f"{r['uf']:<3} {r['item']:<24} {r['soma_bu']:>12} {r['oficial']:>12} "
-              f"{r['diferenca']:>8}  {'sim' if r['ok'] else 'NAO'}")
+              f"{r['diferenca']:>8}  {'sim' if r['ok'] else 'NÃO'}")
     print("RESULTADO:", "reconciliado" if ok else "DIVERGENTE")
     return 0 if ok else 1
 

@@ -1,13 +1,13 @@
-"""Coleta de dados da eleicao geral de 2026 (1o turno, Presidente).
+"""Coleta de dados da eleição geral de 2026 (1º turno, Presidente).
 
-Reune as funcoes puras de transformacao (testaveis sem rede) e um cliente
-HTTP assincrono enxuto, com retentativas e backoff exponencial.
+Reúne as funções puras de transformação (testáveis sem rede) e um cliente
+HTTP assíncrono enxuto, com retentativas e backoff exponencial.
 
 Endpoints usados (base https://resultados.tse.jus.br/oficial):
-  - {ciclo}/{eleicao}/config/mun-e{eleicao:06}-cm.json        lista de municipios
+  - {ciclo}/{eleicao}/config/mun-e{eleicao:06}-cm.json        lista de municípios
   - {ciclo}/{eleicao}/dados/{abr}/{abr}-c0001-e{eleicao}-u.json  resultado agregado
     (abr = br, uf ou uf+cd_mun)
-  - {ciclo}/arquivo-urna/{pleito}/config/{uf}/{uf}-p{pleito}-cs.json  secoes
+  - {ciclo}/arquivo-urna/{pleito}/config/{uf}/{uf}-p{pleito}-cs.json  seções
   - {ciclo}/arquivo-urna/{pleito}/dados/{uf}/{mun}/{zona}/{secao}/...-aux.json
   - .../{hash}/{arquivo}-bu.dat (BU, ASN.1 spec v2) e -vota.vsc (assinatura)
 """
@@ -34,11 +34,11 @@ MODELOS = {9: "UE2009", 10: "UE2010", 11: "UE2011", 13: "UE2013",
 
 
 # ---------------------------------------------------------------------------
-# Conversoes basicas
+# Conversões básicas
 # ---------------------------------------------------------------------------
 
 def to_int(val: Any) -> Optional[int]:
-    """Converte string numerica do TSE em int ('' e None viram None)."""
+    """Converte string numérica do TSE em int ('' e None viram None)."""
     if val is None:
         return None
     if isinstance(val, int):
@@ -53,7 +53,7 @@ def to_int(val: Any) -> Optional[int]:
 
 
 def to_float_br(val: Any) -> Optional[float]:
-    """Converte numero no formato brasileiro ('47,03') em float."""
+    """Converte número no formato brasileiro ('47,03') em float."""
     if val is None:
         return None
     if isinstance(val, (int, float)):
@@ -114,7 +114,7 @@ def url_arquivo(uf: str, mun: str, zona: str, secao: str, hash_val: str,
 
 def iter_candidatos(d: dict) -> Iterable[dict]:
     """Itera os candidatos do primeiro cargo de um JSON de resultado,
-    achatando agremiacao (agr) > partido (par) > candidato (cand)."""
+    achatando agremiação (agr) > partido (par) > candidato (cand)."""
     cargos = d.get("carg") or []
     if not cargos:
         return
@@ -160,7 +160,7 @@ def parse_candidatos(d: dict) -> list[dict]:
 
 
 def parse_totais(d: dict) -> dict:
-    """Totais de secoes, eleitorado e votos de um JSON de resultado."""
+    """Totais de seções, eleitorado e votos de um JSON de resultado."""
     s = d.get("s") or {}
     e = d.get("e") or {}
     v = d.get("v") or {}
@@ -193,7 +193,7 @@ def parse_totais(d: dict) -> dict:
 
 
 def votos_por_candidato(d: dict) -> dict[int, int]:
-    """Mapa numero do candidato -> votos apurados."""
+    """Mapa número do candidato -> votos apurados."""
     out: dict[int, int] = {}
     for _agr, _par, cand in iter_candidatos(d):
         n = to_int(cand.get("n"))
@@ -203,7 +203,7 @@ def votos_por_candidato(d: dict) -> dict[int, int]:
 
 
 def resultado_row(d: dict, numeros: Iterable[int], **ident) -> dict:
-    """Linha larga de resultado: identificacao + totais + v_<numero> por candidato."""
+    """Linha larga de resultado: identificação + totais + v_<numero> por candidato."""
     row = dict(ident)
     row.update(parse_totais(d))
     votos = votos_por_candidato(d)
@@ -213,7 +213,7 @@ def resultado_row(d: dict, numeros: Iterable[int], **ident) -> dict:
 
 
 def iter_municipios(cm: dict) -> Iterable[dict]:
-    """Itera municipios do arquivo mun-eXXXXXX-cm.json (inclui exterior 'zz')."""
+    """Itera municípios do arquivo mun-eXXXXXX-cm.json (inclui exterior 'zz')."""
     for abr in cm.get("abr", []):
         uf = abr.get("cd", "").lower()
         for mu in abr.get("mu", []):
@@ -228,14 +228,14 @@ def iter_municipios(cm: dict) -> Iterable[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Secoes (arquivo-urna)
+# Seções (arquivo-urna)
 # ---------------------------------------------------------------------------
 
 def iter_secoes_cs(cs: dict) -> Iterable[dict]:
-    """Itera secoes do arquivo de configuracao -cs.json de uma UF.
+    """Itera seções do arquivo de configuração -cs.json de uma UF.
 
-    Secoes com 'nsp' foram agregadas a outra secao (principal) e nao tem
-    arquivos proprios; 'nsa' lista as secoes agregadas a uma principal.
+    Seções com 'nsp' foram agregadas a outra seção (principal) e não tem
+    arquivos próprios; 'nsa' lista as seções agregadas a uma principal.
     """
     for abr in cs.get("abr", []):
         uf = abr.get("cd", "").lower()
@@ -261,9 +261,9 @@ def secao_key(uf: str, mun: str, zona: str, secao: str) -> str:
 
 
 def escolher_hash(aux: dict) -> Optional[dict]:
-    """Escolhe o conjunto de arquivos valido no -aux.json.
+    """Escolhe o conjunto de arquivos válido no -aux.json.
 
-    Preferencia: hash com st 'Totalizado'; senao o ultimo hash nao nulo.
+    Preferencia: hash com st 'Totalizado'; senão o último hash não nulo.
     Retorna dict com hash, status, data/hora de recebimento, nomes por tipo
     e quantidade de hashes encontrados.
     """
@@ -300,7 +300,7 @@ def escolher_hash(aux: dict) -> Optional[dict]:
 # ---------------------------------------------------------------------------
 
 def _ber_tlv(b: bytes, i: int) -> tuple[int, int, int]:
-    """Le tag/len BER em b[i]; retorna (tag, inicio_conteudo, tamanho)."""
+    """Lê tag/len BER em b[i]; retorna (tag, inicio_conteudo, tamanho)."""
     tag = b[i]
     i += 1
     ln = b[i]
@@ -313,9 +313,9 @@ def _ber_tlv(b: bytes, i: int) -> tuple[int, int, int]:
 
 
 def modelo_from_vsc(raw: bytes) -> Optional[int]:
-    """Extrai o codigo do modelo da urna de um arquivo -vota.vsc.
+    """Extrai o código do modelo da urna de um arquivo -vota.vsc.
 
-    Spec v2 publicado (2024): EntidadeAssinaturaEcourna comeca com
+    Spec v2 publicado (2024): EntidadeAssinaturaEcourna começa com
     modeloEquipamento (ENUMERATED, tag 0x0a). Nos arquivos de 2026 o modelo
     vem num SEQUENCE ao final: SEQUENCE { assinaturaSW, assinaturaHW,
     SEQUENCE { ENUMERATED modelo, ENUMERATED algoritmo } }. Trata os dois.
@@ -352,7 +352,7 @@ def bu_to_rows(raw: bytes, eleicao: int = int(ELEICAO), cargo: int = CARGO
     """Decodifica um BU (spec v2) com o parser do projeto e devolve
     (campos_da_secao, votos_do_cargo).
 
-    Executado em processo separado (pool), por isso so recebe bytes.
+    Executado em processo separado (pool), por isso só recebe bytes.
     """
     from ..models import SpecVersion, TipoVoto
     from ..parsers.asn1_helper import decode_envelope
@@ -427,11 +427,11 @@ def bu_to_rows(raw: bytes, eleicao: int = int(ELEICAO), cargo: int = CARGO
 
 
 # ---------------------------------------------------------------------------
-# Cliente HTTP assincrono
+# Cliente HTTP assíncrono
 # ---------------------------------------------------------------------------
 
 class AdaptiveRate:
-    """Limitador de taxa AIMD: espaca requisicoes em 1/rate segundos, reduz a
+    """Limitador de taxa AIMD: espaça requisições em 1/rate segundos, reduz a
     taxa (multiplicativo) ao receber 429 e aumenta devagar (aditivo) com sucesso."""
 
     def __init__(self, rate: float, rate_max: float, rate_min: float = 2.0,
@@ -468,13 +468,13 @@ class AdaptiveRate:
 
 
 class HttpFetcher:
-    """GET com limite de concorrencia, taxa adaptativa (AIMD em 429),
+    """GET com limite de concorrência, taxa adaptativa (AIMD em 429),
     retentativas e backoff exponencial."""
 
     def __init__(self, concurrency: int = 16, retries: int = 8,
                  timeout: float = 30.0, http2: bool = True, connections: int = 1,
                  rate: Optional[float] = None, rate_max: Optional[float] = None):
-        """connections > 1 abre varios clientes HTTP/2 usados em rodizio.
+        """connections > 1 abre vários clientes HTTP/2 usados em rodízio.
         rate (req/s) liga o limitador adaptativo; None desliga."""
         import httpx
 
@@ -506,7 +506,7 @@ class HttpFetcher:
             await c.aclose()
 
     async def get(self, url: str) -> Optional[bytes]:
-        """Retorna o corpo, None em 404, levanta excecao apos esgotar tentativas."""
+        """Retorna o corpo, None em 404, levanta exceção após esgotar tentativas."""
         last: Optional[BaseException] = None
         for attempt in range(self.retries):
             pause = 0.0
@@ -539,7 +539,7 @@ class HttpFetcher:
                 await asyncio.sleep(max(pause, min(60.0, 0.5 * 2 ** attempt))
                                     + random.random())
         self.stats["fail"] += 1
-        raise RuntimeError(f"falha apos {self.retries} tentativas: {url}: {last!r}")
+        raise RuntimeError(f"falha após {self.retries} tentativas: {url}: {last!r}")
 
     def rate_info(self) -> str:
         return f"{self.limiter.rate:.1f} req/s" if self.limiter else "sem limite"

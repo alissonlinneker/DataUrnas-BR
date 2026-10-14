@@ -3,17 +3,12 @@
 .env.*
 *.pem
 *.key
-.mcp.json
 
 # Controle de versão e ferramentas locais
 .git
 .gitignore
 .gitattributes
 .github
-.cla*
-.memory-bank
-CLA*.md
-graphify-out
 
 # Dados brutos e bancos locais (a imagem reconstrói o banco a partir dos Parquet)
 data/raw
@@ -22,6 +17,9 @@ data/db
 data/*.log
 *.duckdb
 *.duckdb.wal
+data/parquet/2026/secoes_parts
+data/parquet/2026/secoes_checkpoint.txt
+data/parquet/2026/secoes_erros.txt
 
 # Desenvolvimento
 tests
@@ -48,3 +46,7 @@ dist
 .vscode
 .idea
 ARCHITECTURE.md
+
+# Configurações locais que não devem ir para o contexto de build
+.mcp.json
+.memory-bank/

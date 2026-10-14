@@ -4,11 +4,36 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dataurnas-br"
-version = "0.1.0"
-description = "Auditoria independente dos dados eleitorais brasileiros"
+version = "0.2.0"
+description = "Auditoria independente dos arquivos públicos da urna eletrônica brasileira"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
+authors = [{name = "Alisson Linneker"}]
+maintainers = [{name = "Alisson Linneker"}]
+keywords = [
+    "eleições",
+    "urna eletrônica",
+    "auditoria",
+    "TSE",
+    "boletim de urna",
+    "ASN.1",
+    "dados abertos",
+    "Brasil",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Portuguese (Brazilian)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 dependencies = [
     "asn1tools>=0.166.0,<1",
     "httpx>=0.27.0,<1",
@@ -34,6 +59,13 @@ dev = [
     "pytest-cov>=5.0.0",
     "ruff>=0.6.0",
 ]
+
+[project.urls]
+Homepage = "https://huggingface.co/spaces/alissonlinneker/dataurnas-br"
+Repository = "https://github.com/alissonlinneker/DataUrnas-BR"
+Issues = "https://github.com/alissonlinneker/DataUrnas-BR/issues"
+Changelog = "https://github.com/alissonlinneker/DataUrnas-BR/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/alissonlinneker/DataUrnas-BR/tree/main/docs"
 
 [project.scripts]
 dataurnas = "dataurnas.cli:main"

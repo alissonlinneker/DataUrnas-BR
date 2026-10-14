@@ -1,9 +1,10 @@
-"""Utilitarios para decodificacao ASN.1."""
+"""Utilitários para decodificação ASN.1."""
 
 import logging
 from pathlib import Path
 
 import asn1tools
+from asn1tools.compiler import Specification
 
 from ..config import SPEC_DIR
 from ..models import SpecVersion
@@ -11,25 +12,25 @@ from ..models import SpecVersion
 logger = logging.getLogger(__name__)
 
 # Cache de compiladores ASN.1 (evita recompilar a cada arquivo)
-_compilers: dict[str, asn1tools.CompiledFile] = {}
+_compilers: dict[str, Specification] = {}
 
 
-def get_compiler(spec_version: SpecVersion, module: str = "bu") -> asn1tools.CompiledFile:
-    """Obtem compilador ASN.1 para a versao e modulo especificados.
+def get_compiler(spec_version: SpecVersion, module: str = "bu") -> Specification:
+    """Obtém o compilador ASN.1 para a versão e o módulo especificados.
 
     Args:
         spec_version: V1 (2022) ou V2 (2024+)
         module: 'bu', 'rdv', ou 'assinatura'
 
     Returns:
-        Compilador ASN.1 pronto para decodificacao
+        Compilador ASN.1 pronto para decodificação
     """
     cache_key = f"{spec_version.value}_{module}"
     if cache_key not in _compilers:
         spec_dir = SPEC_DIR / spec_version.value
         spec_file = spec_dir / f"{module}.asn1"
         if not spec_file.exists():
-            raise FileNotFoundError(f"Spec ASN.1 nao encontrada: {spec_file}")
+            raise FileNotFoundError(f"Spec ASN.1 não encontrada: {spec_file}")
         _compilers[cache_key] = asn1tools.compile_files(
             [str(spec_file)], codec="ber"
         )
@@ -60,7 +61,7 @@ def decode_envelope(
 
 
 def detect_spec_version(file_path: Path) -> SpecVersion:
-    """Detecta a versao da spec baseado na extensao do arquivo.
+    """Detecta a versão da spec baseado na extensão do arquivo.
 
     V1 (2022): .bu, .rdv, .logjez, .imgbu, .vscmr
     V2 (2024+): -bu.dat, -rdv.dat, -log.jez, -imgbu.dat, -vota.vsc

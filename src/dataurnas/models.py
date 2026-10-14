@@ -1,4 +1,4 @@
-"""Modelos de dados do dominio."""
+"""Modelos de dados do domínio."""
 
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -21,8 +21,8 @@ class Fase(Enum):
 
 
 class SpecVersion(Enum):
-    V1 = "v1"  # Eleicoes 2022
-    V2 = "v2"  # Eleicoes 2024+
+    V1 = "v1"  # Eleições 2022
+    V2 = "v2"  # Eleições 2024+
 
 
 class IssueSeverity(Enum):
@@ -34,7 +34,7 @@ class IssueSeverity(Enum):
 
 @dataclass
 class Election:
-    """Representa uma eleicao disponivel no TSE."""
+    """Representa uma eleição disponível no TSE."""
     ciclo: str
     pleito: str
     eleicao: str
@@ -46,7 +46,7 @@ class Election:
 
 @dataclass
 class Section:
-    """Representa uma secao eleitoral."""
+    """Representa uma seção eleitoral."""
     uf: str
     municipio_codigo: str
     municipio_nome: str
@@ -78,7 +78,7 @@ class VotoTupla:
 
 @dataclass
 class ResultadoCargo:
-    """Resultado de votacao para um cargo."""
+    """Resultado de votação para um cargo."""
     codigo_cargo: int
     nome_cargo: str
     comparecimento: int
@@ -87,7 +87,7 @@ class ResultadoCargo:
 
 @dataclass
 class ResultadoEleicao:
-    """Resultado de uma eleicao no BU."""
+    """Resultado de uma eleição no BU."""
     id_eleicao: int
     eleitores_aptos: int
     eleitores_aptos_secao: Optional[int] = None
@@ -100,7 +100,7 @@ class ResultadoEleicao:
 @dataclass
 class BoletimUrna:
     """Dados decodificados de um Boletim de Urna."""
-    # Identificacao
+    # Identificação
     uf: str
     municipio: int
     zona: int
@@ -112,7 +112,7 @@ class BoletimUrna:
     numero_serie: Optional[int] = None
     numero_interno: Optional[int] = None
     codigo_carga: Optional[str] = None
-    tipo_urna: Optional[str] = None  # secao, reservaSecao, contingencia
+    tipo_urna: Optional[str] = None  # seção, reservaSecao, contingencia
     tipo_arquivo: Optional[str] = None
     versao_votacao: Optional[str] = None
 
@@ -120,7 +120,7 @@ class BoletimUrna:
     fase: Fase = Fase.OFICIAL
     spec_version: SpecVersion = SpecVersion.V1
 
-    # Dados de votacao
+    # Dados de votação
     data_hora_emissao: Optional[str] = None
     hora_abertura: Optional[str] = None
     hora_encerramento: Optional[str] = None
@@ -130,7 +130,7 @@ class BoletimUrna:
     # Resultados
     resultados_por_eleicao: list[ResultadoEleicao] = field(default_factory=list)
 
-    # Historico
+    # Histórico
     historico_correspondencias: Optional[list] = None
 
     @property
@@ -164,7 +164,7 @@ class LogEntry:
 
 @dataclass
 class HashVerification:
-    """Resultado de verificacao de hash de um arquivo."""
+    """Resultado de verificação de hash de um arquivo."""
     arquivo: str
     hash_esperado: bytes
     hash_calculado: bytes
@@ -180,7 +180,7 @@ class HashVerification:
 
 @dataclass
 class SignatureVerification:
-    """Resultado de verificacao de assinatura digital."""
+    """Resultado de verificação de assinatura digital."""
     arquivo: str
     algoritmo: str
     valido: bool
@@ -190,7 +190,7 @@ class SignatureVerification:
 
 @dataclass
 class Issue:
-    """Uma inconsistencia detectada."""
+    """Uma inconsistência detectada."""
     codigo: str
     severidade: IssueSeverity
     descricao: str
