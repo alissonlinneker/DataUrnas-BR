@@ -746,8 +746,15 @@ async def baixar_vsc(fetcher, r, via_aux: bool = False) -> tuple[Optional[bytes]
 
 
 def carregar_secoes_ok(path: Path, ufs: Optional[list[str]] = None,
-                       limite: Optional[int] = None) -> tuple[pd.DataFrame, int]:
-    """Seções com status ok (ordenadas) e o total nacional de seções ok."""
+                       limite: Optional[int] = None,
+                       fracao: Optional[float] = None) -> tuple[pd.DataFrame, int]:
+    """Seções com status ok (ordenadas) e o total nacional de seções ok.
+
+    Com ``fracao`` (0 a 1), mantém uma amostra determinística: a seção entra
+    quando o SHA-256 da sua chave cai abaixo do limiar. Como o sorteio é
+    uniforme e independente da UF e do modelo, a amostra fica proporcional em
+    cada UF e em cada modelo de urna, e é reproduzível em qualquer máquina.
+    """
     cols = CHAVE + ["status", "hash", "fase"]
     import pyarrow.parquet as pq
     disp = pq.read_schema(path).names
@@ -756,6 +763,13 @@ def carregar_secoes_ok(path: Path, ufs: Optional[list[str]] = None,
     total = int(len(df))
     if ufs:
         df = df[df["uf"].isin([u.lower() for u in ufs])]
+    if fracao is not None and 0 < fracao < 1:
+        import hashlib
+
+        limiar = int(fracao * 2**32)
+        chaves = df[CHAVE].astype(str).agg("/".join, axis=1)
+        sorteio = chaves.map(lambda k: int.from_bytes(hashlib.sha256(k.encode()).digest()[:4], "big"))
+        df = df[sorteio < limiar]
     df = df.sort_values(CHAVE).reset_index(drop=True)
     if limite:
         df = df.head(limite)
@@ -980,7 +994,7 @@ def executar_todas(args) -> int:
     from dataurnas.downloader import ele2026 as E
 
     ufs = [u.strip() for u in args.uf.split(",")] if args.uf else None
-    secoes, total_ok = carregar_secoes_ok(Path(args.bu), ufs, args.limite)
+    secoes, total_ok = carregar_secoes_ok(Path(args.bu), ufs, args.limite, args.fracao)
     tabela = Path(args.tabela)
     ac_dir = Path(args.ac) if args.ac else (AC_PADRAO if AC_PADRAO.exists() else None)
     procs = args.processos if args.processos is not None else max(1, (os.cpu_count() or 2) // 2)
@@ -1003,6 +1017,9 @@ def executar_todas(args) -> int:
     bloco["gerado_em"] = time.strftime("%Y-%m-%dT%H:%M:%S")
     bloco["acs"] = descrever_acs(ac_dir) if ac_dir else []
     bloco["ultima_execucao"] = st
+    if args.fracao:
+        bloco["amostra_fracao"] = args.fracao
+        bloco["amostra_criterio"] = "SHA-256 da chave uf/cd_mun/zona/secao abaixo do limiar"
     atualizar_resumo(Path(args.saida), bloco)
     print(f"execução: {st}")
     print(f"tabela: {tabela} ({len(df)} seções); situação: {bloco['situacao']} "
@@ -1086,6 +1103,9 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
                     help="lê em fluxo o .vsc de todas as seções ok (retomável)")
     ap.add_argument("--uf", help="em --todas: só estas UFs (ex.: rr,ac)")
     ap.add_argument("--limite", type=int, help="em --todas: no máximo N seções")
+    ap.add_argument("--fracao", type=float,
+                    help="em --todas: amostra determinística (ex.: 0.05 para 5%%), "
+                         "proporcional por UF e modelo")
     ap.add_argument("--tabela", help="em --todas: parquet de saída "
                     "(padrão <integridade>/certificados.parquet)")
     ap.add_argument("--processos", type=int, default=None,
