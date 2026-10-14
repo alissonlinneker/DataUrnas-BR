@@ -1,0 +1,191 @@
+{
+  "versao": 1,
+  "definicoes": "eb32b760bf838a14949a9c4dfa88ede1b77123a76fec0f231e46a032bd97210a",
+  "entradas": "8641e3557303b8cea94c9ff5f6244660e1f8a1ab3de245f36279fec059160ba9",
+  "tabelas": {
+    "agg_presidente_secao": {
+      "arquivo": "agg_presidente_secao.parquet",
+      "linhas": 941653,
+      "colunas": [
+        [
+          "secao_id",
+          "VARCHAR"
+        ],
+        [
+          "votos_13",
+          "HUGEINT"
+        ],
+        [
+          "votos_22",
+          "HUGEINT"
+        ],
+        [
+          "n_13",
+          "BIGINT"
+        ],
+        [
+          "n_22",
+          "BIGINT"
+        ],
+        [
+          "nominais",
+          "HUGEINT"
+        ],
+        [
+          "brancos",
+          "HUGEINT"
+        ],
+        [
+          "nulos",
+          "HUGEINT"
+        ],
+        [
+          "total",
+          "HUGEINT"
+        ]
+      ],
+      "sha256": "193c4a9ab5f88b5271579ec5d7596eb6974a05ebb12896dc120664c2b1367b81"
+    },
+    "agg_votos_nominais": {
+      "arquivo": "agg_votos_nominais.parquet",
+      "linhas": 365343,
+      "colunas": [
+        [
+          "turno",
+          "INTEGER"
+        ],
+        [
+          "uf",
+          "VARCHAR"
+        ],
+        [
+          "regiao",
+          "VARCHAR"
+        ],
+        [
+          "modelo_urna",
+          "VARCHAR"
+        ],
+        [
+          "is_reserva",
+          "BOOLEAN"
+        ],
+        [
+          "has_issues",
+          "BOOLEAN"
+        ],
+        [
+          "cargo",
+          "VARCHAR"
+        ],
+        [
+          "codigo_candidato",
+          "INTEGER"
+        ],
+        [
+          "partido",
+          "INTEGER"
+        ],
+        [
+          "votos",
+          "HUGEINT"
+        ],
+        [
+          "secoes",
+          "BIGINT"
+        ]
+      ],
+      "sha256": "0def806ee22f7b3fbf7df994b22e8c8f16ca9a4f44ea0089181e7bc056078b22"
+    },
+    "agg_benford_presidente": {
+      "arquivo": "agg_benford_presidente.parquet",
+      "linhas": 114384,
+      "colunas": [
+        [
+          "turno",
+          "INTEGER"
+        ],
+        [
+          "uf",
+          "VARCHAR"
+        ],
+        [
+          "regiao",
+          "VARCHAR"
+        ],
+        [
+          "modelo_urna",
+          "VARCHAR"
+        ],
+        [
+          "is_reserva",
+          "BOOLEAN"
+        ],
+        [
+          "has_issues",
+          "BOOLEAN"
+        ],
+        [
+          "candidato",
+          "INTEGER"
+        ],
+        [
+          "d1",
+          "INTEGER"
+        ],
+        [
+          "d2",
+          "INTEGER"
+        ],
+        [
+          "n",
+          "BIGINT"
+        ]
+      ],
+      "sha256": "6a69decee9f921353fab4b97fdad5ab3cc0b9b5aa27dc686d177d4b614aada9e"
+    },
+    "agg_benford_cargo": {
+      "arquivo": "agg_benford_cargo.parquet",
+      "linhas": 25917,
+      "colunas": [
+        [
+          "turno",
+          "INTEGER"
+        ],
+        [
+          "uf",
+          "VARCHAR"
+        ],
+        [
+          "regiao",
+          "VARCHAR"
+        ],
+        [
+          "modelo_urna",
+          "VARCHAR"
+        ],
+        [
+          "is_reserva",
+          "BOOLEAN"
+        ],
+        [
+          "has_issues",
+          "BOOLEAN"
+        ],
+        [
+          "cargo",
+          "VARCHAR"
+        ],
+        [
+          "d1",
+          "INTEGER"
+        ],
+        [
+          "n",
+          "BIGINT"
+        ]
+      ],
+      "sha256": "af4bc56c4c92234fe3eb56b89a5130a8cc5f512dc6014b9cda1e9a4503741b76"
+    }
+  }
+}
