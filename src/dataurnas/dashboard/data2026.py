@@ -92,12 +92,22 @@ def load_resumo(base: Path | None = None) -> dict:
         return json.load(fh)
 
 
+# Prenomes que o TSE publica sem acento e cuja grafia é inequívoca
+_ACENTOS = {"Flavio": "Flávio"}
+
+
+def nome_exibicao(nome_urna: str) -> str:
+    """Nome de urna em caixa de título, com acento restituído onde é inequívoco."""
+    return " ".join(_ACENTOS.get(p, p) for p in str(nome_urna).title().split())
+
+
 def load_candidatos(base: Path | None = None) -> pd.DataFrame:
     path = (base or base_dir()) / "candidatos.parquet"
     if not path.exists():
         return pd.DataFrame()
     df = pd.read_parquet(path).sort_values("votos", ascending=False).reset_index(drop=True)
-    df["rotulo"] = df["nome_urna"].str.title() + " (" + df["partido_sigla"] + ")"
+    df["nome_exibicao"] = df["nome_urna"].map(nome_exibicao)
+    df["rotulo"] = df["nome_exibicao"] + " (" + df["partido_sigla"] + ")"
     return df
 
 

@@ -211,7 +211,7 @@ def _mapa(res_uf: pd.DataFrame, cand: pd.DataFrame) -> None:
         tab = res_uf.copy()
         tab["nome"] = tab["uf"].map(d26.UF_NOMES)
         tab["uf"] = tab["uf"].str.upper()
-        nomes = dict(zip(cand["numero"].astype(int), cand["nome_urna"].str.title(), strict=False))
+        nomes = dict(zip(cand["numero"].astype(int), cand["nome_exibicao"], strict=False))
         show_df(tab[cols], hide_index=True, column_config={
             f"pct_{int(n)}": st.column_config.NumberColumn(f"% {nomes[int(n)]}", format="%.2f")
             for n in cand["numero"].head(4)
@@ -240,7 +240,7 @@ def _municipios(res_mun: pd.DataFrame, cand: pd.DataFrame) -> None:
         df = df[df["nome"].str.contains(busca.strip(), case=False, na=False, regex=False)]
     df = df.sort_values(ordem_opcoes[ordem], ascending=False).head(top_n).copy()
     df["uf"] = df["uf"].str.upper()
-    nomes = dict(zip(cand["numero"].astype(int), cand["nome_urna"].str.title(), strict=False))
+    nomes = dict(zip(cand["numero"].astype(int), cand["nome_exibicao"], strict=False))
     pct_cols = [f"pct_{int(n)}" for n in cand["numero"].head(4)]
     cols = ["uf", "nome", "capital", "eleitorado", "pct_comparecimento", "pct_brancos", "pct_nulos",
             "lider", "pct_lider", "margem_pp"] + pct_cols
