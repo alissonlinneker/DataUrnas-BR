@@ -64,3 +64,15 @@ data/parquet/2026/integridade/execucoes.jsonl
 data/parquet/2026/integridade/*.tmp
 data/parquet/2026/integridade/certificados_partes/
 data/parquet/2026/auditoria/*.tmp
+
+# Segredos e credenciais (nunca versionar)
+.env.*
+!.env.example
+*.key
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+id_ed25519*
+secrets/
+credentials*.json
