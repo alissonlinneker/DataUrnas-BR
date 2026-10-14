@@ -19,7 +19,7 @@ Prova apenas o que pode ser conferido nos arquivos publicados:
 
 - **Não prova fraude nem ausência de fraude.** Uma ocorrência é um indicador para investigar, e a severidade expressa a prioridade dessa investigação, não a probabilidade de irregularidade.
 - **Não audita o software da urna** nem os sistemas do TSE. O projeto trabalha só com os arquivos que a urna produz.
-- **Não valida a cadeia de certificados** nem a assinatura digital em si; a conferência de integridade compara hashes.
+- **Não valida a cadeia de certificados.** Em 2022 a conferência de integridade compara hashes; em 2026 também verifica a assinatura de cada urna com o certificado que a acompanha, mas não a cadeia até a autoridade certificadora.
 - **Não identifica eleitores.** Nenhum arquivo usado contém o voto associado a uma pessoa.
 - **Não substitui a totalização oficial.** O índice de confiança do painel resume indicadores do projeto e depende dos pesos escolhidos.
 
@@ -61,6 +61,10 @@ Seções sem BU decodificável (código E02) ficam fora dos totais e são listad
 ## A ausência de ocorrências C01 em 2022 significa que os hashes foram conferidos?
 
 Não. A base de 2022 distribuída nos Parquet foi compilada sem a conferência de hashes, que é opcional por ser custosa. Para conferir, rode `dataurnas analyze batch --hashes` ou `dataurnas analyze hashes <diretório da seção>` sobre os arquivos brutos.
+
+## A urna usa MD5? Por que o catálogo de 2026 tem MD5?
+
+A urna não usa MD5. O mecanismo oficial é o SHA-512: a urna calcula o SHA-512 do BU, do RDV e do log e grava esses valores num arquivo de assinatura (`.vsc`), assinado com a chave da própria urna. O projeto recalcula o SHA-512 dos arquivos publicados pelo TSE, compara com os valores assinados e verifica a assinatura. O catálogo de 2026 guarda também MD5 e SHA-256 de cada arquivo apenas por conveniência, para facilitar a comparação com outras fontes que usem esses algoritmos; eles não entram na conclusão. Os resultados estão no [relatório de integridade](relatorio-integridade-2026.md).
 
 ## Reinícios de urna indicam problema?
 

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="334" viewBox="0 0 1000 334" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Integridade dos arquivos de urna, 1º turno de 2026</title>
+<desc id="descricao">0 seções verificadas de 499.207 instaladas (0,0%); 0 hashes SHA-512 conferem, 0 divergem; 0 assinaturas válidas; 0 seções com divergência.</desc>
+<rect x="1" y="1" width="998" height="332" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Integridade dos arquivos de urna, 1º turno de 2026</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">SHA-512 recalculado x valor assinado pela urna; verificação em andamento, 0,0% das seções instaladas</text>
+<rect x="32.0" y="96.0" width="222.0" height="70.0" rx="12" fill="#F2F6F9"/>
+<rect x="32.0" y="96.0" width="5.0" height="70.0" rx="2" fill="#0072B2"/>
+<text x="50.0" y="122.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="start">Seções verificadas</text>
+<text x="50.0" y="153.0" font-size="24" font-weight="700" fill="#0B3A5B" text-anchor="start">0</text>
+<rect x="270.0" y="96.0" width="222.0" height="70.0" rx="12" fill="#F2F6F9"/>
+<rect x="270.0" y="96.0" width="5.0" height="70.0" rx="2" fill="#009E73"/>
+<text x="288.0" y="122.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="start">Hashes conferidos</text>
+<text x="288.0" y="153.0" font-size="24" font-weight="700" fill="#0B3A5B" text-anchor="start">0</text>
+<rect x="508.0" y="96.0" width="222.0" height="70.0" rx="12" fill="#F2F6F9"/>
+<rect x="508.0" y="96.0" width="5.0" height="70.0" rx="2" fill="#009E73"/>
+<text x="526.0" y="122.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="start">Divergências</text>
+<text x="526.0" y="153.0" font-size="24" font-weight="700" fill="#0B3A5B" text-anchor="start">0</text>
+<rect x="746.0" y="96.0" width="222.0" height="70.0" rx="12" fill="#F2F6F9"/>
+<rect x="746.0" y="96.0" width="5.0" height="70.0" rx="2" fill="#009E73"/>
+<text x="764.0" y="122.0" font-size="13" font-weight="400" fill="#4F6B80" text-anchor="start">Assinaturas válidas</text>
+<text x="764.0" y="153.0" font-size="24" font-weight="700" fill="#0B3A5B" text-anchor="start">0</text>
+<text x="500.0" y="254.0" font-size="16" font-weight="400" fill="#4F6B80" text-anchor="middle">Nenhuma seção verificada ainda.</text>
+<line x1="32" y1="288" x2="968" y2="288" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="312.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: arquivos de urna publicados pelo TSE (resultados.tse.jus.br); verificação DataUrnas-BR</text>
+<text x="968.0" y="312.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>

@@ -31,11 +31,23 @@ Para cada arquivo listado em `arquivosAssinados` no arquivo de assinatura, o pro
 | Hash calculado e diferente do assinado | C01 | crítica |
 | Arquivo assinado ausente ou assinatura ilegível | E01 | informativa |
 
-A conferência é opcional por ser custosa (`dataurnas analyze batch --hashes`). O projeto **não** verifica a cadeia de certificados nem a assinatura digital em si: verifica que os arquivos publicados correspondem aos hashes que a própria urna assinou.
+A conferência é opcional por ser custosa (`dataurnas analyze batch --hashes`). Nessa conferência (usada em 2022) o projeto **não** verifica a cadeia de certificados nem a assinatura digital em si: verifica que os arquivos publicados correspondem aos hashes que a própria urna assinou. Em 2026 a assinatura também é verificada (ver [Integridade em 2026](#integridade-em-2026)).
 
 A base de 2022 distribuída em `data/parquet` foi compilada sem essa conferência. Por isso a ausência de C01 nessa base não atesta a integridade dos arquivos; para conferir, rode `dataurnas analyze batch --hashes` ou `dataurnas analyze hashes <diretório da seção>` sobre os arquivos brutos, ou recompile com `dataurnas db build --hashes`.
 
 O banco registra se a conferência foi feita na tabela `metadados` (chave `verify_hashes`, `true` ou `false`). `dataurnas db build` grava o valor conforme a opção `--hashes` (padrão: desligada); numa compilação incremental, a base só continua marcada como verificada se a parte anterior também era. `scripts/build_db.py` copia o valor de `metadados.parquet`, quando esse arquivo acompanha os Parquet; sem ele, grava `false`, a menos que a opção `--hashes-verificados` declare que os Parquet vieram de uma compilação verificada. Em bancos antigos, sem a tabela, o painel considera a conferência feita apenas se houver alguma ocorrência C01 ou E01, porque só ela gera esses códigos; caso contrário, trata a base como não verificada.
+
+
+### Integridade em 2026
+
+Para o 1º turno de 2026 a conferência é feita em todas as seções, numa etapa própria que grava o catálogo em `data/parquet/2026/integridade` (`arquivos_<uf>.parquet`, `secoes.parquet` e `resumo.json`):
+
+1. cada arquivo publicado da seção (`bu.dat`, `rdv.dat`, `log.jez`, `-vota.vsc`, `busa.dat`, imagem do BU) recebe MD5, SHA-256 e SHA-512;
+2. o SHA-512 de `bu.dat`, `rdv.dat` e `log.jez` é comparado com o valor assinado no `-vota.vsc` (`hash_confere`); arquivos que a assinatura não cobre ficam com o campo nulo, o que é esperado;
+3. a assinatura do `-vota.vsc` é verificada com a chave pública do certificado que o acompanha (`assinatura_valida`), e os dados do certificado (algoritmo, titular, emissor, número de série e SHA-256) ficam registrados para conferência; a validação da cadeia de certificação não faz parte desta etapa;
+4. o token do `aux.json` (32 bytes em base64url) e a data e hora informadas pelo TSE são registrados, sem comparação, porque o token não é o hash de nenhum arquivo isolado.
+
+MD5 e SHA-256 não fazem parte do mecanismo da urna: ficam no catálogo para facilitar conferências com outras fontes. Uma seção é considerada divergente quando algum SHA-512 difere do assinado, a assinatura é inválida ou os votos não conferem. A cobertura é o número de seções verificadas dividido pelas seções instaladas do resultado oficial. O resultado está na página **Integridade dos arquivos (2026)** do painel e no [relatório de integridade](relatorio-integridade-2026.md), que traz também o passo a passo para conferir uma seção à mão.
 
 ## Consistência do BU
 

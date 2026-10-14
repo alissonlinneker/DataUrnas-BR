@@ -47,6 +47,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 
 - **2022 completo:** 941.987 seções dos dois turnos da eleição presidencial, em todas as 27 UFs, decodificadas e auditadas.
 - **2026 completo:** 1º turno de Presidente com o resultado oficial agregado (Brasil, 27 UFs, exterior e 5.757 municípios) e os Boletins de Urna de todas as 499.207 seções instaladas, cuja soma reproduz exatamente o resultado oficial em todas as 28 UFs (27 mais o exterior).
+- **Integridade dos arquivos de 2026 (em andamento):** o SHA-512 do BU, do RDV e do log de cada seção é recalculado a partir dos arquivos publicados e comparado ao valor assinado pela urna, com verificação da assinatura; a cobertura real está no [relatório de integridade](docs/relatorio-integridade-2026.md).
 - **Totalização paralela:** os votos são somados a partir dos BUs e reconciliados com os totais oficiais, UF por UF.
 - **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. A etapa é opcional (ativada com `--hashes`) e não fez parte da compilação da base de 2022 distribuída.
 - **Dados distribuídos em Parquet (ZSTD):** os 181 GB de arquivos brutos de 2022 viram cerca de 183 MB, prontos para consulta com DuckDB.
@@ -119,6 +120,18 @@ Na comparação com o 1º turno de 2022 (sem o exterior), o comparecimento ficou
 - Modelos de urna identificados pelo arquivo de assinatura: UE2020 (200.463 seções), UE2022 (198.759), UE2015 (88.064) e UE2013 (11.921).
 
 Os esquemas de cada arquivo estão em [docs/dados-2026.md](docs/dados-2026.md).
+
+### Integridade dos arquivos (2026)
+
+> **Em andamento.** A verificação percorre todas as seções e leva horas; o relatório informa a cobertura real a cada geração.
+
+Cada urna grava, ao encerrar a votação, o BU, o RDV e o log, e assina com a própria chave um arquivo (`.vsc`) que contém o SHA-512 de cada um deles. O projeto recalcula esses SHA-512 a partir dos arquivos que o TSE publica, compara com os valores assinados e verifica a assinatura. MD5 e SHA-256 também são catalogados, apenas para conferências futuras: não fazem parte do mecanismo da urna.
+
+<p align="center">
+  <img src="docs/assets/2026-integridade.svg" alt="Cobertura da verificação de integridade dos arquivos de urna de 2026 por UF, com seções verificadas, hashes conferidos, divergências e assinaturas válidas" width="100%">
+</p>
+
+Totais, tabela por UF, divergências e o passo a passo para conferir qualquer seção manualmente estão no [relatório de integridade](docs/relatorio-integridade-2026.md) (gerado por `python scripts/docs/gerar_relatorio_integridade.py`). No painel, a página **Integridade dos arquivos (2026)** permite consultar cada seção e baixar o catálogo de hashes em CSV.
 
 ---
 
@@ -317,6 +330,8 @@ O painel é uma aplicação Streamlit com várias páginas. A página inicial ap
     <td align="center"><sub>Celular (390 x 844)</sub></td>
   </tr>
 </table>
+
+No mesmo grupo, a página **Integridade dos arquivos (2026)** mostra a conferência de hashes e assinaturas por UF, as divergências, a consulta de qualquer seção (MD5, SHA-256 e SHA-512 calculado e assinado, certificado da urna) e a exportação do catálogo em CSV.
 
 As demais páginas cobrem a auditoria de 2022:
 
