@@ -23,7 +23,6 @@ from __future__ import annotations
 import hashlib
 import io
 import json
-import zipfile
 from collections import Counter
 from typing import Any, Optional
 
@@ -59,7 +58,6 @@ EVENTOS_ENCERRAMENTO = ("Inicio do Encerramento", "Início do Encerramento")
 FAIXAS_INTERVALO = (1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 120, 300, 600, 3600)
 LIMIAR_RAJADA_S = 10
 LIMIAR_LACUNA_S = 3600
-MAX_LOG_BYTES = 256 * 1024 * 1024
 
 
 def sha512(b: bytes) -> str:
@@ -216,36 +214,13 @@ def comparar_rdv_bu(rdv, bu_cont: dict, ident: dict, origem_bu: str = "bu",
 # Log: linha do tempo dos votos
 # ---------------------------------------------------------------------------
 
-def _textos_zip(raw: bytes, nivel: int = 0) -> Optional[list[str]]:
-    """Textos dos logs de um ZIP, logs aninhados primeiro.
-
-    Na troca de urna (contingência) o -log.jez traz o logd.dat da urna que
-    terminou a votação e, como .jez aninhado (ZIP com outro logd.dat), o log
-    da urna substituída, nomeado <urna><ddmmaaaahhmmss>-NN.jez. Os aninhados
-    vêm antes, em ordem de nome; o logd.dat do pacote fica por último.
-    """
-    with zipfile.ZipFile(io.BytesIO(raw)) as z:
-        infos = [i for i in z.infolist() if not i.is_dir()]
-        if not infos or sum(i.file_size for i in infos) > MAX_LOG_BYTES:
-            return None
-        aninhados, proprios = [], []
-        for i in sorted(infos, key=lambda i: i.filename):
-            dados = z.read(i)
-            if dados[:4] == b"PK\x03\x04":
-                if nivel < 2:
-                    sub = _textos_zip(dados, nivel + 1)
-                    if sub:
-                        aninhados.extend(sub)
-            else:
-                proprios.append(dados.decode("latin-1", errors="replace"))
-        return aninhados + proprios
-
-
 def texto_log(raw: bytes) -> Optional[str]:
     """Texto de um -log.jez (ZIP em 2026, com logs aninhados de urnas
     substituídas; 7-zip como reserva)."""
     if raw[:4] == b"PK\x03\x04":
-        textos = _textos_zip(raw)
+        from ..parsers.log import textos_zip
+
+        textos = textos_zip(raw)
         return "\n".join(textos) if textos else None
     from ..parsers.log import LogParser
 
@@ -405,11 +380,17 @@ def analisar_log_tempo(texto: str, uf: str, cd_mun, comparecimento: Optional[int
 def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
                     sha_catalogo: Optional[dict[str, str]] = None,
                     pleito: Optional[int] = None,
-                    data_eleicao: str = "04/10/2026") -> dict:
+                    data_eleicao: str = "04/10/2026", auditar: bool = False,
+                    modelo_cod: Optional[int] = None) -> dict:
     """Recontagem e linha do tempo de uma seção.
 
-    arquivos: tipo -> (nome, bytes) com 'rdv', 'bu' (ou 'busa') e 'log'.
+    arquivos: tipo -> (nome, bytes) com 'rdv', 'bu' (ou 'busa') e 'log'
+    (ou 'logsa').
     sha_catalogo: tipo -> SHA-512 do catálogo de integridade (opcional).
+    auditar: roda também a auditoria por seção de BU e log
+    (integrity.analisar_secao_2026, mesmas regras da auditoria publicada) e
+    devolve "secao_log" e "issues"; modelo_cod é o código do modelo da urna
+    (20 para UE2020), que vem do .vsc na auditoria de integridade.
     """
     from ..parsers.bu import BUParser
 
@@ -428,7 +409,18 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
 
     tipo_bu = "bu" if "bu" in arquivos else ("busa" if "busa" in arquivos else None)
     bu = None
-    if tipo_bu:
+    auditoria = None
+    if auditar:
+        from .integrity import analisar_secao_2026
+
+        try:
+            auditoria = analisar_secao_2026(
+                ident, {"arquivos": [(tp, nm, b) for tp, (nm, b) in arquivos.items()]},
+                modelo_cod)
+            bu = auditoria.pop("bu_obj", None)
+        except Exception as e:  # noqa: BLE001 - registrado como motivo da seção
+            sec["motivo"] = f"auditoria BU/log falhou: {e!r}"[:200]
+    if tipo_bu and bu is None:
         try:
             bu = BUParser().parse_bytes(arquivos[tipo_bu][1])
         except Exception as e:  # noqa: BLE001 - registrado como status da seção
@@ -471,9 +463,10 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
     sec["rdv_confere"] = bool(linhas) and all(ln["confere"] for ln in linhas)
 
     tempo = None
-    if "log" in arquivos:
+    tipo_log = "log" if "log" in arquivos else ("logsa" if "logsa" in arquivos else None)
+    if tipo_log:
         try:
-            txt = texto_log(arquivos["log"][1])
+            txt = texto_log(arquivos[tipo_log][1])
         except Exception as e:  # noqa: BLE001
             txt = None
             sec["motivo"] = (sec["motivo"] or "") + f" log: {e!r}"[:200]
@@ -489,5 +482,9 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
                                                  "aberturas")}
                     achados.append({**ident, "categoria": f, "grupo": CATEGORIAS[f],
                                     "detalhes": det})
-    return {"secao": sec, "linhas": linhas, "tempo": tempo, "achados": achados,
-            "presidente": {_chave_txt(k): int(v) for k, v in presidente.items()}}
+    out = {"secao": sec, "linhas": linhas, "tempo": tempo, "achados": achados,
+           "presidente": {_chave_txt(k): int(v) for k, v in presidente.items()}}
+    if auditoria is not None:
+        out["secao_log"] = auditoria["secao_log"]
+        out["issues"] = auditoria["issues"]
+    return out

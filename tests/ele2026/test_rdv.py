@@ -263,12 +263,30 @@ def test_texto_log_com_log_aninhado_de_contingencia():
     assert txt.index("\t111\t") < txt.index("\t222\t")
 
 
-def test_log_parser_prefere_logd_dat_ao_jez_aninhado():
+def test_log_parser_le_os_dois_logs_na_troca_de_urna():
     from dataurnas.parsers.log import LogParser
 
     entradas = LogParser().parse_bytes(_log_contingencia())
-    assert {e.id_urna for e in entradas} == {"222"}
-    assert sum("computado" in e.descricao for e in entradas) == 1
+    assert [e.id_urna for e in entradas] == ["111", "111", "222", "222", "222"]
+    ev = LogParser().extract_events(entradas, turno_date="04/10/2026")
+    assert ev["votos_computados"] == 2
+    assert ev["abertura"].hora == "08:00:00"
+    assert ev["encerramento"].hora == "17:05:00"
+
+
+def test_processar_secao_com_auditoria_de_log(rdv_raw):
+    bu_raw = BU_AC.read_bytes()
+    arquivos = {"rdv": ("x-rdv.dat", rdv_raw), "bu": ("x-bu.dat", bu_raw),
+                "log": ("x-log.jez", _log_contingencia())}
+    r = R.processar_secao(IDENT, arquivos, None, 3220, auditar=True, modelo_cod=22)
+    assert r["secao"]["rdv_confere"] is True
+    sl = r["secao_log"]
+    assert sl["secao_id"] == "1T/ac/01066/0004/0077"
+    assert sl["votos_log"] == 2
+    assert sl["modelo_urna"] == "2022"
+    assert sl["tem_log"] is True
+    codigos = {i[1] for i in r["issues"]}
+    assert "A03" in codigos  # 2 votos no log x 234 no BU
 
 
 # ---------------------------------------------------------------- seção inteira

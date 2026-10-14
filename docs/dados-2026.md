@@ -244,7 +244,9 @@ Em 2026 há duas eleições: 6257 (Presidente) e 6259 (Governador, Senador com d
 
 ### Log de contingência
 
-Na troca de urna o `-log.jez` traz o `logd.dat` da urna que encerrou a votação e, como `.jez` aninhado (outro ZIP), o log da urna substituída. A linha do tempo lê os dois; os votos de cada urna são separados pelo identificador da urna.
+Na troca de urna o `-log.jez` traz o `logd.dat` da urna que encerrou a votação e, como `.jez` aninhado (outro ZIP), o log da urna substituída. O parser de log (`parsers/log.py`, `textos_zip`) lê os dois, o da urna substituída primeiro; na linha do tempo os votos de cada urna são separados pelo identificador da urna.
+
+O mesmo download regera a auditoria por seção de BU e log em `data/parquet/2026/auditoria_v2/` (`secoes_log_2026.parquet` e `issues_2026.parquet`, mesmo esquema e mesmas regras de `auditoria/`), com `comparacao.json` listando as seções que mudaram por coluna e por código. A versão publicada lia o `.jez` aninhado no lugar do `logd.dat` e registrava 0 voto no log nessas seções. Com os dois logs, a troca de urna passa a contar como reinício (C06) e substituição (I01).
 
 ### `rdv/recontagem_secoes.parquet`
 

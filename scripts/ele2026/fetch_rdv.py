@@ -14,6 +14,12 @@ Saída em data/parquet/2026/rdv/ (ZSTD, cada arquivo < 90 MB):
                              histograma de intervalos, grupos de leitura
   divergencias.jsonl         cada divergência do RDV, gravada na hora (fsync)
 
+Com --auditar (padrão), o mesmo download regera a auditoria por seção de BU e
+log (mesmas regras e esquema da auditoria publicada, com o log lido também do
+.jez aninhado da urna substituída) em data/parquet/2026/auditoria_v2/:
+  secoes_log_2026.parquet, issues_2026.parquet e comparacao.json (diferenças
+  por coluna e por código em relação a data/parquet/2026/auditoria/).
+
 Divergência RDV x BU também vai para o log (data/ele2026_rdv.log) numa linha
 que começa com "DIVERGENCIA_RDV ". O run não para.
 
@@ -59,13 +65,16 @@ from dataurnas.analyzer import rdv_recontagem as R  # noqa: E402
 from dataurnas.config import ESTADOS, PARQUET_2026_DIR  # noqa: E402
 from dataurnas.downloader import ele2026 as E  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fetch_integridade import ISSUES_SCHEMA, SECOES_LOG_SCHEMA  # noqa: E402
+
 log = logging.getLogger("fetch_rdv")
 
 TODAS_UFS = ESTADOS + ["zz"]
 LIMITE_BYTES = 90 * 1024 * 1024
 ALVO_PARTE = 80 * 1024 * 1024
 DATA_ELEICAO = "04/10/2026"
-TIPOS = ("rdv", "bu", "busa", "log")
+TIPOS = ("rdv", "bu", "busa", "log", "logsa")
 CATEGORIAS_ALERTA = {"rdv_bu_diverge", "rdv_bu_diverge_sa", "rdv_registros_diverge",
                      "rdv_estrutura", "rdv_hash_diverge", "rdv_nao_decodificado"}
 MANIFESTO = PARQUET_2026_DIR / "integridade" / "catalogo_manifest.json"
@@ -139,7 +148,8 @@ class Writer:
 
     TABELAS = (("recontagem", RECONTAGEM_SCHEMA), ("tempo", TEMPO_SCHEMA),
                ("secoes", SECOES_SCHEMA), ("presidente", PRESIDENTE_SCHEMA),
-               ("achados", ACHADOS_SCHEMA))
+               ("achados", ACHADOS_SCHEMA), ("seclog", SECOES_LOG_SCHEMA),
+               ("issues", ISSUES_SCHEMA))
 
     def __init__(self, out: Path, lote: int):
         self.parts = out / "parts"
@@ -172,6 +182,12 @@ class Writer:
                 **ident, "categoria": a["categoria"], "grupo": a["grupo"],
                 "cargo": a.get("cargo"),
                 "detalhes": json.dumps(det, ensure_ascii=False, default=str)})
+        if r.get("secao_log") is not None:
+            self.rows["seclog"].append(r["secao_log"])
+        for i in r.get("issues") or []:
+            self.rows["issues"].append(dict(zip(
+                ("secao_id", "codigo", "severidade", "descricao", "base_legal", "detalhes"),
+                i, strict=True)))
         self.keys.append(key)
         if len(self.keys) >= self.lote:
             self.flush()
@@ -289,7 +305,23 @@ async def resolver_aux(f: E.HttpFetcher, s: dict) -> Optional[dict]:
 # Processamento
 # ---------------------------------------------------------------------------
 
-async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict) -> dict:
+def modelos_uf(uf: str, secoes_integridade: Path) -> dict[str, int]:
+    """Código do modelo da urna por seção (lido do .vsc na auditoria de integridade)."""
+    from dataurnas.config import MODELOS_URNA
+
+    if not secoes_integridade.exists():
+        return {}
+    cod = {v: k for k, v in MODELOS_URNA.items()}
+    t = pq.read_table(secoes_integridade, columns=["uf", "cd_mun", "zona", "secao",
+                                                   "modelo_urna"],
+                      filters=[("uf", "=", uf)]).to_pydict()
+    return {E.secao_key(u, m, z, s): cod[mo]
+            for u, m, z, s, mo in zip(t["uf"], t["cd_mun"], t["zona"], t["secao"],
+                                      t["modelo_urna"], strict=True) if mo in cod}
+
+
+async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
+                    auditar: bool = False, modelo_cod: Optional[int] = None) -> dict:
     ident = {k: s[k] for k in ("uf", "cd_mun", "zona", "secao")}
     if s["arquivos"] is None:
         s = await resolver_aux(f, s)
@@ -297,6 +329,8 @@ async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict) -> dic
             return {"secao": {**ident, "status": "sem_arquivos", "motivo": "aux.json sem conjunto"},
                     "linhas": [], "tempo": None, "achados": [], "presidente": {}}
     tps = [tp for tp in TIPOS if tp in s["arquivos"]]
+    if "log" in tps and "logsa" in tps:
+        tps.remove("logsa")  # como na auditoria publicada: log da urna, senão o do SA
     corpos = await asyncio.gather(*[
         f.get(E.url_arquivo(s["uf"], s["cd_mun"], s["zona"], s["secao"], s["hash"],
                             s["arquivos"][tp][0])) for tp in tps])
@@ -308,7 +342,7 @@ async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict) -> dic
     del corpos
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(pool, R.processar_secao, ident, arquivos, sha or None,
-                                      int(E.PLEITO), DATA_ELEICAO)
+                                      int(E.PLEITO), DATA_ELEICAO, auditar, modelo_cod)
 
 
 def registrar_execucao(out: Path, evento: dict) -> None:
@@ -348,6 +382,8 @@ async def run(args: argparse.Namespace) -> int:
                 secoes = await secoes_do_aux(f, uf)
             secoes = [s for s in secoes
                       if E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"]) not in done]
+            modelos = (modelos_uf(uf, Path(args.secoes_integridade))
+                       if args.auditar else {})
             log.info("UF %s: %d seções pendentes", uf, len(secoes))
             q: asyncio.Queue = asyncio.Queue()
             for s in secoes:
@@ -364,7 +400,7 @@ async def run(args: argparse.Namespace) -> int:
                         return
                     key = E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"])
                     try:
-                        r = await processar(f, pool, s)
+                        r = await processar(f, pool, s, args.auditar, modelos.get(key))
                     except Exception as e:  # noqa: BLE001 - refeito no próximo run
                         erros.append(f"{key}:{e!r}"[:300])
                         log.warning("erro em %s: %r", key, e)
@@ -401,7 +437,8 @@ async def run(args: argparse.Namespace) -> int:
         dst.write_text("\n".join(erros) + "\n", encoding="utf-8")
         log.warning("erros gravados em %s; rode de novo para refazer", dst.name)
     if not args.sem_consolidar:
-        consolidar(out, Path(args.base_votos))
+        consolidar(out, Path(args.base_votos), Path(args.saida_auditoria),
+                   Path(args.auditoria_publicada))
     return 0 if not erros else 2
 
 
@@ -433,7 +470,9 @@ def _copiar(con, sel: str, dst: Path) -> list[str]:
     return nomes
 
 
-def consolidar(out: Path, base_votos: Optional[Path] = None) -> None:
+def consolidar(out: Path, base_votos: Optional[Path] = None,
+               dst_auditoria: Optional[Path] = None,
+               auditoria_publicada: Optional[Path] = None) -> None:
     import duckdb
 
     parts = out / "parts"
@@ -450,6 +489,9 @@ def consolidar(out: Path, base_votos: Optional[Path] = None) -> None:
                 SELECT x.* EXCLUDE (_lote)
                 FROM read_parquet('{parts / f"{nome}-*.parquet"}', union_by_name = true) x
                 JOIN s USING (uf, cd_mun, zona, secao, _lote)""")
+    auditoria = {}
+    if dst_auditoria is not None and any(parts.glob("seclog-*.parquet")):
+        auditoria = consolidar_auditoria(con, parts, dst_auditoria, auditoria_publicada)
     arquivos = []
     arquivos += _copiar(con, "SELECT * FROM recontagem ORDER BY uf, cd_mun, zona, secao, "
                              "id_eleicao, codigo_cargo", out / "recontagem_secoes.parquet")
@@ -603,6 +645,7 @@ def consolidar(out: Path, base_votos: Optional[Path] = None) -> None:
                        "max_votos_minuto": dist[2], "max_votos_minuto_quantis_50_99pct": dist[3],
                        "menor_intervalo_s": dist[4], "secoes_por_pico_minuto": pico},
         "arquivos_parquet": arquivos,
+        "auditoria_bu_log": auditoria,
         "n_divergencias_rdv": len(divergencias),
         "divergencias_rdv": divergencias[:500],
         "erros_pendentes": len(pendentes),
@@ -612,6 +655,104 @@ def consolidar(out: Path, base_votos: Optional[Path] = None) -> None:
                                                 default=str), encoding="utf-8")
     log.info("consolidado: %d seções, %d divergências RDV, arquivos %s",
              totais.get("secoes", 0), len(divergencias), arquivos)
+
+
+def consolidar_auditoria(con, parts: Path, dst: Path, publicada: Optional[Path]) -> dict:
+    """secoes_log_2026.parquet e issues_2026.parquet (mesmo esquema da
+    auditoria publicada, lote mais recente de cada seção) e comparacao.json
+    com a auditoria publicada."""
+    dst.mkdir(parents=True, exist_ok=True)
+    con.execute("""CREATE OR REPLACE TEMP TABLE sid AS
+        SELECT '1T/' || uf || '/' || cd_mun || '/' || zona || '/' || secao AS secao_id, _lote
+        FROM s""")
+    dl = dst / "secoes_log_2026.parquet"
+    con.execute(f"""CREATE OR REPLACE TEMP TABLE seclog_n AS
+        SELECT x.* EXCLUDE (_lote)
+        FROM read_parquet('{parts / "seclog-*.parquet"}', union_by_name = true) x
+        JOIN sid USING (secao_id, _lote)""")
+    con.execute(f"""COPY (SELECT * FROM seclog_n ORDER BY uf, cd_mun, zona, secao)
+        TO '{dl}.tmp' (FORMAT PARQUET, COMPRESSION ZSTD)""")
+    os.replace(f"{dl}.tmp", dl)
+    di = dst / "issues_2026.parquet"
+    con.execute(f"""CREATE OR REPLACE TEMP TABLE issues_n AS
+        SELECT x.* EXCLUDE (_lote)
+        FROM read_parquet('{parts / "issues-*.parquet"}', union_by_name = true) x
+        JOIN sid USING (secao_id, _lote)""")
+    con.execute(f"""COPY (SELECT * FROM issues_n ORDER BY secao_id, codigo)
+        TO '{di}.tmp' (FORMAT PARQUET, COMPRESSION ZSTD)""")
+    os.replace(f"{di}.tmp", di)
+    for p in (dl, di):
+        if p.stat().st_size > LIMITE_BYTES:
+            log.error("%s passou de 90 MB (%d MB)", p.name, p.stat().st_size >> 20)
+    res = {"secoes_log": con.execute("SELECT count(*) FROM seclog_n").fetchone()[0],
+           "issues_por_codigo": {c: int(n) for c, n in con.execute(
+               "SELECT codigo, count(*) FROM issues_n GROUP BY 1 ORDER BY 1").fetchall()}}
+    if publicada and (publicada / "secoes_log_2026.parquet").exists():
+        res["comparacao"] = comparar_auditorias(con, publicada, dst)
+    log.info("auditoria v2: %s", json.dumps(res, ensure_ascii=False, default=str)[:1500])
+    return res
+
+
+def comparar_auditorias(con, publicada: Path, dst: Path) -> dict:
+    """Compara a auditoria nova (tabelas seclog_n e issues_n) com a publicada,
+    só nas seções processadas nesta auditoria."""
+    from dataurnas.dashboard.reference import GRUPO_ADULTERACAO, ISSUE_GRUPOS
+
+    pl, pi = publicada / "secoes_log_2026.parquet", publicada / "issues_2026.parquet"
+    con.execute(f"""CREATE OR REPLACE TEMP TABLE seclog_p AS
+        SELECT p.* FROM read_parquet('{pl}') p JOIN seclog_n n USING (secao_id)""")
+    con.execute(f"""CREATE OR REPLACE TEMP TABLE issues_p AS
+        SELECT p.* FROM read_parquet('{pi}') p JOIN seclog_n n USING (secao_id)""")
+    cols = [c for c, *_ in con.execute("DESCRIBE seclog_n").fetchall()
+            if c not in ("secao_id", "n_issues", "has_issues")]
+    mudou_col = {c: int(con.execute(f"""SELECT count(*) FROM seclog_n n
+        JOIN seclog_p p USING (secao_id) WHERE n.{c} IS DISTINCT FROM p.{c}""").fetchone()[0])
+        for c in cols}
+    cond = " OR ".join(f"n.{c} IS DISTINCT FROM p.{c}" for c in cols)
+    secoes_mudaram = int(con.execute(f"""SELECT count(*) FROM seclog_n n
+        JOIN seclog_p p USING (secao_id) WHERE {cond}""").fetchone()[0])
+    por_codigo = {}
+    for cod, n_pub, n_nov, s_ganhou, s_perdeu, s_mudou in con.execute("""
+        WITH p AS (SELECT secao_id, codigo, count(*) n,
+                          string_agg(severidade || '|' || descricao, ';' ORDER BY descricao) d
+                   FROM issues_p GROUP BY 1, 2),
+             q AS (SELECT secao_id, codigo, count(*) n,
+                          string_agg(severidade || '|' || descricao, ';' ORDER BY descricao) d
+                   FROM issues_n GROUP BY 1, 2)
+        SELECT coalesce(p.codigo, q.codigo) codigo, coalesce(sum(p.n), 0), coalesce(sum(q.n), 0),
+               count(*) FILTER (WHERE p.secao_id IS NULL),
+               count(*) FILTER (WHERE q.secao_id IS NULL),
+               count(*) FILTER (WHERE p.secao_id IS NOT NULL AND q.secao_id IS NOT NULL
+                                AND p.d <> q.d)
+        FROM p FULL JOIN q USING (secao_id, codigo) GROUP BY 1 ORDER BY 1""").fetchall():
+        por_codigo[cod] = {"ocorrencias_publicada": int(n_pub), "ocorrencias_nova": int(n_nov),
+                           "secoes_ganharam": int(s_ganhou), "secoes_perderam": int(s_perdeu),
+                           "secoes_descricao_mudou": int(s_mudou),
+                           "grupo": ISSUE_GRUPOS.get(cod)}
+    secoes_issues_mudaram = int(con.execute("""
+        WITH p AS (SELECT secao_id, string_agg(codigo || '|' || descricao, ';'
+                          ORDER BY codigo, descricao) d FROM issues_p GROUP BY 1),
+             q AS (SELECT secao_id, string_agg(codigo || '|' || descricao, ';'
+                          ORDER BY codigo, descricao) d FROM issues_n GROUP BY 1)
+        SELECT count(*) FROM p FULL JOIN q USING (secao_id)
+        WHERE p.d IS DISTINCT FROM q.d""").fetchone()[0])
+    grupo1 = [c for c, g in ISSUE_GRUPOS.items() if g == GRUPO_ADULTERACAO]
+    alvo = ["A03", *grupo1]
+    exemplos = {c: [r[0] for r in con.execute(
+        "SELECT DISTINCT secao_id FROM issues_n WHERE codigo = ? ORDER BY 1 LIMIT 20",
+        [c]).fetchall()] for c in alvo}
+    comp = {
+        "secoes_comparadas": int(con.execute("SELECT count(*) FROM seclog_p").fetchone()[0]),
+        "secoes_log_mudaram": secoes_mudaram,
+        "secoes_log_mudaram_por_coluna": {c: n for c, n in mudou_col.items() if n},
+        "secoes_issues_mudaram": secoes_issues_mudaram,
+        "issues_por_codigo": por_codigo,
+        "a03_e_grupo1_na_nova": {c: {"secoes": len(v), "exemplos": v}
+                                 for c, v in exemplos.items() if v},
+    }
+    (dst / "comparacao.json").write_text(json.dumps(comp, ensure_ascii=False, indent=1),
+                                         encoding="utf-8")
+    return comp
 
 
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
@@ -634,6 +775,13 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--base-votos", default=str(PARQUET_2026_DIR))
     ap.add_argument("--saida", default=str(PARQUET_2026_DIR / "rdv"))
     ap.add_argument("--log", default=str(ROOT / "data" / "ele2026_rdv.log"))
+    ap.add_argument("--auditar", action=argparse.BooleanOptionalAction, default=True,
+                    help="regera a auditoria por seção de BU e log com o mesmo download")
+    ap.add_argument("--saida-auditoria", default=str(PARQUET_2026_DIR / "auditoria_v2"))
+    ap.add_argument("--auditoria-publicada", default=str(PARQUET_2026_DIR / "auditoria"))
+    ap.add_argument("--secoes-integridade",
+                    default=str(PARQUET_2026_DIR / "integridade" / "secoes.parquet"),
+                    help="modelo da urna por seção (lido do .vsc na integridade)")
     ap.add_argument("--sem-consolidar", action="store_true")
     ap.add_argument("--so-consolidar", action="store_true")
     a = ap.parse_args(argv)
@@ -660,6 +808,7 @@ if __name__ == "__main__":
     args = parse_args()
     configurar_log(args.log)
     if args.so_consolidar:
-        consolidar(Path(args.saida), Path(args.base_votos))
+        consolidar(Path(args.saida), Path(args.base_votos), Path(args.saida_auditoria),
+                   Path(args.auditoria_publicada))
         sys.exit(0)
     sys.exit(asyncio.run(run(args)))

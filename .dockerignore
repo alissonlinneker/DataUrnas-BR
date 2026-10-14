@@ -69,3 +69,4 @@ data/parquet/2026/rdv/checkpoint.txt
 data/parquet/2026/rdv/erros-*.txt
 data/parquet/2026/rdv/execucoes.jsonl
 data/parquet/2026/rdv/*.tmp
+data/parquet/2026/auditoria_v2/*.tmp
