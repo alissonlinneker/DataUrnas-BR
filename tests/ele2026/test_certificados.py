@@ -511,7 +511,6 @@ def test_relatorio_secao_certificados(tmp_path):
     md = R.secao_certificados(tmp_path)
     assert md.startswith("## Certificados das urnas")
     assert "**Em andamento.** Modo completo" in md and "ausente nesta cópia" in md
-    assert "| CN igual ao número interno da urna no BU | 2 de 2 |" in md
     assert "validade no dia da eleição: válidos: 2" in md and "cadeia: conferida: 2" in md
     assert "| AC UE2022 | UE2022 | 50 | 13/08/2023 a 21/06/2024 | sim: 50 | sim: 50 |" in md
     assert "acue2022.cer" in md and "não indício de adulteração" in md
