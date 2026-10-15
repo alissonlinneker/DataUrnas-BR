@@ -4,7 +4,7 @@
 
 **Origem:** projeto DataUrnas-BR, auditoria independente dos arquivos públicos da urna eletrônica (<https://github.com/alissonlinneker/DataUrnas-BR>).
 
-**Data de referência:** 14/10/2026.
+**Data de referência:** 15/10/2026.
 
 ## 1. Contexto
 
@@ -117,6 +117,24 @@ Em 14 seções, o CN do certificado que assina o `.vsc` não é igual ao número
 
 **Pedido:** confirmar se essas divergências correspondem a substituição de urna depois da carga e, se for o caso, onde esse registro é publicado (ata da mesa ou relatório da zona eleitoral).
 
-## 6. Como reproduzir
+## 6. Log de urna ausente ou trocado no pacote publicado
+
+A contagem de votos no log de cada seção (eventos "O voto do eleitor foi computado" do dia da eleição) foi comparada com o comparecimento do BU nas 499.207 seções. Nas seções abaixo, o BU e o RDV conferem entre si e o SHA-512 do pacote confere com o valor assinado, mas o `-log.jez` publicado não traz o log da urna que recebeu parte dos votos. O resultado não é afetado; o que fica incompleto é a trilha de auditoria.
+
+| UF | Município | Zona | Seção | Votos no log | Comparecimento no BU | Diferença | Observação |
+|---|---|---|---|---:|---:|---:|---|
+| BA | 39934 | 0183 | 0175 | 236 | 272 | -36 | o `.jez` aninhado (`024291180410202614245201ME.jez`) começa com o log da urna 02423907, que é da seção 0181 (100 votos); falta o log da manhã da urna original da 0175 (02424441), cerca de 136 votos |
+| SP | 71072 | 0002 | 0035 | 232 | 247 | -15 | o `.jez` aninhado é o log da urna 02254720, que não recebeu votos; falta o log da urna que abriu a votação (MV 9F62BC72), com cerca de 15 votos até as 10h17 |
+| RS | 89036 | 0083 | 0044 | 278 | 279 | -1 | a urna 01675257 copiou a mídia externa às 11h11 e foi usada como contingência, mas o log dela não está no pacote |
+
+Em algumas seções o pacote traz o mesmo log mais de uma vez (cópia da memória interna e da mídia externa, ou a mesma mídia copiada por duas urnas de contingência); as contagens acima já descontam as cópias repetidas.
+
+Na seção BA 39934/0183/0175, a urna original da seção passou a gravar, às 13h23, na mídia externa que trazia o log da seção vizinha 0181, com "Resultado da verificação da mídia externa estática : 1" (nas demais urnas o resultado é 0). A seção 0181 fecha com o próprio BU (263 votos) e não há sinal de voto cruzado entre as duas seções: a mídia de votação da 0175 acompanhou só as urnas da 0175.
+
+Também se registra a seção RJ 58971/0087/0184: uma única urna reiniciou 18 vezes no dia, sem contingência, com 12 votos interrompidos; o log publicado soma 256 votos contra 258 no BU, e não permite identificar quais 2 eleitores concluíram o voto antes de um reinício.
+
+**Pedido:** publicar ou disponibilizar os logs das urnas 02424441 (BA 39934/0183/0175), da urna que abriu a votação em SP 71072/0002/0035 e da urna 01675257 (RS 89036/0083/0044), e esclarecer como a mídia externa da seção 0181 passou a integrar o pacote da seção 0175.
+
+## 7. Como reproduzir
 
 Os dados e o código que fundamentam este documento estão no repositório do projeto. O catálogo com MD5, SHA-256 e SHA-512 de cada um dos 1.999.485 arquivos baixados está nos anexos da versão [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1), com `SHA256SUMS` para conferência. O [relatório de integridade](relatorio-integridade-2026.md) descreve o passo a passo para conferir qualquer seção com ferramentas comuns (`curl` e `shasum`).

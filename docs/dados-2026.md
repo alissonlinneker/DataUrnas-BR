@@ -226,3 +226,65 @@ Tipos conforme lidos dos próprios arquivos com DuckDB.
 | `partido` | INTEGER | Número do partido (nulo para branco e nulo) |
 | `votos` | INTEGER | Quantidade de votos na seção para o tipo e o número |
 
+
+## Recontagem do RDV e linha do tempo do log
+
+`scripts/ele2026/fetch_rdv.py` baixa em memória, para cada seção com RDV publicado, o `-rdv.dat`, o `-bu.dat` e o `-log.jez` do mesmo conjunto de arquivos (nomes, diretório e SHA-512 vêm do catálogo de integridade `arquivos_<uf>.parquet`; com `--fonte aux`, do `aux.json`). Confere o SHA-512 de cada arquivo com o catálogo, reconta o RDV cargo a cargo e compara com o BU, e mede no log o horário de cada voto computado. Nada é gravado em disco além dos resultados em `data/parquet/2026/rdv/`.
+
+### Estrutura do RDV (spec v2)
+
+O `-rdv.dat` é uma `EntidadeResultadoRDV` em BER (`spec/v2/rdv.asn1`), sem o envelope genérico do BU:
+
+- `cabecalho`: `dataGeracao` e `idEleitoral` (`idPleito` 3220).
+- `urna`: tipo, versão do software, carga (número interno, código de carga), `tipoArquivo` e número de série da flash.
+- `rdv`: `pleito`, `fase`, `identificacao` (município, zona, local, seção), `historicoCodigosCarga` e `eleicoes`, um CHOICE entre `eleicoesVota` (urna) e `eleicoesSA` (Sistema de Apuração).
+- Cada eleição traz `votosCargos`; cada cargo traz `idCargo`, `quantidadeEscolhas` e a lista `votos`, um registro `{tipoVoto, digitacao}` por escolha, embaralhado e sem vínculo com o eleitor.
+
+Em 2026 há duas eleições: 6257 (Presidente) e 6259 (Governador, Senador com duas escolhas, Deputado Federal, Deputado Estadual ou Distrital). Cada cargo tem `comparecimento x quantidadeEscolhas` registros. Equivalência com o BU: `nominal` pelo número digitado; `legenda` pelos dois primeiros dígitos (partido); `branco` e `brancoAposSuspensao` como branco; `nulo`, `nuloAposSuspensao` e `nuloPorRepeticao` como nulo; `nuloCargoSemCandidato` e `nuloAposSuspensaoCargoSemCandidato` como `cargoSemCandidato` (agrupado em nulo se o BU não tiver o tipo). O parser fica em `src/dataurnas/parsers/rdv.py`.
+
+### Log de contingência
+
+Na troca de urna o `-log.jez` traz o `logd.dat` da urna que encerrou a votação e, como `.jez` aninhado (outro ZIP), o log da urna substituída. O parser de log (`parsers/log.py`, `textos_zip`) lê os dois, o da urna substituída primeiro; na linha do tempo os votos de cada urna são separados pelo identificador da urna.
+
+O mesmo download regera a auditoria por seção de BU e log em `data/parquet/2026/auditoria_v2/` (`secoes_log_2026.parquet` e `issues_2026.parquet`, mesmo esquema e mesmas regras de `auditoria/`), com `comparacao.json` listando as seções que mudaram por coluna e por código. A versão publicada lia o `.jez` aninhado no lugar do `logd.dat` e registrava 0 voto no log nessas seções. Com os dois logs, a troca de urna passa a contar como reinício (C06) e substituição (I01).
+
+### `rdv/recontagem_secoes.parquet`
+
+Uma linha por seção e cargo.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `uf`, `cd_mun`, `zona`, `secao` | VARCHAR | Identificação da seção |
+| `id_eleicao` | INTEGER | 6257 ou 6259 |
+| `cargo`, `codigo_cargo` | VARCHAR, SMALLINT | Cargo |
+| `qtd_escolhas` | SMALLINT | Escolhas por eleitor (Senador: 2) |
+| `registros_rdv` | INTEGER | Registros do cargo no RDV |
+| `comparecimento_bu` | INTEGER | Comparecimento do BU na eleição |
+| `votos_rdv`, `votos_bu` | INTEGER | Total recontado no RDV e total do BU |
+| `nominais_*`, `legenda_*`, `brancos_*`, `nulos_*` | INTEGER | Mesmos totais por tipo, RDV e BU |
+| `n_votaveis` | INTEGER | Números distintos votados no RDV |
+| `confere` | BOOLEAN | Mesma contagem por candidato, legenda, brancos e nulos e registros = comparecimento x escolhas |
+| `detalhes` | VARCHAR | JSON com as diferenças (`{"nominal:22": [rdv, bu]}`), nulo quando confere |
+
+### `rdv/log_tempo_secoes.parquet`
+
+Uma linha por seção. Horários em hora local da urna; abertura oficial às 8h e fim às 17h de Brasília, convertidos pelo fuso do município (`fuso_offset`).
+
+| Coluna | Descrição |
+|---|---|
+| `votos_log`, `comparecimento_bu`, `diferenca_log_bu` | Eventos "O voto do eleitor foi computado" no dia da eleição e comparação com o BU |
+| `votos_outras_datas` | Votos computados com outra data |
+| `n_urnas_log`, `aberturas` | Urnas com voto no log e eventos "Urna pronta para receber votos" |
+| `hora_pronta`, `hora_encerramento`, `primeiro_voto`, `ultimo_voto` | Marcos do dia |
+| `votos_antes_8h`, `votos_apos_17h` | Votos antes da abertura oficial e depois das 17h (legais: eleitores na fila) |
+| `votos_antes_pronta`, `votos_apos_encerramento` | Votos fora da sequência de eventos da mesma urna |
+| `max_votos_minuto`, `minuto_pico` | Pico por minuto |
+| `intervalo_min_s`, `intervalo_mediana_s`, `intervalos_lt_10s`, `intervalos_lt_5s` | Intervalos entre votos consecutivos da mesma urna |
+| `maior_lacuna_min`, `lacunas_60min` | Lacunas sem voto |
+| `inversoes_relogio`, `ajustes_hora` | Hora menor que a do voto anterior e eventos de ajuste de hora |
+| `hist_intervalos` | Contagem por faixa de intervalo (faixas em `resumo.json`) |
+| `flags`, `grupo` | Categorias marcadas e o grupo de leitura mais grave (1, 2 ou 3) |
+
+Grupos de leitura (`dashboard/reference.py`, `RDV_CATEGORIAS`): divergência RDV x BU, registros diferentes do comparecimento, estrutura inválida e hash diferente são grupo 1; contagem do log diferente do BU, voto fora de sequência ou com outra data, RDV não decodificado e divergência com BU do Sistema de Apuração são grupo 2; voto antes das 8h, intervalos curtos, lacunas e relógio invertido são grupo 3.
+
+`rdv/resumo.json` traz os totais, os números por UF e por cargo, a soma nacional de Presidente pelo RDV comparada com `votos_presidente_2026.parquet`, as categorias encontradas e o histograma de intervalos. `rdv/divergencias.jsonl` recebe cada divergência do RDV na hora em que aparece (com `fsync`), e o log `data/ele2026_rdv.log` repete a linha com o prefixo `DIVERGENCIA_RDV `.

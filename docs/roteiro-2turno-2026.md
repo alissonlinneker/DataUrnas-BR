@@ -24,9 +24,8 @@ só as seções com 2º turno ou suplementar, e o BU é sempre filtrado pela ele
 
 ## Interpretadores
 
-- Coleta (rede, processos longos): `/opt/homebrew/bin/python3.14`.
-- Testes e lint: `.venv/bin/python` do checkout principal
-  (`/Users/alissonlinneker/www/dataUrnas-br/.venv/bin/python`).
+- Coleta (rede, processos longos): um Python 3.11 ou mais recente com as dependências do projeto.
+- Testes e lint: `.venv/bin/python` do checkout.
 
 Todos os comandos abaixo partem da raiz do repositório.
 

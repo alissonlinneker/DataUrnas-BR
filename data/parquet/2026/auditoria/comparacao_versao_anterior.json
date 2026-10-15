@@ -1,0 +1,146 @@
+{
+ "secoes_comparadas": 499207,
+ "secoes_log_mudaram": 7645,
+ "secoes_log_mudaram_por_coluna": {
+  "hora_abertura": 7645,
+  "hora_encerramento": 7645,
+  "duracao_min": 7645,
+  "reboots": 2580,
+  "erros_log": 7645,
+  "alertas_mesario": 7641,
+  "votos_log": 7645,
+  "substituicoes": 2833
+ },
+ "secoes_issues_mudaram": 3177,
+ "issues_por_codigo": {
+  "A03": {
+   "ocorrencias_publicada": 0,
+   "ocorrencias_nova": 2,
+   "secoes_ganharam": 2,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "investigar"
+  },
+  "A04": {
+   "ocorrencias_publicada": 718,
+   "ocorrencias_nova": 1015,
+   "secoes_ganharam": 297,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "A05": {
+   "ocorrencias_publicada": 88,
+   "ocorrencias_nova": 88,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "C06": {
+   "ocorrencias_publicada": 25675,
+   "ocorrencias_nova": 28255,
+   "secoes_ganharam": 2580,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "I01": {
+   "ocorrencias_publicada": 69,
+   "ocorrencias_nova": 2902,
+   "secoes_ganharam": 2833,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "I02": {
+   "ocorrencias_publicada": 2595,
+   "ocorrencias_nova": 2693,
+   "secoes_ganharam": 98,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "I03": {
+   "ocorrencias_publicada": 35631,
+   "ocorrencias_nova": 35631,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "I04": {
+   "ocorrencias_publicada": 177616,
+   "ocorrencias_nova": 177616,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "I05": {
+   "ocorrencias_publicada": 3794,
+   "ocorrencias_nova": 3794,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "I06": {
+   "ocorrencias_publicada": 3064,
+   "ocorrencias_nova": 3064,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "M02": {
+   "ocorrencias_publicada": 31,
+   "ocorrencias_nova": 33,
+   "secoes_ganharam": 2,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "M03": {
+   "ocorrencias_publicada": 31,
+   "ocorrencias_nova": 31,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "investigar"
+  },
+  "M04": {
+   "ocorrencias_publicada": 265,
+   "ocorrencias_nova": 563,
+   "secoes_ganharam": 298,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "M05": {
+   "ocorrencias_publicada": 66,
+   "ocorrencias_nova": 86,
+   "secoes_ganharam": 20,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  },
+  "M06": {
+   "ocorrencias_publicada": 533,
+   "ocorrencias_nova": 533,
+   "secoes_ganharam": 0,
+   "secoes_perderam": 0,
+   "secoes_descricao_mudou": 0,
+   "grupo": "operacional"
+  }
+ },
+ "a03_e_grupo1_na_nova": {
+  "A03": {
+   "secoes": 2,
+   "exemplos": [
+    "1T/ba/39934/0183/0175",
+    "1T/sp/71072/0002/0035"
+   ]
+  }
+ }
+}

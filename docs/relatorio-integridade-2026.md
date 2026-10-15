@@ -1,6 +1,6 @@
 # Relatório de integridade dos arquivos de urna: 1º turno de 2026
 
-> **Concluída** a conferência de hashes e assinaturas em 499.207 de 499.207 seções instaladas (100,00%), sem erros pendentes, e a auditoria do BU e do log de 2026. A validação da cadeia de certificados, numa amostra, tem a situação própria indicada em [Certificados das urnas](#certificados-das-urnas). Relatório gerado em 14/10/2026 14:17 por `scripts/docs/gerar_relatorio_integridade.py`.
+> **Concluída** a conferência de hashes e assinaturas em 499.207 de 499.207 seções instaladas (100,00%), sem erros pendentes, e a auditoria do BU e do log de 2026. A validação da cadeia de certificados, numa amostra, tem a situação própria indicada em [Certificados das urnas](#certificados-das-urnas). Relatório gerado em 15/10/2026 07:09 por `scripts/docs/gerar_relatorio_integridade.py`.
 
 Registro da coleta: gerado em: 2026-10-14T13:41:17.
 
@@ -160,39 +160,40 @@ Todas as seções afetadas aparecem com status "Recebida" e foram republicadas e
 
 ## Auditoria do BU e do log de 2026
 
-> **Concluída.** 499.207 seções com BU e log analisados. 250.176 ocorrências em 159.526 seções. Dados em `data/parquet/2026/auditoria/` (`issues_2026.parquet` e `secoes_log_2026.parquet`).
+> **Concluída.** 499.207 seções com BU e log analisados. 256.306 ocorrências em 159.777 seções. Dados em `data/parquet/2026/auditoria/` (`issues_2026.parquet` e `secoes_log_2026.parquet`).
 
 Cada código pertence a um dos três [grupos de leitura](metodologia.md#grupos-de-leitura), conforme o que pode dizer sobre manipulação. A severidade indica a prioridade de investigar; o grupo, o tipo de conclusão que o achado admite.
 
 | Grupo | Códigos encontrados | Ocorrências | Seções |
 |---|---|---:|---:|
 | 1. Indício direto de adulteração | nenhum | 0 | 0 |
-| 2. Inconsistência a investigar | M03 | 31 | 31 |
-| 3. Operacional ou estatístico | A04, A05, C06, I01, I02, I03, I04, I05, I06, M02, M04, M05, M06 | 250.145 | 159.526 |
+| 2. Inconsistência a investigar | A03, M03 | 33 | 33 |
+| 3. Operacional ou estatístico | A04, A05, C06, I01, I02, I03, I04, I05, I06, M02, M04, M05, M06 | 256.273 | 159.777 |
 
 **Grupo 1 (indício direto de adulteração).** Nenhuma ocorrência de A02, A06, C01, C05 no BU e no log de 2026: nenhum BU com votos acima dos aptos ou do comparecimento, nenhum comparecimento diferente entre cargos e nenhum SHA-512 divergente. Na conferência dos arquivos, as categorias do grupo 1 somam 1 registro: o RDV assinado e não publicado descrito em [Divergências](#divergências).
 
-**Grupo 2 (inconsistência a investigar).** M03 (abertura não encontrada no log): 31. Nenhuma ocorrência de A01 nem de A03. As 31 ocorrências de M03 são todas de seções cujo BU veio do sistema de apuração (`busa.dat`, votação por cédula): o log dessas seções é o do equipamento de apuração, que não registra a abertura de votação de uma urna.
+**Grupo 2 (inconsistência a investigar).** A03 (divergência de votos no log vs bu): 2; M03 (abertura não encontrada no log): 31. Nenhuma ocorrência de A01. As ocorrências de A03 são de seções em que o pacote publicado não traz o log da urna que recebeu parte dos votos; o RDV dessas seções é igual ao BU (ver [investigação log x BU](investigacao-log-bu-2026.md)). As 31 ocorrências de M03 são todas de seções cujo BU veio do sistema de apuração (`busa.dat`, votação por cédula): o log dessas seções é o do equipamento de apuração, que não registra a abertura de votação de uma urna.
 
 **Grupo 3 (operacional ou estatístico).** Descreve como o dia de votação transcorreu (reinícios, horários, proporção de brancos e nulos, abstenção, urna de reserva, liberação sem biometria). Sozinho, não é evidência de manipulação.
 
 | Código | Descrição | Severidade | Grupo | Ocorrências | Seções |
 |---|---|---|:---:|---:|---:|
 | M03 | Abertura não encontrada no log | média | 2 | 31 | 31 |
+| A03 | Divergência de votos no log vs BU | alta | 2 | 2 | 2 |
 | I04 | Proporção elevada de brancos | informativa | 3 | 177.616 | 110.757 |
 | I03 | Proporção elevada de nulos | informativa | 3 | 35.631 | 33.850 |
-| C06 | Reinício durante votação | média | 3 | 22.414 | 22.414 |
+| C06 | Reinício durante votação | média | 3 | 23.488 | 23.488 |
+| C06 | Reinício durante votação | alta | 3 | 4.767 | 4.767 |
 | I05 | Abstenção acima de 40% | informativa | 3 | 3.794 | 2.532 |
-| C06 | Reinício durante votação | alta | 3 | 3.261 | 3.261 |
 | I06 | Urna não padrão (reservaSeção) | informativa | 3 | 3.064 | 3.064 |
-| I02 | Alertas de mesário elevados | informativa | 3 | 2.595 | 2.595 |
-| A04 | Abertura muito tardia | alta | 3 | 718 | 718 |
+| I01 | Eventos de substituição/contingência | informativa | 3 | 2.902 | 2.902 |
+| I02 | Alertas de mesário elevados | informativa | 3 | 2.693 | 2.693 |
+| A04 | Abertura muito tardia | alta | 3 | 1.015 | 1.015 |
+| M04 | Número elevado de erros no log | média | 3 | 563 | 563 |
 | M06 | Alta taxa de liberação sem biometria | média | 3 | 533 | 533 |
-| M04 | Número elevado de erros no log | média | 3 | 265 | 265 |
 | A05 | Encerramento antes do horário | alta | 3 | 88 | 88 |
-| I01 | Eventos de substituição/contingência | informativa | 3 | 69 | 69 |
-| M05 | Ajustes de hora detectados | média | 3 | 66 | 66 |
-| M02 | Encerramento muito tarde | média | 3 | 31 | 31 |
+| M05 | Ajustes de hora detectados | média | 3 | 86 | 86 |
+| M02 | Encerramento muito tarde | média | 3 | 33 | 33 |
 
 ## Certificados das urnas
 
