@@ -3,11 +3,13 @@
 
 Lê ``data/parquet/2022/integridade`` (``resumo.json``, ``secoes.parquet``,
 ``divergencias.jsonl``, ``ocorrencias_publicacao.jsonl`` e
-``catalogo_manifest.json``), gerados por ``scripts/ele2022/fetch_integridade.py``,
+``catalogo_manifest.json``, gerados por ``scripts/ele2022/fetch_integridade.py``,
+e ``certificados_amostra.json``, gerado por ``scripts/ele2022/analisar_certificados.py``)
 e escreve ``docs/integridade-2022.md``: resultado, método, totais por turno e por
 UF, tipos de arquivo, divergências por categoria, UF e turno, a lista completa
 dos arquivos assinados e ausentes do pacote do TSE (base para o pedido de
-esclarecimento), ocorrências de publicação e observações.
+esclarecimento), ocorrências de publicação, a cadeia de certificados na
+amostra de 5% e observações.
 
 Uso:
     python scripts/docs/gerar_relatorio_integridade_2022.py
@@ -76,6 +78,91 @@ def tabela(cab: list[str], linhas: list[list], alinhar: str | None = None) -> li
     out = ["| " + " | ".join(cab) + " |", "|" + "|".join(sep) + "|"]
     out += ["| " + " | ".join(str(c) for c in linha) + " |" for linha in linhas]
     return out
+
+
+def _cont_txt(d: dict) -> str:
+    rot = {"True": "sim", "False": "não", "indeterminado": "indeterminado"}
+    return "; ".join(f"{rot.get(k, k)}: {fi(v)}" for k, v in sorted((d or {}).items())) or "-"
+
+
+def secao_certificados(pasta: Path) -> list[str]:
+    """Seção da cadeia de certificados na amostra (certificados_amostra.json,
+    gerado por scripts/ele2022/analisar_certificados.py). Lista vazia se não houver."""
+    p = pasta / "certificados_amostra.json"
+    if not p.exists():
+        return []
+    c = json.loads(p.read_text(encoding="utf-8"))
+    am = c["amostra"]
+    n = c["com_certificado"]
+    ok = (c.get("cadeia_ok") or {}).get("True", 0)
+    ass = (c.get("assinatura_confere") or {}).get("True", 0)
+    L = ["## Cadeia de certificados (amostra de 5%)", ""]
+    situacao = "concluída" if c.get("situacao") == "concluído" else "em andamento"
+    L.append(f"Conferência {situacao}: {fi(c['secoes_processadas'])} de {fi(am['secoes_sorteadas'])} "
+             f"seções sorteadas ({fp(am['secoes_sorteadas'], am['universo'])} das {fi(am['universo'])} "
+             f"seções dos dois turnos), {fi(n)} com certificado lido do `.vscmr`. Gerado em "
+             f"{c.get('gerado_em')} por `scripts/ele2022/analisar_certificados.py`.")
+    L.append("")
+    L.append(f"- **Amostra:** estratificada por turno e UF (inclusive o exterior), "
+             f"{str(am['fracao'] * 100).replace('.0', '')}% de cada estrato arredondado para cima. "
+             f"Dentro do estrato entram as seções de menor SHA-256 de "
+             f"`<semente>|<turno>|<uf>|<cd_mun>|<zona>|<secao>`, com **semente {am['semente']}**. "
+             "O sorteio não depende de biblioteca nem de máquina e pode ser refeito por qualquer pessoa.")
+    L.append("- **Leitura:** só o `.vscmr` de cada seção, por faixas de bytes do zip de dados abertos, "
+             "descompactado em memória com o CRC-32 conferido. Nada bruto vai para o disco.")
+    L.append(f"- **Certificado da urna assinado pela AC emissora:** {fi(ok)} de {fi(n)} "
+             f"({_cont_txt(c.get('cadeia_ok'))}).")
+    L.append(f"- **Chave pública do certificado valida a assinatura de hardware do `.vscmr`:** "
+             f"{fi(ass)} de {fi(n)} ({_cont_txt(c.get('assinatura_confere'))}).")
+    L.append(f"- **Certificado da urna válido no dia do turno:** {_cont_txt(c.get('valido_na_eleicao'))}. "
+             f"**Uso de chave** (digitalSignature, sem keyCertSign, sem CA): "
+             f"{_cont_txt(c.get('uso_chave_ok'))}.")
+    L.append(f"- **AC emissora:** válida no dia do turno: {_cont_txt(c.get('ac_valida_na_eleicao'))}; "
+             f"autoridade com keyCertSign: {_cont_txt(c.get('ac_autoridade_ok'))}; certificado da urna "
+             f"emitido dentro da validade da AC: {_cont_txt(c.get('emitido_na_validade_da_ac'))}.")
+    L.append(f"- **CN igual ao usuário da assinatura:** {_cont_txt(c.get('cn_confere_usuario'))}. "
+             f"**SHA-256 do certificado igual ao de `secoes.parquet`:** "
+             f"{_cont_txt(c.get('confere_catalogo'))}.")
+    if c.get("falhas"):
+        L.append(f"- **Falhas críticas ({fi(len(c['falhas']))}):** "
+                 + "; ".join(f"`{x['secao_id']}` ({x['motivo']})" for x in c["falhas"][:50]) + ".")
+    else:
+        L.append("- **Nenhuma falha crítica:** nenhuma cadeia inválida e nenhuma assinatura que "
+                 "deixe de fechar com o certificado da urna.")
+    L.append("")
+    linhas = []
+    for em, itens in sorted((c.get("por_emissor") or {}).items()):
+        for x in itens:
+            linhas.append([em, x["modelo"], x["algoritmo"], fi(x["secoes"]),
+                           ", ".join(x.get("ac_emissor") or []) or "-",
+                           f"{(x['nao_antes_min'] or '')[:10]} a {(x['nao_antes_max'] or '')[:10]}",
+                           (x["nao_depois_min"] or "")[:10]])
+    L += tabela(["AC emissora", "Modelo", "Chave", "Seções", "Emissor da AC", "Emissão", "Validade mínima"],
+                linhas, "lllrlll")
+    L.append("")
+    if c.get("acs"):
+        L += ["Certificados de AC usados (pasta `data/certificados/ac`, origem e conferência em "
+              "`data/certificados/README.md`):", ""]
+        L += tabela(["AC", "Emissor", "Validade", "Válida em 2022", "SHA-256 (DER)"],
+                    [[a["cn"], a.get("emissor") or "-",
+                      f"{a['nao_antes'][:10]} a {a['nao_depois'][:10]}",
+                      ", ".join(f"{t}: {'sim' if v else 'não'}"
+                                for t, v in (a.get("valida_no_dia_da_eleicao") or {}).items()),
+                      f"`{a['sha256_der']}`"] for a in c["acs"]], "lllll")
+        L.append("")
+    raiz = c.get("raiz") or {}
+    if not raiz.get("disponivel"):
+        L.append("**Raiz não conferida.** Cada `.vscmr` traz só o certificado da urna. As AC "
+                 "superiores (AC RAIZ UE, emissora da AC URNA; AC URNA v2 e AC RAIZ UE v2, acima da "
+                 "AC UE2020) não são publicadas em endereço que se possa baixar, então a cadeia é "
+                 "conferida até a AC intermediária (`nivel_cadeia = intermediaria`). Tentativas em "
+                 "15/10/2026: " + "; ".join(f"`{t['url']}` ({t['resultado']})"
+                                           for t in raiz.get("tentativas") or [])
+                 + ". O TSE publica o SHA-512 desses arquivos no resumo digital do HOLOCRON de 2026, "
+                 "o que permite conferi-los byte a byte quando forem obtidos; basta colocá-los em "
+                 "`data/certificados/ac` e rodar o script de novo.")
+        L.append("")
+    return L
 
 
 def gerar(pasta: Path) -> str:
@@ -257,6 +344,8 @@ def gerar(pasta: Path) -> str:
                 "lllll")
     L.append("")
 
+    L += secao_certificados(pasta)
+
     # Observações
     no_banco_sem_votos = secoes[secoes["no_banco_2022"] & secoes["votos_conferem"].isna()]
     sv = Counter(zip(no_banco_sem_votos["turno"], no_banco_sem_votos["uf"], strict=True))
@@ -275,8 +364,13 @@ def gerar(pasta: Path) -> str:
                  + "; ".join(f"`{m.secao_id}` ({m.modelo_urna}: {m.motivo})" for m in motivos.itertuples())
                  + ".")
     L.append("- **Assinatura de software (CEPESC):** algoritmo de governo não publicado; não verificada.")
-    L.append("- **Cadeia de certificados:** não validada nesta conferência; subject, emissor, número de série "
-             "e SHA-256 do certificado de cada urna ficam em `secoes.parquet`.")
+    if (pasta / "certificados_amostra.json").exists():
+        L.append("- **Cadeia de certificados:** conferida numa amostra de 5% (ver [Cadeia de certificados]"
+                 "(#cadeia-de-certificados-amostra-de-5)); subject, emissor, número de série e SHA-256 do "
+                 "certificado de cada urna ficam em `secoes.parquet`.")
+    else:
+        L.append("- **Cadeia de certificados:** não validada nesta conferência; subject, emissor, número de "
+                 "série e SHA-256 do certificado de cada urna ficam em `secoes.parquet`.")
     L.append("")
 
     # Catálogo
@@ -303,6 +397,7 @@ def gerar(pasta: Path) -> str:
     L += ["## Reproduzir este relatório", "", "```bash",
           "python scripts/ele2022/fetch_integridade.py --so-consolidar   # refaz resumo.json a partir das partes",
           "python scripts/ele2022/registrar_metadados_integridade.py --gravar",
+          "python scripts/ele2022/analisar_certificados.py --so-consolidar   # cadeia de certificados (amostra)",
           "python scripts/docs/gerar_relatorio_integridade_2022.py", "```", "",
           "Os dados de entrada ficam em `data/parquet/2022/integridade`. Veja também a "
           "[metodologia](metodologia.md) e o [relatório de 2026](relatorio-integridade-2026.md).", ""]

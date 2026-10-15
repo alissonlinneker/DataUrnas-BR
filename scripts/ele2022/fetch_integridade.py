@@ -356,18 +356,23 @@ def esperado_banco(turno: int, uf: str, base: Path, conferir_votos: bool
 class RangeFetcher:
     """GET com Range, taxa limitada (AIMD em 429), retentativas e backoff."""
 
-    def __init__(self, taxa: float, paralelos: int, retries: int = 8, timeout: float = 120.0):
+    def __init__(self, taxa: float, paralelos: int, retries: int = 8, timeout: float = 120.0,
+                 http2: Optional[bool] = None):
+        import importlib.util
+
         import httpx
 
         from dataurnas.downloader.ele2026 import AdaptiveRate
 
+        if http2 is None:  # HTTP/2 só quando o pacote h2 estiver instalado
+            http2 = importlib.util.find_spec("h2") is not None
         self._httpx = httpx
         taxa = min(taxa, TAXA_TETO)
         self.limiter = AdaptiveRate(taxa, taxa, rate_min=0.5)
         self.sem = asyncio.Semaphore(paralelos)
         self.retries = retries
         self.client = httpx.AsyncClient(
-            timeout=httpx.Timeout(timeout, connect=20.0), http2=True,
+            timeout=httpx.Timeout(timeout, connect=20.0), http2=http2,
             follow_redirects=True,
             limits=httpx.Limits(max_connections=paralelos + 1),
             headers={"User-Agent": "dataurnas-br/0.1 (auditoria academica)"})

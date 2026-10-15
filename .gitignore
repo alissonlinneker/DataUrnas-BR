@@ -74,6 +74,7 @@ data/parquet/2022/integridade/checkpoint.txt
 data/parquet/2022/integridade/erros-*.txt
 data/parquet/2022/integridade/execucoes.jsonl
 data/parquet/2022/integridade/pacotes.jsonl
+data/parquet/2022/integridade/certificados_amostra_partes/
 data/parquet/2022/integridade/*.tmp
 # Catálogo por arquivo (anexos de versão; o manifesto é versionado)
 data/parquet/2022/integridade/arquivos_*.parquet
