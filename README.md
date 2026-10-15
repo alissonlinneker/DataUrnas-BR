@@ -51,7 +51,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 - **Recontagem voto a voto pelo RDV (2026):** os 749.119.391 registros de voto dos RDVs de 499.206 seções foram decodificados e recontados por cargo; o resultado é igual ao do BU em todas as seções e em todos os cargos, sem nenhuma divergência. Detalhes na [recontagem](#recontagem-voto-a-voto-pelo-rdv-2026).
 - **Auditoria de BU e log de 2026:** nenhuma ocorrência do grupo 1 (indício direto de adulteração) nas 499.207 seções; certificados coerentes em todas e cadeia conferida até a AC intermediária numa amostra determinística de 5%.
 - **Totalização paralela:** os votos são somados a partir dos BUs e reconciliados com os totais oficiais, UF por UF.
-- **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. Em 2026 foi feita em todas as seções, com verificação da assinatura; em 2022 é opcional (ativada com `--hashes`) e não fez parte da compilação da base distribuída.
+- **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. Feita em todas as seções de 2026 e de 2022 (1º e 2º turnos), com verificação da assinatura de cada urna: nenhum hash divergente e nenhuma assinatura inválida nas duas eleições.
 - **Dados distribuídos em Parquet (ZSTD):** os 181 GB de arquivos brutos de 2022 viram cerca de 183 MB, prontos para consulta com DuckDB.
 - **Painel web** em Streamlit, com filtros por turno, região, UF, município, modelo de urna, severidade e grupo de leitura das inconsistências.
 
@@ -215,7 +215,7 @@ A única fonte pública e independente de boletins de 2026 encontrada é a Total
 | Modelos de urna | UE2009, UE2010, UE2011, UE2013, UE2015, UE2020 |
 | Versão do software de votação | 8.26.0.0 (Onça-pintada) em 941.986 seções; uma seção sem versão registrada |
 
-A maior parte das ocorrências é informativa (proporção elevada de brancos ou nulos, abstenção alta, urna de reserva) ou operacional (reinícios durante a votação, horários). Nenhuma seção de 2022 registrou mais votos que eleitores aptos (C05). **A base de 2022 foi compilada sem a conferência de hashes** (`verify_hashes` desligado em `db build` e nos scripts de recompilação, por ser uma etapa lenta). Por isso ela não traz ocorrências C01 nem E01, e a ausência de C01 não atesta a integridade dos arquivos. No índice de confiança do painel, o componente de integridade reflete apenas essa ausência e aparece como "não verificado". Para conferir os hashes, rode `dataurnas analyze hashes <diretório da seção>` ou `dataurnas analyze batch --hashes` sobre os arquivos brutos.
+A maior parte das ocorrências é informativa (proporção elevada de brancos ou nulos, abstenção alta, urna de reserva) ou operacional (reinícios durante a votação, horários). Nenhuma seção de 2022 registrou mais votos que eleitores aptos (C05). **Integridade dos arquivos de 2022.** A base foi compilada sem a conferência de hashes, por ser uma etapa lenta; a conferência foi feita depois, à parte, a partir dos pacotes de dados abertos do TSE lidos por faixas de bytes (`scripts/ele2022/fetch_integridade.py`). Em 944.051 seções dos dois turnos: 3.776.042 SHA-512 iguais ao valor assinado pela urna, **nenhum divergente**; 944.051 assinaturas de urna válidas, **nenhuma inválida**; votos de Presidente do BU assinado iguais aos da base em 941.653 seções, nenhum diferente. A cadeia de certificados foi validada até a AC intermediária numa amostra estratificada de 5% (47.230 seções), sem nenhuma falha. Há 173 arquivos assinados pela urna e ausentes do pacote de dados abertos (64 seções, a maioria do exterior), listados para pedido de esclarecimento ao TSE. Detalhes em [docs/integridade-2022.md](docs/integridade-2022.md); o catálogo de hashes por arquivo está nos anexos da [v0.2.2](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.2). O resultado é registrado em `data/parquet/metadados.parquet` e passa a valer no índice de confiança do painel depois de recompilar o banco (`make build-db`).
 
 ### Logs do 2º turno
 
@@ -308,7 +308,7 @@ Resumo abaixo; a descrição completa, com fórmulas e critérios de cada verifi
 | Estatística | Lei de Benford (1º e 2º dígito, qui-quadrado e V de Cramér), outliers por z-score nacional e por UF, nulos e brancos, biometria, duração da votação, comparação entre turnos. |
 | Reconciliação | Soma dos BUs por UF comparada com o total oficial do TSE (candidatos, brancos, nulos, comparecimento e número de seções). |
 
-O painel também calcula um **índice de confiança de 0 a 100**, média ponderada de sete componentes (integridade de hash, votos acima do eleitorado, Benford, impacto de reinícios, consistência entre turnos, concentração de outliers e biometria). Como a base de 2022 foi compilada sem conferência de hashes, o componente de integridade reflete apenas a ausência de C01 e é exibido como "não verificado". O índice resume os indicadores do projeto; ele não substitui nem contesta a totalização oficial.
+O painel também calcula um **índice de confiança de 0 a 100**, média ponderada de sete componentes (integridade de hash, votos acima do eleitorado, Benford, impacto de reinícios, consistência entre turnos, concentração de outliers e biometria). Na base de 2022 distribuída, compilada antes da conferência de hashes, o componente de integridade aparece como "não verificado" até o banco ser recompilado com o registro da conferência feita à parte (nenhum hash divergente). O índice resume os indicadores do projeto; ele não substitui nem contesta a totalização oficial.
 
 ### Fusos horários
 
@@ -636,7 +636,7 @@ DataUrnas-BR/
 - Testes estatísticos como Benford têm alcance limitado em dados eleitorais, cuja distribuição depende do tamanho das seções. Por isso o projeto usa medidas de efeito (V de Cramér) além do p-valor.
 - Em 2026, a validação da cadeia de certificados foi feita numa amostra determinística de 5% das seções; a coerência dos certificados (unicidade, CN e emissor por modelo) cobre todas. Arquivos que o TSE não publica (um RDV e 2.658 imagens do BU listadas e indisponíveis) não puderam ser conferidos.
 - Seções cujo BU não pôde ser decodificado (E02) ficam fora dos totais e são listadas para conferência.
-- A base de 2022 distribuída foi compilada **sem conferência de hashes**: não contém C01 nem E01, e o componente de integridade do índice de confiança aparece como "não verificado".
+- A base de 2022 foi compilada sem conferência de hashes, feita depois à parte (nenhum divergente); o componente de integridade do índice de confiança só passa a refleti-la depois de recompilar o banco. Em 2022 a cadeia de certificados foi validada numa amostra de 5% e o RDV não é recontado.
 - Em 2026 o RDV é decodificado e recontado em todas as seções; nas seções apuradas no Sistema de Apuração o RDV é gerado pelo próprio sistema, e a conferência com o BU não é independente. Em 2022 o RDV ainda não é recontado. A imagem do BU é baixada e tem o hash conferido, mas não é decodificada.
 - Os códigos E01, E02 e E03 e as exceções de fuso por município foram introduzidos na versão 0.2.0; os Parquet de 2022 distribuídos foram compilados antes deles e só passam a refleti-los após uma recompilação a partir dos dados brutos.
 
@@ -654,6 +654,8 @@ DataUrnas-BR/
 | 2026, 1º turno: coerência dos certificados das urnas | Concluído (todas as seções) |
 | 2026, 1º turno: validação da cadeia de certificados até a AC intermediária | Concluído na amostra de 5%, sorteio determinístico |
 | 2026, 1º turno: catálogo de hashes por arquivo | Publicado nos anexos da [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1) |
+| 2022, 1º e 2º turnos: integridade dos arquivos (SHA-512 e assinatura de cada urna) | Concluído (0 divergentes em 3.776.042; 0 assinaturas inválidas) |
+| 2022: validação da cadeia de certificados até a AC intermediária | Concluído na amostra de 5% (47.230 seções) |
 | Cadeia de certificados até a raiz | Depende da publicação dos certificados raiz pelo TSE |
 | 2026, Presidente, 2º turno | Planejado |
 | 2026, 1º turno: recontagem voto a voto do RDV contra o BU de cada seção | Concluído (0 divergências em 499.206 seções) |

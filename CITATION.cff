@@ -11,8 +11,8 @@ abstract: >-
 authors:
   - family-names: Linneker
     given-names: Alisson
-version: 0.2.1
-date-released: "2026-10-14"
+version: 0.2.2
+date-released: "2026-10-15"
 license: MIT
 repository-code: "https://github.com/alissonlinneker/DataUrnas-BR"
 url: "https://huggingface.co/spaces/alissonlinneker/dataurnas-br"

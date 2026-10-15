@@ -1,7 +1,7 @@
 {
  "descricao": "Catálogo de hashes por arquivo das urnas de 2022 (1º e 2º turnos), um anexo por turno e UF.",
- "versao": null,
- "url_base": null,
+ "versao": "v0.2.2",
+ "url_base": "https://github.com/alissonlinneker/DataUrnas-BR/releases/download/v0.2.2",
  "total_arquivos": 58,
  "total_bytes": 894483847,
  "total_linhas": 4720093,

@@ -404,7 +404,9 @@ def gerar(pasta: Path) -> str:
              + ", ".join(f"`{c}`" for c in manifesto["arquivos"][0]["colunas"]) + ". O manifesto com o SHA-256 "
              "de cada anexo está em `data/parquet/2022/integridade/catalogo_manifest.json`.")
     if manifesto.get("versao"):
-        L.append(f"Publicado como anexos da versão {manifesto['versao']}.")
+        url = f"https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/{manifesto['versao']}"
+        L.append(f"Publicado como anexos da versão [{manifesto['versao']}]({url}), com `SHA256SUMS` para "
+                 "conferência (`sha256sum -c SHA256SUMS`).")
     else:
         L.append("A publicação como anexos de uma versão ainda está pendente.")
     L.append("")

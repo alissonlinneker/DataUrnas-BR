@@ -1,6 +1,6 @@
 # Integridade dos arquivos de urna: eleições de 2022 (1º e 2º turnos)
 
-> **Concluída** a conferência de hashes e assinaturas em 944.051 seções dos dois turnos (56 de 56 pacotes de dados abertos do TSE), com 0 erros pendentes. Relatório gerado em 15/10/2026 03:16 por `scripts/docs/gerar_relatorio_integridade_2022.py`.
+> **Concluída** a conferência de hashes e assinaturas em 944.051 seções dos dois turnos (56 de 56 pacotes de dados abertos do TSE), com 0 erros pendentes. Relatório gerado em 15/10/2026 07:16 por `scripts/docs/gerar_relatorio_integridade_2022.py`.
 
 Registro da coleta: gerado em 2026-10-15T01:26:15.
 
@@ -455,7 +455,7 @@ Certificados de AC usados (pasta `data/certificados/ac`, origem e conferência e
 ## Catálogo de hashes por arquivo
 
 O catálogo por arquivo (4.720.093 linhas em 58 arquivos Parquet, 894,5 MB, um por turno e UF, `arquivos_t<turno>_<uf>.parquet`) não fica no git, como em 2026. Colunas: `turno`, `uf`, `cd_mun`, `zona`, `secao`, `tipo`, `nome`, `tamanho`, `md5`, `sha256`, `sha512`, `sha512_assinado`, `hash_confere`, `assinatura_arquivo_valida`, `crc32`, `data_hora_zip`. O manifesto com o SHA-256 de cada anexo está em `data/parquet/2022/integridade/catalogo_manifest.json`.
-A publicação como anexos de uma versão ainda está pendente.
+Publicado como anexos da versão [v0.2.2](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.2), com `SHA256SUMS` para conferência (`sha256sum -c SHA256SUMS`).
 
 ## Pacotes do TSE
 
