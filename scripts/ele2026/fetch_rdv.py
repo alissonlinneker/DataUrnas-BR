@@ -71,8 +71,27 @@ from dataurnas.analyzer import rdv_recontagem as R  # noqa: E402
 from dataurnas.config import ESTADOS, PARQUET_2026_DIR  # noqa: E402
 from dataurnas.downloader import ele2026 as E  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fetch_integridade import ISSUES_SCHEMA, SECOES_LOG_SCHEMA  # noqa: E402
+
+def _carregar_fetch_integridade_2026():
+    """Carrega scripts/ele2026/fetch_integridade.py pelo caminho.
+
+    Há outro fetch_integridade.py em scripts/ele2022; importar pelo nome curto
+    pegaria o que estiver primeiro em sys.modules.
+    """
+    import importlib.util
+
+    nome = "ele2026_fetch_integridade"
+    if nome in sys.modules:
+        return sys.modules[nome]
+    spec = importlib.util.spec_from_file_location(nome, Path(__file__).resolve().parent / "fetch_integridade.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[nome] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_FI = _carregar_fetch_integridade_2026()
+ISSUES_SCHEMA, SECOES_LOG_SCHEMA = _FI.ISSUES_SCHEMA, _FI.SECOES_LOG_SCHEMA
 
 log = logging.getLogger("fetch_rdv")
 
