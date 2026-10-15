@@ -153,13 +153,13 @@ Cada urna grava, ao encerrar a votação, o BU, o RDV e o log, e assina com a pr
 
 São lacunas de publicação, não evidência de adulteração. Os pedidos de esclarecimento estão reunidos em [docs/relatorio-tse-ocorrencias-2026.md](docs/relatorio-tse-ocorrencias-2026.md).
 
-**Auditoria do BU e do log (2026), por grupo de leitura.** Concluída em 499.207 seções: 250.176 ocorrências em 159.526 seções.
+**Auditoria do BU e do log (2026), por grupo de leitura.** Concluída em 499.207 seções: 256.306 ocorrências em 159.777 seções. Esta versão foi regerada com o leitor de log corrigido, que lê também o log da urna substituída nas seções com contingência e descarta cópias repetidas do mesmo log; as diferenças em relação à versão anterior estão em `data/parquet/2026/auditoria/comparacao_versao_anterior.json`.
 
 | Grupo | Resultado |
 |---|---|
 | 1. Indício direto de adulteração | Nenhuma ocorrência de C01, C05, A02 ou A06. Na conferência dos arquivos, 1 registro: o RDV não publicado descrito acima. |
-| 2. Inconsistência a investigar | Nenhuma ocorrência de A01 ou A03. 31 M03 (abertura não encontrada no log), todas em seções com BU do sistema de apuração (votação por cédula), cujo log não tem abertura de urna. |
-| 3. Operacional ou estatístico | I04 177.616, I03 35.631, C06 25.675 (22.414 de severidade média e 3.261 alta), I05 3.794, I06 3.064, I02 2.595, A04 718, M06 533, M04 265, A05 88, I01 69, M05 66, M02 31. |
+| 2. Inconsistência a investigar | Nenhuma ocorrência de A01. 2 A03 (votos no log diferentes do BU), nas seções em que o pacote publicado não traz o log da urna que recebeu parte dos votos (BA 39934/0183/0175 e SP 71072/0002/0035; ver a [investigação](docs/investigacao-log-bu-2026.md)). 31 M03 (abertura não encontrada no log), todas em seções com BU do sistema de apuração (votação por cédula), cujo log não tem abertura de urna. |
+| 3. Operacional ou estatístico | I04 177.616, I03 35.631, C06 28.255 (23.488 de severidade média e 4.767 alta), I05 3.794, I06 3.064, I01 2.902, I02 2.693, A04 1.015, M04 563, M06 533, A05 88, M05 86, M02 33. |
 
 **Certificados das urnas.** Em todas as 499.207 seções: cada modelo tem uma única AC emissora e um único algoritmo (AC URNA com ECDSA P-521 para UE2013 e UE2015; AC UE2020 e AC UE2022 com Ed521 para os modelos de mesmo nome); nenhuma urna aparece com dois certificados e nenhum certificado aparece em urnas diferentes; o CN (`UEAO` + 8 dígitos) segue o padrão em todas. Há 499.179 certificados distintos porque um certificado de urna de apuração do exterior assina 29 BUs do sistema de apuração. O CN é igual ao número interno da urna registrado na carga do BU em 499.193 seções; as 14 restantes, com hash e assinatura válidos, estão listadas no relatório para confirmação com o TSE. A **validação da cadeia** foi **concluída na amostra de 5%, sorteio determinístico** (24.846 seções de todas as UFs, escolhidas pelo SHA-256 da chave da seção): em 24.846 de 24.846 a assinatura do certificado conferiu com a chave da AC emissora e o certificado estava válido no dia da eleição. A cadeia vai **até a AC intermediária**: os certificados das raízes (AC RAIZ UE e AC RAIZ UE v2) e da AC URNA v2 não estão disponíveis publicamente. Os certificados públicos das AC estão em [`data/certificados/`](data/certificados/README.md); os da AC UE2020 e AC UE2022 conferem byte a byte com o SHA-512 publicado pelo TSE. Uma observação a esclarecer com o TSE: o certificado publicado da AC URNA venceu em 18/07/2026, e há certificado de urna emitido em 03/08/2026 que confere com a mesma chave; a explicação mais provável é um certificado renovado da AC URNA, com a mesma chave, que não foi publicado. Não é indício de adulteração.
 
@@ -187,7 +187,9 @@ O Registro Digital do Voto (RDV) guarda cada voto digitado na urna, embaralhado 
 
 Nas seções cujo BU foi digitado no Sistema de Apuração (votação por cédula, inclusive os boletins do exterior apurados no SA), o RDV é gerado pelo próprio sistema a partir dos dados digitados; ali, RDV igual ao BU confirma a coerência do pacote, mas não é uma conferência independente do voto. Nessas seções o RDV pode trazer a eleição em blocos repetidos, um por urna ou mídia, que são somados antes da comparação.
 
-Os resultados por seção estão em `data/parquet/2026/rdv/` (`recontagem_secoes.parquet`, `resumo.json`); o código está em `src/dataurnas/parsers/rdv.py`, `src/dataurnas/analyzer/rdv_recontagem.py` e `scripts/ele2026/fetch_rdv.py`.
+**Log contra BU, voto a voto no tempo.** No mesmo download, o log de cada seção é lido por inteiro (inclusive o da urna substituída, nas seções com contingência) e os eventos "O voto do eleitor foi computado" do dia da eleição são comparados com o comparecimento do BU. Em 499.207 seções, o log confere com o BU em todas as seções de urna, exceto 9, que somam 59 votos a menos no log; nenhum voto fora da sequência de abertura e encerramento da urna. Nas 31 seções com BU do Sistema de Apuração a comparação não se aplica, porque o log do SA não registra votos. As 9 seções estão explicadas na [investigação log x BU](docs/investigacao-log-bu-2026.md): em 5 a urna travou logo depois do voto para Presidente sem gravar a linha do voto (o voto foi contado), em 3 o pacote publicado não traz o log da urna que recebeu parte dos votos (encaminhadas ao TSE) e em 1 a urna reiniciou 17 vezes no dia. O resultado não é afetado em nenhuma delas: o RDV recontado é igual ao BU.
+
+Os resultados por seção estão em `data/parquet/2026/rdv/` (`recontagem_secoes.parquet`, `log_tempo_secoes.parquet`, `resumo.json`); o código está em `src/dataurnas/parsers/rdv.py`, `src/dataurnas/analyzer/rdv_recontagem.py` e `scripts/ele2026/fetch_rdv.py`.
 
 #### Confronto com fontes externas
 
@@ -599,7 +601,10 @@ DataUrnas-BR/
 | [Perguntas frequentes](docs/faq.md) | O que o projeto prova e não prova, como reproduzir, BU x RDV, nulos técnicos e cobertura |
 | [Relatório de integridade de 2026](docs/relatorio-integridade-2026.md) | Hashes, assinaturas, auditoria por grupo de leitura, certificados e conferência manual de uma seção |
 | [Investigação das seções "Recebida"](docs/investigacao-secoes-recebidas-2026.md) | Seções republicadas entre 05 e 07/10/2026 e imagens do BU indisponíveis |
-| [Ocorrências para o TSE](docs/relatorio-tse-ocorrencias-2026.md) | Pontos de publicação e de certificação a esclarecer com o TSE |
+| [Integridade de 2022](docs/integridade-2022.md) | Hashes, assinaturas e cadeia de certificados de 2022 (1º e 2º turnos) e arquivos assinados ausentes do pacote do TSE |
+| [Investigação log x BU (2026)](docs/investigacao-log-bu-2026.md) | Seções em que a contagem de votos no log difere do BU: causas, correções do leitor e casos encaminhados ao TSE |
+| [Confronto com fontes externas](docs/confronto-fontes-externas.md) | BUs do TSE confrontados com leituras independentes do QR Code dos boletins impressos |
+| [Ocorrências para o TSE](docs/relatorio-tse-ocorrencias-2026.md) | Pontos de publicação, de certificação e de log a esclarecer com o TSE |
 
 ---
 

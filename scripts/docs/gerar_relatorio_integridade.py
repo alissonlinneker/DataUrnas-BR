@@ -633,7 +633,13 @@ def secao_auditoria(aud: dict | None, registro: list[dict]) -> str:
             extra = (f" As {fmt_int(aud['m03_total'])} ocorrências de M03 são todas de seções cujo BU veio do "
                      "sistema de apuração (`busa.dat`, votação por cédula): o log dessas seções é o do "
                      "equipamento de apuração, que não registra a abertura de votação de uma urna.")
-        p.append(f"**Grupo 2 (inconsistência a investigar).** {txt}. Nenhuma ocorrência de A01 nem de A03.{extra}\n")
+        ausentes = [c for c in ("A01", "A03") if c not in set(sub2["codigo"])]
+        nenhuma = (f" Nenhuma ocorrência de {' nem de '.join(ausentes)}." if ausentes else "")
+        if "A03" in set(sub2["codigo"]):
+            extra = (" As ocorrências de A03 são de seções em que o pacote publicado não traz o log da urna que "
+                     "recebeu parte dos votos; o RDV dessas seções é igual ao BU (ver "
+                     "[investigação log x BU](investigacao-log-bu-2026.md))." + extra)
+        p.append(f"**Grupo 2 (inconsistência a investigar).** {txt}.{nenhuma}{extra}\n")
     else:
         p.append("**Grupo 2 (inconsistência a investigar).** Nenhuma ocorrência.\n")
     p.append("**Grupo 3 (operacional ou estatístico).** Descreve como o dia de votação transcorreu (reinícios, "
