@@ -36,6 +36,12 @@ Uso:
   python3 scripts/ele2026/fetch_rdv.py --ufs ac,rr     # teste
   python3 scripts/ele2026/fetch_rdv.py                 # 27 UFs + zz
   python3 scripts/ele2026/fetch_rdv.py --so-consolidar
+  python3 scripts/ele2026/fetch_rdv.py --secoes lista.txt  # reprocessa só a lista
+
+Com --secoes, refaz as seções listadas (uma chave uf/cd_mun/zona/secao por
+linha) mesmo que já estejam no checkpoint, só nas UFs da lista. O checkpoint
+só recebe linhas novas e as partes antigas ficam; a consolidação usa o lote
+mais recente de cada seção.
 """
 
 from __future__ import annotations
@@ -104,7 +110,8 @@ TEMPO_SCHEMA = pa.schema(IDENT + [
     ("intervalos_lt_5s", pa.int32()), ("maior_lacuna_min", pa.float32()),
     ("lacunas_60min", pa.int16()), ("inversoes_relogio", pa.int32()),
     ("ajustes_hora", pa.int16()), ("hist_intervalos", pa.list_(pa.int32())),
-    ("flags", pa.list_(pa.string())), ("grupo", pa.int8()), ("_lote", pa.string()),
+    ("flags", pa.list_(pa.string())), ("grupo", pa.int8()), ("origem_log", pa.string()),
+    ("_lote", pa.string()),
 ])
 SECOES_SCHEMA = pa.schema(IDENT + [
     ("status", pa.string()), ("motivo", pa.string()), ("hash_confere", pa.bool_()),
@@ -345,6 +352,19 @@ async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
                                       int(E.PLEITO), DATA_ELEICAO, auditar, modelo_cod)
 
 
+def ler_lista_secoes(path: Path) -> set[str]:
+    """Chaves uf/cd_mun/zona/secao de um arquivo (uma por linha; # comenta)."""
+    out = set()
+    for ln in Path(path).read_text(encoding="utf-8").splitlines():
+        ln = ln.split("#", 1)[0].strip().lower()
+        if not ln:
+            continue
+        if ln.count("/") != 3:
+            raise ValueError(f"chave de seção inválida em {path}: {ln!r}")
+        out.add(ln)
+    return out
+
+
 def registrar_execucao(out: Path, evento: dict) -> None:
     with open(out / "execucoes.jsonl", "a", encoding="utf-8") as fh:
         fh.write(json.dumps(evento, ensure_ascii=False) + "\n")
@@ -356,8 +376,14 @@ async def run(args: argparse.Namespace) -> int:
     w = Writer(out, args.lote)
     divs = Divergencias(out / "divergencias.jsonl")
     done = w.done_keys()
+    refazer = ler_lista_secoes(Path(args.secoes)) if args.secoes else None
+    ufs = args.ufs
+    if refazer is not None:
+        ufs = [u for u in args.ufs if any(k.startswith(f"{u}/") for k in refazer)]
+        log.info("--secoes: %d seções a refazer em %d UFs", len(refazer), len(ufs))
     inicio = time.strftime("%Y-%m-%dT%H:%M:%S")
-    registrar_execucao(out, {"inicio": inicio, "ufs": args.ufs, "pid": os.getpid(),
+    registrar_execucao(out, {"inicio": inicio, "ufs": ufs, "pid": os.getpid(),
+                             "lista_secoes": args.secoes, "n_refazer": len(refazer or ()),
                              "fonte": args.fonte, "taxa": args.taxa, "taxa_max": args.taxa_max,
                              "workers": args.workers})
     log.info("checkpoint: %d seções já processadas", len(done))
@@ -372,7 +398,7 @@ async def run(args: argparse.Namespace) -> int:
     t0 = time.time()
     n_ok = 0
     try:
-        for uf in args.ufs:
+        for uf in ufs:
             if args.fonte == "catalogo":
                 secoes = await carregar_catalogo(f, uf, manifesto, dir_local)
                 if secoes is None:
@@ -380,8 +406,12 @@ async def run(args: argparse.Namespace) -> int:
                     secoes = await secoes_do_aux(f, uf)
             else:
                 secoes = await secoes_do_aux(f, uf)
-            secoes = [s for s in secoes
-                      if E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"]) not in done]
+            if refazer is not None:
+                secoes = [s for s in secoes
+                          if E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"]) in refazer]
+            else:
+                secoes = [s for s in secoes
+                          if E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"]) not in done]
             modelos = (modelos_uf(uf, Path(args.secoes_integridade))
                        if args.auditar else {})
             log.info("UF %s: %d seções pendentes", uf, len(secoes))
@@ -489,6 +519,9 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
                 SELECT x.* EXCLUDE (_lote)
                 FROM read_parquet('{parts / f"{nome}-*.parquet"}', union_by_name = true) x
                 JOIN s USING (uf, cd_mun, zona, secao, _lote)""")
+    # Partes gravadas antes da coluna origem_log: eram todas lidas como log de urna.
+    con.execute("ALTER TABLE tempo ADD COLUMN IF NOT EXISTS origem_log VARCHAR")
+    con.execute("UPDATE tempo SET origem_log = 'log' WHERE origem_log IS NULL")
     auditoria = {}
     if dst_auditoria is not None and any(parts.glob("seclog-*.parquet")):
         auditoria = consolidar_auditoria(con, parts, dst_auditoria, auditoria_publicada)
@@ -510,20 +543,26 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
                                                                      AND status = 'ok'),
                count(*) FILTER (WHERE hash_confere), count(*) FILTER (WHERE NOT hash_confere),
                count(*) FILTER (WHERE NOT estrutura_ok),
-               coalesce(sum(registros_rdv), 0), coalesce(sum(comparecimento_bu), 0)
+               coalesce(sum(registros_rdv), 0), coalesce(sum(comparecimento_bu), 0),
+               count(*) FILTER (WHERE origem_bu = 'busa')
         FROM s GROUP BY 1 ORDER BY 1"""):
         por_uf[row[0]] = dict(zip(
             ["secoes", "ok", "sem_rdv", "outros_status", "rdv_confere", "rdv_diverge",
              "hash_confere", "hash_diverge", "estrutura_invalida", "registros_rdv",
-             "comparecimento_bu"], [int(x) for x in row[1:]], strict=True))
-    tempo_uf = {r[0]: {"votos_log": int(r[1]), "comparecimento_bu": int(r[2]),
+             "comparecimento_bu", "secoes_bu_sa"], [int(x) for x in row[1:]], strict=True))
+    # Seções com só o log do SA (origem_log = 'logsa') ficam fora da soma log x BU:
+    # o log da digitação não tem eventos de voto.
+    tempo_uf = {r[0]: {"votos_log": int(r[1] or 0), "comparecimento_bu": int(r[2] or 0),
                        "secoes_log_diverge": int(r[3]), "secoes_fora_sequencia": int(r[4]),
-                       "secoes_voto_antes_8h": int(r[5])}
-                for r in q("""SELECT uf, sum(votos_log), sum(comparecimento_bu),
-                    count(*) FILTER (WHERE diferenca_log_bu <> 0),
+                       "secoes_voto_antes_8h": int(r[5]), "secoes_log_sa": int(r[6])}
+                for r in q("""SELECT uf, sum(votos_log) FILTER (WHERE NOT sa),
+                    sum(comparecimento_bu) FILTER (WHERE NOT sa),
+                    count(*) FILTER (WHERE diferenca_log_bu <> 0 AND NOT sa),
                     count(*) FILTER (WHERE list_contains(flags, 'log_voto_fora_sequencia')),
-                    count(*) FILTER (WHERE votos_antes_8h > 0)
-                    FROM tempo GROUP BY 1""")}
+                    count(*) FILTER (WHERE votos_antes_8h > 0),
+                    count(*) FILTER (WHERE sa)
+                    FROM (SELECT *, origem_log = 'logsa' AS sa FROM tempo)
+                    GROUP BY 1""")}
     for uf, v in tempo_uf.items():
         por_uf.setdefault(uf, {}).update({f"log_{k}": x for k, x in v.items()})
     totais = {}
@@ -619,7 +658,10 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
                    "cargoSemCandidato (agrupado em nulo se o BU não tiver o tipo).",
             "bu": "BU do mesmo conjunto de arquivos, decodificado com parsers/bu.py; "
                   "comparação por candidato, legenda, brancos e nulos em cada cargo e "
-                  "registros do RDV = comparecimento x quantidadeEscolhas.",
+                  "registros do RDV = comparecimento x quantidadeEscolhas. Nas seções com BU "
+                  "do Sistema de Apuração (totais.secoes_bu_sa) o RDV também é gerado pelo SA a "
+                  "partir dos dados digitados, então RDV = BU ali não é conferência "
+                  "independente.",
             "hash": "SHA-512 de cada arquivo baixado comparado ao catálogo de integridade "
                     "(arquivos_<uf>.parquet, já conferido com o hash assinado no .vsc).",
             "log": "eventos 'O voto do eleitor foi computado' do dia da eleição; abertura "
@@ -627,7 +669,11 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
                    "(timezones.get_tz_offset; exterior em hora local). Voto fora de sequência:"
                    " antes da 'Urna pronta para receber votos' ou depois do 'Inicio do "
                    "Encerramento' da mesma urna. Intervalos medidos entre votos consecutivos "
-                   "da mesma urna.",
+                   "da mesma urna. Logs aninhados ordenados pela data e hora do nome e linhas "
+                   "idênticas repetidas entre arquivos do pacote (o mesmo log copiado mais de "
+                   "uma vez) contadas uma vez. Seções só com log do SA (-logsa.jez, digitação "
+                   "do BU, sem eventos de voto) ficam fora da comparação log x BU "
+                   "(origem_log = 'logsa', totais.log_secoes_log_sa).",
             "grupos": "1 = indício direto (RDV x BU, registros, estrutura, hash); 2 = "
                       "inconsistência a investigar (log x BU, sequência, outra data, RDV não "
                       "decodificado, BU do SA); 3 = operacional (horários, rajadas, lacunas).",
@@ -782,6 +828,8 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--secoes-integridade",
                     default=str(PARQUET_2026_DIR / "integridade" / "secoes.parquet"),
                     help="modelo da urna por seção (lido do .vsc na integridade)")
+    ap.add_argument("--secoes", default=None,
+                    help="arquivo com chaves uf/cd_mun/zona/secao a refazer (ignora o checkpoint)")
     ap.add_argument("--sem-consolidar", action="store_true")
     ap.add_argument("--so-consolidar", action="store_true")
     a = ap.parse_args(argv)
