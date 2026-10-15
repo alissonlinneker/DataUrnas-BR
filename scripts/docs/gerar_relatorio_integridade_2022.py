@@ -85,6 +85,22 @@ def _cont_txt(d: dict) -> str:
     return "; ".join(f"{rot.get(k, k)}: {fi(v)}" for k, v in sorted((d or {}).items())) or "-"
 
 
+def _txt_repetidos(c: dict) -> str:
+    r = c.get("certificados_repetidos")
+    if not r or not r.get("certificados"):
+        return ""
+    txt = (f"; {fi(r['certificados'])} aparecem em mais de uma seção, {fi(r['so_entre_turnos'])} só "
+           "porque a mesma urna foi sorteada nos dois turnos")
+    if r.get("no_mesmo_turno"):
+        arqs = r.get("no_mesmo_turno_por_arquivo") or {}
+        txt += (f", e {fi(r['no_mesmo_turno'])} em seções do mesmo turno"
+                + (": a urna do sistema de apuração (`.vscsa`) que assina várias seções do exterior"
+                   if set(arqs) == {"vscsa"} else ""))
+    if r.get("com_mais_de_um_cn"):
+        txt += f"; {fi(r['com_mais_de_um_cn'])} certificados com mais de um CN"
+    return txt
+
+
 def secao_certificados(pasta: Path) -> list[str]:
     """Seção da cadeia de certificados na amostra (certificados_amostra.json,
     gerado por scripts/ele2022/analisar_certificados.py). Lista vazia se não houver."""
@@ -100,7 +116,8 @@ def secao_certificados(pasta: Path) -> list[str]:
     situacao = "concluída" if c.get("situacao") == "concluído" else "em andamento"
     L.append(f"Conferência {situacao}: {fi(c['secoes_processadas'])} de {fi(am['secoes_sorteadas'])} "
              f"seções sorteadas ({fp(am['secoes_sorteadas'], am['universo'])} das {fi(am['universo'])} "
-             f"seções dos dois turnos), {fi(n)} com certificado lido do `.vscmr`. Gerado em "
+             f"seções dos dois turnos), {fi(n)} com certificado lido do arquivo de assinatura "
+             f"({fi(c['certificados_distintos'])} certificados distintos{_txt_repetidos(c)}). Gerado em "
              f"{c.get('gerado_em')} por `scripts/ele2022/analisar_certificados.py`.")
     L.append("")
     L.append(f"- **Amostra:** estratificada por turno e UF (inclusive o exterior), "
@@ -108,8 +125,11 @@ def secao_certificados(pasta: Path) -> list[str]:
              f"Dentro do estrato entram as seções de menor SHA-256 de "
              f"`<semente>|<turno>|<uf>|<cd_mun>|<zona>|<secao>`, com **semente {am['semente']}**. "
              "O sorteio não depende de biblioteca nem de máquina e pode ser refeito por qualquer pessoa.")
-    L.append("- **Leitura:** só o `.vscmr` de cada seção, por faixas de bytes do zip de dados abertos, "
-             "descompactado em memória com o CRC-32 conferido. Nada bruto vai para o disco.")
+    arq = c.get("arquivo_assinatura") or {}
+    L.append("- **Leitura:** só o arquivo de assinatura de cada seção (`.vscmr`; `.vscsa` nas seções do "
+             f"sistema de apuração), por faixas de bytes do zip de dados abertos, descompactado em memória "
+             f"com o CRC-32 conferido. Nada bruto vai para o disco. `.vscmr`: {fi(arq.get('vscmr'))}; "
+             f"`.vscsa`: {fi(arq.get('vscsa'))}.")
     L.append(f"- **Certificado da urna assinado pela AC emissora:** {fi(ok)} de {fi(n)} "
              f"({_cont_txt(c.get('cadeia_ok'))}).")
     L.append(f"- **Chave pública do certificado valida a assinatura de hardware do `.vscmr`:** "
@@ -143,12 +163,15 @@ def secao_certificados(pasta: Path) -> list[str]:
     if c.get("acs"):
         L += ["Certificados de AC usados (pasta `data/certificados/ac`, origem e conferência em "
               "`data/certificados/README.md`):", ""]
-        L += tabela(["AC", "Emissor", "Validade", "Válida em 2022", "SHA-256 (DER)"],
+        usadas = set(c.get("por_emissor") or {})
+        L += tabela(["AC", "Emissor", "Validade", "Usada em 2022", "Válida em 2022", "SHA-256 (DER)"],
                     [[a["cn"], a.get("emissor") or "-",
                       f"{a['nao_antes'][:10]} a {a['nao_depois'][:10]}",
+                      "sim" if a["cn"] in usadas else "não (emitida depois de 2022)"
+                      if a["nao_antes"][:4] > "2022" else "não",
                       ", ".join(f"{t}: {'sim' if v else 'não'}"
                                 for t, v in (a.get("valida_no_dia_da_eleicao") or {}).items()),
-                      f"`{a['sha256_der']}`"] for a in c["acs"]], "lllll")
+                      f"`{a['sha256_der']}`"] for a in c["acs"]], "llllll")
         L.append("")
     raiz = c.get("raiz") or {}
     if not raiz.get("disponivel"):

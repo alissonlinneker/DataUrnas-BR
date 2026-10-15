@@ -212,7 +212,7 @@ def test_coleta_consolida_e_resume_sem_rede(C, acs, tmp_path):
 
     pacote = _zip({"o00406-0100700090001.bu": b"x" * 50,
                    "o00406-0100700090001.vscmr": VSCMR_URNA.read_bytes(),
-                   "o00406-0139200010003.vscmr": VSCMR_2020.read_bytes(),
+                   "o00406-0139200010003.vscsa": VSCMR_2020.read_bytes(),
                    "leiame.pdf": b"pdf"})
     f = FetcherFalso({Z.url_pacote_2022(1, "ac"): pacote})
     am = _amostra(("01007", "0009", "0001"), ("01392", "0001", "0003"), ("01392", "0001", "0099"))
@@ -224,12 +224,19 @@ def test_coleta_consolida_e_resume_sem_rede(C, acs, tmp_path):
     df = C.consolidar(tmp_path)
     assert len(df) == 3 and (tmp_path / "certificados_amostra.parquet").exists()
     assert df["cadeia_ok"].tolist()[:2] == [True, True]
-    assert df.iloc[2]["motivo"] == "vscmr ausente no pacote"
+    assert df.iloc[2]["motivo"] == "arquivo de assinatura ausente no pacote"
+    assert df["arquivo_assinatura"].tolist()[:2] == ["vscmr", "vscsa"]
     res = C.resumir(df, {"1T/ac": (60, 3)}, 20221002, 0.05, AC_REPO)
     assert res["situacao"] == "concluído" and res["falhas_criticas"] == 0
     assert res["cadeia_ok"] == {"True": 2} and res["assinatura_confere"] == {"True": 2}
-    assert res["sem_certificado_por_motivo"] == {"vscmr ausente no pacote": 1}
+    assert res["sem_certificado_por_motivo"] == {"arquivo de assinatura ausente no pacote": 1}
+    assert res["arquivo_assinatura"] == {"vscmr": 1, "vscsa": 1, "indeterminado": 1}
     assert set(res["por_emissor"]) == {"AC URNA", "AC UE2020"}
+    assert res["certificados_repetidos"]["certificados"] == 0
+    dup = pd.concat([df.iloc[:1], df.iloc[:1].assign(turno=2), df.iloc[:1].assign(secao="0002")])
+    rep = C._repetidos(dup)
+    assert rep == {"certificados": 1, "so_entre_turnos": 0, "no_mesmo_turno": 1,
+                   "no_mesmo_turno_por_arquivo": {"vscmr": 1}, "com_mais_de_um_cn": 0}
     assert res["raiz"]["disponivel"] is False and res["raiz"]["tentativas"]
     acurna = next(a for a in res["acs"] if a["cn"] == "AC URNA")
     assert acurna["valida_no_dia_da_eleicao"] == {"1T": True, "2T": True}

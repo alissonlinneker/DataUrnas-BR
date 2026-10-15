@@ -3,8 +3,8 @@
 
 Mesma conferência feita em 2026 (scripts/ele2026/analisar_certificados.py),
 adaptada à fonte de 2022: o .vscmr de cada seção sorteada é lido por faixas
-de bytes do zip de dados abertos do TSE (um por turno e UF), descompactado em
-memória com o CRC-32 conferido, e nada bruto vai para o disco.
+de bytes do zip de dados abertos do TSE (um por turno e UF; nas seções do
+sistema de apuração, o .vscsa), descompactado em memória com o CRC-32 conferido, e nada bruto vai para o disco.
 
 Amostra: 5% das seções de data/parquet/2022/integridade/secoes.parquet em cada
 estrato (turno, UF), arredondado para cima. Dentro do estrato, as seções são
@@ -112,8 +112,9 @@ RAIZ_TENTATIVAS = [
     {"url": "http://lcr.acraizue.tse.jus.br/", "resultado": "HTTP 403", "data": "2026-10-15"},
 ]
 
+EXT_ASSINATURA = ("vscmr", "vscsa")
 COLS = CHAVE + [
-    "modelo", "cn", "cn_confere_usuario", "cert_sha256", "confere_catalogo", "algoritmo_chave",
+    "arquivo_assinatura", "modelo", "cn", "cn_confere_usuario", "cert_sha256", "confere_catalogo", "algoritmo_chave",
     "emissor", "not_before", "not_after", "valido_na_eleicao", "uso_chave_ok",
     "assinatura_confere", "cadeia_ok", "ac_cn", "ac_emissor", "ac_valida_na_eleicao",
     "ac_autoridade_ok", "emitido_na_validade_da_ac", "nivel_cadeia", "cadeia_caminho",
@@ -299,11 +300,14 @@ async def coletar_estrato(fetcher, turno: int, uf: str, amostra: pd.DataFrame, a
                   for k in amostra[CHAVE].itertuples(index=False, name=None)]
     else:
         entradas = await ler_entradas(fetcher, url, cab["tamanho"])
-        vscmr = {}
+        # .vscmr (urna) ou, nas seções do sistema de apuração, .vscsa
+        vscmr: dict = {}
         for e in entradas:
             p = Z.parse_nome_v1(e.nome)
-            if p and p["ext"] == "vscmr":
-                vscmr[(p["cd_mun"], p["zona"], p["secao"])] = e
+            if p and p["ext"] in EXT_ASSINATURA:
+                k = (p["cd_mun"], p["zona"], p["secao"])
+                if k not in vscmr or p["ext"] == "vscmr":
+                    vscmr[k] = e
         del entradas
 
         async def uma(r) -> dict:
@@ -311,7 +315,8 @@ async def coletar_estrato(fetcher, turno: int, uf: str, amostra: pd.DataFrame, a
                     "secao": r.secao}
             e = vscmr.get((r.cd_mun, r.zona, r.secao))
             if e is None:
-                return {**base, "critica": False, "motivo": "vscmr ausente no pacote"}
+                return {**base, "critica": False, "motivo": "arquivo de assinatura ausente no pacote"}
+            base["arquivo_assinatura"] = e.nome.rsplit(".", 1)[-1]
             buf = await fetcher.faixa(url, e.offset, e.fim)
             raw = Z.extrair(buf, e.offset, e)
             sha_cat = getattr(r, "cert_sha256", None)
@@ -391,6 +396,25 @@ def _iso(s: pd.Series) -> tuple[Optional[str], Optional[str]]:
     return (s.min().isoformat(), s.max().isoformat()) if len(s) else (None, None)
 
 
+def _repetidos(com: pd.DataFrame) -> dict:
+    """Certificados em mais de uma seção: entre turnos (a mesma urna nos dois)
+    ou no mesmo turno (com o arquivo de assinatura de cada seção)."""
+    g = com.groupby("cert_sha256").agg(n=("turno", "size"), turnos=("turno", "nunique"),
+                                       cns=("cn", "nunique"),
+                                       arqs=("arquivo_assinatura",
+                                             lambda x: ",".join(sorted(set(x.dropna())))))
+    rep = g[g["n"] > 1]
+    mesmo = rep[rep["n"] > rep["turnos"]]
+    return {
+        "certificados": int(len(rep)),
+        "so_entre_turnos": int((rep["n"] == rep["turnos"]).sum()),
+        "no_mesmo_turno": int(len(mesmo)),
+        "no_mesmo_turno_por_arquivo": {str(k): int(v) for k, v in
+                                       mesmo["arqs"].value_counts().items()},
+        "com_mais_de_um_cn": int((rep["cns"] > 1).sum()),
+    }
+
+
 def resumir(df: pd.DataFrame, estratos: dict, semente: int, fracao: float,
             ac_dir: Optional[Path]) -> dict:
     com = df[df["cert_sha256"].notna()]
@@ -409,6 +433,7 @@ def resumir(df: pd.DataFrame, estratos: dict, semente: int, fracao: float,
         "secoes_processadas": int(len(df)),
         "situacao": "concluído" if len(df) >= alvo and alvo else "em andamento",
         "com_certificado": int(len(com)),
+        "arquivo_assinatura": _cont(df["arquivo_assinatura"]),
         "sem_certificado_por_motivo": {str(k): int(v) for k, v in
                                        df[df["cert_sha256"].isna()]["motivo"].fillna("?")
                                        .value_counts().items()},
@@ -423,6 +448,7 @@ def resumir(df: pd.DataFrame, estratos: dict, semente: int, fracao: float,
         "emitido_na_validade_da_ac": _cont(com["emitido_na_validade_da_ac"]),
         "nivel_cadeia": _cont(com["nivel_cadeia"]),
         "certificados_distintos": int(com["cert_sha256"].nunique()),
+        "certificados_repetidos": _repetidos(com),
         "falhas_criticas": int(df["critica"].fillna(False).astype(bool).sum()),
     }
     por_turno = {}
