@@ -423,7 +423,7 @@ async def run(args: argparse.Namespace) -> int:
         log.info("--secoes: %d seções a refazer em %d UFs", len(refazer), len(ufs))
     inicio = time.strftime("%Y-%m-%dT%H:%M:%S")
     registrar_execucao(out, {"inicio": inicio, "ufs": ufs, "pid": os.getpid(),
-                             "lista_secoes": args.secoes, "n_refazer": len(refazer or ()),
+                             "lista_secoes": Path(args.secoes).name if args.secoes else None, "n_refazer": len(refazer or ()),
                              "fonte": args.fonte, "taxa": args.taxa, "taxa_max": args.taxa_max,
                              "workers": args.workers})
     log.info("checkpoint: %d seções já processadas", len(done))

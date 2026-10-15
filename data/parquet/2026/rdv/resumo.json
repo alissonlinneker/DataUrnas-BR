@@ -1255,7 +1255,7 @@
     "zz"
    ],
    "pid": 5574,
-   "lista_secoes": "/private/tmp/claude-501/-Users-alissonlinneker-www-dataUrnas-br/0f340e3f-f7ed-43d8-b028-37d4e61aa268/scratchpad/fix_log/secoes_refazer.txt",
+   "lista_secoes": "secoes_refazer.txt",
    "n_refazer": 28286,
    "fonte": "catalogo",
    "taxa": 4.0,
