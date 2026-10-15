@@ -12,6 +12,11 @@ processos do pool (recebem só bytes e dicts).
    comparecimento do BU e mede a linha do tempo (antes da abertura oficial,
    antes da "Urna pronta para receber votos", depois do "Inicio do
    Encerramento", máximo por minuto, menor intervalo, lacunas).
+   Seção com BU do Sistema de Apuração (só -logsa.jez, sem log de urna): o
+   log é o da digitação, sem eventos de voto, e a comparação não se aplica
+   (origem_log = "logsa", votos_log e diferenca_log_bu nulos). Nessas seções
+   o RDV também é gerado pelo SA a partir dos dados digitados, então RDV = BU
+   ali não é uma conferência independente.
 
 Grupos de leitura (dashboard/reference.py): divergência RDV x BU é grupo 1;
 contagem do log diferente do BU e voto fora da sequência de eventos são
@@ -481,8 +486,18 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
             txt = None
             sec["motivo"] = (sec["motivo"] or "") + f" log: {e!r}"[:200]
         if txt:
-            tempo = {**ident, **analisar_log_tempo(txt, ident["uf"], ident["cd_mun"], comp,
-                                                   data_eleicao)}
+            # Só o log do SA (-logsa.jez): é o log da digitação do BU e da
+            # apuração das cédulas, sem eventos de voto. Log x BU não se aplica
+            # (votos_log e diferença ficam nulos, sem flag de divergência).
+            # O catálogo de integridade normaliza o tipo logsa para log; o nome
+            # do arquivo preserva a origem.
+            sa = tipo_log == "logsa" or arquivos[tipo_log][0].lower().endswith("-logsa.jez")
+            tipo_log = "logsa" if sa else tipo_log
+            tempo = {**ident, "origem_log": tipo_log,
+                     **analisar_log_tempo(txt, ident["uf"], ident["cd_mun"],
+                                          None if sa else comp, data_eleicao)}
+            if sa:
+                tempo.update(comparecimento_bu=comp, votos_log=None)
             for f in tempo["flags"]:
                 if CATEGORIAS[f] <= GRUPO_2:
                     det = {k: tempo[k] for k in ("votos_log", "comparecimento_bu",
