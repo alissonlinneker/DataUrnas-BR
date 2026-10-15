@@ -1,6 +1,6 @@
 # Certificados das autoridades certificadoras das urnas
 
-Esta pasta guarda os certificados **públicos** das autoridades certificadoras (AC) do TSE que emitem os certificados das urnas eletrônicas. Nenhuma chave privada, nenhum dado pessoal. Eles são usados por `scripts/ele2026/analisar_certificados.py` para conferir se o certificado que acompanha cada arquivo de assinatura (`-vota.vsc`) foi de fato emitido pela AC indicada nele.
+Esta pasta guarda os certificados **públicos** das autoridades certificadoras (AC) do TSE que emitem os certificados das urnas eletrônicas. Nenhuma chave privada, nenhum dado pessoal. Eles são usados por `scripts/ele2026/analisar_certificados.py` (arquivos `-vota.vsc` de 2026) e por `scripts/ele2022/analisar_certificados.py` (arquivos `.vscmr` de 2022, amostra de 5%) para conferir se o certificado que acompanha cada arquivo de assinatura foi de fato emitido pela AC indicada nele.
 
 ## Arquivos
 
@@ -56,6 +56,10 @@ Esses valores estão também em `RESUMO_OFICIAL_SHA512` no script. Basta colocar
 2. A assinatura do certificado da urna é verificada com a chave pública da AC (ECDSA P-521 pela biblioteca `cryptography`; Ed521 pela implementação própria em `src/dataurnas/parsers/ed521.py`). Resultado em `cadeia_ok`.
 3. A partir dessa AC, o script sobe a cadeia enquanto encontrar o emissor nesta pasta e a assinatura conferir. Com os arquivos atuais a conferência para na AC intermediária (`nivel_cadeia = "intermediaria"`); com as raízes, chegaria a `"raiz"`.
 4. A validade da AC no dia da eleição (04/10/2026) é registrada à parte (`ac_valida_na_eleicao`), como observação.
+
+## Eleições de 2022
+
+Em 2022 as urnas usaram duas AC emissoras, as duas com certificado nesta pasta: **AC URNA** (UE2009 a UE2015, ECDSA P-521, emitida pela AC RAIZ UE) e **AC UE2020** (UE2020, Ed521, emitida pela AC URNA v2). A AC URNA (validade até 18/07/2026) e a AC UE2020 (até 01/07/2037) estavam válidas nos dois turnos (02/10 e 30/10/2022). O `.vscmr` de 2022 traz só o certificado da urna, sem a cadeia; nova tentativa de baixar as raízes em 15/10/2026 (`dpc.acue2020.tse.jus.br/acraizue.crt`, `acurnav2.crt`, `dpc.acraizue`, `lcr.acraizue`) recebeu HTTP 403, então a conferência de 2022 também para na AC intermediária.
 
 ## Observação sobre a AC URNA
 
