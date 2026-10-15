@@ -1,13 +1,13 @@
 {
- "gerado_em": "2026-10-15T03:04:49",
+ "gerado_em": "2026-10-15T07:05:02",
  "pleito": "3220",
  "ciclo": "ele2026",
  "data_eleicao": "04/10/2026",
  "metodo": {
   "rdv": "EntidadeResultadoRDV (spec/v2/rdv.asn1) decodificado em memória; cada registro recontado por cargo: nominal pelo número digitado, legenda pelos 2 primeiros dígitos, branco e brancoAposSuspensao como branco, nulo, nuloAposSuspensao e nuloPorRepeticao como nulo, *CargoSemCandidato como cargoSemCandidato (agrupado em nulo se o BU não tiver o tipo).",
-  "bu": "BU do mesmo conjunto de arquivos, decodificado com parsers/bu.py; comparação por candidato, legenda, brancos e nulos em cada cargo e registros do RDV = comparecimento x quantidadeEscolhas.",
+  "bu": "BU do mesmo conjunto de arquivos, decodificado com parsers/bu.py; comparação por candidato, legenda, brancos e nulos em cada cargo e registros do RDV = comparecimento x quantidadeEscolhas. Nas seções com BU do Sistema de Apuração (totais.secoes_bu_sa) o RDV também é gerado pelo SA a partir dos dados digitados, então RDV = BU ali não é conferência independente.",
   "hash": "SHA-512 de cada arquivo baixado comparado ao catálogo de integridade (arquivos_<uf>.parquet, já conferido com o hash assinado no .vsc).",
-  "log": "eventos 'O voto do eleitor foi computado' do dia da eleição; abertura oficial 8h e fim 17h de Brasília convertidos para a hora local da urna (timezones.get_tz_offset; exterior em hora local). Voto fora de sequência: antes da 'Urna pronta para receber votos' ou depois do 'Inicio do Encerramento' da mesma urna. Intervalos medidos entre votos consecutivos da mesma urna.",
+  "log": "eventos 'O voto do eleitor foi computado' do dia da eleição; abertura oficial 8h e fim 17h de Brasília convertidos para a hora local da urna (timezones.get_tz_offset; exterior em hora local). Voto fora de sequência: antes da 'Urna pronta para receber votos' ou depois do 'Inicio do Encerramento' da mesma urna. Intervalos medidos entre votos consecutivos da mesma urna. Logs aninhados ordenados pela data e hora do nome e linhas idênticas repetidas entre arquivos do pacote (o mesmo log copiado mais de uma vez) contadas uma vez. Seções só com log do SA (-logsa.jez, digitação do BU, sem eventos de voto) ficam fora da comparação log x BU (origem_log = 'logsa', totais.log_secoes_log_sa).",
   "grupos": "1 = indício direto (RDV x BU, registros, estrutura, hash); 2 = inconsistência a investigar (log x BU, sequência, outra data, RDV não decodificado, BU do SA); 3 = operacional (horários, rajadas, lacunas)."
  },
  "totais": {
@@ -22,11 +22,13 @@
   "estrutura_invalida": 0,
   "registros_rdv": 749119391,
   "comparecimento_bu": 125275835,
-  "log_votos_log": 125275244,
-  "log_comparecimento_bu": 125275835,
-  "log_secoes_log_diverge": 45,
+  "secoes_bu_sa": 31,
+  "log_votos_log": 125274428,
+  "log_comparecimento_bu": 125274487,
+  "log_secoes_log_diverge": 9,
   "log_secoes_fora_sequencia": 0,
-  "log_secoes_voto_antes_8h": 153
+  "log_secoes_voto_antes_8h": 153,
+  "log_secoes_log_sa": 31
  },
  "por_uf": {
   "ac": {
@@ -41,11 +43,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 2928185,
    "comparecimento_bu": 488330,
+   "secoes_bu_sa": 0,
    "log_votos_log": 488330,
    "log_comparecimento_bu": 488330,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "al": {
    "secoes": 7101,
@@ -59,11 +63,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 11617528,
    "comparecimento_bu": 1938428,
+   "secoes_bu_sa": 0,
    "log_votos_log": 1938428,
    "log_comparecimento_bu": 1938428,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "am": {
    "secoes": 8157,
@@ -77,11 +83,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 13395904,
    "comparecimento_bu": 2234549,
+   "secoes_bu_sa": 0,
    "log_votos_log": 2234549,
    "log_comparecimento_bu": 2234549,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 153
+   "log_secoes_voto_antes_8h": 153,
+   "log_secoes_log_sa": 0
   },
   "ap": {
    "secoes": 1914,
@@ -95,11 +103,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 2856657,
    "comparecimento_bu": 476562,
+   "secoes_bu_sa": 0,
    "log_votos_log": 476562,
    "log_comparecimento_bu": 476562,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "ba": {
    "secoes": 35476,
@@ -113,11 +123,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 54284496,
    "comparecimento_bu": 9053601,
+   "secoes_bu_sa": 0,
    "log_votos_log": 9053565,
    "log_comparecimento_bu": 9053601,
    "log_secoes_log_diverge": 1,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "ce": {
    "secoes": 23765,
@@ -131,11 +143,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 35438081,
    "comparecimento_bu": 5910471,
+   "secoes_bu_sa": 0,
    "log_votos_log": 5910471,
    "log_comparecimento_bu": 5910471,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "df": {
    "secoes": 6969,
@@ -149,11 +163,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 10921001,
    "comparecimento_bu": 1831396,
+   "secoes_bu_sa": 0,
    "log_votos_log": 1831396,
    "log_comparecimento_bu": 1831396,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "es": {
    "secoes": 9844,
@@ -167,11 +183,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 14095342,
    "comparecimento_bu": 2352282,
+   "secoes_bu_sa": 0,
    "log_votos_log": 2352281,
    "log_comparecimento_bu": 2352282,
    "log_secoes_log_diverge": 1,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "go": {
    "secoes": 15686,
@@ -185,11 +203,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 23804027,
    "comparecimento_bu": 3971587,
+   "secoes_bu_sa": 0,
    "log_votos_log": 3971587,
    "log_comparecimento_bu": 3971587,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "ma": {
    "secoes": 18093,
@@ -203,11 +223,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 24951004,
    "comparecimento_bu": 4160343,
+   "secoes_bu_sa": 0,
    "log_votos_log": 4160343,
    "log_comparecimento_bu": 4160343,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "mg": {
    "secoes": 52062,
@@ -221,11 +243,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 75773109,
    "comparecimento_bu": 12637274,
-   "log_votos_log": 12636937,
-   "log_comparecimento_bu": 12637274,
-   "log_secoes_log_diverge": 4,
+   "secoes_bu_sa": 2,
+   "log_votos_log": 12636715,
+   "log_comparecimento_bu": 12636715,
+   "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 2
   },
   "ms": {
    "secoes": 7106,
@@ -239,11 +263,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 9236265,
    "comparecimento_bu": 1541220,
+   "secoes_bu_sa": 0,
    "log_votos_log": 1541220,
    "log_comparecimento_bu": 1541220,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "mt": {
    "secoes": 8287,
@@ -257,11 +283,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 12300723,
    "comparecimento_bu": 2052133,
+   "secoes_bu_sa": 0,
    "log_votos_log": 2052133,
    "log_comparecimento_bu": 2052133,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "pa": {
    "secoes": 20827,
@@ -275,11 +303,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 30380254,
    "comparecimento_bu": 5066504,
-   "log_votos_log": 5066642,
+   "secoes_bu_sa": 0,
+   "log_votos_log": 5066504,
    "log_comparecimento_bu": 5066504,
-   "log_secoes_log_diverge": 1,
+   "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "pb": {
    "secoes": 10712,
@@ -293,11 +323,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 16073508,
    "comparecimento_bu": 2683988,
+   "secoes_bu_sa": 0,
    "log_votos_log": 2683988,
    "log_comparecimento_bu": 2683988,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "pe": {
    "secoes": 21418,
@@ -311,11 +343,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 35439687,
    "comparecimento_bu": 5911062,
+   "secoes_bu_sa": 0,
    "log_votos_log": 5911062,
    "log_comparecimento_bu": 5911062,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "pi": {
    "secoes": 10225,
@@ -329,11 +363,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 13437813,
    "comparecimento_bu": 2240883,
+   "secoes_bu_sa": 0,
    "log_votos_log": 2240883,
    "log_comparecimento_bu": 2240883,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "pr": {
    "secoes": 27142,
@@ -347,11 +383,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 40989532,
    "comparecimento_bu": 6841457,
-   "log_votos_log": 6841643,
+   "secoes_bu_sa": 0,
+   "log_votos_log": 6841457,
    "log_comparecimento_bu": 6841457,
-   "log_secoes_log_diverge": 2,
+   "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "rj": {
    "secoes": 37675,
@@ -365,11 +403,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 59089137,
    "comparecimento_bu": 9859802,
-   "log_votos_log": 9859980,
+   "secoes_bu_sa": 0,
+   "log_votos_log": 9859800,
    "log_comparecimento_bu": 9859802,
-   "log_secoes_log_diverge": 2,
+   "log_secoes_log_diverge": 1,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "rn": {
    "secoes": 8115,
@@ -383,11 +423,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 13009583,
    "comparecimento_bu": 2171013,
+   "secoes_bu_sa": 0,
    "log_votos_log": 2171012,
    "log_comparecimento_bu": 2171013,
    "log_secoes_log_diverge": 1,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "ro": {
    "secoes": 4698,
@@ -401,11 +443,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 5942645,
    "comparecimento_bu": 991080,
+   "secoes_bu_sa": 0,
    "log_votos_log": 991080,
    "log_comparecimento_bu": 991080,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "rr": {
    "secoes": 1519,
@@ -419,11 +463,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 1992567,
    "comparecimento_bu": 332772,
+   "secoes_bu_sa": 0,
    "log_votos_log": 332772,
    "log_comparecimento_bu": 332772,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "rs": {
    "secoes": 27547,
@@ -437,11 +483,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 40190023,
    "comparecimento_bu": 6702903,
-   "log_votos_log": 6702992,
+   "secoes_bu_sa": 0,
+   "log_votos_log": 6702902,
    "log_comparecimento_bu": 6702903,
    "log_secoes_log_diverge": 1,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "sc": {
    "secoes": 17326,
@@ -455,11 +503,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 27820909,
    "comparecimento_bu": 4648159,
+   "secoes_bu_sa": 0,
    "log_votos_log": 4648159,
    "log_comparecimento_bu": 4648159,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "se": {
    "secoes": 5923,
@@ -473,11 +523,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 8622127,
    "comparecimento_bu": 1439082,
+   "secoes_bu_sa": 0,
    "log_votos_log": 1439082,
    "log_comparecimento_bu": 1439082,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "sp": {
    "secoes": 103656,
@@ -491,11 +543,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 158403272,
    "comparecimento_bu": 26431992,
+   "secoes_bu_sa": 0,
    "log_votos_log": 26431974,
    "log_comparecimento_bu": 26431992,
    "log_secoes_log_diverge": 4,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "to": {
    "secoes": 4384,
@@ -509,11 +563,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 5784246,
    "comparecimento_bu": 965196,
+   "secoes_bu_sa": 0,
    "log_votos_log": 965196,
    "log_comparecimento_bu": 965196,
    "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 0
   },
   "zz": {
    "secoes": 1310,
@@ -527,11 +583,13 @@
    "estrutura_invalida": 0,
    "registros_rdv": 341766,
    "comparecimento_bu": 341766,
+   "secoes_bu_sa": 29,
    "log_votos_log": 340977,
-   "log_comparecimento_bu": 341766,
-   "log_secoes_log_diverge": 28,
+   "log_comparecimento_bu": 340977,
+   "log_secoes_log_diverge": 0,
    "log_secoes_fora_sequencia": 0,
-   "log_secoes_voto_antes_8h": 0
+   "log_secoes_voto_antes_8h": 0,
+   "log_secoes_log_sa": 29
   }
  },
  "por_cargo": {
@@ -660,22 +718,14 @@
  "achados_por_categoria": {
   "log_votos_diverge": {
    "grupo": 2,
-   "ocorrencias": 45,
-   "secoes": 45
+   "ocorrencias": 9,
+   "secoes": 9
   }
  },
  "flags_log": {
-  "log_intervalo_curto": {
-   "grupo": 3,
-   "secoes": 1
-  },
   "log_lacuna_60min": {
    "grupo": 3,
    "secoes": 1912
-  },
-  "log_relogio_inverso": {
-   "grupo": 3,
-   "secoes": 7
   },
   "log_voto_antes_8h": {
    "grupo": 3,
@@ -683,11 +733,11 @@
   },
   "log_votos_diverge": {
    "grupo": 2,
-   "secoes": 45
+   "secoes": 9
   }
  },
  "secoes_por_grupo_log": {
-  "2": 45,
+  "2": 9,
   "3": 2064
  },
  "intervalos": {
@@ -709,7 +759,7 @@
    "[3600,inf)"
   ],
   "contagem": [
-   1,
+   0,
    0,
    0,
    0,
@@ -717,12 +767,12 @@
    0,
    2,
    3960,
-   94462,
-   3234923,
-   76502746,
-   39345452,
-   4636602,
-   953525,
+   94461,
+   3234910,
+   76502315,
+   39345132,
+   4636572,
+   953512,
    2254
   ],
   "intervalo_min_s_quantis_0.1_1_10_50pct": [
@@ -736,18 +786,17 @@
    102.0,
    130.0
   ],
-  "max_votos_minuto": 4,
+  "max_votos_minuto": 3,
   "max_votos_minuto_quantis_50_99pct": [
    1.0,
    2.0
   ],
-  "menor_intervalo_s": 0,
+  "menor_intervalo_s": 19,
   "secoes_por_pico_minuto": {
    "0": 31,
-   "1": 354360,
-   "2": 144792,
-   "3": 22,
-   "4": 2
+   "1": 354365,
+   "2": 144789,
+   "3": 22
   }
  },
  "arquivos_parquet": [
@@ -757,8 +806,8 @@
  "auditoria_bu_log": {
   "secoes_log": 499207,
   "issues_por_codigo": {
-   "A03": 9,
-   "A04": 1033,
+   "A03": 2,
+   "A04": 1015,
    "A05": 88,
    "C06": 28255,
    "I01": 2902,
@@ -790,16 +839,16 @@
    "issues_por_codigo": {
     "A03": {
      "ocorrencias_publicada": 0,
-     "ocorrencias_nova": 9,
-     "secoes_ganharam": 9,
+     "ocorrencias_nova": 2,
+     "secoes_ganharam": 2,
      "secoes_perderam": 0,
      "secoes_descricao_mudou": 0,
      "grupo": "investigar"
     },
     "A04": {
      "ocorrencias_publicada": 718,
-     "ocorrencias_nova": 1033,
-     "secoes_ganharam": 315,
+     "ocorrencias_nova": 1015,
+     "secoes_ganharam": 297,
      "secoes_perderam": 0,
      "secoes_descricao_mudou": 0,
      "grupo": "operacional"
@@ -911,16 +960,9 @@
    },
    "a03_e_grupo1_na_nova": {
     "A03": {
-     "secoes": 9,
+     "secoes": 2,
      "exemplos": [
       "1T/ba/39934/0183/0175",
-      "1T/mg/44458/0103/0221",
-      "1T/mg/47830/0165/0031",
-      "1T/pa/04855/0031/0087",
-      "1T/pr/75353/0002/0574",
-      "1T/pr/76570/0010/0273",
-      "1T/rj/58041/0155/0190",
-      "1T/rs/89036/0083/0044",
       "1T/sp/71072/0002/0035"
      ]
     }
@@ -1178,6 +1220,62 @@
     "retry": 0,
     "fail": 0,
     "bytes": 39267256
+   }
+  },
+  {
+   "inicio": "2026-10-15T00:59:44",
+   "ufs": [
+    "ac",
+    "al",
+    "ap",
+    "am",
+    "ba",
+    "ce",
+    "df",
+    "es",
+    "go",
+    "ma",
+    "mt",
+    "ms",
+    "mg",
+    "pa",
+    "pb",
+    "pr",
+    "pe",
+    "pi",
+    "rj",
+    "rn",
+    "rs",
+    "ro",
+    "rr",
+    "sc",
+    "sp",
+    "se",
+    "to",
+    "zz"
+   ],
+   "pid": 5574,
+   "lista_secoes": "/private/tmp/claude-501/-Users-alissonlinneker-www-dataUrnas-br/0f340e3f-f7ed-43d8-b028-37d4e61aa268/scratchpad/fix_log/secoes_refazer.txt",
+   "n_refazer": 28286,
+   "fonte": "catalogo",
+   "taxa": 4.0,
+   "taxa_max": 4.0,
+   "workers": 1
+  },
+  {
+   "inicio": "2026-10-15T00:59:44",
+   "fim": "2026-10-15T07:03:26",
+   "secoes": 28286,
+   "segundos": 21821,
+   "erros": 0,
+   "divergencias_rdv": 0,
+   "http": {
+    "ok": 84886,
+    "404": 0,
+    "429": 0,
+    "retry": 3,
+    "fail": 0,
+    "bytes": 4290723880
    }
   }
  ]
