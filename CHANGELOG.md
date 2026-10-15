@@ -6,6 +6,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não publicado]
 
+### Adicionado
+
+- Verificação de integridade dos arquivos de urna de 2022, 1º e 2º turnos (`scripts/ele2022/fetch_integridade.py`), a partir dos zips de dados abertos do TSE lidos por faixas de bytes, já que a API de resultados não serve mais os arquivos de 2022. Resultado em 944.051 seções (56 pacotes): 3.776.042 SHA-512 iguais ao assinado no `.vscmr`, nenhum divergente, 944.051 assinaturas de urna válidas (ECDSA P-521 e Ed521) e nenhuma inválida, e votos de Presidente do BU iguais aos da base em 941.653 seções, nenhuma diferente.
+- Resultados em `data/parquet/2022/integridade` (`secoes.parquet`, `resumo.json`, `divergencias.jsonl`, `ocorrencias_publicacao.jsonl` e `catalogo_manifest.json`). O catálogo por arquivo (`arquivos_t<turno>_<uf>.parquet`, 58 arquivos, 4.720.093 linhas) fica fora do git, como em 2026.
+- Registro do flag `verify_hashes` de 2022 em `data/parquet/metadados.parquet` (`scripts/ele2022/registrar_metadados_integridade.py`), lido pelo `build_db`.
+- Documento `docs/integridade-2022.md`, gerado por `scripts/docs/gerar_relatorio_integridade_2022.py`, com totais por turno e UF, divergências por categoria, UF e turno e a lista dos 173 arquivos assinados pela urna e ausentes do pacote do TSE (64 seções, 162 deles no exterior), base do pedido de esclarecimento ao TSE.
+
 ## [0.2.1] - 2026-10-14
 
 ### Adicionado
