@@ -415,6 +415,36 @@ def info_certificado(cert_bytes: bytes) -> dict:
     }
 
 
+def ecdsa_der_canonica(sig: bytes) -> bytes | None:
+    """Reescreve uma assinatura ECDSA em DER canônico, ou None se ilegível.
+
+    As urnas de 2022 (.vscmr) gravam r e s como INTEGER de largura fixa
+    (66 bytes para P-521), com zeros à esquerda quando o valor é menor. Isso é
+    BER válido, mas não DER mínimo, e o OpenSSL rejeita a codificação não
+    canônica: cerca de metade das assinaturas válidas falharia. Aqui r e s são
+    lidos como inteiros e recodificados. Também aceita r||s cru (2 x 66 bytes).
+    """
+    from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
+
+    try:
+        if sig[:1] == b"\x30":
+            t, i, ln = _ber_tlv(sig, 0)
+            partes = _filhos(sig, i, i + ln)
+            if len(partes) != 2 or any(p[0] != 0x02 for p in partes):
+                return None
+            r, s = (int.from_bytes(_val(sig, p), "big", signed=True) for p in partes)
+        elif len(sig) % 2 == 0 and len(sig) in (64, 96, 132):
+            meio = len(sig) // 2
+            r, s = int.from_bytes(sig[:meio], "big"), int.from_bytes(sig[meio:], "big")
+        else:
+            return None
+    except (IndexError, ValueError):
+        return None
+    if r <= 0 or s <= 0:
+        return None
+    return encode_dss_signature(r, s)
+
+
 def _verificador_hw(info: dict, algoritmo: str):
     """Função (hash_assinado, assinatura) -> bool para a chave do certificado,
     ou (None, motivo) se o algoritmo não for verificável."""
@@ -438,8 +468,11 @@ def _verificador_hw(info: dict, algoritmo: str):
             return None, "certificado sem chave ECDSA"
 
         def v(h: bytes, s: bytes) -> bool:
+            canonica = ecdsa_der_canonica(s)
+            if canonica is None:
+                return False
             try:
-                pk.verify(s, h, ec.ECDSA(hashes.SHA512()))
+                pk.verify(canonica, h, ec.ECDSA(hashes.SHA512()))
                 return True
             except InvalidSignature:
                 return False

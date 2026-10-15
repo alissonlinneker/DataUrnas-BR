@@ -1,0 +1,931 @@
+{
+ "gerado_em": "2026-10-15T03:16:38",
+ "amostra": {
+  "fracao": 0.05,
+  "semente": 20221002,
+  "criterio": "estratos (turno, UF) de secoes.parquet; em cada um, ceil(fração x N) seções de menor SHA-256 de '<semente>|<turno>|<uf>|<cd_mun>|<zona>|<secao>'",
+  "universo": 944051,
+  "secoes_sorteadas": 47230,
+  "estratos": {
+   "1T/ac": {
+    "universo": 2124,
+    "amostra": 107
+   },
+   "1T/al": {
+    "universo": 6626,
+    "amostra": 332
+   },
+   "1T/am": {
+    "universo": 7453,
+    "amostra": 373
+   },
+   "1T/ap": {
+    "universo": 1740,
+    "amostra": 87
+   },
+   "1T/ba": {
+    "universo": 34424,
+    "amostra": 1722
+   },
+   "1T/ce": {
+    "universo": 22796,
+    "amostra": 1140
+   },
+   "1T/df": {
+    "universo": 6748,
+    "amostra": 338
+   },
+   "1T/es": {
+    "universo": 9239,
+    "amostra": 462
+   },
+   "1T/go": {
+    "universo": 14620,
+    "amostra": 731
+   },
+   "1T/ma": {
+    "universo": 16423,
+    "amostra": 822
+   },
+   "1T/mg": {
+    "universo": 49981,
+    "amostra": 2500
+   },
+   "1T/ms": {
+    "universo": 6912,
+    "amostra": 346
+   },
+   "1T/mt": {
+    "universo": 7652,
+    "amostra": 383
+   },
+   "1T/pa": {
+    "universo": 18235,
+    "amostra": 912
+   },
+   "1T/pb": {
+    "universo": 9602,
+    "amostra": 481
+   },
+   "1T/pe": {
+    "universo": 20572,
+    "amostra": 1029
+   },
+   "1T/pi": {
+    "universo": 8963,
+    "amostra": 449
+   },
+   "1T/pr": {
+    "universo": 25721,
+    "amostra": 1287
+   },
+   "1T/rj": {
+    "universo": 34068,
+    "amostra": 1704
+   },
+   "1T/rn": {
+    "universo": 7674,
+    "amostra": 384
+   },
+   "1T/ro": {
+    "universo": 4198,
+    "amostra": 210
+   },
+   "1T/rr": {
+    "universo": 1268,
+    "amostra": 64
+   },
+   "1T/rs": {
+    "universo": 27201,
+    "amostra": 1361
+   },
+   "1T/sc": {
+    "universo": 16242,
+    "amostra": 813
+   },
+   "1T/se": {
+    "universo": 5498,
+    "amostra": 275
+   },
+   "1T/sp": {
+    "universo": 101073,
+    "amostra": 5054
+   },
+   "1T/to": {
+    "universo": 3957,
+    "amostra": 198
+   },
+   "1T/zz": {
+    "universo": 1014,
+    "amostra": 51
+   },
+   "2T/ac": {
+    "universo": 2124,
+    "amostra": 107
+   },
+   "2T/al": {
+    "universo": 6626,
+    "amostra": 332
+   },
+   "2T/am": {
+    "universo": 7453,
+    "amostra": 373
+   },
+   "2T/ap": {
+    "universo": 1740,
+    "amostra": 87
+   },
+   "2T/ba": {
+    "universo": 34424,
+    "amostra": 1722
+   },
+   "2T/ce": {
+    "universo": 22796,
+    "amostra": 1140
+   },
+   "2T/df": {
+    "universo": 6748,
+    "amostra": 338
+   },
+   "2T/es": {
+    "universo": 9239,
+    "amostra": 462
+   },
+   "2T/go": {
+    "universo": 14620,
+    "amostra": 731
+   },
+   "2T/ma": {
+    "universo": 16423,
+    "amostra": 822
+   },
+   "2T/mg": {
+    "universo": 49981,
+    "amostra": 2500
+   },
+   "2T/ms": {
+    "universo": 6912,
+    "amostra": 346
+   },
+   "2T/mt": {
+    "universo": 7652,
+    "amostra": 383
+   },
+   "2T/pa": {
+    "universo": 18235,
+    "amostra": 912
+   },
+   "2T/pb": {
+    "universo": 9602,
+    "amostra": 481
+   },
+   "2T/pe": {
+    "universo": 20572,
+    "amostra": 1029
+   },
+   "2T/pi": {
+    "universo": 8963,
+    "amostra": 449
+   },
+   "2T/pr": {
+    "universo": 25721,
+    "amostra": 1287
+   },
+   "2T/rj": {
+    "universo": 34068,
+    "amostra": 1704
+   },
+   "2T/rn": {
+    "universo": 7674,
+    "amostra": 384
+   },
+   "2T/ro": {
+    "universo": 4198,
+    "amostra": 210
+   },
+   "2T/rr": {
+    "universo": 1268,
+    "amostra": 64
+   },
+   "2T/rs": {
+    "universo": 27201,
+    "amostra": 1361
+   },
+   "2T/sc": {
+    "universo": 16242,
+    "amostra": 813
+   },
+   "2T/se": {
+    "universo": 5498,
+    "amostra": 275
+   },
+   "2T/sp": {
+    "universo": 101073,
+    "amostra": 5054
+   },
+   "2T/to": {
+    "universo": 3957,
+    "amostra": 198
+   },
+   "2T/zz": {
+    "universo": 1017,
+    "amostra": 51
+   }
+  }
+ },
+ "dias_eleicao": {
+  "1T": "2022-10-02T15:00:00+00:00",
+  "2T": "2022-10-30T15:00:00+00:00"
+ },
+ "secoes_processadas": 47230,
+ "situacao": "concluído",
+ "com_certificado": 47230,
+ "arquivo_assinatura": {
+  "vscmr": 47225,
+  "vscsa": 5
+ },
+ "sem_certificado_por_motivo": {},
+ "cadeia_ok": {
+  "True": 47230
+ },
+ "assinatura_confere": {
+  "True": 47230
+ },
+ "valido_na_eleicao": {
+  "True": 47230
+ },
+ "uso_chave_ok": {
+  "True": 47230
+ },
+ "cn_confere_usuario": {
+  "True": 47230
+ },
+ "confere_catalogo": {
+  "True": 47230
+ },
+ "ac_valida_na_eleicao": {
+  "True": 47230
+ },
+ "ac_autoridade_ok": {
+  "True": 47230
+ },
+ "emitido_na_validade_da_ac": {
+  "True": 47230
+ },
+ "nivel_cadeia": {
+  "intermediaria": 47230
+ },
+ "certificados_distintos": 46104,
+ "certificados_repetidos": {
+  "certificados": 1126,
+  "so_entre_turnos": 1125,
+  "no_mesmo_turno": 1,
+  "no_mesmo_turno_por_arquivo": {
+   "vscsa": 1
+  },
+  "com_mais_de_um_cn": 0
+ },
+ "falhas_criticas": 0,
+ "por_turno": {
+  "1T": {
+   "secoes": 23615,
+   "cadeia_ok": {
+    "True": 23615
+   },
+   "assinatura_confere": {
+    "True": 23615
+   },
+   "valido_na_eleicao": {
+    "True": 23615
+   }
+  },
+  "2T": {
+   "secoes": 23615,
+   "cadeia_ok": {
+    "True": 23615
+   },
+   "assinatura_confere": {
+    "True": 23615
+   },
+   "valido_na_eleicao": {
+    "True": 23615
+   }
+  }
+ },
+ "por_turno_uf": {
+  "1T/ac": {
+   "secoes": 107,
+   "cadeia_ok": 107,
+   "assinatura_confere": 107,
+   "valido_na_eleicao": 107,
+   "uso_chave_ok": 107
+  },
+  "1T/al": {
+   "secoes": 332,
+   "cadeia_ok": 332,
+   "assinatura_confere": 332,
+   "valido_na_eleicao": 332,
+   "uso_chave_ok": 332
+  },
+  "1T/am": {
+   "secoes": 373,
+   "cadeia_ok": 373,
+   "assinatura_confere": 373,
+   "valido_na_eleicao": 373,
+   "uso_chave_ok": 373
+  },
+  "1T/ap": {
+   "secoes": 87,
+   "cadeia_ok": 87,
+   "assinatura_confere": 87,
+   "valido_na_eleicao": 87,
+   "uso_chave_ok": 87
+  },
+  "1T/ba": {
+   "secoes": 1722,
+   "cadeia_ok": 1722,
+   "assinatura_confere": 1722,
+   "valido_na_eleicao": 1722,
+   "uso_chave_ok": 1722
+  },
+  "1T/ce": {
+   "secoes": 1140,
+   "cadeia_ok": 1140,
+   "assinatura_confere": 1140,
+   "valido_na_eleicao": 1140,
+   "uso_chave_ok": 1140
+  },
+  "1T/df": {
+   "secoes": 338,
+   "cadeia_ok": 338,
+   "assinatura_confere": 338,
+   "valido_na_eleicao": 338,
+   "uso_chave_ok": 338
+  },
+  "1T/es": {
+   "secoes": 462,
+   "cadeia_ok": 462,
+   "assinatura_confere": 462,
+   "valido_na_eleicao": 462,
+   "uso_chave_ok": 462
+  },
+  "1T/go": {
+   "secoes": 731,
+   "cadeia_ok": 731,
+   "assinatura_confere": 731,
+   "valido_na_eleicao": 731,
+   "uso_chave_ok": 731
+  },
+  "1T/ma": {
+   "secoes": 822,
+   "cadeia_ok": 822,
+   "assinatura_confere": 822,
+   "valido_na_eleicao": 822,
+   "uso_chave_ok": 822
+  },
+  "1T/mg": {
+   "secoes": 2500,
+   "cadeia_ok": 2500,
+   "assinatura_confere": 2500,
+   "valido_na_eleicao": 2500,
+   "uso_chave_ok": 2500
+  },
+  "1T/ms": {
+   "secoes": 346,
+   "cadeia_ok": 346,
+   "assinatura_confere": 346,
+   "valido_na_eleicao": 346,
+   "uso_chave_ok": 346
+  },
+  "1T/mt": {
+   "secoes": 383,
+   "cadeia_ok": 383,
+   "assinatura_confere": 383,
+   "valido_na_eleicao": 383,
+   "uso_chave_ok": 383
+  },
+  "1T/pa": {
+   "secoes": 912,
+   "cadeia_ok": 912,
+   "assinatura_confere": 912,
+   "valido_na_eleicao": 912,
+   "uso_chave_ok": 912
+  },
+  "1T/pb": {
+   "secoes": 481,
+   "cadeia_ok": 481,
+   "assinatura_confere": 481,
+   "valido_na_eleicao": 481,
+   "uso_chave_ok": 481
+  },
+  "1T/pe": {
+   "secoes": 1029,
+   "cadeia_ok": 1029,
+   "assinatura_confere": 1029,
+   "valido_na_eleicao": 1029,
+   "uso_chave_ok": 1029
+  },
+  "1T/pi": {
+   "secoes": 449,
+   "cadeia_ok": 449,
+   "assinatura_confere": 449,
+   "valido_na_eleicao": 449,
+   "uso_chave_ok": 449
+  },
+  "1T/pr": {
+   "secoes": 1287,
+   "cadeia_ok": 1287,
+   "assinatura_confere": 1287,
+   "valido_na_eleicao": 1287,
+   "uso_chave_ok": 1287
+  },
+  "1T/rj": {
+   "secoes": 1704,
+   "cadeia_ok": 1704,
+   "assinatura_confere": 1704,
+   "valido_na_eleicao": 1704,
+   "uso_chave_ok": 1704
+  },
+  "1T/rn": {
+   "secoes": 384,
+   "cadeia_ok": 384,
+   "assinatura_confere": 384,
+   "valido_na_eleicao": 384,
+   "uso_chave_ok": 384
+  },
+  "1T/ro": {
+   "secoes": 210,
+   "cadeia_ok": 210,
+   "assinatura_confere": 210,
+   "valido_na_eleicao": 210,
+   "uso_chave_ok": 210
+  },
+  "1T/rr": {
+   "secoes": 64,
+   "cadeia_ok": 64,
+   "assinatura_confere": 64,
+   "valido_na_eleicao": 64,
+   "uso_chave_ok": 64
+  },
+  "1T/rs": {
+   "secoes": 1361,
+   "cadeia_ok": 1361,
+   "assinatura_confere": 1361,
+   "valido_na_eleicao": 1361,
+   "uso_chave_ok": 1361
+  },
+  "1T/sc": {
+   "secoes": 813,
+   "cadeia_ok": 813,
+   "assinatura_confere": 813,
+   "valido_na_eleicao": 813,
+   "uso_chave_ok": 813
+  },
+  "1T/se": {
+   "secoes": 275,
+   "cadeia_ok": 275,
+   "assinatura_confere": 275,
+   "valido_na_eleicao": 275,
+   "uso_chave_ok": 275
+  },
+  "1T/sp": {
+   "secoes": 5054,
+   "cadeia_ok": 5054,
+   "assinatura_confere": 5054,
+   "valido_na_eleicao": 5054,
+   "uso_chave_ok": 5054
+  },
+  "1T/to": {
+   "secoes": 198,
+   "cadeia_ok": 198,
+   "assinatura_confere": 198,
+   "valido_na_eleicao": 198,
+   "uso_chave_ok": 198
+  },
+  "1T/zz": {
+   "secoes": 51,
+   "cadeia_ok": 51,
+   "assinatura_confere": 51,
+   "valido_na_eleicao": 51,
+   "uso_chave_ok": 51
+  },
+  "2T/ac": {
+   "secoes": 107,
+   "cadeia_ok": 107,
+   "assinatura_confere": 107,
+   "valido_na_eleicao": 107,
+   "uso_chave_ok": 107
+  },
+  "2T/al": {
+   "secoes": 332,
+   "cadeia_ok": 332,
+   "assinatura_confere": 332,
+   "valido_na_eleicao": 332,
+   "uso_chave_ok": 332
+  },
+  "2T/am": {
+   "secoes": 373,
+   "cadeia_ok": 373,
+   "assinatura_confere": 373,
+   "valido_na_eleicao": 373,
+   "uso_chave_ok": 373
+  },
+  "2T/ap": {
+   "secoes": 87,
+   "cadeia_ok": 87,
+   "assinatura_confere": 87,
+   "valido_na_eleicao": 87,
+   "uso_chave_ok": 87
+  },
+  "2T/ba": {
+   "secoes": 1722,
+   "cadeia_ok": 1722,
+   "assinatura_confere": 1722,
+   "valido_na_eleicao": 1722,
+   "uso_chave_ok": 1722
+  },
+  "2T/ce": {
+   "secoes": 1140,
+   "cadeia_ok": 1140,
+   "assinatura_confere": 1140,
+   "valido_na_eleicao": 1140,
+   "uso_chave_ok": 1140
+  },
+  "2T/df": {
+   "secoes": 338,
+   "cadeia_ok": 338,
+   "assinatura_confere": 338,
+   "valido_na_eleicao": 338,
+   "uso_chave_ok": 338
+  },
+  "2T/es": {
+   "secoes": 462,
+   "cadeia_ok": 462,
+   "assinatura_confere": 462,
+   "valido_na_eleicao": 462,
+   "uso_chave_ok": 462
+  },
+  "2T/go": {
+   "secoes": 731,
+   "cadeia_ok": 731,
+   "assinatura_confere": 731,
+   "valido_na_eleicao": 731,
+   "uso_chave_ok": 731
+  },
+  "2T/ma": {
+   "secoes": 822,
+   "cadeia_ok": 822,
+   "assinatura_confere": 822,
+   "valido_na_eleicao": 822,
+   "uso_chave_ok": 822
+  },
+  "2T/mg": {
+   "secoes": 2500,
+   "cadeia_ok": 2500,
+   "assinatura_confere": 2500,
+   "valido_na_eleicao": 2500,
+   "uso_chave_ok": 2500
+  },
+  "2T/ms": {
+   "secoes": 346,
+   "cadeia_ok": 346,
+   "assinatura_confere": 346,
+   "valido_na_eleicao": 346,
+   "uso_chave_ok": 346
+  },
+  "2T/mt": {
+   "secoes": 383,
+   "cadeia_ok": 383,
+   "assinatura_confere": 383,
+   "valido_na_eleicao": 383,
+   "uso_chave_ok": 383
+  },
+  "2T/pa": {
+   "secoes": 912,
+   "cadeia_ok": 912,
+   "assinatura_confere": 912,
+   "valido_na_eleicao": 912,
+   "uso_chave_ok": 912
+  },
+  "2T/pb": {
+   "secoes": 481,
+   "cadeia_ok": 481,
+   "assinatura_confere": 481,
+   "valido_na_eleicao": 481,
+   "uso_chave_ok": 481
+  },
+  "2T/pe": {
+   "secoes": 1029,
+   "cadeia_ok": 1029,
+   "assinatura_confere": 1029,
+   "valido_na_eleicao": 1029,
+   "uso_chave_ok": 1029
+  },
+  "2T/pi": {
+   "secoes": 449,
+   "cadeia_ok": 449,
+   "assinatura_confere": 449,
+   "valido_na_eleicao": 449,
+   "uso_chave_ok": 449
+  },
+  "2T/pr": {
+   "secoes": 1287,
+   "cadeia_ok": 1287,
+   "assinatura_confere": 1287,
+   "valido_na_eleicao": 1287,
+   "uso_chave_ok": 1287
+  },
+  "2T/rj": {
+   "secoes": 1704,
+   "cadeia_ok": 1704,
+   "assinatura_confere": 1704,
+   "valido_na_eleicao": 1704,
+   "uso_chave_ok": 1704
+  },
+  "2T/rn": {
+   "secoes": 384,
+   "cadeia_ok": 384,
+   "assinatura_confere": 384,
+   "valido_na_eleicao": 384,
+   "uso_chave_ok": 384
+  },
+  "2T/ro": {
+   "secoes": 210,
+   "cadeia_ok": 210,
+   "assinatura_confere": 210,
+   "valido_na_eleicao": 210,
+   "uso_chave_ok": 210
+  },
+  "2T/rr": {
+   "secoes": 64,
+   "cadeia_ok": 64,
+   "assinatura_confere": 64,
+   "valido_na_eleicao": 64,
+   "uso_chave_ok": 64
+  },
+  "2T/rs": {
+   "secoes": 1361,
+   "cadeia_ok": 1361,
+   "assinatura_confere": 1361,
+   "valido_na_eleicao": 1361,
+   "uso_chave_ok": 1361
+  },
+  "2T/sc": {
+   "secoes": 813,
+   "cadeia_ok": 813,
+   "assinatura_confere": 813,
+   "valido_na_eleicao": 813,
+   "uso_chave_ok": 813
+  },
+  "2T/se": {
+   "secoes": 275,
+   "cadeia_ok": 275,
+   "assinatura_confere": 275,
+   "valido_na_eleicao": 275,
+   "uso_chave_ok": 275
+  },
+  "2T/sp": {
+   "secoes": 5054,
+   "cadeia_ok": 5054,
+   "assinatura_confere": 5054,
+   "valido_na_eleicao": 5054,
+   "uso_chave_ok": 5054
+  },
+  "2T/to": {
+   "secoes": 198,
+   "cadeia_ok": 198,
+   "assinatura_confere": 198,
+   "valido_na_eleicao": 198,
+   "uso_chave_ok": 198
+  },
+  "2T/zz": {
+   "secoes": 51,
+   "cadeia_ok": 51,
+   "assinatura_confere": 51,
+   "valido_na_eleicao": 51,
+   "uso_chave_ok": 51
+  }
+ },
+ "por_emissor": {
+  "AC UE2020": [
+   {
+    "modelo": "UE2020",
+    "algoritmo": "Ed521",
+    "secoes": 19258,
+    "nao_antes_min": "2022-04-23T00:38:38+00:00",
+    "nao_antes_max": "2022-09-29T18:31:42+00:00",
+    "nao_depois_min": "2035-12-31T00:38:38+00:00",
+    "nao_depois_max": "2036-06-07T18:31:42+00:00",
+    "cadeia_ok": {
+     "True": 19258
+    },
+    "caminhos": {
+     "AC UE2020": 19258
+    },
+    "ac_emissor": [
+     "AC URNA v2"
+    ]
+   }
+  ],
+  "AC URNA": [
+   {
+    "modelo": "UE2009",
+    "algoritmo": "ECDSA",
+    "secoes": 4786,
+    "nao_antes_min": "2012-06-28T17:09:31+00:00",
+    "nao_antes_max": "2020-11-04T19:10:46+00:00",
+    "nao_depois_min": "2026-03-07T17:09:31+00:00",
+    "nao_depois_max": "2034-07-14T19:10:46+00:00",
+    "cadeia_ok": {
+     "True": 4786
+    },
+    "caminhos": {
+     "AC URNA": 4786
+    },
+    "ac_emissor": [
+     "AC RAIZ UE"
+    ]
+   },
+   {
+    "modelo": "UE2010",
+    "algoritmo": "ECDSA",
+    "secoes": 9538,
+    "nao_antes_min": "2012-05-23T14:04:59+00:00",
+    "nao_antes_max": "2018-09-26T19:15:02+00:00",
+    "nao_depois_min": "2026-01-30T14:04:59+00:00",
+    "nao_depois_max": "2032-06-04T19:15:02+00:00",
+    "cadeia_ok": {
+     "True": 9538
+    },
+    "caminhos": {
+     "AC URNA": 9538
+    },
+    "ac_emissor": [
+     "AC RAIZ UE"
+    ]
+   },
+   {
+    "modelo": "UE2011",
+    "algoritmo": "ECDSA",
+    "secoes": 2599,
+    "nao_antes_min": "2012-06-19T22:19:55+00:00",
+    "nao_antes_max": "2022-05-17T17:15:35+00:00",
+    "nao_depois_min": "2026-02-26T22:19:55+00:00",
+    "nao_depois_max": "2036-01-24T17:15:35+00:00",
+    "cadeia_ok": {
+     "True": 2599
+    },
+    "caminhos": {
+     "AC URNA": 2599
+    },
+    "ac_emissor": [
+     "AC RAIZ UE"
+    ]
+   },
+   {
+    "modelo": "UE2013",
+    "algoritmo": "ECDSA",
+    "secoes": 2474,
+    "nao_antes_min": "2013-07-30T05:23:51+00:00",
+    "nao_antes_max": "2022-08-02T17:39:32+00:00",
+    "nao_depois_min": "2027-04-08T05:23:51+00:00",
+    "nao_depois_max": "2036-04-10T17:39:32+00:00",
+    "cadeia_ok": {
+     "True": 2474
+    },
+    "caminhos": {
+     "AC URNA": 2474
+    },
+    "ac_emissor": [
+     "AC RAIZ UE"
+    ]
+   },
+   {
+    "modelo": "UE2015",
+    "algoritmo": "ECDSA",
+    "secoes": 8575,
+    "nao_antes_min": "2016-06-14T00:32:10+00:00",
+    "nao_antes_max": "2022-09-19T22:23:18+00:00",
+    "nao_depois_min": "2030-02-21T00:32:10+00:00",
+    "nao_depois_max": "2036-05-28T22:23:18+00:00",
+    "cadeia_ok": {
+     "True": 8575
+    },
+    "caminhos": {
+     "AC URNA": 8575
+    },
+    "ac_emissor": [
+     "AC RAIZ UE"
+    ]
+   }
+  ]
+ },
+ "observacoes": {
+  "n": 0,
+  "por_motivo": {},
+  "exemplos": []
+ },
+ "falhas": [],
+ "acs": [
+  {
+   "arquivo": "acue2020.pem",
+   "cn": "AC UE2020",
+   "emissor": "AC URNA v2",
+   "serial": "5",
+   "sha256_der": "77f31bef3d8eb35f0cc969a2b9bba3ff2a498cc339d29a375d3181e0547c0376",
+   "nao_antes": "2021-07-05T21:31:56+00:00",
+   "nao_depois": "2037-07-01T21:31:56+00:00",
+   "valida_no_dia_da_eleicao": {
+    "1T": true,
+    "2T": true
+   },
+   "ski": "bcb3545deeea432e1e832e81283cb8ae948e400b",
+   "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+   "cadeia_conferida": [
+    "AC UE2020"
+   ],
+   "nivel": "intermediaria",
+   "confere_resumo_oficial_tse": "acue2020.cer"
+  },
+  {
+   "arquivo": "acue2022.pem",
+   "cn": "AC UE2022",
+   "emissor": "AC URNA v2",
+   "serial": "8",
+   "sha256_der": "6ae65790dae7cc5d97394e461204744c8e2f7a810d0303af828d4d3dbecfa293",
+   "nao_antes": "2023-02-28T13:46:49+00:00",
+   "nao_depois": "2039-02-24T13:46:49+00:00",
+   "valida_no_dia_da_eleicao": {
+    "1T": false,
+    "2T": false
+   },
+   "ski": "bb7c517f294a5b96f9bf6a964c4f255a755f698a",
+   "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+   "cadeia_conferida": [
+    "AC UE2022"
+   ],
+   "nivel": "intermediaria",
+   "confere_resumo_oficial_tse": "acue2022.cer"
+  },
+  {
+   "arquivo": "acurna.pem",
+   "cn": "AC URNA",
+   "emissor": "AC RAIZ UE",
+   "serial": "3",
+   "sha256_der": "dc20a4c3b8aef01794b80efe8e143e1fbf719707e00bb0d4ba8865191dc2731d",
+   "nao_antes": "2011-07-22T21:59:57+00:00",
+   "nao_depois": "2026-07-18T21:59:57+00:00",
+   "valida_no_dia_da_eleicao": {
+    "1T": true,
+    "2T": true
+   },
+   "ski": "cdaaf4b29701b3f0deb2b54258594a6d34ada48a",
+   "aki": "8668837bbbe348cd19b61030a489d5dfde6742c0",
+   "cadeia_conferida": [
+    "AC URNA"
+   ],
+   "nivel": "intermediaria",
+   "confere_resumo_oficial_tse": null
+  }
+ ],
+ "raiz": {
+  "disponivel": false,
+  "acs_superiores": {
+   "AC URNA": "AC RAIZ UE",
+   "AC UE2020": "AC URNA v2 (sob AC RAIZ UE v2)"
+  },
+  "explicacao": "os certificados AC RAIZ UE, AC RAIZ UE v2 e AC URNA v2 não estão nos .vscmr (cada um traz só o certificado da urna) nem publicados em endereço que se possa baixar; a cadeia é conferida até a AC intermediária",
+  "tentativas": [
+   {
+    "url": "http://dpc.acue2020.tse.jus.br/acraizue.crt",
+    "resultado": "HTTP 403",
+    "data": "2026-10-15"
+   },
+   {
+    "url": "http://dpc.acue2020.tse.jus.br/acurnav2.crt",
+    "resultado": "HTTP 403",
+    "data": "2026-10-15"
+   },
+   {
+    "url": "https://dpc.acue2020.tse.jus.br/acraizue.crt",
+    "resultado": "sem resposta (HTTPS)",
+    "data": "2026-10-15"
+   },
+   {
+    "url": "http://dpc.acraizue.tse.jus.br/",
+    "resultado": "HTTP 403",
+    "data": "2026-10-15"
+   },
+   {
+    "url": "http://lcr.acraizue.tse.jus.br/",
+    "resultado": "HTTP 403",
+    "data": "2026-10-15"
+   }
+  ],
+  "sha512_resumo_oficial_tse_2026": {
+   "acraiz-ue.pem": "O/LBooMqsk+Zx//zxVwXr0lboFIPwvgVj/nILBlZQaC+HZtQ1PuAFEdaWga458oPijiuUl5umAjVO+2bIcgt0g==",
+   "acraizuev2.cer": "2a/T+2kuy0njwNLrSgqlAkala9p7FF6PL8x3327/M+xY9RHeQTytbeSSBEqib40aFS0q0Ir9HuL0LVwhRi6ozw==",
+   "acurnav2.cer": "OTL7MHgqDbasQvSjBMWk5SkqBf5UTV7V3YjQ/kWqe8ZYZfayRLLJRJAtnS9USj4MIVg5ejiWM5ZGKiAJ1usOgw=="
+  }
+ }
+}

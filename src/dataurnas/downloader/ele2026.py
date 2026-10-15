@@ -1,4 +1,4 @@
-"""Coleta de dados da eleição geral de 2026 (1º turno, Presidente).
+"""Coleta de dados da eleição geral de 2026 (Presidente, 1º e 2º turnos).
 
 Reúne as funções puras de transformação (testáveis sem rede) e um cliente
 HTTP assíncrono enxuto, com retentativas e backoff exponencial.
@@ -17,9 +17,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
+from pathlib import Path
 from typing import Any, Iterable, Optional
 
-from ..config import ELE2026, TSE_BASE_URL
+from ..config import ELE2026, PARQUET_2026_DIR, TSE_BASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,39 @@ CICLO = ELE2026["ciclo"]
 PLEITO = ELE2026["pleito_1t"]
 ELEICAO = ELE2026["eleicao_1t"]
 CARGO = ELE2026["cargo_presidente"]
+
+TURNOS = (1, 2)
+
+
+def parametros_turno(turno: int = 1) -> dict:
+    """Parâmetros de coleta de um turno de 2026, num lugar só.
+
+    Chaves: turno, ciclo, pleito, eleicao, cargo, data (DD/MM/AAAA),
+    sufixo_dir ('' no 1º turno, 't2' no 2º), prefixo_id ('1T/' ou '2T/', como
+    em make_secao_id), prefixo_log ('ele2026_' ou 'ele2026_t2_') e saida
+    (diretório base dos Parquet: data/parquet/2026 ou data/parquet/2026/t2).
+
+    O 1º turno mantém exatamente os caminhos e nomes usados até aqui. O pleito
+    do 2º turno (3221) também lista suplementares e consultas; por isso o BU é
+    sempre filtrado pela eleição e pelo cargo de Presidente.
+    """
+    turno = int(turno)
+    if turno not in TURNOS:
+        raise ValueError(f"turno inválido: {turno!r} (use 1 ou 2)")
+    sufixo = "" if turno == 1 else f"t{turno}"
+    return {
+        "turno": turno,
+        "ciclo": ELE2026["ciclo"],
+        "pleito": ELE2026[f"pleito_{turno}t"],
+        "eleicao": ELE2026[f"eleicao_{turno}t"],
+        "cargo": ELE2026["cargo_presidente"],
+        "data": ELE2026[f"data_{turno}t"],
+        "sufixo_dir": sufixo,
+        "prefixo_id": f"{turno}T/",
+        "prefixo_log": f"ele2026_{sufixo}_" if sufixo else "ele2026_",
+        "saida": Path(PARQUET_2026_DIR) / sufixo if sufixo else Path(PARQUET_2026_DIR),
+    }
+
 
 # Modelos de urna (enum ModeloEquipamento do spec de assinatura)
 MODELOS = {9: "UE2009", 10: "UE2010", 11: "UE2011", 13: "UE2013",
