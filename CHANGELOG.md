@@ -8,13 +8,16 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ### Adicionado
 
-- Parser do Registro Digital do Voto de 2026 (`parsers/rdv.py`, spec v2) e recontagem do RDV contra o BU da mesma seção em todos os cargos (`scripts/ele2026/fetch_rdv.py`, `analyzer/rdv_recontagem.py`), com conferência dos registros contra o comparecimento, da estrutura do RDV e do SHA-512 contra o catálogo de integridade. No Acre e em Roraima (3.789 seções, 4.920.752 registros), todas as seções e cargos conferem.
+- Parser do Registro Digital do Voto de 2026 (`parsers/rdv.py`, spec v2) e recontagem do RDV contra o BU da mesma seção em todos os cargos (`scripts/ele2026/fetch_rdv.py`, `analyzer/rdv_recontagem.py`), com conferência dos registros contra o comparecimento, da estrutura do RDV e do SHA-512 contra o catálogo de integridade. Rodada nacional concluída: 749.119.391 registros em 499.206 seções, todos os cargos conferem com o BU, nenhuma divergência (a seção restante é a do RDV não publicado).
 - Auditoria de BU e log de 2026 regerada no mesmo download, com o log de contingência lido por inteiro (`data/parquet/2026/auditoria_v2/`, mesmo esquema da publicada, e `comparacao.json` com as diferenças por coluna e por código).
 - Linha do tempo dos votos no log por seção: votos computados x comparecimento do BU, votos antes das 8h de Brasília, fora da sequência de abertura e encerramento, pico por minuto, intervalos e lacunas. Resultados em `data/parquet/2026/rdv/`.
+- Confronto dos BUs do TSE com leituras independentes do QR Code dos boletins impressos (Totalização Paralela do CMInd), com verificação da assinatura da urna no QR Code: 38 de 38 conferem (`scripts/externo/confrontar_bu_externo.py`, `docs/confronto-fontes-externas.md`).
+- Pedido ao TSE ampliado com os logs de urna ausentes ou trocados no pacote publicado (BA 39934/0183/0175, SP 71072/0002/0035, RS 89036/0083/0044).
 
 ### Corrigido
 
 - Log de 2026 com troca de urna: o `-log.jez` traz o log da urna substituída como `.jez` aninhado, e o parser lia esse ZIP aninhado como texto em vez do `logd.dat`. Agora lê os dois logs, o da urna substituída primeiro. A auditoria de BU e log já publicada (`secoes_log_2026.parquet`) registra `votos_log` 0 em 7.675 seções com log; nas 21 de AC e RR conferidas, a causa é essa. A versão corrigida sai em `auditoria_v2/`.
+- RDV de BU do Sistema de Apuração com a eleição em blocos repetidos (um por urna ou mídia): os blocos são somados antes da comparação com o BU. Gerava falso positivo em 2 seções de MG.
 
 ## [0.2.1] - 2026-10-14
 

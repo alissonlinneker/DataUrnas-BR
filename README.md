@@ -48,6 +48,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 - **2022 completo:** 941.987 seções dos dois turnos da eleição presidencial, em todas as 27 UFs, decodificadas e auditadas.
 - **2026 completo:** 1º turno de Presidente com o resultado oficial agregado (Brasil, 27 UFs, exterior e 5.757 municípios) e os Boletins de Urna de todas as 499.207 seções instaladas, cuja soma reproduz exatamente o resultado oficial em todas as 28 UFs (27 mais o exterior).
 - **Integridade dos arquivos de 2026 concluída:** em 499.207 seções, 1.497.620 SHA-512 de BU, RDV e log recalculados a partir dos arquivos publicados conferem com o valor assinado pela urna, sem nenhum divergente, e as 499.207 assinaturas de urna são válidas. Detalhes no [resultado](#integridade-dos-arquivos-resultado) e no [relatório de integridade](docs/relatorio-integridade-2026.md).
+- **Recontagem voto a voto pelo RDV (2026):** os 749.119.391 registros de voto dos RDVs de 499.206 seções foram decodificados e recontados por cargo; o resultado é igual ao do BU em todas as seções e em todos os cargos, sem nenhuma divergência. Detalhes na [recontagem](#recontagem-voto-a-voto-pelo-rdv-2026).
 - **Auditoria de BU e log de 2026:** nenhuma ocorrência do grupo 1 (indício direto de adulteração) nas 499.207 seções; certificados coerentes em todas e cadeia conferida até a AC intermediária numa amostra determinística de 5%.
 - **Totalização paralela:** os votos são somados a partir dos BUs e reconciliados com os totais oficiais, UF por UF.
 - **Verificação criptográfica:** hashes SHA-512 de cada arquivo conferidos contra o arquivo de assinatura da urna. Em 2026 foi feita em todas as seções, com verificação da assinatura; em 2022 é opcional (ativada com `--hashes`) e não fez parte da compilação da base distribuída.
@@ -167,6 +168,30 @@ São lacunas de publicação, não evidência de adulteração. Os pedidos de es
 - [Relatório de integridade](docs/relatorio-integridade-2026.md): totais, tabela por UF, divergências com endereços, arquivos indisponíveis, auditoria por código, certificados e o passo a passo para conferir qualquer seção à mão (gerado por `python scripts/docs/gerar_relatorio_integridade.py`).
 - [Catálogo de hashes por arquivo](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1): MD5, SHA-256 e SHA-512 dos 1.999.485 arquivos, um Parquet por UF nos anexos da versão v0.2.1, conferível com `sha256sum -c SHA256SUMS`.
 - No painel, a página **Integridade dos arquivos (2026)** permite consultar cada seção.
+
+#### Recontagem voto a voto pelo RDV (2026)
+
+> **Concluída** em 499.207 seções: **o RDV recontado é igual ao BU em 499.206 seções, em todos os cargos; nenhuma divergência.** A seção restante é a do RDV não publicado pelo TSE (Lagoa Grande do Maranhão).
+
+O Registro Digital do Voto (RDV) guarda cada voto digitado na urna, embaralhado e sem identificação do eleitor. O projeto decodifica o RDV de cada seção (`spec/v2/rdv.asn1`), reconta os registros por cargo (voto nominal pelo número digitado, voto de legenda pelos dois primeiros dígitos, brancos e nulos, inclusive os registrados após suspensão da votação) e compara com o BU do mesmo pacote: votos de cada candidato e legenda, brancos, nulos e o número de registros, que deve ser igual ao comparecimento vezes o número de escolhas do cargo. Antes da recontagem, o SHA-512 de cada arquivo baixado é conferido com o catálogo de integridade.
+
+| Cargo | Seções | Conferem | Divergem | Registros no RDV | Votos no BU |
+|---|---:|---:|---:|---:|---:|
+| Presidente | 499.206 | 499.206 | 0 | 125.275.616 | 125.275.616 |
+| Governador | 497.896 | 497.896 | 0 | 124.768.266 | 124.768.266 |
+| Senador (2 vagas) | 497.896 | 497.896 | 0 | 249.536.532 | 249.536.532 |
+| Deputado Federal | 497.896 | 497.896 | 0 | 124.768.266 | 124.768.266 |
+| Deputado Estadual | 490.927 | 490.927 | 0 | 122.950.345 | 122.950.345 |
+| Deputado Distrital | 6.969 | 6.969 | 0 | 1.817.921 | 1.817.921 |
+| Eleição 6261 (cargo 25) | 10 | 10 | 0 | 2.445 | 2.445 |
+
+Nas seções cujo BU foi digitado no Sistema de Apuração (votação por cédula, inclusive os boletins do exterior apurados no SA), o RDV é gerado pelo próprio sistema a partir dos dados digitados; ali, RDV igual ao BU confirma a coerência do pacote, mas não é uma conferência independente do voto. Nessas seções o RDV pode trazer a eleição em blocos repetidos, um por urna ou mídia, que são somados antes da comparação.
+
+Os resultados por seção estão em `data/parquet/2026/rdv/` (`recontagem_secoes.parquet`, `resumo.json`); o código está em `src/dataurnas/parsers/rdv.py`, `src/dataurnas/analyzer/rdv_recontagem.py` e `scripts/ele2026/fetch_rdv.py`.
+
+#### Confronto com fontes externas
+
+A única fonte pública e independente de boletins de 2026 encontrada é a Totalização Paralela do CMInd, que reúne leituras do QR Code dos BUs impressos nas seções. Em 14/10/2026 ela tinha 38 BUs do 1º turno (MG, RS, SC e SP). Os 38 tiveram a assinatura da própria urna verificada no QR Code e **todos conferem** com os dados do TSE: votos de cada candidato a Presidente, brancos, nulos, comparecimento, aptos, número da urna e código de carga. A amostra é pequena e não aleatória; serve para validar o método, não para concluir sobre o país. Detalhes em [docs/confronto-fontes-externas.md](docs/confronto-fontes-externas.md) e no script `scripts/externo/confrontar_bu_externo.py`.
 
 ---
 
@@ -607,7 +632,7 @@ DataUrnas-BR/
 - Em 2026, a validação da cadeia de certificados foi feita numa amostra determinística de 5% das seções; a coerência dos certificados (unicidade, CN e emissor por modelo) cobre todas. Arquivos que o TSE não publica (um RDV e 2.658 imagens do BU listadas e indisponíveis) não puderam ser conferidos.
 - Seções cujo BU não pôde ser decodificado (E02) ficam fora dos totais e são listadas para conferência.
 - A base de 2022 distribuída foi compilada **sem conferência de hashes**: não contém C01 nem E01, e o componente de integridade do índice de confiança aparece como "não verificado".
-- O RDV e a imagem do BU são baixados, mas não decodificados; a recontagem voto a voto pelo RDV ainda não é feita.
+- Em 2026 o RDV é decodificado e recontado em todas as seções; nas seções apuradas no Sistema de Apuração o RDV é gerado pelo próprio sistema, e a conferência com o BU não é independente. Em 2022 o RDV ainda não é recontado. A imagem do BU é baixada e tem o hash conferido, mas não é decodificada.
 - Os códigos E01, E02 e E03 e as exceções de fuso por município foram introduzidos na versão 0.2.0; os Parquet de 2022 distribuídos foram compilados antes deles e só passam a refleti-los após uma recompilação a partir dos dados brutos.
 
 ---
@@ -626,7 +651,9 @@ DataUrnas-BR/
 | 2026, 1º turno: catálogo de hashes por arquivo | Publicado nos anexos da [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1) |
 | Cadeia de certificados até a raiz | Depende da publicação dos certificados raiz pelo TSE |
 | 2026, Presidente, 2º turno | Planejado |
-| Decodificação do RDV e conferência voto a voto do RDV com o BU de cada seção; imagem do BU | Futuro |
+| 2026, 1º turno: recontagem voto a voto do RDV contra o BU de cada seção | Concluído (0 divergências em 499.206 seções) |
+| 2026, 1º turno: confronto com leituras independentes do QR Code (CMInd) | Concluído (38 de 38 conferem) |
+| Recontagem pelo RDV em 2022; decodificação da imagem do BU | Futuro |
 
 As mudanças de cada versão ficam no [CHANGELOG](CHANGELOG.md).
 
