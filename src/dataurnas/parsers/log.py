@@ -35,15 +35,64 @@ PATTERN_REBOOT = re.compile(r"In[ií]cio das opera[çc][oõ]es do logd")
 MAX_LOG_BYTES = 256 * 1024 * 1024
 
 
+# Nome do .jez aninhado: <8 dígitos da urna><ddmmaaaahhmmss><sufixo>.jez
+_NOME_ANINHADO = re.compile(r"^\d{8}(\d{2})(\d{2})(\d{4})(\d{2})(\d{2})(\d{2})")
+
+
+def _chave_aninhado(nome: str) -> tuple:
+    """Ordem dos arquivos do pacote: data e hora embutida no nome (aaaammddhhmmss),
+    com o nome como desempate; nomes sem data (logd.dat) vão depois."""
+    m = _NOME_ANINHADO.match(Path(nome).name)
+    if not m:
+        return (1, "", nome)
+    d, mes, a, h, mi, s = m.groups()
+    return (0, a + mes + d + h + mi + s, nome)
+
+
+def _sem_linhas_repetidas(textos: list[str]) -> list[str]:
+    """União dos logs por linha completa, na ordem dos arquivos.
+
+    O pacote às vezes traz o mesmo log mais de uma vez: o log corrompido é
+    guardado em dupla (<urna><data>01MI.jez e 02ME.jez, cópia da memória
+    interna e da mídia externa, às vezes com a MI truncada) e cada urna de
+    contingência que lê a mesma mídia externa grava a sua cópia. Uma linha
+    só é duplicata se for idêntica byte a byte (data, hora, urna, aplicativo,
+    evento e código de verificação), então eventos iguais de urnas diferentes
+    continuam contando. A união é de multiconjuntos: uma linha que aparece k
+    vezes num arquivo e j vezes num anterior entra max(k, j) vezes, o que
+    preserva repetições legítimas dentro do mesmo log.
+    """
+    vistos: dict[str, int] = {}
+    saida: list[str] = []
+    for texto in textos:
+        locais: dict[str, int] = {}
+        linhas: list[str] = []
+        for ln in texto.splitlines():
+            if ln.strip():
+                locais[ln] = locais.get(ln, 0) + 1
+                if locais[ln] <= vistos.get(ln, 0):
+                    continue
+            linhas.append(ln)
+        for ln, n in locais.items():
+            if n > vistos.get(ln, 0):
+                vistos[ln] = n
+        saida.append("\n".join(linhas))
+    return saida
+
+
 def textos_zip(raw: bytes, nivel: int = 0) -> Optional[list[str]]:
     """Textos dos logs de um -log.jez em ZIP (2026), logs aninhados primeiro.
 
     Na troca de urna (contingência) o pacote traz o logd.dat da urna que
     encerrou a votação e, como .jez aninhado (outro ZIP com logd.dat), o log
-    da urna substituída, nomeado <urna><ddmmaaaahhmmss>-NN.jez. Os aninhados
-    vêm antes, em ordem de nome, e o logd.dat do pacote por último, para que
-    as entradas fiquem na ordem em que as urnas foram usadas. Devolve None se
-    o pacote estiver vazio ou passar de MAX_LOG_BYTES descompactado.
+    da urna substituída, nomeado <urna><ddmmaaaahhmmss>-NN.jez (ou ...01MI.jez
+    e ...02ME.jez, cópias de log corrompido). Os aninhados vêm antes, na
+    ordem da data e hora do nome (o nome começa pelo número da urna, então a
+    ordem alfabética misturaria urnas), e o logd.dat do pacote por último,
+    para que as entradas fiquem na ordem em que as urnas foram usadas. Linhas
+    repetidas entre arquivos (o mesmo log copiado mais de uma vez) entram uma
+    vez só (ver _sem_linhas_repetidas). Devolve None se o pacote estiver
+    vazio ou passar de MAX_LOG_BYTES descompactado.
     """
     import io
     import zipfile
@@ -54,14 +103,15 @@ def textos_zip(raw: bytes, nivel: int = 0) -> Optional[list[str]]:
             return None
         aninhados: list[str] = []
         proprios: list[str] = []
-        for i in sorted(infos, key=lambda i: i.filename):
+        for i in sorted(infos, key=lambda i: _chave_aninhado(i.filename)):
             dados = z.read(i)
             if dados[:4] == b"PK\x03\x04":
                 if nivel < 2:
                     aninhados.extend(textos_zip(dados, nivel + 1) or [])
             else:
                 proprios.append(dados.decode("latin-1", errors="replace"))
-        return aninhados + proprios
+        textos = aninhados + proprios
+        return _sem_linhas_repetidas(textos) if nivel == 0 else textos
 
 
 class LogParser:
