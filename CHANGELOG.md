@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não publicado]
 
+## [0.2.2] - 2026-10-15
+
 ### Adicionado
 
 - Verificação de integridade dos arquivos de urna de 2022, 1º e 2º turnos (`scripts/ele2022/fetch_integridade.py`), a partir dos zips de dados abertos do TSE lidos por faixas de bytes, já que a API de resultados não serve mais os arquivos de 2022. Resultado em 944.051 seções (56 pacotes): 3.776.042 SHA-512 iguais ao assinado no `.vscmr`, nenhum divergente, 944.051 assinaturas de urna válidas (ECDSA P-521 e Ed521) e nenhuma inválida, e votos de Presidente do BU iguais aos da base em 941.653 seções, nenhuma diferente.
@@ -102,7 +104,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Banco DuckDB, exportação Parquet com ZSTD e painel Streamlit com filtros e exportação.
 - Deploy no Hugging Face Spaces via GitHub Actions.
 
-[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.1...HEAD
+[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.1.0
