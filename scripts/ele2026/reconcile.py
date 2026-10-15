@@ -6,8 +6,11 @@ Compara, por UF presente em secoes_2026.parquet:
   - brancos, nulos, comparecimento e votos nominais
   - número de seções com BU x seções totalizadas
 
+Com --turno 2 lê os Parquet do 2º turno em data/parquet/2026/t2/.
+
 Uso:
   python3 scripts/ele2026/reconcile.py [--ufs ac,rr]
+  python3 scripts/ele2026/reconcile.py --turno 2
 Sai com código 1 se houver divergência.
 """
 
@@ -16,13 +19,14 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import Optional
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 import duckdb  # noqa: E402
 
-from dataurnas.config import PARQUET_2026_DIR  # noqa: E402
+from dataurnas.downloader import ele2026 as E  # noqa: E402
 
 
 def reconciliar(base: Path, ufs: list[str] | None = None) -> tuple[list[dict], bool]:
@@ -79,15 +83,26 @@ def reconciliar(base: Path, ufs: list[str] | None = None) -> tuple[list[dict], b
     return linhas, ok_geral
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
+def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--turno", type=int, choices=E.TURNOS, default=1,
+                    help="turno da eleição: 1 ou 2 (padrão: 1)")
     ap.add_argument("--ufs", default="",
                     help="UFs separadas por vírgula (padrão: todas as presentes nos dados)")
-    ap.add_argument("--base", default=str(PARQUET_2026_DIR),
-                    help="diretório com os Parquet de 2026 (padrão: data/parquet/2026)")
+    ap.add_argument("--base", default=None,
+                    help="diretório com os Parquet de 2026 (padrão: data/parquet/2026 no "
+                         "1º turno, data/parquet/2026/t2 no 2º)")
     ap.add_argument("--so-divergencias", action="store_true",
                     help="mostra apenas as linhas com diferença")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
+    if a.base is None:
+        a.base = str(E.parametros_turno(a.turno)["saida"])
+    return a
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    a = parse_args(argv)
     ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()] or None
     linhas, ok = reconciliar(Path(a.base), ufs)
     print(f"{'uf':<3} {'item':<24} {'soma_bu':>12} {'oficial':>12} {'dif':>8}  ok")

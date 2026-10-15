@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Auditoria de integridade dos arquivos de urna (Presidente, 1º turno de 2026).
+"""Auditoria de integridade dos arquivos de urna (Presidente, 2026, 1º ou 2º turno).
 
 Para cada seção com arquivos, sem gravar arquivo bruto em disco:
   aux.json -> todos os conjuntos (hashes) -> baixa cada arquivo listado
@@ -30,10 +30,16 @@ derruba a seção: vira linha com disponivel False e http_status 404, uma linha
 "PUBLICACAO" no log e, se for arquivo assinado no .vsc, a divergência
 arquivo_ausente_tse. A seção segue verificada e entra no checkpoint.
 
+Com --turno 2 (pleito 3221, eleição 6258, 25/10/2026) os caminhos padrão passam
+a data/parquet/2026/t2/ (integridade/, auditoria/ e os Parquet de votos de
+fetch_secoes.py --turno 2), o log padrão a data/ele2026_t2_integridade.log e o
+secao_id da auditoria usa o prefixo "2T/" no lugar de "1T/".
+
 Uso:
   python3 scripts/ele2026/fetch_integridade.py --ufs ac,rr     # teste
   python3 scripts/ele2026/fetch_integridade.py                 # 27 UFs + zz
   python3 scripts/ele2026/fetch_integridade.py --so-consolidar
+  python3 scripts/ele2026/fetch_integridade.py --turno 2 --ufs ac,rr
 """
 
 from __future__ import annotations
@@ -58,7 +64,7 @@ import pyarrow as pa  # noqa: E402
 import pyarrow.parquet as pq  # noqa: E402
 
 from dataurnas.analyzer import integrity as I  # noqa: E402
-from dataurnas.config import ESTADOS, PARQUET_2026_DIR  # noqa: E402
+from dataurnas.config import ESTADOS  # noqa: E402
 from dataurnas.downloader import ele2026 as E  # noqa: E402
 
 log = logging.getLogger("fetch_integridade")
@@ -243,7 +249,10 @@ def votos_esperados_uf(uf: str, base: Path) -> tuple[set[str], dict[str, tuple]]
 
 
 async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
-                          esperado: Optional[tuple], analisar: bool = True) -> dict:
+                          esperado: Optional[tuple], analisar: bool = True,
+                          p: Optional[dict] = None) -> dict:
+    p = p or E.parametros_turno(1)
+    url = {"pleito": p["pleito"], "ciclo": p["ciclo"]}
     uf, mun, zona, secao = s["uf"], s["cd_mun"], s["zona"], s["secao"]
     ident = {"uf": uf, "cd_mun": mun, "zona": zona, "secao": secao}
     vazio = {"n_arquivos": 0, "n_hash_confere": 0, "n_hash_diverge": 0, "n_sem_hash": 0,
@@ -252,7 +261,7 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
         return {"linhas": [], "divergencias": [], "secao": {
             **ident, **vazio, "status_secao": "agregada",
             "motivo": f"agregada à seção {s['secao_principal']}"}}
-    aux = await f.get_json(E.url_aux(uf, mun, zona, secao))
+    aux = await f.get_json(E.url_aux(uf, mun, zona, secao, **url))
     if not aux:
         return {"linhas": [], "divergencias": [], "secao": {
             **ident, **vazio, "status_secao": "sem_arquivos",
@@ -273,7 +282,8 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
             if isinstance(a, dict) and a.get("nm"):
                 pedidos.append((h["hash"], a.get("tp", ""), a["nm"]))
     corpos = await asyncio.gather(*[
-        f.get(E.url_arquivo(uf, mun, zona, secao, hh, nm)) for hh, _tp, nm in pedidos])
+        f.get(E.url_arquivo(uf, mun, zona, secao, hh, nm, **url))
+        for hh, _tp, nm in pedidos])
     faltando = [(tp, nm) for (_h, tp, nm), b in zip(pedidos, corpos, strict=True)
                 if b is None]
     refaz = [nm for tp, nm in faltando if refaz_em_404(tp, nm)]
@@ -296,7 +306,7 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
     del corpos
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(pool, I.auditar_secao, ident, conjuntos,
-                                      escolhido, esperado, analisar)
+                                      escolhido, esperado, analisar, p["turno"])
 
 
 def registrar_execucao(out: Path, evento: dict) -> None:
@@ -306,6 +316,7 @@ def registrar_execucao(out: Path, evento: dict) -> None:
 
 
 async def run(args: argparse.Namespace) -> int:
+    p = E.parametros_turno(args.turno)
     out = Path(args.saida)
     out.mkdir(parents=True, exist_ok=True)
     w = Writer(out, args.lote)
@@ -314,6 +325,8 @@ async def run(args: argparse.Namespace) -> int:
     inicio = time.strftime("%Y-%m-%dT%H:%M:%S")
     registrar_execucao(out, {"inicio": inicio, "ufs": args.ufs, "pid": os.getpid()})
     log.info("checkpoint: %d seções já processadas", len(done))
+    log.info("turno %d: pleito %s, eleição %s, saída %s", p["turno"], p["pleito"],
+             p["eleicao"], out)
     f = E.HttpFetcher(concurrency=args.concorrencia, http2=args.http2,
                       connections=args.conexoes, rate=args.taxa, rate_max=args.taxa_max)
     pool = ProcessPoolExecutor(max_workers=args.workers, initializer=_init_worker,
@@ -323,7 +336,7 @@ async def run(args: argparse.Namespace) -> int:
     n_ok = 0
     try:
         for uf in args.ufs:
-            cs = await f.get_json(E.url_secoes_uf(uf))
+            cs = await f.get_json(E.url_secoes_uf(uf, pleito=p["pleito"], ciclo=p["ciclo"]))
             if not cs:
                 log.error("sem lista de seções para %s", uf)
                 erros.append(f"{uf}:sem_cs")
@@ -350,7 +363,7 @@ async def run(args: argparse.Namespace) -> int:
                     key = E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"])
                     esperado = votos.get(key, ()) if key in ok_keys else None
                     try:
-                        r = await processar_secao(f, pool, s, esperado, args.analisar)
+                        r = await processar_secao(f, pool, s, esperado, args.analisar, p)
                     except Exception as e:  # noqa: BLE001 - registrado e refeito no próximo run
                         erros.append(f"{key}:{e!r}"[:300])
                         log.warning("erro em %s: %r", key, e)
@@ -388,7 +401,7 @@ async def run(args: argparse.Namespace) -> int:
         dst.write_text("\n".join(erros) + "\n", encoding="utf-8")
         log.warning("erros gravados em %s; rode de novo para refazer", dst.name)
     if not args.sem_consolidar:
-        consolidar(out, Path(args.saida_auditoria))
+        consolidar(out, Path(args.saida_auditoria), args.turno)
     return 0 if not erros else 2
 
 
@@ -418,16 +431,18 @@ def _escrever_uf(con, uf: str, out: Path) -> list[str]:
     return nomes
 
 
-def consolidar_auditoria(con, out: Path, dst_dir: Path) -> dict:
+def consolidar_auditoria(con, out: Path, dst_dir: Path, prefixo_id: str = "1T/") -> dict:
     """issues_2026.parquet e secoes_log_2026.parquet (lote mais recente de
-    cada seção, mesmo critério de secoes.parquet)."""
+    cada seção, mesmo critério de secoes.parquet).
+
+    prefixo_id: '1T/' ou '2T/', o mesmo de make_secao_id no turno coletado."""
     parts = out / "parts"
     if not any(parts.glob("seclog-*.parquet")):
         return {}
     dst_dir.mkdir(parents=True, exist_ok=True)
     con.execute("""CREATE OR REPLACE TEMP TABLE sid AS
-        SELECT '1T/' || uf || '/' || cd_mun || '/' || zona || '/' || secao AS secao_id, _lote
-        FROM s""")
+        SELECT ? || uf || '/' || cd_mun || '/' || zona || '/' || secao AS secao_id, _lote
+        FROM s""", [prefixo_id])
     dl = dst_dir / "secoes_log_2026.parquet"
     con.execute(f"""COPY (
         SELECT x.* EXCLUDE (_lote)
@@ -457,10 +472,12 @@ def consolidar_auditoria(con, out: Path, dst_dir: Path) -> dict:
     return {"secoes_log": int(n_log), "issues_por_codigo": por_codigo}
 
 
-def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
+def consolidar(out: Path, dst_auditoria: Optional[Path] = None, turno: int = 1) -> None:
     """Junta as partes (mantendo o lote mais recente de cada seção) nos
     Parquet finais e grava resumo.json."""
     import duckdb
+
+    p = E.parametros_turno(turno)
 
     parts = out / "parts"
     if not any(parts.glob("secoes-*.parquet")):
@@ -490,7 +507,7 @@ def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
                     TO '{dst_s}.tmp' (FORMAT PARQUET, COMPRESSION ZSTD)""")
     os.replace(f"{dst_s}.tmp", dst_s)
     auditoria = consolidar_auditoria(
-        con, out, dst_auditoria or (out.parent / "auditoria"))
+        con, out, dst_auditoria or (out.parent / "auditoria"), p["prefixo_id"])
     ufs = [r[0] for r in con.execute("SELECT DISTINCT uf FROM s ORDER BY uf").fetchall()]
     arquivos_parquet = []
     for uf in ufs:
@@ -564,7 +581,7 @@ def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
     erros_pend = len(pendentes)
     resumo = {
         "gerado_em": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "pleito": E.PLEITO, "ciclo": E.CICLO,
+        "pleito": p["pleito"], "ciclo": p["ciclo"],
         "metodo": {
             "hash_arquivo": "SHA-512 do arquivo publicado comparado ao hash da lista "
                             "de arquivos assinados no .vsc (partes SW e HW).",
@@ -609,6 +626,8 @@ def consolidar(out: Path, dst_auditoria: Optional[Path] = None) -> None:
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--turno", type=int, choices=E.TURNOS, default=1,
+                    help="turno da eleição: 1 (pleito 3220) ou 2 (pleito 3221); padrão: 1")
     ap.add_argument("--ufs", default=",".join(TODAS_UFS),
                     help="lista de UFs separadas por vírgula (padrão: 27 UFs + zz)")
     ap.add_argument("--concorrencia", type=int, default=96,
@@ -619,26 +638,39 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
                     help="seções por parte Parquet gravada e anotada no checkpoint")
     ap.add_argument("--conferir-votos", action=argparse.BooleanOptionalAction, default=True,
                     help="confere os votos do BU com votos_presidente_2026.parquet")
-    ap.add_argument("--base-votos", default=str(PARQUET_2026_DIR),
-                    help="diretório com secoes_2026.parquet e votos_presidente_2026.parquet")
+    ap.add_argument("--base-votos", default=None,
+                    help="diretório com secoes_2026.parquet e votos_presidente_2026.parquet "
+                         "(padrão: data/parquet/2026 ou data/parquet/2026/t2)")
     ap.add_argument("--analisar", action=argparse.BooleanOptionalAction, default=True,
                     help="roda a auditoria por seção de 2022 (BU e log) e grava "
-                         "data/parquet/2026/auditoria/ (padrão: ativado)")
-    ap.add_argument("--saida-auditoria", default=str(PARQUET_2026_DIR / "auditoria"),
-                    help="diretório de issues_2026.parquet e secoes_log_2026.parquet")
+                         "data/parquet/2026[/t2]/auditoria/ (padrão: ativado)")
+    ap.add_argument("--saida-auditoria", default=None,
+                    help="diretório de issues_2026.parquet e secoes_log_2026.parquet "
+                         "(padrão: data/parquet/2026[/t2]/auditoria)")
     ap.add_argument("--http2", action=argparse.BooleanOptionalAction, default=True)
     ap.add_argument("--taxa", type=float, default=50.0,
                     help="taxa inicial em req/s, reduzida automaticamente em HTTP 429")
     ap.add_argument("--taxa-max", type=float, default=90.0, help="teto da taxa adaptativa")
     ap.add_argument("--conexoes", type=int, default=4,
                     help="clientes HTTP/2 em rodízio (padrão: 4)")
-    ap.add_argument("--saida", default=str(PARQUET_2026_DIR / "integridade"),
-                    help="diretório de saída (padrão: data/parquet/2026/integridade)")
-    ap.add_argument("--log", default=str(ROOT / "data" / "ele2026_integridade.log"),
-                    help="arquivo de log (padrão: data/ele2026_integridade.log)")
+    ap.add_argument("--saida", default=None,
+                    help="diretório de saída (padrão: data/parquet/2026/integridade no "
+                         "1º turno, data/parquet/2026/t2/integridade no 2º)")
+    ap.add_argument("--log", default=None,
+                    help="arquivo de log (padrão: data/ele2026_integridade.log no 1º "
+                         "turno, data/ele2026_t2_integridade.log no 2º)")
     ap.add_argument("--sem-consolidar", action="store_true")
     ap.add_argument("--so-consolidar", action="store_true")
     a = ap.parse_args(argv)
+    p = E.parametros_turno(a.turno)
+    if a.base_votos is None:
+        a.base_votos = str(p["saida"])
+    if a.saida is None:
+        a.saida = str(p["saida"] / "integridade")
+    if a.saida_auditoria is None:
+        a.saida_auditoria = str(p["saida"] / "auditoria")
+    if a.log is None:
+        a.log = str(ROOT / "data" / f"{p['prefixo_log']}integridade.log")
     a.ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()]
     return a
 
@@ -662,6 +694,6 @@ if __name__ == "__main__":
     args = parse_args()
     configurar_log(args.log)
     if args.so_consolidar:
-        consolidar(Path(args.saida), Path(args.saida_auditoria))
+        consolidar(Path(args.saida), Path(args.saida_auditoria), args.turno)
         sys.exit(0)
     sys.exit(asyncio.run(run(args)))

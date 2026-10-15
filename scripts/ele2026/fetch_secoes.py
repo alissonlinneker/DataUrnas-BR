@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Baixa e decodifica o BU de cada seção (Presidente, 1º turno de 2026).
+"""Baixa e decodifica o BU de cada seção (Presidente, 2026, 1º ou 2º turno).
 
 Fluxo por seção, sem gravar arquivo bruto em disco:
   aux.json -> escolhe hash -> baixa -bu.dat (e -vota.vsc se --modelo)
@@ -11,10 +11,15 @@ data/parquet/2026/secoes_parts/ e cada lote gravado e anotado no checkpoint
 No final as partes são consolidadas (com deduplicação) em
 secoes_2026.parquet e votos_presidente_2026.parquet.
 
+Com --turno 2 usa o pleito 3221 (eleição 6258, 25/10/2026) e grava tudo em
+data/parquet/2026/t2/ (mesmos nomes de arquivo). O pleito do 2º turno também
+lista suplementares; o BU é filtrado pela eleição 6258 e cargo Presidente.
+
 Uso:
   python3 scripts/ele2026/fetch_secoes.py --ufs ac          # teste
   python3 scripts/ele2026/fetch_secoes.py                    # todas (27 + zz)
   python3 scripts/ele2026/fetch_secoes.py --so-consolidar
+  python3 scripts/ele2026/fetch_secoes.py --turno 2 --ufs ac,rr
 """
 
 from __future__ import annotations
@@ -37,7 +42,7 @@ if SRC not in sys.path:
 import pyarrow as pa  # noqa: E402
 import pyarrow.parquet as pq  # noqa: E402
 
-from dataurnas.config import ESTADOS, PARQUET_2026_DIR  # noqa: E402
+from dataurnas.config import ESTADOS  # noqa: E402
 from dataurnas.downloader import ele2026 as E  # noqa: E402
 
 log = logging.getLogger("fetch_secoes")
@@ -136,13 +141,16 @@ class Writer:
 
 
 async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor,
-                          s: dict, modelo: bool) -> tuple[dict, list[dict]]:
+                          s: dict, modelo: bool,
+                          p: Optional[dict] = None) -> tuple[dict, list[dict]]:
+    p = p or E.parametros_turno(1)
+    url = {"pleito": p["pleito"], "ciclo": p["ciclo"]}
     uf, mun, zona, secao = s["uf"], s["cd_mun"], s["zona"], s["secao"]
     row = dict(s)
     if s.get("secao_principal"):
         row["status"] = "agregada"
         return row, []
-    aux = await f.get_json(E.url_aux(uf, mun, zona, secao))
+    aux = await f.get_json(E.url_aux(uf, mun, zona, secao, **url))
     if not aux:
         row["status"] = "sem_aux"
         return row, []
@@ -159,17 +167,19 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor,
     row.update({k: h[k] for k in ("hash", "st_hash", "n_hashes",
                                    "dt_recebimento", "hr_recebimento")})
     row["origem_bu"] = tp_bu
-    bu_task = f.get(E.url_arquivo(uf, mun, zona, secao, h["hash"], arqs[tp_bu]))
+    bu_task = f.get(E.url_arquivo(uf, mun, zona, secao, h["hash"], arqs[tp_bu], **url))
     vsc_task = None
     if modelo and tp_vsc:
-        vsc_task = f.get(E.url_arquivo(uf, mun, zona, secao, h["hash"], arqs[tp_vsc]))
+        vsc_task = f.get(E.url_arquivo(uf, mun, zona, secao, h["hash"], arqs[tp_vsc],
+                                       **url))
     raw_bu = await bu_task
     raw_vsc = await vsc_task if vsc_task else None
     if raw_bu is None:
         row["status"] = "sem_bu"
         return row, []
     loop = asyncio.get_running_loop()
-    sec, votos = await loop.run_in_executor(pool, E.bu_to_rows, raw_bu)
+    sec, votos = await loop.run_in_executor(pool, E.bu_to_rows, raw_bu,
+                                            int(p["eleicao"]), p["cargo"])
     del raw_bu
     row.update(sec)
     if raw_vsc:
@@ -182,9 +192,12 @@ async def processar_secao(f: E.HttpFetcher, pool: ProcessPoolExecutor,
 
 
 async def run(args: argparse.Namespace) -> int:
+    p = E.parametros_turno(args.turno)
     out = Path(args.saida)
     out.mkdir(parents=True, exist_ok=True)
     w = Writer(out, args.lote)
+    log.info("turno %d: pleito %s, eleição %s, saída %s", p["turno"], p["pleito"],
+             p["eleicao"], out)
     done = w.done_keys()
     log.info("checkpoint: %d seções já processadas", len(done))
     f = E.HttpFetcher(concurrency=args.concorrencia, http2=args.http2,
@@ -197,7 +210,7 @@ async def run(args: argparse.Namespace) -> int:
     n_ok = 0
     try:
         for uf in args.ufs:
-            cs = await f.get_json(E.url_secoes_uf(uf))
+            cs = await f.get_json(E.url_secoes_uf(uf, pleito=p["pleito"], ciclo=p["ciclo"]))
             if not cs:
                 log.error("sem lista de seções para %s", uf)
                 erros.append(f"{uf}:sem_cs")
@@ -220,7 +233,7 @@ async def run(args: argparse.Namespace) -> int:
                         return
                     key = E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"])
                     try:
-                        row, votos = await processar_secao(f, pool, s, args.modelo)
+                        row, votos = await processar_secao(f, pool, s, args.modelo, p)
                     except Exception as e:  # noqa: BLE001 - registrado e refeito no próximo run
                         erros.append(f"{key}:{e!r}"[:300])
                         log.warning("erro em %s: %r", key, e)
@@ -289,6 +302,8 @@ def consolidar(out: Path) -> None:
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--turno", type=int, choices=E.TURNOS, default=1,
+                    help="turno da eleição: 1 (pleito 3220) ou 2 (pleito 3221); padrão: 1")
     ap.add_argument("--ufs", default=",".join(TODAS_UFS),
                     help="lista de UFs separadas por vírgula (padrão: 27 UFs + zz)")
     ap.add_argument("--concorrencia", type=int, default=96,
@@ -307,13 +322,16 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
                     help="teto da taxa adaptativa, em req/s (padrão: 90)")
     ap.add_argument("--conexoes", type=int, default=4,
                     help="clientes HTTP/2 em rodízio (cada um com janela de fluxo própria; padrão: 4)")
-    ap.add_argument("--saida", default=str(PARQUET_2026_DIR),
-                    help="diretório de saída das partes e dos Parquet finais (padrão: data/parquet/2026)")
+    ap.add_argument("--saida", default=None,
+                    help="diretório de saída das partes e dos Parquet finais (padrão: "
+                         "data/parquet/2026 no 1º turno, data/parquet/2026/t2 no 2º)")
     ap.add_argument("--sem-consolidar", action="store_true",
                     help="não consolida as partes ao final da coleta")
     ap.add_argument("--so-consolidar", action="store_true",
                     help="apenas consolida as partes já gravadas, sem baixar nada")
     a = ap.parse_args(argv)
+    if a.saida is None:
+        a.saida = str(E.parametros_turno(a.turno)["saida"])
     a.ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()]
     return a
 

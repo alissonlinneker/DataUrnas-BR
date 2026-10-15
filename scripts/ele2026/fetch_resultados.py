@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Baixa o resultado agregado de Presidente (1º turno de 2026) do TSE.
+"""Baixa o resultado agregado de Presidente (2026, 1º ou 2º turno) do TSE.
 
 Níveis: Brasil, cada UF (27 + ZZ exterior) e cada município (inclusive
-cidades do exterior). Grava em data/parquet/2026/:
+cidades do exterior). Grava em data/parquet/2026/ (1º turno) ou
+data/parquet/2026/t2/ (2º turno, --turno 2):
   candidatos.parquet, resultado_uf.parquet, resultado_municipio.parquet,
   resumo_br.json
 
 Uso:
   python3 scripts/ele2026/fetch_resultados.py [--concorrencia 16]
+  python3 scripts/ele2026/fetch_resultados.py --turno 2
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
@@ -26,7 +29,6 @@ sys.path.insert(0, str(ROOT / "src"))
 import pyarrow as pa  # noqa: E402
 import pyarrow.parquet as pq  # noqa: E402
 
-from dataurnas.config import ELE2026, PARQUET_2026_DIR  # noqa: E402
 from dataurnas.downloader import ele2026 as E  # noqa: E402
 
 log = logging.getLogger("fetch_resultados")
@@ -43,10 +45,12 @@ def write_parquet(rows: list[dict], path: Path) -> None:
 async def main(args: argparse.Namespace) -> int:
     out = Path(args.saida)
     out.mkdir(parents=True, exist_ok=True)
+    p = E.parametros_turno(args.turno)
+    eleicao, ciclo = p["eleicao"], p["ciclo"]
     f = E.HttpFetcher(concurrency=args.concorrencia)
     t0 = time.time()
     try:
-        br = await f.get_json(E.url_resultado("br"))
+        br = await f.get_json(E.url_resultado("br", eleicao=eleicao, ciclo=ciclo))
         if not br:
             log.error("resultado nacional indisponível")
             return 1
@@ -54,13 +58,14 @@ async def main(args: argparse.Namespace) -> int:
         numeros = [c["numero"] for c in candidatos]
         write_parquet(candidatos, out / "candidatos.parquet")
 
-        cm = await f.get_json(E.url_municipios())
+        cm = await f.get_json(E.url_municipios(eleicao=eleicao, ciclo=ciclo))
         municipios = list(E.iter_municipios(cm))
         ufs = sorted({m["uf"] for m in municipios})
         log.info("%d UFs, %d municípios", len(ufs), len(municipios))
 
         # UFs
-        uf_jsons = await asyncio.gather(*[f.get_json(E.url_resultado(uf)) for uf in ufs])
+        uf_jsons = await asyncio.gather(*[f.get_json(E.url_resultado(uf, eleicao=eleicao, ciclo=ciclo))
+                                         for uf in ufs])
         uf_rows = []
         for uf, d in zip(ufs, uf_jsons, strict=True):
             if not d:
@@ -74,7 +79,8 @@ async def main(args: argparse.Namespace) -> int:
 
         async def um(m: dict):
             nonlocal done
-            d = await f.get_json(E.url_resultado(f"{m['uf']}{m['cd_mun']}"))
+            d = await f.get_json(E.url_resultado(f"{m['uf']}{m['cd_mun']}",
+                                                 eleicao=eleicao, ciclo=ciclo))
             done += 1
             if done % 500 == 0:
                 log.info("municípios: %d/%d", done, len(municipios))
@@ -96,12 +102,12 @@ async def main(args: argparse.Namespace) -> int:
 
         tot = E.parse_totais(br)
         resumo = {
-            "eleicao": ELE2026["eleicao_1t"],
-            "pleito": ELE2026["pleito_1t"],
-            "ciclo": ELE2026["ciclo"],
+            "eleicao": eleicao,
+            "pleito": p["pleito"],
+            "ciclo": ciclo,
             "cargo": "Presidente",
-            "turno": 1,
-            "data_eleicao": ELE2026["data_1t"],
+            "turno": p["turno"],
+            "data_eleicao": p["data"],
             "data_geracao_tse": f"{br.get('dg')} {br.get('hg')}",
             "totais": tot,
             "candidatos": [
@@ -131,12 +137,24 @@ async def main(args: argparse.Namespace) -> int:
         await f.close()
 
 
-if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description=__doc__)
+def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--turno", type=int, choices=E.TURNOS, default=1,
+                    help="turno da eleição: 1 (pleito 3220) ou 2 (pleito 3221); padrão: 1")
     ap.add_argument("--concorrencia", type=int, default=16,
                     help="máximo de requisições HTTP simultâneas (padrão: 16)")
-    ap.add_argument("--saida", default=str(PARQUET_2026_DIR),
-                    help="diretório de saída dos Parquet (padrão: data/parquet/2026)")
+    ap.add_argument("--saida", default=None,
+                    help="diretório de saída dos Parquet (padrão: data/parquet/2026 no "
+                         "1º turno, data/parquet/2026/t2 no 2º)")
+    a = ap.parse_args(argv)
+    if a.saida is None:
+        a.saida = str(E.parametros_turno(a.turno)["saida"])
+    return a
+
+
+if __name__ == "__main__":
+    args = parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    sys.exit(asyncio.run(main(ap.parse_args())))
+    sys.exit(asyncio.run(main(args)))
