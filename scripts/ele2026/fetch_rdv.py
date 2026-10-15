@@ -150,6 +150,27 @@ class Divergencias:
         log.warning("DIVERGENCIA_RDV %s", linha)
 
 
+def prefixo_lote(parts: Path, agora: float) -> str:
+    """Prefixo aaaammddhhmmss do lote, sempre maior que o de qualquer parte já
+    gravada.
+
+    A consolidação fica com o lote de maior nome de cada seção. Se o relógio
+    ou o fuso do processo mudar entre execuções, a hora local pode sair menor
+    que a de lotes antigos e a seção refeita perderia para a versão velha;
+    nesse caso o prefixo passa a ser o maior existente + 1 s.
+    """
+    import datetime as dt
+
+    atual = time.strftime("%Y%m%d%H%M%S", time.localtime(agora))
+    existentes = [p.name.split("-")[1] for p in parts.glob("secoes-*.parquet")
+                  if len(p.name.split("-")) > 2 and p.name.split("-")[1].isdigit()]
+    maior = max(existentes, default="")
+    if len(maior) == 14 and maior >= atual:
+        prox = dt.datetime.strptime(maior, "%Y%m%d%H%M%S") + dt.timedelta(seconds=1)
+        return prox.strftime("%Y%m%d%H%M%S")
+    return atual
+
+
 class Writer:
     """Acumula linhas e grava partes Parquet + checkpoint."""
 
@@ -166,7 +187,7 @@ class Writer:
         self.rows: dict[str, list[dict]] = {n: [] for n, _ in self.TABELAS}
         self.keys: list[str] = []
         self.n_part = 0
-        self.prefix = time.strftime("%Y%m%d%H%M%S") + f"-{os.getpid()}"
+        self.prefix = prefixo_lote(self.parts, time.time()) + f"-{os.getpid()}"
 
     def done_keys(self) -> set[str]:
         if not self.ckpt.exists():

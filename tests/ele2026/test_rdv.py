@@ -562,3 +562,17 @@ def test_parse_args_secoes():
     mod = _script()
     assert mod.parse_args(["--secoes", "x.txt"]).secoes == "x.txt"
     assert mod.parse_args([]).secoes is None
+
+
+def test_prefixo_lote_sempre_maior_que_lotes_existentes(tmp_path):
+    """Relógio ou fuso que volta entre execuções não pode fazer a seção
+    refeita perder para o lote antigo na consolidação."""
+    import time
+
+    mod = _script()
+    agora = time.mktime((2026, 10, 15, 0, 59, 42, 0, 0, -1))
+    assert mod.prefixo_lote(tmp_path, agora) == "20261015005942"
+    (tmp_path / "secoes-20261015030440-39963-00001.parquet").write_bytes(b"")
+    assert mod.prefixo_lote(tmp_path, agora) == "20261015030441"
+    depois = time.mktime((2026, 10, 15, 7, 0, 0, 0, 0, -1))
+    assert mod.prefixo_lote(tmp_path, depois) == "20261015070000"
