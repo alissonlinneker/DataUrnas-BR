@@ -123,13 +123,15 @@ def comparar_rdv_bu(rdv, bu_cont: dict, ident: dict, origem_bu: str = "bu",
     """
     linhas, achados = [], []
     estrutura = validar(rdv, pleito=pleito, ident=ident)
-    if estrutura:
-        achados.append({**ident, "categoria": "rdv_estrutura", "grupo": GRUPO_1,
-                        "detalhes": estrutura[:20]})
     presidente: Counter = Counter()
     vistos = set()
-    for id_el, cargo in rdv.cargos():
+    # Blocos repetidos do SA (um por urna ou mídia) são somados antes de
+    # comparar; a repetição só vira rdv_estrutura se a soma não fechar.
+    for id_el, cargo, n_blocos in rdv.cargos_agregados():
         chave = (id_el, cargo.codigo_cargo)
+        if chave in vistos:
+            estrutura.append(f"cargo {id_el}/{cargo.nome_cargo} repetido com quantidade "
+                             "de escolhas diferente entre blocos")
         vistos.add(chave)
         cont_rdv = recontar(cargo)
         bu = bu_cont.get(chave)
@@ -159,6 +161,11 @@ def comparar_rdv_bu(rdv, bu_cont: dict, ident: dict, origem_bu: str = "bu",
             det["comparecimento_bu_x_escolhas"] = esperado
         if nota:
             det["nota"] = nota
+        if n_blocos > 1:
+            det["blocos_sa"] = n_blocos
+            if dif or not reg_ok:
+                estrutura.append(f"cargo {id_el}/{cargo.nome_cargo} em {n_blocos} blocos do "
+                                 "SA cuja soma não fecha com o BU")
         rs, bs = _resumo_cargo(cont_rdv), _resumo_cargo(cont_bu)
         linhas.append({
             **ident, "id_eleicao": id_el, "cargo": cargo.nome_cargo,
@@ -206,6 +213,9 @@ def comparar_rdv_bu(rdv, bu_cont: dict, ident: dict, origem_bu: str = "bu",
             achados.append({**ident, "categoria": cat, "grupo": CATEGORIAS[cat],
                             "id_eleicao": id_el, "cargo": nome, "origem_bu": origem_bu,
                             "detalhes": {"cargo_ausente_no_rdv": [0, total]}})
+    if estrutura:
+        achados.insert(0, {**ident, "categoria": "rdv_estrutura", "grupo": GRUPO_1,
+                           "detalhes": estrutura[:20]})
     return {"linhas": linhas, "achados": achados, "presidente": presidente,
             "estrutura": estrutura}
 

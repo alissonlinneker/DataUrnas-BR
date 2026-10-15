@@ -145,6 +145,40 @@ class RegistroDigitalVoto:
             for c in e.cargos:
                 yield e.id_eleicao, c
 
+    def cargos_agregados(self):
+        """Itera (id_eleicao, CargoRDV, n_blocos) somando os blocos repetidos do SA.
+
+        O RDV do Sistema de Apuração traz a mesma eleição (ou o mesmo cargo)
+        em mais de um bloco, um por urna ou mídia apurada; a seção é a soma
+        dos blocos. Só blocos de origem "sa" com a mesma quantidade de
+        escolhas são somados. Repetição na urna (origem "vota") continua
+        separada e é apontada por validar().
+        """
+        grupos: dict[tuple[int, int], list[CargoRDV]] = {}
+        ordem: list[tuple] = []
+        for e in self.eleicoes:
+            for c in e.cargos:
+                if e.origem == "sa":
+                    k = (e.id_eleicao, c.codigo_cargo, c.qtd_escolhas)
+                    if k not in grupos:
+                        grupos[k] = []
+                        ordem.append(("sa", k))
+                    grupos[k].append(c)
+                else:
+                    ordem.append(("vota", (e.id_eleicao, c)))
+        for tipo, k in ordem:
+            if tipo == "vota":
+                yield k[0], k[1], 1
+                continue
+            blocos = grupos[k]
+            if len(blocos) == 1:
+                yield k[0], blocos[0], 1
+                continue
+            b0 = blocos[0]
+            votos = [v for b in blocos for v in b.votos]
+            yield k[0], CargoRDV(codigo_cargo=b0.codigo_cargo, nome_cargo=b0.nome_cargo,
+                                 qtd_escolhas=b0.qtd_escolhas, votos=votos), len(blocos)
+
 
 def _codigo_cargo(raw) -> int:
     """idCargo é CHOICE: ('cargoConstitucional', 'presidente') ou
@@ -267,15 +301,18 @@ def validar(rdv: RegistroDigitalVoto, pleito: Optional[int] = None,
                            ("secao", ident.get("secao"))):
             if val is not None and int(val) != getattr(rdv, campo):
                 probs.append(f"{campo} {getattr(rdv, campo)} difere do caminho ({int(val)})")
+    # Blocos repetidos do Sistema de Apuração (origem "sa") são normais: um
+    # por urna ou mídia, somados em cargos_agregados(). Lá a repetição só vira
+    # problema se a soma não fechar com o BU (analyzer.rdv_recontagem).
     vistos_e: set[int] = set()
     for e in rdv.eleicoes:
-        if e.id_eleicao in vistos_e:
+        if e.id_eleicao in vistos_e and e.origem != "sa":
             probs.append(f"eleição {e.id_eleicao} repetida")
         vistos_e.add(e.id_eleicao)
         vistos_c: set[int] = set()
         for c in e.cargos:
             rot = f"{e.id_eleicao}/{c.nome_cargo}"
-            if c.codigo_cargo in vistos_c:
+            if c.codigo_cargo in vistos_c and e.origem != "sa":
                 probs.append(f"cargo {rot} repetido")
             vistos_c.add(c.codigo_cargo)
             if c.qtd_escolhas < 1 or c.n_registros % c.qtd_escolhas:

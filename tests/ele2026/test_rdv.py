@@ -18,7 +18,9 @@ from dataurnas.analyzer import rdv_recontagem as R
 from dataurnas.parsers.bu import BUParser
 from dataurnas.parsers.rdv import (
     CargoRDV,
+    EleicaoRDV,
     RDVParseError,
+    RegistroDigitalVoto,
     parse_rdv_bytes,
     recontar,
     validar,
@@ -151,6 +153,79 @@ def test_cargo_ausente_no_rdv(rdv, bu_cont):
                                     "votos": Counter({("nominal", 1234): 3})}}
     r = R.comparar_rdv_bu(rdv, extra, IDENT, pleito=3220)
     assert any(a["detalhes"] == {"cargo_ausente_no_rdv": [0, 3]} for a in r["achados"])
+
+
+# ------------------------------------------------- RDV do SA em blocos repetidos
+
+IDENT_SA = {"uf": "mg", "cd_mun": "41238", "zona": "0039", "secao": "0168"}
+
+
+def _rdv_sa(blocos: list[dict[int, list[tuple[str, str | None]]]],
+            origem: str = "sa") -> RegistroDigitalVoto:
+    """RDV com uma eleição (6257) repetida em vários blocos, como no SA."""
+    eleicoes = [EleicaoRDV(6257, origem, [CargoRDV(cod, "Presidente" if cod == 1 else "Senador",
+                                                    1 if cod == 1 else 2, votos)
+                                           for cod, votos in b.items()])
+                for b in blocos]
+    return RegistroDigitalVoto(
+        data_geracao=None, id_pleito_cabecalho=None, pleito=3220, fase="oficial",
+        municipio=41238, zona=39, local=0, secao=168, tipo_urna=None, tipo_arquivo=None,
+        versao_votacao=None, numero_interno_urna=None, codigo_carga=None,
+        historico_codigos_carga=[], eleicoes=eleicoes)
+
+
+def _votos(**n) -> list[tuple[str, str | None]]:
+    out = []
+    for k, q in n.items():
+        out += [("branco", None)] * q if k == "branco" else [("nominal", k[1:])] * q
+    return out
+
+
+def _bu_sa(comparecimento: int, pres: dict, sen: dict) -> dict:
+    return {(6257, 1): {"comparecimento": comparecimento, "votos": Counter(pres)},
+            (6257, 5): {"comparecimento": comparecimento, "votos": Counter(sen)}}
+
+
+# mg/41238/0039/0168 (BU do SA): bloco de 20 + bloco de 261 = 281 comparecimento
+BLOCOS_SA = [
+    {1: _votos(branco=1, n13=12, n22=6, n30=1), 5: _votos(n131=20, n222=20)},
+    {1: _votos(branco=3, n13=118, n22=111, n30=29), 5: _votos(n131=261, n222=261)},
+]
+BU_SA = _bu_sa(281, {("branco", None): 4, ("nominal", 13): 130, ("nominal", 22): 117,
+                     ("nominal", 30): 30},
+               {("nominal", 131): 281, ("nominal", 222): 281})
+
+
+def test_rdv_sa_blocos_repetidos_somados_conferem():
+    rdv = _rdv_sa(BLOCOS_SA)
+    assert validar(rdv, pleito=3220, ident=IDENT_SA) == []
+    r = R.comparar_rdv_bu(rdv, BU_SA, IDENT_SA, origem_bu="busa", pleito=3220)
+    assert r["achados"] == []
+    assert len(r["linhas"]) == 2
+    assert all(ln["confere"] for ln in r["linhas"])
+    pres = next(ln for ln in r["linhas"] if ln["codigo_cargo"] == 1)
+    assert pres["registros_rdv"] == 281
+    assert json.loads(pres["detalhes"]) == {"blocos_sa": 2}
+    sen = next(ln for ln in r["linhas"] if ln["codigo_cargo"] == 5)
+    assert sen["registros_rdv"] == 562
+    assert r["presidente"][("nominal", 13)] == 130
+
+
+def test_rdv_sa_blocos_que_nao_fecham_marcam_estrutura():
+    bu = _bu_sa(282, {**BU_SA[(6257, 1)]["votos"], ("nominal", 13): 131},
+                BU_SA[(6257, 5)]["votos"])
+    r = R.comparar_rdv_bu(_rdv_sa(BLOCOS_SA), bu, IDENT_SA, origem_bu="busa", pleito=3220)
+    cats = [a["categoria"] for a in r["achados"]]
+    assert cats[0] == "rdv_estrutura"
+    assert "rdv_bu_diverge_sa" in cats
+    assert any("blocos do SA" in p for p in r["achados"][0]["detalhes"])
+
+
+def test_rdv_urna_com_eleicao_repetida_continua_estrutura():
+    rdv = _rdv_sa(BLOCOS_SA, origem="vota")
+    assert any("repetida" in p for p in validar(rdv, pleito=3220, ident=IDENT_SA))
+    r = R.comparar_rdv_bu(rdv, BU_SA, IDENT_SA, pleito=3220)
+    assert r["achados"][0]["categoria"] == "rdv_estrutura"
 
 
 # ---------------------------------------------------------------- log
