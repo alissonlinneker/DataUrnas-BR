@@ -349,6 +349,128 @@ def test_log_parser_le_os_dois_logs_na_troca_de_urna():
     assert ev["encerramento"].hora == "17:05:00"
 
 
+def _votos_de(urna: str, inicio: int, n: int) -> list[tuple]:
+    """Abertura e n votos de uma urna, um por minuto a partir de 08:<inicio>."""
+    ev = [(f"04/10/2026 08:{inicio:02d}:00", "Urna pronta para receber votos", urna)]
+    ev += [(f"04/10/2026 08:{inicio + 1 + i:02d}:00", "O voto do eleitor foi computado", urna)
+           for i in range(n)]
+    return ev
+
+
+def test_textos_zip_sem_duplicar_copias_mi_e_me_do_log_corrompido():
+    """Log corrompido guardado em dupla (01MI e 02ME): é o mesmo log, a cópia MI
+    truncada; os votos contam uma vez só e a ME acrescenta só o que falta."""
+    antigo = _votos_de("111", 0, 4)
+    mi = _log(antigo[:-1])                 # MI truncada: perdeu o último voto
+    me = _log(antigo)
+    nova = _log(_votos_de("111", 30, 2))   # logd.dat da mesma urna depois do reinício
+    raw = _zip({"0000011104102026083000" "01MI.jez": _zip({"logd.dat": mi.encode("latin-1")}),
+                "0000011104102026083000" "02ME.jez": _zip({"logd.dat": me.encode("latin-1")}),
+                "logd.dat": nova.encode("latin-1")})
+    r = R.analisar_log_tempo(R.texto_log(raw), "sp", None, 6)
+    assert r["votos_log"] == 6
+    assert r["diferenca_log_bu"] == 0
+    assert r["aberturas"] == 2
+    assert r["inversoes_relogio"] == 0
+    assert "log_relogio_inverso" not in r["flags"]
+
+
+def test_textos_zip_sem_duplicar_a_mesma_me_copiada_por_duas_urnas():
+    """Duas urnas de contingência copiam a mesma ME: duas cópias iguais no pacote."""
+    me = _log(_votos_de("111", 0, 3)).encode("latin-1")
+    nova = _log(_votos_de("333", 40, 2)).encode("latin-1")
+    raw = _zip({"0000022204102026090000" "01ME.jez": _zip({"logd.dat": me}),
+                "0000033304102026093900-01.jez": _zip({"logd.dat": me}),
+                "logd.dat": nova})
+    r = R.analisar_log_tempo(R.texto_log(raw), "sp", None, 5)
+    assert r["votos_log"] == 5
+    assert r["aberturas"] == 2
+    assert r["inversoes_relogio"] == 0
+
+
+def test_textos_zip_ordena_aninhados_pela_data_e_hora_do_nome():
+    """O nome começa pelo número da urna; a ordem é a da data e hora embutida."""
+    from dataurnas.parsers.log import textos_zip
+
+    cedo = _log(_votos_de("999", 0, 1)).encode("latin-1")
+    tarde = _log(_votos_de("111", 30, 1)).encode("latin-1")
+    raw = _zip({"1111111104102026120000-01.jez": _zip({"logd.dat": tarde}),
+                "9999999904102026080000-01.jez": _zip({"logd.dat": cedo}),
+                "logd.dat": b""})
+    textos = textos_zip(raw)
+    assert "\t999\t" in textos[0] and "\t111\t" in textos[1]
+
+
+def test_textos_zip_preserva_eventos_repetidos_legitimos():
+    """Linha igual só é duplicata se tudo coincide (data, hora, urna, evento,
+    código). Eventos iguais de urnas diferentes e linhas repetidas dentro do
+    mesmo log ficam; a cópia do log não acrescenta nada."""
+    mesmo_seg = [("04/10/2026 08:00:00", "Urna pronta para receber votos", "111"),
+                 ("04/10/2026 08:01:00", "Voto confirmado para [Senador]", "111"),
+                 ("04/10/2026 08:01:00", "Voto confirmado para [Senador]", "111"),
+                 ("04/10/2026 08:01:00", "O voto do eleitor foi computado", "111")]
+    log_a = _log(mesmo_seg).encode("latin-1")
+    log_b = _log([(d, e, "222") for d, e, _ in mesmo_seg]).encode("latin-1")
+    raw = _zip({"0000011104102026090000" "01MI.jez": _zip({"logd.dat": log_a}),
+                "0000011104102026090000" "02ME.jez": _zip({"logd.dat": log_a}),
+                "logd.dat": log_b})
+    txt = R.texto_log(raw)
+    assert txt.count("Voto confirmado para [Senador]") == 4
+    assert txt.count("\t111\t") == 4 and txt.count("\t222\t") == 4
+    assert R.analisar_log_tempo(txt, "sp", None, 2)["votos_log"] == 2
+
+
+def test_log_parser_sem_duplicar_logs_aninhados():
+    """A auditoria por seção (LogParser.parse_bytes) usa a mesma leitura."""
+    from dataurnas.parsers.log import LogParser
+
+    me = _log(_votos_de("111", 0, 3)).encode("latin-1")
+    raw = _zip({"0000011104102026083000" "01MI.jez": _zip({"logd.dat": me}),
+                "0000011104102026083000" "02ME.jez": _zip({"logd.dat": me}),
+                "logd.dat": _log(_votos_de("111", 30, 1)).encode("latin-1")})
+    ev = LogParser().extract_events(LogParser().parse_bytes(raw), turno_date="04/10/2026")
+    assert ev["votos_computados"] == 4
+    assert ev["reboots"] == 1
+    assert ev["abertura"].hora == "08:00:00"
+
+
+def test_processar_secao_log_do_sa_nao_entra_na_comparacao_com_bu():
+    """BU do Sistema de Apuração: o -logsa.jez é o log da digitação e não tem
+    eventos de voto; log x BU não se aplica (não é divergência)."""
+    logsa = _log([("04/10/2026 17:33:00", "Tipo de apuração selecionada (DIGITAÇÃO DE BUEx)",
+                   "01808076")]).encode("latin-1")
+    arquivos = {"busa": ("x-busa.dat", BU_AC.read_bytes()),
+                "logsa": ("x-logsa.jez", _zip({"logd.dat": logsa}))}
+    r = R.processar_secao(IDENT, arquivos, None, 3220)
+    t = r["tempo"]
+    assert t["origem_log"] == "logsa"
+    assert t["votos_log"] is None
+    assert t["diferenca_log_bu"] is None
+    assert t["comparecimento_bu"] == r["secao"]["comparecimento_bu"]
+    assert "log_votos_diverge" not in t["flags"]
+    assert not [a for a in r["achados"] if a["categoria"].startswith("log_")]
+
+
+def test_processar_secao_log_do_sa_pelo_nome_do_arquivo():
+    """O catálogo de integridade normaliza o tipo logsa para log; o nome
+    (-logsa.jez) preserva a origem."""
+    logsa = _log([("04/10/2026 17:33:00", "Tipo de apuração selecionada (DIGITAÇÃO DE BUEx)",
+                   "01808076")]).encode("latin-1")
+    arquivos = {"busa": ("o03220zz2946700010010-busa.dat", BU_AC.read_bytes()),
+                "log": ("o03220zz2946700010010-logsa.jez", _zip({"logd.dat": logsa}))}
+    t = R.processar_secao(IDENT, arquivos, None, 3220)["tempo"]
+    assert t["origem_log"] == "logsa"
+    assert t["diferenca_log_bu"] is None
+    assert "log_votos_diverge" not in t["flags"]
+
+
+def test_processar_secao_log_da_urna_marca_origem():
+    arquivos = {"bu": ("x-bu.dat", BU_AC.read_bytes()), "log": ("x-log.jez", _log_contingencia())}
+    t = R.processar_secao(IDENT, arquivos, None, 3220)["tempo"]
+    assert t["origem_log"] == "log"
+    assert t["votos_log"] == 2
+
+
 def test_processar_secao_com_auditoria_de_log(rdv_raw):
     bu_raw = BU_AC.read_bytes()
     arquivos = {"rdv": ("x-rdv.dat", rdv_raw), "bu": ("x-bu.dat", bu_raw),
@@ -423,3 +545,20 @@ def test_secoes_do_catalogo_escolhe_conjunto_com_rdv():
     assert s77["arquivos"] == {"bu": ("b-bu.dat", "h2"), "rdv": ("b-rdv.dat", "h3")}
     assert s77["n_conjuntos"] == 2
     assert "rdv" not in secoes["0078"]["arquivos"]
+
+
+def test_ler_lista_secoes(tmp_path):
+    mod = _script()
+    p = tmp_path / "lista.txt"
+    p.write_text("# seções a refazer\nRS/89036/0083/0044\n\nzz/29467/0001/0010  # SA\n",
+                 encoding="utf-8")
+    assert mod.ler_lista_secoes(p) == {"rs/89036/0083/0044", "zz/29467/0001/0010"}
+    p.write_text("rs/89036/0083\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        mod.ler_lista_secoes(p)
+
+
+def test_parse_args_secoes():
+    mod = _script()
+    assert mod.parse_args(["--secoes", "x.txt"]).secoes == "x.txt"
+    assert mod.parse_args([]).secoes is None
