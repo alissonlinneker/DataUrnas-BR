@@ -1,6 +1,6 @@
 # Integridade dos arquivos de urna: eleições de 2022 (1º e 2º turnos)
 
-> **Concluída** a conferência de hashes e assinaturas em 944.051 seções dos dois turnos (56 de 56 pacotes de dados abertos do TSE), com 0 erros pendentes. Relatório gerado em 15/10/2026 00:20 por `scripts/docs/gerar_relatorio_integridade_2022.py`.
+> **Concluída** a conferência de hashes e assinaturas em 944.051 seções dos dois turnos (56 de 56 pacotes de dados abertos do TSE), com 0 erros pendentes. Relatório gerado em 15/10/2026 03:16 por `scripts/docs/gerar_relatorio_integridade_2022.py`.
 
 Registro da coleta: gerado em 2026-10-15T01:26:15.
 
@@ -413,12 +413,44 @@ Há 2.064 seções no pacote e fora do banco de 2022: 2.031 do exterior (o banco
 | 2º | RS | 89192 | 0054 | 0013 |
 | 2º | SC | 83011 | 0046 | 0022 |
 
+## Cadeia de certificados (amostra de 5%)
+
+Conferência concluída: 47.230 de 47.230 seções sorteadas (5,00% das 944.051 seções dos dois turnos), 47.230 com certificado lido do arquivo de assinatura (46.104 certificados distintos; 1.126 aparecem em mais de uma seção, 1.125 só porque a mesma urna foi sorteada nos dois turnos, e 1 em seções do mesmo turno: a urna do sistema de apuração (`.vscsa`) que assina várias seções do exterior). Gerado em 2026-10-15T03:16:38 por `scripts/ele2022/analisar_certificados.py`.
+
+- **Amostra:** estratificada por turno e UF (inclusive o exterior), 5% de cada estrato arredondado para cima. Dentro do estrato entram as seções de menor SHA-256 de `<semente>|<turno>|<uf>|<cd_mun>|<zona>|<secao>`, com **semente 20221002**. O sorteio não depende de biblioteca nem de máquina e pode ser refeito por qualquer pessoa.
+- **Leitura:** só o arquivo de assinatura de cada seção (`.vscmr`; `.vscsa` nas seções do sistema de apuração), por faixas de bytes do zip de dados abertos, descompactado em memória com o CRC-32 conferido. Nada bruto vai para o disco. `.vscmr`: 47.225; `.vscsa`: 5.
+- **Certificado da urna assinado pela AC emissora:** 47.230 de 47.230 (sim: 47.230).
+- **Chave pública do certificado valida a assinatura de hardware do `.vscmr`:** 47.230 de 47.230 (sim: 47.230).
+- **Certificado da urna válido no dia do turno:** sim: 47.230. **Uso de chave** (digitalSignature, sem keyCertSign, sem CA): sim: 47.230.
+- **AC emissora:** válida no dia do turno: sim: 47.230; autoridade com keyCertSign: sim: 47.230; certificado da urna emitido dentro da validade da AC: sim: 47.230.
+- **CN igual ao usuário da assinatura:** sim: 47.230. **SHA-256 do certificado igual ao de `secoes.parquet`:** sim: 47.230.
+- **Nenhuma falha crítica:** nenhuma cadeia inválida e nenhuma assinatura que deixe de fechar com o certificado da urna.
+
+| AC emissora | Modelo | Chave | Seções | Emissor da AC | Emissão | Validade mínima |
+|---|---|---|---:|---|---|---|
+| AC UE2020 | UE2020 | Ed521 | 19.258 | AC URNA v2 | 2022-04-23 a 2022-09-29 | 2035-12-31 |
+| AC URNA | UE2009 | ECDSA | 4.786 | AC RAIZ UE | 2012-06-28 a 2020-11-04 | 2026-03-07 |
+| AC URNA | UE2010 | ECDSA | 9.538 | AC RAIZ UE | 2012-05-23 a 2018-09-26 | 2026-01-30 |
+| AC URNA | UE2011 | ECDSA | 2.599 | AC RAIZ UE | 2012-06-19 a 2022-05-17 | 2026-02-26 |
+| AC URNA | UE2013 | ECDSA | 2.474 | AC RAIZ UE | 2013-07-30 a 2022-08-02 | 2027-04-08 |
+| AC URNA | UE2015 | ECDSA | 8.575 | AC RAIZ UE | 2016-06-14 a 2022-09-19 | 2030-02-21 |
+
+Certificados de AC usados (pasta `data/certificados/ac`, origem e conferência em `data/certificados/README.md`):
+
+| AC | Emissor | Validade | Usada em 2022 | Válida em 2022 | SHA-256 (DER) |
+|---|---|---|---|---|---|
+| AC UE2020 | AC URNA v2 | 2021-07-05 a 2037-07-01 | sim | 1T: sim, 2T: sim | `77f31bef3d8eb35f0cc969a2b9bba3ff2a498cc339d29a375d3181e0547c0376` |
+| AC UE2022 | AC URNA v2 | 2023-02-28 a 2039-02-24 | não (emitida depois de 2022) | 1T: não, 2T: não | `6ae65790dae7cc5d97394e461204744c8e2f7a810d0303af828d4d3dbecfa293` |
+| AC URNA | AC RAIZ UE | 2011-07-22 a 2026-07-18 | sim | 1T: sim, 2T: sim | `dc20a4c3b8aef01794b80efe8e143e1fbf719707e00bb0d4ba8865191dc2731d` |
+
+**Raiz não conferida.** Cada `.vscmr` traz só o certificado da urna. As AC superiores (AC RAIZ UE, emissora da AC URNA; AC URNA v2 e AC RAIZ UE v2, acima da AC UE2020) não são publicadas em endereço que se possa baixar, então a cadeia é conferida até a AC intermediária (`nivel_cadeia = intermediaria`). Tentativas em 15/10/2026: `http://dpc.acue2020.tse.jus.br/acraizue.crt` (HTTP 403); `http://dpc.acue2020.tse.jus.br/acurnav2.crt` (HTTP 403); `https://dpc.acue2020.tse.jus.br/acraizue.crt` (sem resposta (HTTPS)); `http://dpc.acraizue.tse.jus.br/` (HTTP 403); `http://lcr.acraizue.tse.jus.br/` (HTTP 403). O TSE publica o SHA-512 desses arquivos no resumo digital do HOLOCRON de 2026, o que permite conferi-los byte a byte quando forem obtidos; basta colocá-los em `data/certificados/ac` e rodar o script de novo.
+
 ## Observações
 
 - **Votos não conferidos (2.398):** 2.064 são seções fora do banco; as outras 334 estão no banco, mas a base Parquet (`votos_t*.parquet`) não traz votos de Presidente para elas (traz os demais cargos): 1º turno BA: 167; 2º turno BA: 166; 2º turno GO: 1. É uma lacuna da base do projeto, não do arquivo da urna; o hash e a assinatura dessas seções conferem.
 - **Certificado com CN diferente do usuário registrado (2 seções):** a assinatura é válida; o nome comum do certificado difere do identificador de usuário gravado no arquivo de assinatura. Seções: `1T/se/31690/0012/0018` (UE2013: CN do certificado (ueao01654951) difere do usuário (ueao01308856)); `2T/mg/40720/0167/0080` (UE2010: CN do certificado (ueao01221893) difere do usuário (ueao01241440)).
 - **Assinatura de software (CEPESC):** algoritmo de governo não publicado; não verificada.
-- **Cadeia de certificados:** não validada nesta conferência; subject, emissor, número de série e SHA-256 do certificado de cada urna ficam em `secoes.parquet`.
+- **Cadeia de certificados:** conferida numa amostra de 5% (ver [Cadeia de certificados](#cadeia-de-certificados-amostra-de-5)); subject, emissor, número de série e SHA-256 do certificado de cada urna ficam em `secoes.parquet`.
 
 ## Catálogo de hashes por arquivo
 
@@ -491,6 +523,7 @@ A publicação como anexos de uma versão ainda está pendente.
 ```bash
 python scripts/ele2022/fetch_integridade.py --so-consolidar   # refaz resumo.json a partir das partes
 python scripts/ele2022/registrar_metadados_integridade.py --gravar
+python scripts/ele2022/analisar_certificados.py --so-consolidar   # cadeia de certificados (amostra)
 python scripts/docs/gerar_relatorio_integridade_2022.py
 ```
 
