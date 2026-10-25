@@ -39,6 +39,7 @@ import hashlib
 import json
 import logging
 import os
+import signal
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor
@@ -228,11 +229,15 @@ class Estado:
         self.path = path
         self.aux: dict[str, str] = {}
         self.bus: dict[str, dict[str, dict]] = {}
+        # arquivos guardados por seção: (hash, nome) -> registro com tipo e MD5
+        self.arqs: dict[str, dict[tuple[str, str], dict]] = {}
         if path.exists():
             for ln in path.read_text(encoding="utf-8").splitlines():
                 r = json.loads(ln)
                 if r["t"] == "aux":
                     self.aux[r["k"]] = r["sha"]
+                elif r["t"] == "arq":
+                    self.arqs.setdefault(r["k"], {})[(r["hash"], r["nome"])] = r
                 else:
                     self.bus.setdefault(r["k"], {})[r["hash"]] = r
         self.fh = open(path, "a", encoding="utf-8")
@@ -262,7 +267,32 @@ class Bus:
         self.n_part = 0
         self.prefixo = time.strftime("%Y%m%d%H%M%S") + f"-{os.getpid()}"
         self.cont = {"aux_novo": 0, "bu_novo": 0, "sem_aux": 0, "sem_bu": 0,
-                     "igual": 0, "erro": 0}
+                     "igual": 0, "erro": 0, "conferidos": 0, "alterados": 0}
+        self.reverificar = False
+        self._completar_md5()
+
+    def _completar_md5(self) -> None:
+        """Anota o MD5 dos arquivos gravados antes de o estado guardar o MD5."""
+        faltam = {k for k in self.estado.bus if k not in self.estado.arqs}
+        if not faltam:
+            return
+        n = 0
+        for part in sorted(self.parts.glob("versoes-*.parquet")):
+            t = pq.read_table(part, columns=["uf", "cd_mun", "zona", "secao", "tipo",
+                                             "hash", "nome", "conteudo"])
+            for r in t.to_pylist():
+                if r["tipo"] == "aux":
+                    continue
+                k = E.secao_key(r["uf"], r["cd_mun"], r["zona"], r["secao"])
+                if k not in faltam or r["hash"] not in self.estado.bus.get(k, {}):
+                    continue
+                reg = {"t": "arq", "k": k, "hash": r["hash"], "nome": r["nome"],
+                       "tipo": r["tipo"], "md5": hashlib.md5(r["conteudo"]).hexdigest()}
+                self.estado.arqs.setdefault(k, {})[(r["hash"], r["nome"])] = reg
+                self.estado.gravar(reg)
+                n += 1
+        self.estado.flush()
+        log.info("MD5 anotado para %d arquivos já guardados", n)
 
     def flush(self) -> None:
         if not self.versoes and not self.pend_estado:
@@ -289,7 +319,47 @@ class Bus:
         self.versoes.append({"coletado_em": agora(), **ident, "tipo": tipo,
                              "sha512": sha, "tamanho": len(conteudo),
                              "conteudo": conteudo, **campos})
+        if tipo != "aux":
+            k = E.secao_key(ident["uf"], ident["cd_mun"], ident["zona"], ident["secao"])
+            reg = {"t": "arq", "k": k, "hash": campos["hash"], "nome": campos["nome"],
+                   "tipo": tipo, "md5": hashlib.md5(conteudo).hexdigest()}
+            self.estado.arqs.setdefault(k, {})[(reg["hash"], reg["nome"])] = reg
+            self.pend_estado.append(reg)
         return sha
+
+    async def conferir(self, key: str, ident: dict) -> None:
+        """Confere por HEAD (ETag = MD5) cada arquivo já guardado da seção.
+        Arquivo trocado no mesmo endereço é baixado de novo e vira alerta."""
+        uf, mun, zona, secao = ident["uf"], ident["cd_mun"], ident["zona"], ident["secao"]
+        for (hv, nome), reg in list(self.estado.arqs.get(key, {}).items()):
+            url = E.url_arquivo(uf, mun, zona, secao, hv, nome, **URL)
+            h = await self.f.head(url)
+            self.cont["conferidos"] += 1
+            if h is None:
+                self.alertas.registrar("arquivo_removido", secao=key, hash=hv, nome=nome,
+                                       md5=reg["md5"])
+                continue
+            etag = (h.get("etag") or "").strip('"')
+            if not etag or "-" in etag or etag == reg["md5"]:
+                continue  # ETag de upload em partes não é o MD5: nada a comparar
+            raw = await self.f.get(url)
+            if raw is None or hashlib.md5(raw).hexdigest() == reg["md5"]:
+                continue
+            self.cont["alterados"] += 1
+            sha = self._guardar(ident, reg["tipo"], raw, hash=hv, nome=nome,
+                                st_hash="alterado_mesmo_endereco")
+            dados = {"secao": key, "hash": hv, "nome": nome, "tipo_arquivo": reg["tipo"],
+                     "md5_anterior": reg["md5"], "md5_novo": hashlib.md5(raw).hexdigest(),
+                     "sha512_novo": sha, "last_modified": h.get("last-modified")}
+            if reg["tipo"] in ("bu", "busa"):
+                loop = asyncio.get_running_loop()
+                comp, votos = await loop.run_in_executor(self.pool, votos_bu, raw)
+                ant = self.estado.bus.get(key, {}).get(hv) or {}
+                dados["comparecimento"] = [ant.get("comparecimento"), comp]
+                dados["votos_iguais"] = ([list(x) for x in ant.get("votos", [])]
+                                         == [list(x) for x in votos])
+                dados["votos_anterior"], dados["votos_novo"] = ant.get("votos"), votos
+            self.alertas.registrar("arquivo_alterado", **dados)
 
     async def secao(self, s: dict) -> None:
         uf, mun, zona, secao = s["uf"], s["cd_mun"], s["zona"], s["secao"]
@@ -302,10 +372,15 @@ class Bus:
         sha_aux = hashlib.sha256(body).hexdigest()
         if self.estado.aux.get(key) == sha_aux:
             self.cont["igual"] += 1
+            if self.reverificar:
+                await self.conferir(key, ident)
             return
         aux = json.loads(body)
         self._guardar(ident, "aux", body, st_secao=aux.get("st"))
         self.cont["aux_novo"] += 1
+        if key in self.estado.arqs:
+            # aux.json mudou: confere também o que já estava guardado
+            await self.conferir(key, ident)
         vistos = self.estado.bus.setdefault(key, {})
         completo = True
         for h in aux.get("hashes") or []:
@@ -400,6 +475,7 @@ async def run(args: argparse.Namespace) -> int:
     alertas = Alertas(out / "alertas.jsonl")
     parar = asyncio.Event()
     tarefas = []
+    bus = None
     f_tot = E.HttpFetcher(concurrency=8, http2=True, rate=10, rate_max=20)
     f_bus = E.HttpFetcher(concurrency=args.concorrencia, http2=True,
                           connections=args.conexoes, rate=args.taxa,
@@ -418,6 +494,10 @@ async def run(args: argparse.Namespace) -> int:
                 n = 0
                 while not parar.is_set() and (not args.ciclos or n < args.ciclos):
                     n += 1
+                    bus.reverificar = bool(args.reverificar_a_cada) and (
+                        n % args.reverificar_a_cada == 0)
+                    if bus.reverificar:
+                        log.info("bus: ciclo %d confere por HEAD os arquivos já guardados", n)
                     t0 = time.time()
                     log.info("bus: ciclo %d começou", n)
                     await bus.ciclo(args.ufs, args.concorrencia)
@@ -431,9 +511,17 @@ async def run(args: argparse.Namespace) -> int:
                     parar.set()
 
             tarefas.append(asyncio.create_task(ciclos()))
-        await asyncio.gather(*tarefas)
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGTERM, signal.SIGINT):
+            loop.add_signal_handler(sig, lambda: [t.cancel() for t in tarefas])
+        try:
+            await asyncio.gather(*tarefas)
+        except asyncio.CancelledError:
+            log.info("interrompido: gravando o que já foi baixado")
     finally:
         parar.set()
+        if bus is not None:
+            bus.flush()
         await f_tot.close()
         await f_bus.close()
         pool.shutdown(wait=True)
@@ -460,6 +548,9 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--taxa-max", type=float, default=70.0)
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--lote", type=int, default=2000)
+    ap.add_argument("--reverificar-a-cada", type=int, default=2,
+                    help="a cada N ciclos confere por HEAD todos os arquivos guardados "
+                         "(0 desliga)")
     a = ap.parse_args(argv)
     a.ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()]
     return a
