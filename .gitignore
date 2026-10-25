@@ -98,3 +98,6 @@ data/parquet/2026/rdv/erros-*.txt
 data/parquet/2026/rdv/execucoes.jsonl
 data/parquet/2026/rdv/*.tmp
 data/parquet/2026/auditoria_v2/*.tmp
+
+# Versões do 2º turno de 2026 (BU, aux.json e totais brutos)
+data/versoes/
