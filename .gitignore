@@ -101,3 +101,6 @@ data/parquet/2026/auditoria_v2/*.tmp
 
 # Versões do 2º turno de 2026 (BU, aux.json e totais brutos)
 data/versoes/
+
+# Análise de encerramento do 2º turno de 2026 (derivado dos BUs)
+data/parquet/2026/t2/encerramento/
