@@ -306,6 +306,21 @@ def test_marcar_recebimento_apos_totalizacao():
     assert bus[1]["m_recebimento_apos_totalizacao_15min"]
 
 
+def test_marcar_emissao_e_encerramento_apos_totalizacao():
+    bus = [_bu("2026-10-25 19:10:00", 1, 1), _bu("2026-10-25 21:00:00", 1, 1)]
+    bus[0].update({"emissao_bsb": "2026-10-25 17:02:00", "encerramento_bsb": "2026-10-25 17:01:00"})
+    bus[1].update({"emissao_bsb": "2026-10-25 19:30:00", "encerramento_bsb": "2026-10-25 19:29:00"})
+    vs = [_versao("pb19267", "19:25:00", 2, 2, 2, 2, ht="19:24:56")]
+    linhas, _ = M.checar_versoes(vs, INI, FIM)
+    M.marcar_recebimento_apos_totalizacao(linhas, {"pb19267": bus})
+    assert not bus[0]["m_emissao_apos_totalizacao"]
+    assert bus[0]["emissao_menos_totalizacao_s"] < 0
+    assert bus[1]["m_emissao_apos_totalizacao"]
+    assert bus[1]["emissao_menos_totalizacao_s"] == 304
+    assert bus[1]["m_encerramento_apos_totalizacao"]
+    assert bus[1]["encerramento_menos_totalizacao_s"] == 244
+
+
 def test_distribuicao():
     assert M.distribuicao([]) == {"n": 0}
     d = M.distribuicao([5, 1, 3])
@@ -401,6 +416,30 @@ def test_curva_marca_excesso_e_lista_secoes():
     assert por_v[2]["recebidas_ate_hg"] == 1 and por_v[2]["excesso_hg"] == 2
     assert [e["secao"] for e in exc] == ["0002", "0003"]
     assert [e["recebimento_menos_hg_s"] for e in exc] == [60, 180]
+
+
+def test_curva_emissao_marca_totalizacao_antes_da_emissao():
+    secs = [_sec("38490", "0001", "2026-10-25 19:10:00", emissao="2026-10-25 17:01:00"),
+            _sec("38490", "0002", "2026-10-25 19:31:00", emissao="2026-10-25 17:02:00"),
+            _sec("38490", "0003", "2026-10-25 19:33:00", emissao="2026-10-25 19:25:00")]
+    vs = [_versao("ba38490", "19:20:00", 3, 3, 3, 3, ht="19:19:50")]
+    linhas, ultima = M.checar_versoes(vs, INI, FIM)
+    curva = M.curva_emissao_totalizacao(linhas, {"ba38490": secs}, ultima)
+    assert curva == [{"abr": "ba38490", "versao": 1, "hg_bsb": "2026-10-25 19:20:00",
+                      "ht_bsb": "2026-10-25 19:19:50", "secoes_totalizadas": 3,
+                      "bu_secoes": 3, "emitidas_ate_ht": 2, "excesso_emissao_ht": 1}]
+
+
+def test_resumir_curva_conta_secoes_distintas():
+    exc = [{"abr": "ba1", "uf": "ba", "cd_mun": "1", "zona": "1", "secao": "1",
+            "recebimento_menos_hg_s": 60},
+           {"abr": "ba1", "uf": "ba", "cd_mun": "1", "zona": "1", "secao": "1",
+            "recebimento_menos_hg_s": 1000},
+           {"abr": "ba", "uf": "ba", "cd_mun": "1", "zona": "1", "secao": "2",
+            "recebimento_menos_hg_s": 30}]
+    r = M.resumir_curva([], exc, 10)
+    assert r["secoes_distintas_excesso"] == 2
+    assert r["secoes_distintas_excesso_mais_15min"] == 1
 
 
 def test_curva_ignora_cobertura_insuficiente():

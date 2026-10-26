@@ -6,7 +6,8 @@ tinha sido encerrada às 17h, e o TSE pausou a totalização entre cerca de 17h0
 (ou 17h20, conforme a fonte) e 19h (docs/prorrogacao-votacao-2turno-2026.md).
 Este script reúne, com os arquivos públicos já versionados por versionar_t2.py,
 checagens objetivas sobre esse intervalo. É descritivo: aponta ocorrências e
-diferenças, não atribui causa.
+diferenças, não atribui causa. Resultados nacionais em
+docs/verificacoes-externas-2turno-2026.md, seção 5.
 
 Entradas (só leitura, uma ou mais cópias com a mesma estrutura):
   --parts DIR    versoes-*.parquet (aux.json e BU de cada versão vista)
@@ -23,6 +24,8 @@ Saída em data/parquet/2026/t2/linha_tempo/ (ignorada pelo git):
                             contra seções totalizadas (t = hg e ht), com o excesso
   curva_excesso_secoes.parquet  seções que explicam cada excesso (as de dr/hr mais cedo
                             depois de t)
+  curva_emissao_totalizacao.parquet  por versão dos totais: seções com BU emitido <= ht
+                            contra seções totalizadas
   atraso_municipio.parquet  distribuição de recebimento - emissão por município
   last_modified.parquet     HEAD do bu.dat numa amostra (--head-amostra), com cache
   oficial_municipios/       JSON de resultado municipal baixados quando faltaram
@@ -437,7 +440,8 @@ def marcas(rec_bu: Optional[datetime], em_bsb: Optional[datetime], pacotes: list
 MARCAS = ("m_recebido_na_pausa", "m_algum_pacote_na_pausa", "m_recebido_mais_2h",
           "m_mais_de_um_pacote", "m_bu_mais_de_uma_versao", "m_recebimento_antes_emissao",
           "votos_diferem_entre_versoes", "mesmo_hash_conteudo_diferente",
-          "m_recebimento_apos_totalizacao", "m_recebimento_apos_totalizacao_15min")
+          "m_recebimento_apos_totalizacao", "m_recebimento_apos_totalizacao_15min",
+          "m_emissao_apos_totalizacao", "m_encerramento_apos_totalizacao")
 
 
 def verificar_fuso_recebimento(linhas: list[dict], ini: datetime, fim: datetime) -> dict:
@@ -732,8 +736,9 @@ def comparar_versoes_com_bus(versoes: list[dict], por_abr: dict[str, list[dict]]
 def marcar_recebimento_apos_totalizacao(versoes: list[dict],
                                         por_mun: dict[str, list[dict]]) -> None:
     """Nos municípios com BU de todas as seções, toma a primeira versão vista com
-    100% das seções totalizadas e marca as seções cujo recebimento (dr/hr) é
-    posterior ao ht dessa versão. Altera as linhas das seções em lugar."""
+    100% das seções totalizadas e marca as seções cujo recebimento (dr/hr), cuja
+    emissão do BU e cujo encerramento (ambos convertidos para Brasília) são
+    posteriores ao ht dessa versão. Altera as linhas das seções em lugar."""
     completa: dict[str, str] = {}
     total: dict[str, int] = {}
     for v in versoes:
@@ -758,6 +763,43 @@ def marcar_recebimento_apos_totalizacao(versoes: list[dict],
             ln["recebimento_menos_totalizacao_s"] = d
             ln["m_recebimento_apos_totalizacao"] = d is not None and d > 0
             ln["m_recebimento_apos_totalizacao_15min"] = d is not None and d > LIMITE_APOS_TOT_S
+            for campo, nome in (("emissao_bsb", "emissao"), ("encerramento_bsb", "encerramento")):
+                t = ln.get(campo)
+                d = (int((datetime.strptime(t, "%Y-%m-%d %H:%M:%S") - t_ht).total_seconds())
+                     if t else None)
+                ln[f"{nome}_menos_totalizacao_s"] = d
+                ln[f"m_{nome}_apos_totalizacao"] = d is not None and d > 0
+
+
+def curva_emissao_totalizacao(versoes: list[dict], por_abr: dict[str, list[dict]],
+                              ultima: dict[str, dict]) -> list[dict]:
+    """Por versão dos totais: seções totalizadas (st) contra seções cujo BU foi
+    emitido (horário da urna convertido para Brasília) até a totalização (ht em
+    Brasília). Mesma regra de cobertura da curva de recebimento. Um excesso
+    positivo quer dizer mais seções totalizadas do que BUs já emitidos, o que
+    não deveria acontecer."""
+    import bisect
+    out = []
+    v_abr: dict[str, list[dict]] = defaultdict(list)
+    for v in versoes:
+        v_abr[v["abr"]].append(v)
+    for abr, ls in por_abr.items():
+        of = ultima.get(abr)
+        if not of or of.get("st") is None or len(ls) < of["st"]:
+            continue
+        tempos = sorted(datetime.strptime(ln["emissao_bsb"], "%Y-%m-%d %H:%M:%S")
+                        for ln in ls if ln.get("emissao_bsb"))
+        for v in v_abr.get(abr, []):
+            if not v.get("secoes") or not v.get("ht_bsb"):
+                continue
+            ht = datetime.strptime(v["ht_bsb"], "%Y-%m-%d %H:%M:%S")
+            n = bisect.bisect_right(tempos, ht)
+            out.append({"abr": abr, "versao": v["versao"],
+                        "hg_bsb": fmt(parse_dr_hr(v.get("dg"), v.get("hg"))),
+                        "ht_bsb": v["ht_bsb"], "secoes_totalizadas": v["secoes"],
+                        "bu_secoes": len(ls), "emitidas_ate_ht": n,
+                        "excesso_emissao_ht": v["secoes"] - n})
+    return out
 
 
 def curva_recebimento_totalizacao(versoes: list[dict], por_abr: dict[str, list[dict]],
@@ -1060,7 +1102,14 @@ def resumir_curva(curva: list[dict], excesso: list[dict], limite: int) -> dict:
     com = [c for c in curva if c["excesso_hg"] and c["excesso_hg"] > 0]
     com_ht = [c for c in curva if c["excesso_ht"] and c["excesso_ht"] > 0]
     abrs = {c["abr"] for c in curva}
+    pior: dict[tuple, int] = {}  # maior (recebimento - hg) de cada seção distinta
+    for e in excesso:
+        k = (e["uf"], e["cd_mun"], e["zona"], e["secao"])
+        pior[k] = max(pior.get(k, 0), e["recebimento_menos_hg_s"])
     return {
+        "secoes_distintas_excesso": len(pior),
+        "secoes_distintas_excesso_mais_15min": sum(1 for s in pior.values()
+                                                    if s > LIMITE_APOS_TOT_S),
         "criterio": ("abrangências com seções com BU >= seções totalizadas na última "
                      "versão; excesso = st da versão - seções com dr/hr <= t"),
         "abrangencias": len(abrs),
@@ -1110,6 +1159,7 @@ CAMPOS_LISTA = ("uf", "cd_mun", "zona", "secao", "emissao_bsb", "recebimento_bu"
                 "recebimento_primeiro", "recebimento_ultimo", "atraso_recebimento_min",
                 "primeira_coleta_aux", "primeira_coleta_bu", "n_pacotes", "n_versoes_bu",
                 "st_secao", "ht_totalizacao_completa_mun", "recebimento_menos_totalizacao_s",
+                "emissao_menos_totalizacao_s",
                 "comparecimento", "votos_13",
                 "votos_22")
 
@@ -1223,6 +1273,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     comparar_versoes_com_bus(versoes, por_abr, n_total)
     marcar_recebimento_apos_totalizacao(versoes, por_mun)
     curva, excesso = curva_recebimento_totalizacao(versoes, por_abr, ultima)
+    curva_em = curva_emissao_totalizacao(versoes, por_abr, ultima)
     lm = {"executado": False}
     if args.head_amostra and not args.sem_download:
         lm = head_last_modified(com_bu, saida / "last_modified.parquet", args.head_amostra,
@@ -1247,6 +1298,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     gravar(faixas, saida / "faixas_uf.parquet")
     gravar(curva, saida / "curva_recebimento_totalizacao.parquet")
     gravar(excesso, saida / "curva_excesso_secoes.parquet")
+    gravar(curva_em, saida / "curva_emissao_totalizacao.parquet")
     gravar(atraso_por_municipio(linhas), saida / "atraso_municipio.parquet")
 
     # 4. resumo
@@ -1351,11 +1403,22 @@ def main(argv: Optional[list[str]] = None) -> int:
                    for m in ("m_recebido_na_pausa", "m_recebimento_antes_emissao",
                              "m_mais_de_um_pacote", "m_bu_mais_de_uma_versao",
                              "votos_diferem_entre_versoes", "mesmo_hash_conteudo_diferente",
-                             "m_recebimento_apos_totalizacao_15min")},
+                             "m_recebimento_apos_totalizacao_15min",
+                             "m_emissao_apos_totalizacao")},
         "recebimento_menos_totalizacao_s": distribuicao(
             [ln["recebimento_menos_totalizacao_s"] for ln in linhas
              if ln.get("recebimento_menos_totalizacao_s") is not None]),
         "curva_recebimento_totalizacao": resumir_curva(curva, excesso, args.limite_lista),
+        "curva_emissao_totalizacao": {
+            "criterio": ("mesma cobertura da curva de recebimento; excesso = st da versão - "
+                         "seções com BU emitido (Brasília) <= ht"),
+            "versoes": len(curva_em),
+            "abrangencias": len({c["abr"] for c in curva_em}),
+            "versoes_com_excesso": [c for c in curva_em if c["excesso_emissao_ht"] > 0],
+        },
+        "emissao_menos_totalizacao_s": distribuicao(
+            [ln["emissao_menos_totalizacao_s"] for ln in linhas
+             if ln.get("emissao_menos_totalizacao_s") is not None]),
         "atraso_recebimento_emissao_ba_destaques_min": destaque_ba(linhas),
         "last_modified_amostra": lm,
         "recebidos_mais_2h_por_uf": dict(Counter(ln["uf"] for ln in linhas

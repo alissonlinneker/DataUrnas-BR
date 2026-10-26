@@ -153,9 +153,123 @@ Lista oficial dada pelo secretário de TI do TSE na cerimônia de 04/09/2026: "A
 - O TSE afirma que, na etapa de confirmação concluída em maio de 2026, nenhuma verificação apontou falha capaz de comprometer o sigilo do voto ou alterar resultado (conteúdo de reportagem que cita o TSE, via resumo do buscador; página não lida).
 - **Teste Público de Segurança 2025 (01 a 05/12/2025), etapa ligada ao ciclo de 2026:** o TSE noticiou 38 planos aprovados após recursos [58] e 35 planos executados [59] [oficiais, não lidos; títulos indexados]. Um resumo de imprensa fala em 29 planos executados e 6 com "achados mitigáveis", e na conclusão das comissões de que nenhum achado representou risco efetivo à integridade, ao sigilo do voto ou ao resultado [61] [terceiro, não lido]. Os números divergem entre fontes; o relatório oficial [57] não foi lido (403). O Teste de Confirmação ocorreu de 13 a 15/05/2026 [60] [oficial, não lido].
 
+## 5. Linha do tempo de publicação versus totalização (dados coletados pelo projeto)
+
+Diferente das seções anteriores, esta parte não vem de fontes externas: usa os arquivos públicos do 2º turno versionados pelos coletores do projeto (aux.json, BU e totais por abrangência), com a coleta nacional completa de 26/10/2026. O texto é descritivo e não atribui causa. Script: `scripts/ele2026/linha_tempo_t2.py` (testes em `tests/ele2026/test_linha_tempo_t2.py`); saídas no servidor de análise em `~/dataurnas-t2/linha_tempo-nacional/` e listas em CSV copiadas para `data/parquet/2026/t2/linha_tempo/nacional/` (fora do git). Versão anterior desta análise: 112.493 seções, só Norte e Nordeste.
+
+### 5.1 Horários usados
+
+| Horário | Fonte | Fuso | Uso |
+|---|---|---|---|
+| Emissão do BU (`dataHoraEmissao`) e encerramento | BU | horário local da urna, convertido para Brasília pelo fuso do município | momento em que o BU existiu |
+| Recebimento (`dr`/`hr` do pacote) | aux.json da seção | Brasília (testado abaixo) | recebimento que o TSE publica |
+| Geração do aux.json (`dg`/`hg`) | aux.json | Brasília | quando o arquivo foi gerado |
+| Totalização da versão (`dt`/`ht`) | JSON de totais da abrangência | horário local da abrangência, convertido para Brasília | quando a versão foi totalizada |
+| Geração da versão (`dg`/`hg`) | JSON de totais | Brasília | quando a versão foi publicada |
+| `Last-Modified` do `bu.dat` | cabeçalho HTTP do CDN | GMT | só numa amostra (5.4) |
+
+- Teste do fuso de `hr`: lido como Brasília, o menor atraso entre emissão e recebimento é de 2,3 min nas seções em UTC-5 e de -0,6 min em UTC-4; lido como horário local, o menor atraso seria de 122 min em UTC-5 e de 59 min em UTC-4. A leitura como Brasília é a coerente.
+- 17 seções têm recebimento de 0,1 a 2,5 minutos antes da emissão gravada no BU (15 no PA, 11 delas em Jacareacanga, zona 0102; 1 no AM; 1 no PR). É compatível com relógio da urna adiantado em relação ao do TSE; lista em `secoes_recebimento_antes_emissao.csv`.
+- Em 80.541 seções (status "Recebida") a geração do aux.json coincide com o recebimento; nas 418.666 com status "Totalizada" o aux.json foi gerado de novo depois. O `dr`/`hr` marca o registro do pacote no sistema de divulgação, que pode não ser o instante exato da chegada ao TSE.
+
+### 5.2 Cobertura e consistência dos totais
+
+- 499.248 seções vistas no aux.json, 499.207 com BU (as 41 restantes "Não instalada"), nenhum BU ilegível, nenhuma seção com mais de um pacote ou mais de uma versão de BU.
+- Totais: 15.682 versões de 5.786 abrangências, nenhuma regressão entre versões e nenhuma versão em que o total de votos difira da soma interna.
+- A soma dos 499.207 BUs bate exatamente com a última versão do Brasil (gerada às 23:27:02 de 25/10): comparecimento 128.236.074, 13 com 64.256.232, 22 com 59.826.041, brancos 1.430.496 e nulos 2.723.305. Nenhuma UF e nenhum dos 4.145 municípios comparáveis tem diferença. Em 1.572 municípios a última versão municipal gravada é anterior aos BUs, e a comparação fica para o total da UF.
+- Pausa: 1.193 seções têm recebimento entre 17:06 e 19:00, todas até 17:08:53; não há recebimento entre 17:08:53 e 19:03:37. A última totalização antes das 19h é de 17:07:35, e 8 versões foram totalizadas depois de 17:06 (de 17:06:15 a 17:07:35): 7 municipais (MT 99058 e 98990, MA 07242, SC 80926 e 80942, PR 76996, RO 00795) e a do AM.
+
+### 5.3 BU emitido ou publicado depois de já totalizado
+
+Três verificações, da mais direta à mais ampla:
+
+1. **Emissão depois da totalização completa do município.** Nos 3.999 municípios em que há BU de todas as seções e uma versão com 100% das seções totalizadas (388.431 seções), compara-se a emissão de cada BU, em Brasília, com o `ht` da primeira versão completa. **Nenhuma seção tem BU emitido depois da totalização** (a emissão mais próxima ficou 232 s antes). O mesmo vale para o encerramento da seção: nenhuma depois da totalização.
+2. **Curva de emissão.** Em cada uma das 11.932 versões de 4.767 abrangências (município, UF e Brasil) com cobertura completa de BU, conta-se quantas seções tinham BU emitido até o `ht` da versão. **Em nenhuma versão o número de seções totalizadas passa do número de BUs já emitidos.**
+3. **Recebimento publicado depois da totalização completa.** Nos mesmos 3.999 municípios, compara-se o `dr`/`hr` de cada seção com o `ht` da primeira versão completa. 16.574 seções, em 1.494 municípios, têm recebimento publicado depois de o município já aparecer 100% totalizado: mediana de 93 s, percentil 90 de 167 s, percentil 99 de 1.933 s, máximo de 6.130 s. 11.546 passam de 1 minuto, 691 de 5 minutos, 392 de 15 minutos e 50 de 1 hora. Por UF (todas): BA 5.813, PE 2.151, PI 1.693, CE 1.623, SE 1.478, PB 1.166, AL 802, MA 685, PA 450, MG 292, AM 189, AC 89, RR 76, SP 38, AP 27, TO 2. Lista completa em `secoes_recebimento_apos_totalizacao.csv`.
+
+O conjunto dos três resultados é o seguinte: nenhum BU foi totalizado antes de existir, mas em parte das seções o horário de recebimento que o TSE publica no aux.json é posterior à totalização que já as incluía. A diferença típica, de 1 a 3 minutos, é compatível com o recebimento ser carimbado no registro do pacote para divulgação, logo depois de totalizado. Os casos acima de 15 minutos não se explicam só por isso e ficam para conferência.
+
+Seções com recebimento publicado mais de 15 minutos depois da totalização completa do município (392, em 45 municípios):
+
+| UF | Município | Seções | Totalização completa | Recebimento publicado | Diferença (s) |
+|---|---|---|---|---|---|
+| PA | 04057 Afuá | 99 | 20:15:39 | 20:45:30 a 20:49:53 | 1.791 a 2.054 |
+| PB | 21393 Pitimbu | 42 | 20:50:34 | 21:12:33 a 21:13:44 | 1.319 a 1.390 |
+| PB | 19496 Bonito de Santa Fé | 27 | 19:44:02 | 20:44:02 a 20:51:36 | 3.600 a 4.054 |
+| PI | 10286 Jacobina do Piauí | 19 | 20:52:34 | 21:09:25 a 21:13:30 | 1.011 a 1.256 |
+| PB | 19038 Aguiar | 17 | 20:54:35 | 21:12:47 a 21:13:35 | 1.092 a 1.140 |
+| PB | 20931 Monte Horebe | 15 | 19:29:14 | 20:22:35 a 20:27:48 | 3.201 a 3.514 |
+| PE | 25895 Surubim | 13 | 20:26:42 | 20:49:10 a 20:50:50 | 1.348 a 1.448 |
+| PB | 21571 Riacho dos Cavalos | 11 | 19:51:30 | 20:09:21 a 20:12:07 | 1.071 a 1.237 |
+| PB | 20290 Gurinhém | 10 | 20:54:15 | 21:12:45 a 21:13:27 | 1.110 a 1.152 |
+| PB | 19410 Belém do Brejo do Cruz | 10 | 20:26:13 | 21:12:06 a 21:13:02 | 2.753 a 2.809 |
+| PE | 23000 Quixaba | 10 | 20:28:02 | 20:43:48 a 20:44:18 | 946 a 976 |
+| CE | 13129 Barreira | 9 | 20:49:03 | 21:06:59 a 21:09:12 | 1.076 a 1.209 |
+| PB | 19828 Riacho de Santo Antônio | 9 | 19:45:35 | 21:08:07 a 21:08:54 | 4.952 a 4.999 |
+| PB | 19836 Carrapateira | 9 | 19:37:37 | 20:44:13 a 20:44:52 | 3.996 a 4.035 |
+| PA | 04898 Melgaço | 8 | 20:21:22 | 20:39:17 a 20:52:05 | 1.075 a 1.843 |
+| MA | 07560 Formosa da Serra Negra | 7 | 20:11:16 | 20:39:43 a 20:41:10 | 1.707 a 1.794 |
+| PB | 21490 Puxinanã | 7 | 19:31:43 | 20:10:45 a 20:16:11 | 2.342 a 2.668 |
+| PB | 20672 Lagoa Seca | 6 | 20:00:56 | 20:47:58 a 20:49:53 | 2.822 a 2.937 |
+| AM | 02992 Caapiranga | 6 | 20:16:30 | 20:45:45 a 20:46:05 | 1.755 a 1.775 |
+| outros 26 municípios | AC, AM, CE, PA, PB, PE, PI | 58 | | | 902 a 6.130 |
+
+- Na PB, 193 seções passam de 15 minutos, e 87 delas têm recebimento publicado entre 21:12 e 21:13:59; outro grupo de 34 cai às 20:44. O recebimento chega em blocos, para municípios totalizados em horários diferentes.
+- Em Bonito de Santa Fé, 20 das 27 seções têm recebimento publicado entre 3.600 e 3.636 s depois da totalização completa (as duas primeiras exatamente 3.600 s).
+- Maior diferença: Santo André (PB 19267), zona 0056, seção 0066: BU emitido às 17:02:51, município 100% totalizado às 19:24:56, recebimento publicado às 21:07:06 (6.130 s depois).
+
+Conferência independente no banco ClickHouse, com o horário de geração da versão (`totalizado_em`, que é o `dg`/`hg` do JSON, e não o `ht`) no lugar do `ht`: nas mesmas 388.431 seções, 12.582 têm recebimento depois da primeira versão completa, 380 mais de 15 minutos depois, e nenhuma tem emissão depois. Como `hg` vem depois de `ht`, os números são menores que os do script, e o resultado sobre a emissão é o mesmo:
+
+```sql
+WITH comp AS (
+  SELECT uf, cd_mun, min(totalizado_em) AS tot
+  FROM totais_versoes FINAL
+  WHERE nivel = 'municipio' AND st = ts AND st > 0
+  GROUP BY uf, cd_mun
+),
+bu AS (
+  SELECT uf, cd_mun, zona, secao, recebimento,
+    data_hora_emissao + toIntervalHour(multiIf(cd_mun IN ('02020','02054','02135','02291',
+          '02313','02399','02496','02755','02917','98370','98477'), 2,
+          cd_mun = '30015', -1, uf = 'ac', 2, uf IN ('am','mt','ms','ro','rr'), 1, 0)) AS emissao_bsb
+  FROM v_bu_ultima WHERE uf != 'zz'
+)
+SELECT count() AS secoes,
+  countIf(recebimento > tot) AS rec_depois,
+  countIf(dateDiff('second', tot, recebimento) > 900) AS rec_depois_15min,
+  countIf(emissao_bsb > toDateTime(toString(tot), 'UTC')) AS emissao_depois
+FROM bu INNER JOIN comp USING (uf, cd_mun);
+-- 388431  12582  380  0
+```
+
+### 5.4 Curva de recebimento por versão (todas as versões)
+
+Para cada versão dos totais de cada abrangência com BU de todas as seções (4.913 abrangências, 12.085 versões), conta-se quantas seções tinham recebimento publicado até a geração da versão (`hg`). Em 4.637 versões de 1.746 abrangências o TSE já tinha totalizado mais seções do que o aux.json mostrava como recebidas naquele instante. O menor conjunto de seções que explica esses excessos (as de recebimento mais cedo depois de `hg`) soma 117.656 seções distintas; em 54 s de mediana o recebimento aparece depois de `hg`, e 978 seções ficam mais de 15 minutos depois. A versão parcial desta análise, só com Norte e Nordeste, registrava 895 abrangências com excesso. Lista em `curva_excesso_secoes_distintas.csv`; essas seções são as que explicariam a contagem, não necessariamente as seções totalizadas.
+
+Por emissão, a mesma curva não tem excesso em nenhuma versão (5.3, item 2).
+
+### 5.5 Outras marcas de horário
+
+- **`Last-Modified` do `bu.dat`:** medido só numa amostra de 225 seções na primeira execução (madrugada de 26/10), sem repetir em escala nacional para não fazer requisições em massa ao TSE. Na mediana, o arquivo foi gravado de 2 a 3 s depois do `dr`/`hr`; os maiores intervalos foram de 1.105 a 5.384 s, em seções do AM, AP, MA, PA e do excesso da curva. Em 5 seções regravadas depois da coleta, o MD5 informado pelo CDN era igual ao do arquivo guardado.
+- **`mtime` do `log.jez`:** os coletores versionam aux.json, BU e assinatura; o log da urna só foi baixado numa amostra do estudo de impacto, sem registrar o horário interno do arquivo. Esta marca não entra na análise nacional.
+- **Bahia (recebimento menos emissão, minutos):** Salvador 5.124 seções, mediana 202,6, 41,4% recebidas depois das 21h; Lauro de Freitas 413, 237,6 e 74,6%; Feira de Santana 1.218, 234,1 e 52,3%; resto da BA 28.721, 216,5 e 17,6%.
+
+Reprodução (no servidor de análise; `--sem-download` impede qualquer requisição ao TSE):
+
+```sh
+python3 scripts/ele2026/linha_tempo_t2.py \
+  --parts ~/dataurnas-versoes-t2/bus/parts --parts ~/dataurnas-versoes-t2-nne/bus/parts \
+  --parts ~/dataurnas-mac/versoes/2026/t2/bus/parts --parts ~/dataurnas-mac/versoes/2026/t2-sseco/bus/parts \
+  --totais ~/dataurnas-versoes-t2-nne/totais --totais ~/dataurnas-mac/versoes/2026/t2/totais \
+  --saida <saida> --workers 48 --sem-download --limite-lista 5000
+```
+
+A execução leu 675.765 versões de aux.json e 501.454 de BU e levou cerca de 4 minutos. As colunas `m_emissao_apos_totalizacao`, `emissao_menos_totalizacao_s` e o arquivo `curva_emissao_totalizacao.parquet` foram acrescentados ao script nesta versão.
+
 ## Limitações
 
 - **Bloqueio do TSE e TREs:** todas as páginas de `tse.jus.br` e `tre-*.jus.br` responderam 403. Os conteúdos marcados "não lido" vêm de trechos de buscador ou de reportagens e podem estar incompletos ou desatualizados. Só foram lidas na íntegra as páginas do TSE com cópia no Internet Archive: hashes de 2026 [30], índice de hashes [31], lacração [33], teste de integridade [4], códigos-fonte [48] e relatórios de 2022 [24].
+- **Seção 5 (linha do tempo):** usa só os arquivos públicos coletados; o `ht` dos totais depende da conversão de fuso da abrangência e o `dr`/`hr` do aux.json é o horário publicado, não necessariamente o da chegada ao TSE. `Last-Modified` foi medido só numa amostra e o `mtime` do `log.jez` não foi coletado.
 - **Resultados do dia:** o levantamento terminou por volta das 22h40 de 25/10/2026. Atas e relatórios dos testes do 2º turno, em especial do TRE-BA, podem ser publicados depois.
 - **Hashes:** os valores dos resumos digitais de 2026 não foram obtidos (403 no TSE, ausentes no Internet Archive), portanto não foram comparados com nada.
 - **Versão do software:** veio dos BUs processados pelo projeto, não de fonte oficial textual do TSE.
