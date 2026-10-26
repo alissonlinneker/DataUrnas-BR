@@ -447,6 +447,7 @@ class Bus:
             for s in secoes:
                 q.put_nowait(s)
             t0 = time.time()
+            feitas = [0]
 
             async def worker():
                 while True:
@@ -460,6 +461,12 @@ class Bus:
                         self.cont["erro"] += 1
                         log.warning("erro em %s/%s/%s/%s: %r", s["uf"], s["cd_mun"],
                                     s["zona"], s["secao"], e)
+                    feitas[0] += 1
+                    if feitas[0] % 2000 == 0:
+                        el = time.time() - t0
+                        log.info("bus %s: %d de %d seções (%.1f/s) | %s | taxa %s",
+                                 uf, feitas[0], len(secoes), feitas[0] / el, self.cont,
+                                 self.f.rate_info())
 
             await asyncio.gather(*[worker() for _ in range(concorrencia)])
             self.flush()
