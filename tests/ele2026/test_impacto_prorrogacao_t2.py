@@ -190,3 +190,50 @@ def test_residuos_estrato():
     assert len(r) == 1
     assert r["residuo"].iloc[0] == pytest.approx(10.0)
     assert r["z"].iloc[0] == pytest.approx(10.0 / np.std([0, 1, 2, 3, 4], ddof=1))
+
+
+def test_cenario_descarte_estima_atrasadas_sem_log_pela_taxa_do_grupo():
+    base = {"uf": "ba", "cd_mun": "1", "zona": "1"}
+    df = pd.DataFrame([
+        {**base, "secao": "A", "grupo_t2": "tardia", "comparecimento": 100,
+         "votos_13": 60, "votos_22": 40, "votos_log_17h_t1": 50.0},
+        {**base, "secao": "B", "grupo_t2": "tardia", "comparecimento": 200,
+         "votos_13": 120, "votos_22": 80, "votos_log_17h_t1": 40.0},
+        {**base, "secao": "C", "grupo_t2": "no_horario", "comparecimento": 100,
+         "votos_13": 50, "votos_22": 50, "votos_log_17h_t1": 20.0},
+        {**base, "secao": "D", "grupo_t2": "no_horario", "comparecimento": 100,
+         "votos_13": 70, "votos_22": 30, "votos_log_17h_t1": 100.0},
+        {**base, "secao": "E", "grupo_t2": "no_horario", "comparecimento": 100,
+         "votos_13": 50, "votos_22": 50, "votos_log_17h_t1": 50.0},
+    ])
+    am = pd.DataFrame([
+        {"chave": "ba/1/1/A", "votos_apos_17h00": 10, "papel": "tardia",
+         "comparecimento": 100, "votos_log_17h_t1": 50.0},
+        {"chave": "ba/1/1/C", "votos_apos_17h00": 1, "papel": "controle",
+         "comparecimento": 100, "votos_log_17h_t1": 20.0},
+        {"chave": "ba/1/1/D", "votos_apos_17h00": 2, "papel": "aleatoria_horario",
+         "comparecimento": 100, "votos_log_17h_t1": 100.0},
+    ])
+    t1 = df[["uf", "cd_mun", "zona", "secao", "votos_13", "votos_22"]].assign(
+        votos_log_17h=df["votos_log_17h_t1"])
+    r = M.cenario_descarte(df, am, t1, 1000)
+    assert r["taxa_atrasadas_apos_17h_log"]["tardia"] == pytest.approx(0.1)
+    assert r["razao_t2_t1_fila_normal"] == pytest.approx(0.02)
+    comp = r["componentes"]
+    assert comp["exato_log"]["votos_apos_17h"] == pytest.approx(13.0)
+    # B, tardia sem log: 200 x 0,1
+    assert comp["estimado_atrasada_sem_log"]["votos_apos_17h"] == pytest.approx(20.0)
+    # E, no horário sem log: 50 (1º turno) x 0,02
+    assert comp["estimado_horario"]["votos_apos_17h"] == pytest.approx(1.0)
+    assert r["corte_17h00"]["votos_retirados"] == pytest.approx(34.0)
+    assert r["corte_17h00"]["saldo_13_menos_22_retirado_na_fatia"] == pytest.approx(6.8)
+    assert r["corte_17h00_so_contagem_exata_do_log"]["votos_retirados"] == pytest.approx(13.0)
+    # teto: B com o comparecimento inteiro (200) no lugar da estimativa (20)
+    teto = r["teto_atrasadas_sem_log"]
+    assert teto["secoes"] == 1 and teto["comparecimento"] == 200
+    assert teto["votos_retirados"] == pytest.approx(214.0)
+    assert teto["saldo_13_menos_22_retirado_na_fatia"] == pytest.approx(42.8)
+    # sensibilidade: razão 2º/1º turno da tardia com log (10/50) aplicada a B (40)
+    sens = r["sensibilidade_atrasadas_sem_log_razao_t1"]["tardia"]
+    assert sens["razao_t2_t1"] == pytest.approx(0.2)
+    assert sens["estimativa"] == pytest.approx(8.0)

@@ -1,279 +1,401 @@
 # Seções que encerraram depois do horário no 2º turno de 2026 e impacto possível da prorrogação
 
-Levantamento de 25 e 26/10/2026 sobre as seções que encerraram a votação depois das 17h de Brasília no 2º turno presidencial (25/10/2026), quando a Rcl 101.673/BA (STF) prorrogou o recebimento de votos até as 19h nos locais onde as urnas ainda não tinham sido fechadas (contexto em `docs/prorrogacao-votacao-2turno-2026.md`). O objetivo é descrever, com os arquivos públicos das urnas, onde houve encerramento tardio, quantos eleitores votaram depois das 17h e quanto isso poderia pesar na diferença final entre 13 (Lula) e 22 (Flávio Bolsonaro). É um levantamento descritivo: não estima efeito causal e não faz juízo sobre a decisão.
+Levantamento nacional de 26/10/2026 sobre as seções que encerraram a votação depois das 17h de Brasília no 2º turno presidencial (25/10/2026), quando a Rcl 101.673/BA (STF) prorrogou o recebimento de votos até as 19h nos locais onde as urnas ainda não tinham sido fechadas (Ofício-Circular TSE 354/2026; contexto em `docs/prorrogacao-votacao-2turno-2026.md`). O objetivo é descrever, com os arquivos públicos das urnas, onde houve encerramento tardio, quantos eleitores votaram depois das 17h e quanto isso poderia pesar na diferença final entre 13 (Lula) e 22 (Flávio Bolsonaro). É um levantamento descritivo: não estima efeito causal e não faz juízo sobre a decisão.
 
-Script: `scripts/ele2026/impacto_prorrogacao_t2.py` (testes em `tests/ele2026/test_impacto_prorrogacao_t2.py`). Saída, fora do git: `data/parquet/2026/t2/impacto/` (`resumo.json`, `tabelas.md`, `secoes_t1_t2.parquet`, `amostra_logs.parquet`, `logs_contagens.jsonl`).
+Esta versão cobre todas as 497.897 seções do Brasil (mais 1.310 do exterior, fora da análise), ou seja, todos os 499.207 BUs coletados. A versão anterior (25/10/2026) cobria 135.561 seções, quase só do Norte e do Nordeste.
+
+Scripts: `scripts/ele2026/analisar_encerramento_t2.py` e `scripts/ele2026/impacto_prorrogacao_t2.py` (testes em `tests/ele2026/test_encerramento_t2.py` e `tests/ele2026/test_impacto_prorrogacao_t2.py`). Saída, fora do git: `data/parquet/2026/t2/encerramento/` e `data/parquet/2026/t2/impacto/` (`resumo.json`, `tabelas.md`, `secoes_t1_t2.parquet`, `amostra_logs.parquet`, `logs_contagens.jsonl`).
 
 ## Resumo: descartar os votos dados depois das 17:00:00
 
 | Item | Valor |
 |---|---|
-| Margem oficial final 13 menos 22 (TSE, 25/10/2026 23:09:21, 499.247 de 499.248 seções) | **4.429.967** (64.255.969 a 59.826.002) |
-| Votos computados depois das 17:00:00 de Brasília, contados no log, nas 5.389 seções baixadas | **1.763** |
-| dos quais nas 1.459 seções que encerraram depois de 17:30 | **1.080** |
-| Estimativa para o país inteiro (log + estimativa para as seções sem log, ver método) | **cerca de 16.182** |
-| Margem se todos os 16.182 fossem retirados do 13 | **4.413.785** |
-| Margem se fossem retirados na fatia de cada seção | **4.425.907** |
-| Votos depois das 17h necessários para inverter, retirando todos do 13 | 4.429.968, ou seja, **274 vezes** a estimativa nacional |
-| Idem, retirando na fatia de cada seção | 17,66 milhões, **1.091 vezes** a estimativa nacional (mais do que o comparecimento das seções tardias e intermediárias juntas) |
+| Margem oficial final 13 menos 22 (TSE, totalização de 25/10/2026 23:22:22, 499.248 de 499.248 seções) | **4.430.191** (64.256.232 a 59.826.041) |
+| Soma dos 499.207 BUs coletados | 64.256.232 a 59.826.041, idêntica ao oficial |
+| Seções que encerraram depois de 17:10 / 17:30 / 18:00 / 19:00 (Brasília) | **11.673 / 7.581 / 7.078 / 4.359** |
+| Votos computados depois das 17:00:00, contados no log, nas 5.389 seções com log lido | **1.763** |
+| dos quais nas 1.459 tardias com log (todas de N e NE) | **1.080** |
+| Estimativa para o país inteiro (log + estimativas, ver método) | **cerca de 21.107** |
+| Margem se todos os 21.107 fossem retirados do 13 | **4.409.084** |
+| Margem se fossem retirados na fatia de cada seção | **4.425.504** |
+| Votos depois das 17h necessários para inverter, retirando todos do 13 | 4.430.192, ou seja, **210 vezes** a estimativa nacional |
+| Idem, retirando na fatia de cada seção | 19,95 milhões, **945 vezes** a estimativa nacional |
+| Teto sem log: as 8.727 tardias e intermediárias sem log com o comparecimento inteiro depois das 17h, todos do 13 | margem **1.959.017** (não inverte) |
 
-Com o corte "além do normal" (votos depois das 17h acima do que é típico de fila), o volume cai para algumas centenas de votos:
+**Limite importante desta versão.** O `-log.jez` do 2º turno não está nos Parquet da coleta nem no ClickHouse: as partes `versoes-*.parquet` guardam só `aux`, `bu`, `busa`, `vota` e `sa` (consulta em "Como reproduzir"). A contagem exata de votos depois das 17h continua restrita às 5.389 seções cujo log foi baixado em 25/10/2026, todas de N e NE. As 6.122 tardias e 2.605 intermediárias sem log (RJ, SP, PE, DF e demais UFs do Sul, Sudeste e Centro-Oeste) entram por estimativa, com um teto que não depende de estimativa nenhuma. Nenhum log novo foi baixado do TSE.
 
 | Corte | Votos retirados | Margem se todos do 13 | Margem na fatia da seção | Vezes o observado para inverter (todos do 13) |
 |---|---|---|---|---|
-| Todos os votos depois das 17:00:00, país inteiro (estimativa) | 16.182 | 4.413.785 | 4.425.907 | 274 |
-| Todos os votos depois das 17:00:00, só tardias e intermediárias (contagem exata) | 1.508 | 4.428.459 | 4.429.360 | 2.938 |
-| Além do normal: descontando a mesma seção no 1º turno | 355 | 4.429.612 | 4.429.841 | 12.479 |
-| Além do normal: descontando a taxa das seções que fecharam no horário no 2º turno | 1.360 | 4.428.607 | 4.429.417 | 3.257 |
-| Teto hipotético: fila do 1º turno inteira (3.722.948 votos depois das 17h em todo o país em 04/10) | 3.722.948 | 707.019 | 3.629.095 | 1,19 |
+| Todos os votos depois das 17:00:00, país inteiro (estimativa) | 21.107 | 4.409.084 | 4.425.504 | 210 |
+| Só a contagem exata do log (5.389 seções) | 1.763 | 4.428.428 | 4.429.488 | 2.513 |
+| Tardias e intermediárias (log + estimativa) | 6.551 | 4.423.640 | 4.429.353 | 676 |
+| Além do normal: descontando a mesma seção no 1º turno | 2.366 | 4.427.825 | 4.429.978 | 1.872 |
+| Além do normal: descontando a taxa dos controles pareados do 2º turno | 5.192 | 4.424.999 | 4.429.468 | 853 |
+| Teto: tardias e intermediárias sem log com o comparecimento inteiro (mais o resto da estimativa) | 2.471.174 | 1.959.017 | 4.306.508 | 1,79 |
+| Teto hipotético: fila do 1º turno inteira (3.722.948 votos depois das 17h em todo o país em 04/10) | 3.722.948 | 707.243 | 3.629.319 | 1,19 |
 
-Nenhum cenário, nem o mais desfavorável ao 13, inverte o resultado. O último caso é deliberadamente exagerado: supõe que o 2º turno tivesse a mesma fila depois das 17h do 1º turno em todas as seções do país (o observado foi cerca de 0,4% disso) e que todos esses votos fossem do 13; mesmo assim a margem continua positiva.
+Nenhum cenário, nem o mais desfavorável ao 13, inverte o resultado. Os dois tetos são deliberadamente exagerados: o primeiro supõe que todo eleitor das 8.727 seções atrasadas sem log votou depois das 17h e votou no 13; o segundo supõe que o 2º turno teve a mesma fila depois das 17h do 1º turno em todas as seções do país (o observado na amostra foi 0,4% disso) e que todos esses votos foram do 13. Anular as 7.581 seções tardias inteiras (2.202.543 votos, saldo de +226.840 para o 13) deixaria a margem em 4.203.351.
 
 ## O que os dados mostram, em poucas linhas
 
-1. **Encerramento tardio no 2º turno foi raro e concentrado.** Nas 135.561 seções já coletadas, 1.459 (1,08%) encerraram depois de 17:30. 1.044 delas estão na Bahia e 316 na Paraíba; Salvador sozinha tem 771, João Pessoa 294, Feira de Santana 63, Lauro de Freitas 46 e Aracaju 42. Fora de BA, PB e SE, o número é residual (44 seções em 7 UFs).
-2. **As seções tardias ficaram abertas até as 19h, mas quase ninguém votou depois das 17h.** 1.342 das 1.459 encerraram entre 18:50 e 19:10. Em 796 delas o último voto foi antes das 17h. O total de votos depois das 17h nas tardias foi 1.080 (0,24% do comparecimento delas); depois das 18h, 336.
-3. **No 1º turno, encerrar tarde era comum por causa de fila.** Nas mesmas 135.561 seções, 43.821 (32%) encerraram depois de 17:30 no 1º turno, e o log registra 3,72 milhões de votos depois das 17h no país. No 2º turno, as seções que fecharam no horário tiveram em média 0,06 voto depois das 17h. As próprias seções tardias tiveram 20.118 votos depois das 17h no 1º turno e 1.080 no 2º.
-4. **Comparação 1º x 2º turno (mesma seção, contra seções do mesmo município e zona que fecharam no horário):** a fatia do 13 cresceu praticamente o mesmo nos dois grupos. Diferença em diferenças: +0,06 ponto percentual (IC 95%: -0,10 a +0,22). O comparecimento cresceu um pouco mais nas tardias: +0,22 ponto (IC 95%: +0,03 a +0,42), concentrado na Bahia (+0,27).
-5. **Não há padrão regional que se sustente.** O efeito (pequeno) no comparecimento aparece na BA; fora da BA a variação da fatia do 13 nas tardias foi ligeiramente menor que a dos controles (-0,24 ponto). No Norte, com só 14 tardias, foi -0,90 ponto. Não é possível dizer que a prorrogação favoreceu uma região inteira: o que houve de tardio está em poucas cidades, e os votos depois das 17h somam pouco mais de mil.
+1. **Encerramento tardio no 2º turno foi raro e concentrado em poucas capitais e regiões metropolitanas.** 7.581 seções (1,52% do país) encerraram depois de 17:30. RJ tem 3.316 (Rio de Janeiro 2.162, Niterói 349, Petrópolis 297, Itaboraí 241), SP 1.968 (São Paulo 1.840), BA 1.047 (Salvador 771), PE 715 (Recife 230) e PB 316 (João Pessoa 294). Essas cinco UFs somam 7.362 das 7.581. Fora delas, nenhuma UF passa de 55.
+2. **No 1º turno, encerrar tarde era comum por causa de fila.** No mesmo conjunto de seções, 84.759 encerraram depois de 17:30 no 1º turno, e o log registra 3.722.948 votos depois das 17h no país. No 2º turno, as seções que fecharam no horário tiveram em média 0,06 voto depois das 17h (amostra aleatória), e a fila normal depois das 17h foi 0,4% da do 1º turno.
+3. **As tardias com log ficaram abertas, mas quase ninguém votou depois das 17h.** Nas 1.459 tardias com log (BA, PB, SE e N/NE), 1.080 votos depois das 17h (0,24% do comparecimento delas); depois das 18h, 336. O maior número numa seção foi 39. Para as tardias do RJ, SP e PE não há log; a estimativa nacional usa a taxa medida nas tardias com log, e o teto usa o comparecimento inteiro.
+4. **Comparação 1º x 2º turno (mesma seção, contra seções do mesmo município e zona que fecharam no horário):** no Brasil, a fatia do 13 cresceu um pouco **menos** nas tardias do que nos controles. Diferença em diferenças: **-0,17 ponto percentual (IC 95%: -0,27 a -0,07)**; na medida de dois candidatos, -0,20 (-0,29 a -0,11). O comparecimento cresceu um pouco mais nas tardias: +0,20 ponto (+0,11 a +0,29).
+5. **Não há padrão regional a favor do 13.** O DiD da fatia do 13 é negativo no Sudeste (-0,24), no RJ (-0,31) e em SP (-0,13), praticamente zero no Nordeste (+0,03, IC inclui zero) e em PE (-0,06), e só positivo, sem significância, na BA (+0,19, IC -0,02 a +0,39). Fora da BA: -0,23 (-0,34 a -0,12).
 
 ## Fonte e método
 
 ### Dados
 
-- **2º turno:** BUs versionados pela coleta (`data/versoes/2026/t2/bus/parts` e `data/versoes/2026/t2-sseco/bus/parts`), decodificados por `scripts/ele2026/analisar_encerramento_t2.py` em `data/parquet/2026/t2/encerramento/secoes_encerramento.parquet` (execução de 25/10/2026 23:32, 135.561 seções do Brasil e 1.310 do exterior, que ficam fora desta análise). O horário de encerramento do BU é local; foi convertido para Brasília pelo fuso do município (AC e 11 municípios do oeste do AM em UTC-5; AM, MT, MS, RO e RR em UTC-4; Fernando de Noronha em UTC-2).
-- **1º turno:** `data/parquet/2026/secoes_2026.parquet` (hora de encerramento, aptos, comparecimento), `votos_presidente_2026.parquet` (votos por candidato) e `data/parquet/2026/rdv/log_tempo_secoes.parquet` (votos depois das 17h contados no log de todas as 499.207 seções instaladas). A mesma seção é identificada por UF, município, zona e seção.
-- **Totais oficiais do 2º turno:** `https://resultados.tse.jus.br/oficial/ele2026/6258/dados/br/br-c0001-e006258-u.json`, uma requisição, gerado em 25/10/2026 23:09:21 (499.247 de 499.248 seções totalizadas). A última versão `br` do índice versionado (21:58:51) dava 64.236.719 a 59.817.037.
-- **Log da urna do 2º turno:** `-log.jez` de 5.389 seções baixado do TSE (pleito 3221) a no máximo 3 requisições por segundo, sem nenhum 429 nem falha. O arquivo bruto foi lido em memória e descartado; ficaram só as contagens em `logs_contagens.jsonl`. O log do 2º turno acumula o do 1º; contam só os eventos "O voto do eleitor foi computado" com data 25/10/2026. Em todas as 5.389 seções, menos uma, o número de votos do log bate com o comparecimento do BU.
+- **2º turno:** BUs versionados pela coleta, em quatro pastas do servidor de processamento (`~/dataurnas-mac/versoes/2026/t2/bus/parts`, `~/dataurnas-mac/versoes/2026/t2-sseco/bus/parts`, `~/dataurnas-versoes-t2/bus/parts` e `~/dataurnas-versoes-t2-nne/bus/parts`; 871 partes, 501.454 registros de BU, 499.207 seções depois da deduplicação), decodificados por `analisar_encerramento_t2.py` em `secoes_encerramento.parquet` (execução de 26/10/2026 09:28 UTC, 497.897 seções do Brasil e 1.310 do exterior, nenhuma seção com mais de uma versão de BU). O horário de encerramento do BU é local; foi convertido para Brasília pelo fuso do município (AC e 11 municípios do oeste do AM em UTC-5; demais AM, MT, MS, RO e RR em UTC-4; Fernando de Noronha em UTC-2).
+- **Conferência no ClickHouse:** a contagem por UF na view `v_bu_ultima` com a mesma regra de fuso (consulta em "Como reproduzir") dá exatamente os mesmos totais: 497.897 seções, 11.673 depois de 17:10, 7.581 depois de 17:30, 7.078 depois de 18:00 e 4.359 depois de 19:00. A soma de `v_votos_t2_secao` (499.205 seções com votos de Presidente) é 64.256.232 para o 13 e 59.826.041 para o 22, igual à última versão `br` de `v_totais_ultima`.
+- **1º turno:** `data/parquet/2026/secoes_2026.parquet` (hora de encerramento, aptos, comparecimento), `votos_presidente_2026.parquet` e `data/parquet/2026/rdv/log_tempo_secoes.parquet` (votos depois das 17h contados no log de todas as seções instaladas). Todas as 497.897 seções do 2º turno têm par no 1º turno (mesma UF, município, zona e seção).
+- **Totais oficiais do 2º turno:** `v_totais_ultima`, nível `br`, totalizado em 25/10/2026 23:22:22, 499.248 de 499.248 seções. A versão anterior deste relatório usava a totalização de 23:09:21 (499.247 seções, margem 4.429.967).
+- **Log da urna do 2º turno:** o mesmo cache da versão anterior (`logs_contagens.jsonl`, 5.389 seções, baixadas do TSE em 25/10/2026 a no máximo 3 requisições por segundo). Contam só os eventos "O voto do eleitor foi computado" com data 25/10/2026, hora local convertida para Brasília. Em todas as 5.389 seções, menos uma, o número de votos do log bate com o comparecimento do BU.
 
 ### Definições
 
-- Horário de encerramento em Brasília pelo minuto truncado: "depois de 17:10" é 17:11:00 ou mais tarde (mesma regra das faixas de `analisar_encerramento_t2.py`).
+- Horário de encerramento em Brasília pelo minuto truncado: "depois de 17:10" é 17:11:00 ou mais tarde. "Depois de 17:00" pelo minuto (17:01:00 ou mais tarde) não serve para separar seções tardias: o procedimento de encerramento leva cerca de um minuto, e 372.273 seções (75%) encerraram a partir de 17:01.
 - **Tardia:** encerrou depois de 17:30 no 2º turno. **Intermediária:** 17:11 a 17:30. **No horário (controle):** até 17:10.
-- **Amostra de logs:** todas as tardias (1.459) e intermediárias (1.487); para cada tardia, um controle da mesma UF, município e zona que fechou até 17:10 (1.233 controles, sem reposição; todas as tardias têm controle); e 1% das demais seções no horário, por sorteio estável por hash (1.210 seções), para medir a fila normal no 2º turno.
-- **Votos depois das 17h:** eventos de voto computado com hora local convertida para Brasília, a partir de 17:00:00.
+- **Amostra de logs (desenho):** todas as tardias e intermediárias; para cada tardia, um controle da mesma UF, município e zona que fechou até 17:10 (sem reposição); e 1% das demais seções no horário, por sorteio estável por hash. Com a cobertura nacional, a amostra passou a ter 7.581 tardias, 4.092 intermediárias, 5.451 controles e 4.194 seções aleatórias; destas, 5.389 já têm log (1.459 tardias, 1.487 intermediárias, 1.242 controles e 1.201 aleatórias). O sorteio é estável, por isso as seções já lidas mantêm o papel; algumas mudaram de papel com o novo pareamento nacional (os controles com log passaram de 1.233 para 1.242 e as aleatórias de 1.210 para 1.201).
+- **Votos depois das 17h:** eventos de voto computado a partir de 17:00:00 de Brasília.
+- **Estimativa nacional:** (1) contagem exata nas 5.389 seções com log; (2) tardias e intermediárias sem log: comparecimento vezes a taxa de votos depois das 17h medida no log do mesmo grupo (tardias 0,2432%, intermediárias 0,1099%); (3) seções no horário sem log: votos depois das 17h da própria seção no 1º turno vezes a razão 2º/1º turno medida na amostra aleatória (0,004). Sensibilidade para (2): a razão 2º/1º turno medida nas atrasadas com log (tardias 0,05368, intermediárias 0,01481) aplicada ao 1º turno de cada atrasada sem log dá 3.071 votos em vez de 5.043.
 - **Fatia do 13 e do 22:** sobre os votos válidos (nominais). No 1º turno os válidos incluem os demais candidatos, por isso a fatia do 13 sobe em quase todo o país do 1º para o 2º turno; a comparação relevante é tardias contra controles, não o nível. Também se calculou a fatia do 13 sobre a soma 13 + 22 do 1º turno (dois candidatos).
-- **Diferença em diferenças (DiD):** em cada estrato (UF, município, zona) que tem ao menos uma tardia e um controle, média da variação 1º para 2º turno nas tardias menos a média nos controles; a estimativa é a média ponderada pelo número de tardias. IC 95% por bootstrap das seções dentro de cada estrato (2.000 repetições). Usa todas as seções do estrato que fecharam no horário, não só os controles do log.
+- **Diferença em diferenças (DiD):** em cada estrato (UF, município, zona) que tem ao menos uma tardia e um controle, média da variação 1º para 2º turno nas tardias menos a média nos controles; a estimativa é a média ponderada pelo número de tardias. IC 95% por bootstrap das seções dentro de cada estrato (2.000 repetições). Usa todas as seções do estrato que fecharam no horário. 7.553 das 7.581 tardias têm controle no estrato; as 28 restantes, todas de PE, estão em zonas sem nenhuma seção que tenha fechado até 17:10 (ver os municípios de PE abertos por inteiro, abaixo).
 
-## 1. Cobertura da coleta no 2º turno
+## 1. Inventário: encerramento tardio no 2º e no 1º turno
 
-A coleta dos BUs ainda estava em andamento. N e NE estão quase completos; Sul, Sudeste e Centro-Oeste praticamente não entraram.
-
-| Região | UF com cobertura | Seções coletadas / seções do 1º turno |
-|---|---|---|
-| Norte | AC 99,1%, AM 98,1%, AP 99,8%, PA 79,3%, RR 100%, TO 100% | RO 0% |
-| Nordeste | AL 99,7%, BA 97,6%, CE 65,7%, MA 87,1%, PB 100%, PI 100%, SE 100% | PE 0%, RN 0% |
-| Sudeste | SP 1,0% | ES, MG, RJ 0% |
-| Sul | nenhuma | PR, RS, SC 0% |
-| Centro-Oeste | nenhuma | DF, GO, MS, MT 0% |
-
-No total, 135.561 de 497.897 seções do Brasil (27%). Os números deste relatório valem para essas seções; o que acontece em PE, RN, Sul, Sudeste e Centro-Oeste não está medido (ver Limitações). A estimativa nacional de votos depois das 17h preenche essas seções com o que se observou no 1º turno de cada uma, ajustado pela fila do 2º turno.
-
-## 2. Inventário: encerramento tardio no 2º e no 1º turno
-
-### Por região (só seções já coletadas no 2º turno, comparadas com elas mesmas no 1º)
+### Por região
 
 | Região | Seções | 2º turno: depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 19:00 | 1º turno: depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 19:00 |
 |---|---|---|---|---|---|---|---|---|---|
-| Nordeste | 99.958 | 2.593 | 1.445 | 1.371 | 839 | 50.778 | 33.580 | 18.558 | 4.255 |
-| Norte | 34.570 | 342 | 14 | 1 | 0 | 16.780 | 10.215 | 5.126 | 1.045 |
-| Sudeste (só SP, 1%) | 1.033 | 11 | 0 | 0 | 0 | 69 | 26 | 6 | 0 |
+| Sudeste | 203.237 | 7.033 | 5.304 | 4.953 | 3.083 | 39.619 | 15.673 | 5.618 | 571 |
+| Nordeste | 140.828 | 3.745 | 2.187 | 2.079 | 1.254 | 76.046 | 51.303 | 28.558 | 6.191 |
+| Centro-Oeste | 38.048 | 330 | 48 | 28 | 17 | 9.500 | 3.943 | 1.296 | 106 |
+| Norte | 43.769 | 424 | 29 | 12 | 3 | 19.232 | 11.634 | 5.943 | 1.236 |
+| Sul | 72.015 | 141 | 13 | 6 | 2 | 6.098 | 2.206 | 532 | 25 |
+| **Brasil** | **497.897** | **11.673** | **7.581** | **7.078** | **4.359** | **150.495** | **84.759** | **41.947** | **8.129** |
 
-### Por UF, 2º turno (seções coletadas)
+### Por UF, 2º turno (horário de Brasília)
 
-| UF | Seções | depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 19:00 |
-|---|---|---|---|---|---|
-| BA | 34.641 | 1.720 | 1.044 | 993 | 727 |
-| PB | 10.712 | 380 | 316 | 312 | 80 |
-| SE | 5.923 | 85 | 55 | 54 | 27 |
-| PI | 10.225 | 67 | 14 | 9 | 5 |
-| AM | 8.001 | 106 | 7 | 1 | 0 |
-| AL | 7.078 | 65 | 6 | 2 | 0 |
-| PA | 16.506 | 170 | 6 | 0 | 0 |
-| CE | 15.615 | 64 | 5 | 0 | 0 |
-| MA | 15.764 | 212 | 5 | 1 | 0 |
-| AP | 1.911 | 11 | 1 | 0 | 0 |
-| AC, RR, TO, SP | 9.185 | 66 | 0 | 0 | 0 |
+| UF | Seções | depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 19:00 | Último encerramento |
+|---|---|---|---|---|---|---|
+| RJ | 37.675 | 3.841 | 3.316 | 3.188 | 2.029 | 20:45:31 |
+| SP | 103.656 | 3.002 | 1.968 | 1.760 | 1.052 | 19:18:32 |
+| BA | 35.476 | 1.734 | 1.047 | 994 | 727 | 19:51:49 |
+| PE | 21.418 | 942 | 715 | 700 | 411 | 19:20:56 |
+| PB | 10.712 | 380 | 316 | 312 | 80 | 19:10:16 |
+| SE | 5.923 | 85 | 55 | 54 | 27 | 19:05:28 |
+| DF | 6.969 | 203 | 29 | 17 | 12 | 19:12:28 |
+| PA | 20.827 | 223 | 17 | 9 | 3 | 19:03:12 |
+| MG | 52.062 | 161 | 16 | 3 | 1 | 23:04:42 |
+| CE | 23.765 | 113 | 14 | 1 | 0 | 18:26:31 |
+| PI | 10.225 | 67 | 14 | 9 | 5 | 19:03:17 |
+| MA | 18.093 | 290 | 14 | 4 | 3 | 19:04:25 |
+| MT | 8.287 | 64 | 13 | 9 | 5 | 19:01:40 |
+| RS | 27.547 | 46 | 8 | 4 | 1 | 19:04:00 |
+| AM | 8.157 | 113 | 8 | 1 | 0 | 18:07:12 |
+| AL | 7.101 | 65 | 6 | 2 | 0 | 19:00:45 |
+| RN | 8.115 | 69 | 6 | 3 | 1 | 19:02:01 |
+| GO | 15.686 | 41 | 5 | 2 | 0 | 19:00:52 |
+| ES | 9.844 | 29 | 4 | 2 | 1 | 19:43:21 |
+| PR | 27.142 | 64 | 3 | 1 | 1 | 19:02:08 |
+| SC | 17.326 | 31 | 2 | 1 | 0 | 18:31:02 |
+| RO | 4.698 | 21 | 2 | 1 | 0 | 18:08:24 |
+| AP | 1.914 | 11 | 1 | 0 | 0 | 17:34:02 |
+| MS | 7.106 | 22 | 1 | 0 | 0 | 17:32:34 |
+| AC | 2.270 | 11 | 1 | 1 | 0 | 19:00:38 |
+| TO | 4.384 | 24 | 0 | 0 | 0 | 17:28:49 |
+| RR | 1.519 | 21 | 0 | 0 | 0 | 17:29:51 |
 
 ### Por UF, 1º turno, mesmas seções
 
 | UF | Seções | depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 19:00 |
 |---|---|---|---|---|---|
-| BA | 34.641 | 20.538 | 14.234 | 8.336 | 2.180 |
+| SP | 103.656 | 11.939 | 1.990 | 290 | 10 |
+| MG | 52.062 | 11.359 | 5.778 | 2.256 | 266 |
+| RJ | 37.675 | 14.610 | 7.172 | 2.895 | 285 |
+| BA | 35.476 | 21.073 | 14.646 | 8.599 | 2.242 |
+| RS | 27.547 | 1.671 | 594 | 134 | 5 |
+| PR | 27.142 | 2.459 | 835 | 231 | 14 |
+| CE | 23.765 | 12.503 | 8.260 | 4.292 | 792 |
+| PE | 21.418 | 14.670 | 10.537 | 6.067 | 1.188 |
+| PA | 20.827 | 10.939 | 6.812 | 3.573 | 760 |
+| MA | 18.093 | 8.932 | 5.723 | 3.164 | 702 |
+| SC | 17.326 | 1.968 | 777 | 167 | 6 |
+| GO | 15.686 | 3.618 | 1.649 | 556 | 41 |
 | PB | 10.712 | 4.486 | 2.558 | 1.058 | 116 |
-| SE | 5.923 | 1.826 | 1.004 | 453 | 66 |
 | PI | 10.225 | 3.243 | 1.861 | 894 | 181 |
-| AL | 7.078 | 4.698 | 3.585 | 2.311 | 605 |
-| MA | 15.764 | 7.844 | 5.022 | 2.800 | 616 |
-| AM | 8.001 | 5.258 | 3.458 | 1.850 | 413 |
-| PA | 16.506 | 8.939 | 5.504 | 2.799 | 574 |
+| ES | 9.844 | 1.711 | 733 | 177 | 10 |
+| MT | 8.287 | 3.089 | 1.495 | 515 | 57 |
+| AM | 8.157 | 5.350 | 3.518 | 1.882 | 418 |
+| RN | 8.115 | 4.601 | 3.120 | 1.714 | 296 |
+| AL | 7.101 | 4.712 | 3.594 | 2.317 | 608 |
+| MS | 7.106 | 1.111 | 371 | 95 | 8 |
+| DF | 6.969 | 1.682 | 428 | 130 | 0 |
+| SE | 5.923 | 1.826 | 1.004 | 453 | 66 |
+| RO | 4.698 | 355 | 50 | 10 | 0 |
+| TO | 4.384 | 970 | 365 | 101 | 7 |
+| AC | 2.270 | 440 | 207 | 71 | 10 |
+| AP | 1.914 | 980 | 620 | 288 | 35 |
+| RR | 1.519 | 198 | 62 | 18 | 6 |
 
-No país inteiro, no 1º turno, 84.759 seções encerraram depois de 17:30 (SP 1.990, MG 5.778, RJ 7.172, PE 10.537, RS 594, por exemplo). Encerrar tarde no 1º turno era sinal de fila; no 2º turno quase não houve fila (ver seção 3), e o encerramento tardio passou a ser quase só o das seções mantidas abertas até as 19h.
+No 1º turno o atraso estava no Nordeste e no Norte (fila); no 2º turno, quase só onde as seções foram mantidas abertas até as 19h. SP é o caso mais claro: 1.990 seções depois de 17:30 no 1º turno e 10 depois de 19:00; no 2º turno, 1.968 e 1.052. Das 1.968 tardias de SP no 2º turno, só 24 também foram tardias no 1º; no RJ, 1.301 de 3.316; em PE, 433 de 715; na BA, 397 de 1.047. No país, 2.271 das 7.581 tardias também encerraram depois de 17:30 no 1º turno.
 
 ### Municípios com mais seções tardias no 2º turno
 
 | Município | Seções | 2º turno: depois de 17:30 | depois de 19:00 | 1º turno: depois de 17:30 | depois de 19:00 |
 |---|---|---|---|---|---|
-| Salvador (BA) | 5.123 | 771 | 621 | 1.769 | 29 |
+| Rio de Janeiro (RJ) | 12.635 | 2.162 | 1.449 | 4.936 | 242 |
+| São Paulo (SP) | 26.683 | 1.840 | 1.008 | 565 | 1 |
+| Salvador (BA) | 5.124 | 771 | 621 | 1.770 | 29 |
+| Niterói (RJ) | 1.327 | 349 | 49 | 16 | 0 |
+| Petrópolis (RJ) | 804 | 297 | 181 | 3 | 0 |
 | João Pessoa (PB) | 1.714 | 294 | 75 | 555 | 16 |
+| Itaboraí (RJ) | 540 | 241 | 162 | 55 | 2 |
+| Recife (PE) | 3.481 | 230 | 151 | 1.222 | 13 |
+| São Gonçalo (RJ) | 2.019 | 112 | 86 | 227 | 2 |
 | Feira de Santana (BA) | 1.218 | 63 | 21 | 765 | 75 |
+| Jaboatão dos Guararapes (PE) | 1.342 | 55 | 34 | 714 | 8 |
+| Passira (PE) | 79 | 49 | 25 | 40 | 3 |
+| Olinda (PE) | 893 | 48 | 24 | 302 | 0 |
 | Lauro de Freitas (BA) | 413 | 46 | 21 | 282 | 30 |
 | Aracaju (SE) | 1.354 | 42 | 21 | 168 | 0 |
-| Encruzilhada (BA) | 55 | 20 | 5 | 19 | 4 |
-| Cabedelo (PB) | 168 | 19 | 4 | 16 | 0 |
-| Pojuca (BA) | 88 | 17 | 9 | 19 | 0 |
-| Ribeirão do Largo (BA) | 28 | 12 | 9 | 16 | 1 |
-| Governador Mangabeira (BA) | 60 | 10 | 3 | 24 | 3 |
 
-Salvador, Feira de Santana e Lauro de Freitas são os três municípios citados na Rcl 101.673. Em Salvador, 15% das seções encerraram depois de 17:30 no 2º turno (35% no 1º), mas 621 encerraram depois de 19:00 no 2º contra 29 no 1º. A tabela completa está em `data/parquet/2026/t2/impacto/tabelas.md`.
+Salvador, Feira de Santana e Lauro de Freitas são os três municípios citados na Rcl 101.673. Em Petrópolis, 297 de 804 seções encerraram depois de 17:30 no 2º turno, contra 3 no 1º. A tabela completa está em `data/parquet/2026/t2/impacto/tabelas.md`.
 
-Das 1.459 tardias do 2º turno, 483 também encerraram depois de 17:30 no 1º turno e 976 não.
+### Casos fora do comum no horário
 
-## 3. Votos depois das 17h (log da urna)
+- **Municípios inteiros abertos em PE.** A verificação de fuso de `analisar_encerramento_t2.py` acusou seis municípios de PE com mediana de encerramento por volta de 19h: Brejinho (23 seções), Cumaru (49), Itapetim (38), Passira (79), Santa Terezinha (28) e Fernando de Noronha (10). Não é erro de fuso: o recebimento pelo TSE (horário de Brasília) vem depois do encerramento convertido em todas as seções conferidas (em Noronha, por exemplo, encerramento às 20:20:56 locais, 19:20:56 de Brasília, recebido às 21:02:17). Esses municípios ficaram abertos até cerca de 19h em quase todas as seções.
+- **33 seções encerraram depois de 19:15 de Brasília** (lista pela consulta `apos_19h15.sql` em "Como reproduzir"). 18 delas são de Volta Redonda (RJ), zona 0090, entre 19:16 e 19:48 (a zona tem 324 seções, 20 delas encerradas depois de 19:00). As mais tardias: Chapada Gaúcha (MG), zona 0320, seção 0185, urna de contingência (`reservaSecao`), encerrada às 23:04:42 com 96 eleitores; Duas Barras (RJ), zona 0042, seção 0108, às 20:45:31 com 221; Rio de Janeiro, zona 0179, seção 0050, às 19:57:46; Santana (BA), zona 0099, seção 0190, às 19:51:49; Santa Maria de Jetibá (ES), zona 0009, seção 0112 (`reservaEncerrandoSecao`), às 19:43:21. O encerramento depois das 19h por si só não é irregular (eleitores na fila no horário-limite votam), e o log dessas seções não foi lido.
 
-| Grupo | Seções | Comparecimento | Votos depois de 17:00 | depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 18:30 | % do comparecimento depois de 17:00 |
+## 2. Votos depois das 17h (log da urna)
+
+| Grupo | Seções com log | Comparecimento | Votos depois de 17:00 | depois de 17:10 | depois de 17:30 | depois de 18:00 | depois de 18:30 | % do comparecimento depois de 17:00 |
 |---|---|---|---|---|---|---|---|---|
 | Tardias (depois de 17:30) | 1.459 | 444.030 | 1.080 | 734 | 560 | 336 | 126 | 0,243% |
 | Intermediárias (17:11 a 17:30) | 1.487 | 389.515 | 428 | 84 | 0 | 0 | 0 | 0,110% |
-| Controles pareados (até 17:10) | 1.233 | 372.388 | 185 | 0 | 0 | 0 | 0 | 0,050% |
-| Amostra aleatória no horário | 1.210 | 295.026 | 70 | 0 | 0 | 0 | 0 | 0,024% |
+| Controles pareados (até 17:10) | 1.242 | 374.807 | 185 | 0 | 0 | 0 | 0 | 0,049% |
+| Amostra aleatória no horário | 1.201 | 292.607 | 70 | 0 | 0 | 0 | 0 | 0,024% |
 
-Por UF, nas tardias: BA 852 votos depois das 17h (287 depois das 18h), PB 141, AL 42, SE 22, PI 14, AM 6, CE, MA e PA 1 cada, AP 0. Por município: Salvador 665 em 771 seções, João Pessoa 128 em 294, Lauro de Freitas 47, Feira de Santana 35, Aracaju 18. O maior número numa seção foi 39.
+Por UF, nas tardias com log: BA 852 votos depois das 17h (287 depois das 18h), PB 141, AL 42, SE 22, PI 14, AM 6, CE, MA e PA 1 cada, AP 0. O maior número numa seção foi 39.
 
-Nas mesmas seções tardias, o log do 1º turno registra 20.118 votos depois das 17h; no 2º, 1.080. Em todo o país, o 1º turno teve 3.722.948 votos depois das 17h (fila). Na amostra aleatória do 2º turno, os votos depois das 17h foram 0,4% do que as mesmas seções tiveram no 1º.
+Cobertura do log entre as atrasadas, por UF:
 
-Os votos depois das 17h além da fila típica (taxa dos controles pareados aplicada ao comparecimento de cada tardia) somam 838 nas tardias; descontando a mesma seção no 1º turno, 355 nas tardias e intermediárias.
+| UF | Tardias | com log | Intermediárias | com log | Comparecimento das atrasadas sem log | Votos depois das 17h dessas seções no 1º turno |
+|---|---|---|---|---|---|---|
+| RJ | 3.316 | 0 | 525 | 0 | 1.127.133 | 40.072 |
+| SP | 1.968 | 0 | 1.034 | 11 | 811.448 | 3.319 |
+| PE | 715 | 0 | 227 | 0 | 281.019 | 18.992 |
+| DF | 29 | 0 | 174 | 0 | 54.964 | 846 |
+| MG | 16 | 0 | 145 | 0 | 38.896 | 1.156 |
+| BA | 1.047 | 1.044 | 687 | 676 | 3.867 | 299 |
+| demais | 490 | 415 | 1.300 | 800 | 137.782 | 6.662 |
 
-## 4. Comparação 1º x 2º turno
+Nas atrasadas com log, o 1º turno teve 49.009 votos depois das 17h e o 2º turno 1.508. Nas atrasadas sem log, o 1º turno teve 71.346. Se a razão 2º/1º turno das atrasadas sem log fosse a das que têm log, seriam 3.071 votos depois das 17h; a estimativa principal (pela taxa sobre o comparecimento) dá 5.043. As duas ficam muito longe do teto que inverteria o resultado.
 
-### Agregado por grupo (seções coletadas)
+Os votos depois das 17h além da fila típica somam 838 nas tardias com log (taxa dos controles pareados do mesmo estrato aplicada ao comparecimento de cada tardia).
+
+## 3. Comparação 1º x 2º turno
+
+### Agregado por grupo (país inteiro)
 
 | Grupo no 2º turno | Seções | Comparecimento 2º | % 13 no 1º | % 22 no 1º | % 13 no 2º | Comparecimento/aptos 1º | 2º | Saldo 13 menos 22 no 1º | no 2º |
 |---|---|---|---|---|---|---|---|---|---|
-| No horário | 132.615 | 33.023.093 | 59,12 | 35,26 | 64,87 | 81,25% | 81,96% | 7.446.438 | 9.533.632 |
-| Intermediária | 1.487 | 389.515 | 62,72 | 31,48 | 68,92 | 80,19% | 81,94% | 112.789 | 142.653 |
-| Tardia | 1.459 | 444.030 | 60,42 | 32,10 | 67,68 | 80,82% | 84,44% | 113.617 | 151.510 |
-| Controles do mesmo estrato das tardias | 18.548 | 5.122.949 | 60,00 | 33,26 | 66,73 | 81,15% | 83,52% | 1.259.962 | 1.656.140 |
+| No horário | 486.224 | 124.565.977 | 45,05 | 47,15 | 51,65 | 79,19% | 81,02% | -2.431.833 | 3.988.144 |
+| Intermediária | 4.092 | 1.086.111 | 51,90 | 40,47 | 58,90 | 78,50% | 80,67% | 114.394 | 186.550 |
+| Tardia | 7.581 | 2.202.543 | 47,75 | 43,80 | 55,34 | 77,53% | 80,61% | 78.987 | 226.840 |
+| Controles do mesmo estrato das tardias | 88.530 | 24.378.470 | 48,68 | 42,84 | 56,15 | 78,76% | 81,18% | 1.308.387 | 2.891.632 |
 
-As seções tardias votaram no 1º turno de forma parecida com as seções do mesmo município e zona que fecharam no horário: 60,4% para Lula e 32,1% para Flávio, contra 60,0% e 33,3% nos controles do mesmo estrato.
+As tardias votaram no 1º turno de forma parecida com as seções do mesmo município e zona que fecharam no horário: 47,7% para Lula e 43,8% para Flávio, contra 48,7% e 42,8% nos controles do mesmo estrato.
 
 ### Tardias por UF, 1º e 2º turno
 
 | UF | Tardias | % 13 no 1º (tardias) | % 13 no 2º (tardias) | % 13 no 1º (no horário, UF) | % 13 no 2º (no horário, UF) | Comparecimento 1º e 2º (tardias) |
 |---|---|---|---|---|---|---|
-| BA | 1.044 | 64,87 | 72,25 | 66,38 | 71,41 | 79,97% e 84,28% |
+| RJ | 3.316 | 39,20 | 46,69 | 39,40 | 46,88 | 75,80% e 78,64% |
+| SP | 1.968 | 48,22 | 56,93 | 37,94 | 45,87 | 76,29% e 79,57% |
+| BA | 1.047 | 64,90 | 72,27 | 66,20 | 71,23 | 79,96% e 84,27% |
+| PE | 715 | 59,94 | 65,83 | 63,60 | 69,34 | 82,15% e 84,91% |
 | PB | 316 | 46,62 | 52,95 | 61,89 | 68,03 | 83,50% e 85,48% |
 | SE | 55 | 58,15 | 65,92 | 62,78 | 69,56 | 82,22% e 84,38% |
+| DF | 29 | 40,86 | 47,77 | 38,11 | 45,72 | 82,74% e 84,80% |
+| PA | 17 | 53,42 | 59,66 | 49,87 | 54,97 | 82,60% e 83,44% |
+| MG | 16 | 46,50 | 53,24 | 43,31 | 50,42 | 75,56% e 78,14% |
+| CE | 14 | 59,69 | 65,49 | 63,29 | 68,93 | 83,22% e 85,35% |
+| MA | 14 | 82,03 | 85,85 | 63,90 | 69,46 | 76,49% e 75,35% |
 | PI | 14 | 69,57 | 74,33 | 70,97 | 75,86 | 83,54% e 84,55% |
-| AM | 7 | 51,14 | 55,53 | 47,94 | 53,77 | 76,51% e 75,56% |
-| AL | 6 | 67,97 | 72,36 | 54,70 | 60,74 | 79,57% e 78,73% |
-| PA | 6 | 51,42 | 57,59 | 49,64 | 54,92 | 80,27% e 80,68% |
-| CE | 5 | 47,98 | 55,21 | 62,43 | 68,11 | 85,50% e 86,88% |
-| MA | 5 | 76,04 | 79,50 | 62,95 | 68,58 | 77,19% e 76,28% |
-| AP | 1 | 38,23 | 43,80 | 45,73 | 52,90 | 83,24% e 72,91% |
+| MT | 13 | 26,88 | 31,31 | 29,16 | 33,92 | 77,94% e 80,18% |
+| AM | 8 | 54,65 | 58,47 | 48,13 | 53,93 | 75,51% e 74,05% |
+| RS | 8 | 44,21 | 52,03 | 35,72 | 42,16 | 76,55% e 78,22% |
+| AL, RN, GO, ES, PR, RO, SC, AC, AP, MS | 31 | | | | | |
 
-A diferença de nível entre tardias e o resto da UF é composição geográfica: as tardias de PB estão quase todas em João Pessoa e Cabedelo, onde o 13 tem fatia menor que no interior; as da BA estão em Salvador e região metropolitana.
+A diferença de nível entre tardias e o resto da UF é composição geográfica: as tardias de SP estão quase todas na capital, onde o 13 tem fatia maior que no interior; as de PB, em João Pessoa e Cabedelo; as da BA, em Salvador e região metropolitana. A tabela completa por UF está em `resumo.json` (`votos_por_uf_tardias`).
 
 ### Diferença em diferenças (tardias menos controles do mesmo município e zona), em pontos percentuais
 
 | Recorte | Estratos | Tardias | Controles | Fatia do 13 | Fatia do 22 | Fatia do 13 (dois candidatos no 1º) | Comparecimento |
 |---|---|---|---|---|---|---|---|
-| Brasil (coletado) | 131 | 1.459 | 18.548 | +0,06 (-0,10 a +0,22) | +0,17 (+0,03 a +0,30) | -0,05 (-0,18 a +0,07) | +0,22 (+0,03 a +0,42) |
-| Nordeste | 119 | 1.445 | 15.782 | +0,07 (-0,09 a +0,23) | +0,16 (+0,02 a +0,30) | -0,04 (-0,17 a +0,08) | +0,22 (+0,02 a +0,43) |
-| Norte | 12 | 14 | 2.766 | -0,90 (-1,27 a -0,55) | +1,15 (+0,91 a +1,39) | -1,07 (-1,30 a -0,82) | +0,15 (-0,31 a +0,60) |
-| BA | 80 | 1.044 | 10.430 | +0,18 (-0,02 a +0,39) | +0,14 (-0,02 a +0,32) | +0,01 (-0,15 a +0,17) | +0,27 (+0,01 a +0,54) |
-| Salvador, Feira de Santana e Lauro de Freitas | 22 | 880 | 4.953 | +0,21 (-0,03 a +0,46) | | | +0,29 (-0,02 a +0,60) |
-| Fora da BA | 51 | 415 | 8.118 | -0,24 (-0,48 a -0,01) | | | +0,11 (-0,10 a +0,31) |
+| **Brasil** | 429 | 7.553 | 88.530 | **-0,17 (-0,27 a -0,07)** | +0,19 (+0,10 a +0,28) | -0,20 (-0,29 a -0,11) | +0,20 (+0,11 a +0,29) |
+| Nordeste | 206 | 2.159 | 29.997 | +0,03 (-0,09 a +0,15) | +0,19 (+0,09 a +0,29) | -0,07 (-0,17 a +0,02) | +0,22 (+0,07 a +0,37) |
+| Sudeste | 174 | 5.304 | 46.603 | -0,24 (-0,38 a -0,11) | +0,18 (+0,04 a +0,31) | -0,24 (-0,36 a -0,12) | +0,19 (+0,07 a +0,31) |
+| Norte | 18 | 29 | 3.737 | -0,92 (-1,43 a -0,38) | +0,78 (+0,29 a +1,25) | -0,85 (-1,27 a -0,37) | +0,32 (-0,07 a +0,68) |
+| Centro-Oeste | 19 | 48 | 5.639 | -0,43 (-0,84 a -0,04) | +0,91 (+0,53 a +1,27) | -0,54 (-0,89 a -0,18) | +0,43 (+0,13 a +0,75) |
+| Sul | 12 | 13 | 2.554 | +0,08 (-0,19 a +0,34) | +0,59 (+0,47 a +0,71) | -0,41 (-0,52 a -0,30) | -0,24 (-0,38 a -0,09) |
+| RJ | 83 | 3.316 | 18.137 | -0,31 (-0,50 a -0,11) | +0,28 (+0,09 a +0,48) | -0,30 (-0,47 a -0,12) | +0,18 (+0,00 a +0,37) |
+| SP | 73 | 1.968 | 26.121 | -0,13 (-0,24 a -0,02) | +0,02 (-0,10 a +0,13) | -0,15 (-0,25 a -0,05) | +0,21 (+0,12 a +0,31) |
+| BA | 82 | 1.047 | 10.696 | +0,19 (-0,02 a +0,39) | +0,14 (-0,03 a +0,31) | +0,01 (-0,15 a +0,17) | +0,27 (+0,00 a +0,53) |
+| PE | 65 | 687 | 11.057 | -0,06 (-0,20 a +0,11) | +0,25 (+0,09 a +0,39) | -0,12 (-0,25 a +0,02) | +0,18 (-0,03 a +0,38) |
 | PB | 6 | 316 | 672 | -0,21 (-0,50 a +0,10) | +0,06 (-0,25 a +0,37) | -0,06 (-0,33 a +0,20) | +0,08 (-0,18 a +0,33) |
 | SE | 11 | 55 | 1.912 | -0,05 (-0,61 a +0,51) | +0,77 (+0,32 a +1,20) | -0,58 (-1,00 a -0,16) | +0,25 (-0,22 a +0,70) |
+| DF | 7 | 29 | 2.466 | -0,49 (-1,10 a +0,09) | +1,20 (+0,76 a +1,65) | -0,85 (-1,34 a -0,35) | +0,33 (-0,07 a +0,71) |
+| Fora da BA | 347 | 6.506 | 77.834 | -0,23 (-0,34 a -0,12) | | | +0,19 (+0,09 a +0,28) |
+| Salvador, Feira de Santana e Lauro de Freitas | 22 | 880 | 4.954 | +0,21 (-0,03 a +0,45) | | | +0,29 (-0,01 a +0,61) |
 
-Leitura: a fatia do 13 e a do 22 sobem ambas um pouco mais nas tardias porque os demais candidatos do 1º turno saem da conta; na medida de dois candidatos, que neutraliza isso, a diferença no Brasil coletado é -0,05 ponto, com intervalo que inclui zero. Nas UFs com poucas tardias (AL, AM, AP, MA, PA), os intervalos são estreitos porque há muitos controles, mas cada estimativa se apoia em 1 a 7 seções e reflete poucas zonas; não deve ser lida como padrão da UF.
+Leitura: com o país inteiro, o resultado parcial de 25/10 (+0,06, IC -0,10 a +0,22, quase só BA e PB) virou -0,17 (IC -0,27 a -0,07): nas seções que ficaram abertas, a fatia do 13 cresceu um pouco menos do que nas seções vizinhas que fecharam no horário. O peso vem do RJ e de SP, que agora entram. Na BA o resultado é o mesmo da versão anterior (+0,19, intervalo que inclui zero). O comparecimento cresceu um pouco mais nas tardias em quase todos os recortes (+0,20 ponto no Brasil). Nas UFs com poucas tardias os intervalos são estreitos porque há muitos controles, mas cada estimativa se apoia em 1 a 29 seções; não deve ser lida como padrão da UF (DiD por UF completo em `resumo.json`).
 
-## 5. Impacto na diferença final (cenários pedidos)
+## 4. Impacto na diferença final (cenários pedidos)
 
-Diferença oficial 13 menos 22: 4.429.967.
+Diferença oficial 13 menos 22: 4.430.191.
 
 ### Nas seções tardias, com a contagem do log
 
-| Cenário | Brasil | BA | PB | SE |
+| Cenário | Brasil (tardias com log) | BA | PB | SE |
 |---|---|---|---|---|
-| Votos depois das 17h nas tardias | 1.080 | 852 | 141 | 22 |
+| Votos depois das 17h nas tardias com log | 1.080 | 852 | 141 | 22 |
 | (a) Extremo, todos para um candidato: a diferença se move no máximo | ±1.080 | ±852 | ±141 | ±22 |
 | (b) Saldo 13 menos 22 desses votos pela fatia da própria seção no 2º turno | +428 | +384 | +9 | +8 |
 | (c) Idem pela fatia da própria seção no 1º turno (dois candidatos) | +381 | +348 | +2 | +7 |
-| Diferença sem esses votos, cenário (b) | 4.429.539 | | | |
+| Diferença sem esses votos, cenário (b) | 4.429.763 | | | |
 
 Para (c) não é possível usar a fatia dos votos dados antes das 17h: o RDV é embaralhado por construção e o log não registra o candidato, então não há como separar os votos por horário. A fatia do 1º turno da mesma seção é o substituto.
-
-Limite que não depende do log: anular todas as 1.459 seções tardias (444.030 votos, saldo de +151.510 para o 13) deixaria a diferença em 4.278.457.
 
 ### Estimativa nacional e cenário de descarte
 
 | Componente | Seções | Votos depois das 17h | Como |
 |---|---|---|---|
-| Contagem exata no log | 5.389 | 1.763 | tardias, intermediárias, controles e amostra aleatória |
-| Seções no horário sem log | 130.172 | 7.434 | votos depois das 17h da seção no 1º turno vezes a razão 2º/1º turno medida na amostra aleatória (0,004) |
-| Seções ainda não coletadas no 2º turno | 362.336 | 6.985 | idem |
-| Total | 497.897 | 16.182 | |
+| Contagem exata no log | 5.389 | 1.763 | tardias, intermediárias, controles e amostra aleatória com log |
+| Tardias e intermediárias sem log | 8.727 | 5.043 | comparecimento vezes a taxa do log do mesmo grupo (sensibilidade pela razão do 1º turno: 3.071; teto: 2.455.109, o comparecimento inteiro) |
+| Seções no horário sem log | 483.781 | 14.302 | votos depois das 17h da seção no 1º turno vezes a razão 2º/1º turno da amostra aleatória (0,004) |
+| Total | 497.897 | 21.107 | |
 
-Todas as tardias e intermediárias têm log, então o teto pedido para seção tardia sem log (o comparecimento inteiro) não precisou ser usado. Para as seções que fecharam no horário, esse teto seria o comparecimento delas inteiro, o que não tem sentido físico (elas fecharam até 17:10); em vez dele, o relatório usa como teto a fila inteira do 1º turno (última linha da tabela do resumo).
+Votos necessários para inverter: retirando só do 13, 4.430.192 votos depois das 17h. Retirando na fatia de cada seção, a margem média por voto retirado é 0,22 (país) ou 0,13 (tardias e intermediárias), e seriam necessários de 20 a 35 milhões de votos depois das 17h, mais do que o comparecimento de todas as seções que encerraram depois de 17:10 (3,29 milhões).
 
-Votos necessários para inverter: retirando só do 13, 4.429.968 votos depois das 17h. Retirando na fatia de cada seção, a margem média por voto retirado é 0,25 (país) ou 0,40 (tardias e intermediárias), e seriam necessários de 11 a 18 milhões de votos depois das 17h, mais do que o comparecimento de todas as seções que encerraram depois de 17:10.
-
-## 6. Padrões nas tardias
+## 5. Padrões nas tardias
 
 ### Distribuição da fatia do 13 no 2º turno (por seção)
 
 | Grupo | Seções | Média | P10 | P25 | Mediana | P75 | P90 |
 |---|---|---|---|---|---|---|---|
-| Tardias | 1.459 | 67,8 | 51,1 | 58,8 | 71,1 | 76,4 | 79,9 |
-| Controles do mesmo estrato | 18.548 | 67,1 | 49,2 | 58,3 | 68,1 | 76,5 | 82,7 |
-| Tardias, 1º turno | 1.459 | 60,9 | 44,7 | 51,9 | 63,1 | 69,0 | 73,8 |
-| Controles, 1º turno | 18.548 | 60,8 | 42,4 | 51,3 | 61,2 | 70,1 | 78,2 |
+| Tardias | 7.581 | 55,6 | 38,9 | 44,4 | 54,9 | 65,4 | 74,5 |
+| Controles do mesmo estrato | 88.530 | 56,2 | 39,2 | 46,1 | 55,4 | 65,4 | 75,0 |
+| Tardias, 1º turno | 7.581 | 48,2 | 31,7 | 36,7 | 47,1 | 57,9 | 67,3 |
+| Controles, 1º turno | 88.530 | 48,9 | 31,8 | 38,3 | 47,5 | 58,1 | 68,5 |
 
-Histograma da fatia do 13 no 2º turno (faixas de 10 pontos, de 30 a 100%): tardias 6, 119, 281, 263, 646, 136, 8; controles 235, 1.779, 3.321, 4.888, 5.406, 2.457, 447. As tardias têm menos seções nas pontas (abaixo de 40% e acima de 80%), o que combina com a concentração em capitais e regiões metropolitanas.
+Histograma da fatia do 13 no 2º turno (faixas de 10 pontos, de 20 a 100%): tardias 44, 895, 2.061, 1.719, 1.575, 1.008, 257, 22; controles 1.413, 8.284, 21.232, 23.377, 19.461, 9.690, 3.951, 841 (mais 281 controles abaixo de 20%, nenhuma tardia).
 
 ### Testes simples (Welch, IC 95%)
 
 | Medida | Tardias | Controles do mesmo estrato | Diferença | IC 95% |
 |---|---|---|---|---|
-| Fatia do 13 no 2º turno | 67,81 | 67,12 | +0,69 | +0,08 a +1,30 |
-| Fatia do 13 no 1º turno | 60,90 | 60,77 | +0,13 | -0,49 a +0,74 |
-| Variação da fatia do 13 (1º para 2º) | 6,91 | 6,35 | +0,56 | +0,43 a +0,70 |
-| Variação do comparecimento (1º para 2º) | 3,49 | 2,13 | +1,36 | +1,22 a +1,51 |
+| Fatia do 13 no 2º turno | 55,61 | 56,19 | -0,57 | -0,89 a -0,26 |
+| Fatia do 13 no 1º turno | 48,16 | 48,92 | -0,76 | -1,08 a -0,43 |
+| Variação da fatia do 13 (1º para 2º) | 7,45 | 7,27 | +0,19 | +0,13 a +0,24 |
+| Variação do comparecimento (1º para 2º) | 2,97 | 2,29 | +0,68 | +0,62 a +0,73 |
 
-O teste de Welch compara as tardias com todos os controles dos mesmos estratos juntos, sem pesar por estrato. Como Salvador e região metropolitana têm muitas tardias e uma variação da fatia do 13 maior que a média dos estratos, a diferença de +0,56 é em grande parte composição; dentro de cada município e zona (DiD, seção 4) ela cai para +0,06 e o intervalo inclui zero. A diferença no comparecimento também diminui (de +1,36 para +0,22 ponto), mas continua positiva no agregado e na BA. Não se pode atribuir esse aumento à prorrogação: os votos depois das 17h nas tardias (0,24% do comparecimento) explicam no máximo cerca de 0,2 ponto, o que é da mesma ordem do DiD, mas as seções que ficaram abertas não foram escolhidas ao acaso.
+O teste de Welch compara as tardias com todos os controles dos mesmos estratos juntos, sem pesar por estrato, e mistura composição geográfica. Dentro de cada município e zona (DiD, seção 3), a variação da fatia do 13 nas tardias fica 0,17 ponto **abaixo** da dos controles, e a do comparecimento 0,20 ponto acima. Não se pode atribuir essa diferença de comparecimento à prorrogação: as seções que ficaram abertas não foram escolhidas ao acaso.
 
 ### Casos extremos
 
-Seis tardias têm variação da fatia do 13 a mais de 3 desvios-padrão da média dos controles do mesmo estrato (de 1.459 com estrato de 5 ou mais controles; com distribuição normal se esperariam cerca de 4):
+41 das 7.132 tardias com estrato de 5 ou mais controles têm variação da fatia do 13 a mais de 3 desvios-padrão da média dos controles do mesmo estrato (0,57%): 28 acima e 13 abaixo do esperado; 22 delas no RJ, 6 em SP, 6 na BA e 4 em PE. Como referência, aplicando a mesma regra às próprias seções no horário (cada uma contra a média e o desvio do seu estrato), 0,40% delas passam de 3 desvios, 1.379 acima e 564 abaixo: a cauda é mais pesada que a normal e assimétrica no país inteiro, não só nas tardias. A lista está em `resumo.json` (`extremos_z3`) e em `tabelas.md`. As seis maiores:
 
 | Seção | Encerramento | Comparecimento | % 13 no 1º | % 13 no 2º | Variação | Esperada (controles) | z |
 |---|---|---|---|---|---|---|---|
-| BA, Araci, zona 0123, seção 0135 | 19:05:08 | 277 | 88,98 | 85,02 | -3,96 | +3,19 | -3,45 |
-| BA, Salvador, zona 0019, seção 0389 | 19:04:18 | 306 | 61,33 | 75,77 | +14,44 | +8,41 | +3,16 |
-| PB, João Pessoa, zona 0076, seção 0410 | 18:59:34 | 300 | 48,79 | 60,21 | +11,42 | +6,13 | +3,10 |
-| BA, Salvador, zona 0010, seção 0077 | 19:00:32 | 336 | 73,00 | 74,62 | +1,62 | +7,35 | -3,07 |
-| BA, Salvador, zona 0005, seção 0299 | 19:00:45 | 297 | 57,35 | 71,13 | +13,77 | +7,37 | +3,04 |
-| BA, Salvador, zona 0017, seção 0579 | 19:00:51 | 108 | 58,89 | 73,74 | +14,85 | +8,28 | +3,02 |
-
-Os desvios vão para os dois lados (4 com variação do 13 acima do esperado e 2 abaixo), em número compatível com o acaso.
+| RJ, Rio de Janeiro, zona 0233, seção 0161 | 19:00:35 | 122 | 48,51 | 46,55 | -1,96 | +7,73 | -4,35 |
+| RJ, Rio de Janeiro, zona 0238, seção 0227 | 19:03:09 | 279 | 34,17 | 49,43 | +15,26 | +7,16 | +4,32 |
+| RJ, Rio de Janeiro, zona 0238, seção 0234 | 19:02:21 | 297 | 45,53 | 60,57 | +15,05 | +7,16 | +4,20 |
+| SP, São Paulo, zona 0253, seção 0475 | 19:00:31 | 202 | 33,15 | 49,74 | +16,59 | +7,74 | +3,97 |
+| RJ, Petrópolis, zona 0065, seção 0287 | 19:00:37 | 225 | 43,40 | 60,38 | +16,98 | +7,99 | +3,95 |
+| RJ, Rio de Janeiro, zona 0009, seção 0429 | 19:02:28 | 327 | 48,28 | 61,90 | +13,63 | +6,74 | +3,66 |
 
 ## Limitações
 
-- **Cobertura parcial.** 27% das seções do país, quase todas do Norte e do Nordeste. PE e RN (que, pelas notícias, mantiveram seções abertas) e todo o Sul, Sudeste e Centro-Oeste ainda não entraram. Em SP o TRE disse que cerca de 20% das seções estavam abertas às 17h18. A estimativa nacional supõe, nas seções não coletadas, a mesma relação entre a fila do 2º e a do 1º turno vista na amostra; se houver muitas seções mantidas até as 19h nessas UFs, o número de votos depois das 17h será maior. Para inverter o resultado, porém, seriam precisos mais de 4,4 milhões de votos depois das 17h todos do 13, mais que toda a fila do 1º turno no país (3,72 milhões).
+- **Log do 2º turno só em N e NE.** O `-log.jez` não faz parte da coleta versionada (Parquet e ClickHouse têm só `aux`, `bu`, `busa`, `vota` e `sa`). Os votos depois das 17h nas 6.122 tardias e 2.605 intermediárias sem log (sobretudo RJ, SP e PE) são estimados pela taxa medida em BA, PB e demais UFs de N e NE. Se a fila depois das 17h no RJ, em SP ou em PE tiver sido maior, a estimativa sobe; o teto (comparecimento inteiro dessas seções, 2.455.109, todos do 13) mesmo assim deixa a margem em 1.959.017. Completar a contagem exige baixar do TSE o log dessas seções (`impacto_prorrogacao_t2.py --baixar-logs`, só as que faltam: 6.122 tardias, 2.605 intermediárias, 4.209 controles e 2.993 aleatórias, 15.929 arquivos; cerca de 1h30 a 3 requisições por segundo).
 - **Seleção não aleatória.** As seções que ficaram abertas dependeram de decisões dos TREs e das mesas, do horário em que a ordem chegou e de onde havia eleitores ou fila. Diferenças entre tardias e controles não são efeito da prorrogação.
-- **Composição geográfica.** As tardias estão concentradas em Salvador, João Pessoa e entorno. Comparações sem estrato misturam essa composição com o horário; por isso o resultado principal é o DiD dentro de município e zona.
+- **Composição geográfica.** As tardias estão concentradas no Rio de Janeiro, em São Paulo, Salvador, Recife, João Pessoa e entorno. Comparações sem estrato misturam essa composição com o horário; por isso o resultado principal é o DiD dentro de município e zona.
 - **Fatia dos votos depois das 17h.** O candidato de cada voto não é observável por horário (RDV embaralhado, log sem candidato). Os cenários (b) e (c) supõem que esses votos se dividiram como o total da seção no 2º turno ou no 1º turno.
-- **Horário do BU e do log.** O horário de encerramento é o do relógio da urna, convertido pelo fuso do município. Seções com urna de contingência (`reservaSecao`) usam o BU final. Uma seção da amostra tem número de votos no log diferente do comparecimento do BU.
+- **Horário do BU e do log.** O horário de encerramento é o do relógio da urna, convertido pelo fuso do município. Seções com urna de contingência (`reservaSecao`, `reservaEncerrandoSecao`) usam o BU final. Uma seção da amostra tem número de votos no log diferente do comparecimento do BU.
 - **Exterior** (1.310 seções) fora da análise: cada país segue o próprio fuso.
-- A coleta continua: rodar de novo `analisar_encerramento_t2.py` e `impacto_prorrogacao_t2.py --baixar-logs` atualiza tudo; o cache de logs é incremental e a escolha da amostra é estável.
+- **Totalizadas e BUs.** O TSE totalizou 499.248 seções; a coleta tem BU de 499.207 (497.897 no Brasil e 1.310 no exterior). As somas de 13 e 22 dos BUs batem exatamente com o total oficial.
 
 ## Como reproduzir
 
+No servidor de processamento (as partes ficam lá, só leitura), com um ambiente temporário em memória (`/dev/shm`), sem gravar nada em `/work`:
+
 ```sh
-nice -n 20 .venv/bin/python scripts/ele2026/analisar_encerramento_t2.py \
-  --parts data/versoes/2026/t2/bus/parts --parts data/versoes/2026/t2-sseco/bus/parts --workers 3
-curl -s https://resultados.tse.jus.br/oficial/ele2026/6258/dados/br/br-c0001-e006258-u.json -o br.json
-nice -n 20 .venv/bin/python scripts/ele2026/impacto_prorrogacao_t2.py --total-oficial br.json --baixar-logs
+# código e referências do 1º turno no ambiente temporário
+rsync -a --relative pyproject.toml src/dataurnas spec scripts/ele2026 tests/ele2026 \
+  data/parquet/2026/secoes_2026.parquet data/parquet/2026/votos_presidente_2026.parquet \
+  data/parquet/2026/resumo_br.json data/parquet/2026/rdv/log_tempo_secoes.parquet \
+  data/parquet/2026/t2/impacto/logs_contagens.jsonl data/parquet/2026/t2/encerramento/municipios.json \
+  <servidor>:/dev/shm/enc-nac/
+cd /dev/shm/enc-nac && UV_CACHE_DIR=/dev/shm/enc-nac/.uvcache uv venv -p 3.12 venv
+VIRTUAL_ENV=venv uv pip install asn1tools httpx py7zr click pandas numpy pyarrow cryptography scipy pytest
+
+# 1) decodificação nacional dos BUs (cerca de 2 min com 64 processos)
+venv/bin/python scripts/ele2026/analisar_encerramento_t2.py \
+  --parts ~/dataurnas-mac/versoes/2026/t2/bus/parts \
+  --parts ~/dataurnas-mac/versoes/2026/t2-sseco/bus/parts \
+  --parts ~/dataurnas-versoes-t2/bus/parts \
+  --parts ~/dataurnas-versoes-t2-nne/bus/parts \
+  --municipios data/parquet/2026/t2/encerramento/municipios.json --workers 64
+
+# 2) análise nacional (cerca de 2,5 min), com o total oficial final
+venv/bin/python scripts/ele2026/impacto_prorrogacao_t2.py \
+  --oficial-13 64256232 --oficial-22 59826041 --oficial-comparecimento 128236074 \
+  --oficial-fonte "v_totais_ultima br, totalizado 25/10/2026 23:22:22, 499.248 de 499.248 seções"
+
+# testes
+venv/bin/python -m pytest -q tests/ele2026/test_impacto_prorrogacao_t2.py tests/ele2026/test_encerramento_t2.py
 ```
+
+Consultas no ClickHouse (`~/dataurnas-ch/app/scripts/ch/ch.sh < arquivo.sql`):
+
+```sql
+-- total oficial final e soma dos BUs
+SELECT abr, totalizado_em, st, ts, cand['13'] AS v13, cand['22'] AS v22,
+       cand['13'] - cand['22'] AS margem
+FROM v_totais_ultima WHERE nivel = 'br';
+SELECT count() AS secoes, sum(votos_13) AS v13, sum(votos_22) AS v22,
+       sum(votos_13) - sum(votos_22) AS margem, sum(comparecimento) AS comp
+FROM v_votos_t2_secao;
+
+-- tipos de arquivo guardados na coleta (não há log)
+SELECT tipo, count(), sum(tamanho) FROM versoes_arquivo FINAL GROUP BY tipo;
+
+-- encerramento_uf.sql: encerramento por UF, Brasília, minuto truncado
+WITH
+  multiIf(cd_mun IN ('02020','02054','02135','02291','02313','02399','02496','02755',
+                     '02917','98370','98477'), -5,
+          cd_mun = '30015', -2,
+          uf = 'ac', -5,
+          uf IN ('am','mt','ms','ro','rr'), -4, -3) AS fuso,
+  hora_encerramento + toIntervalHour(-3 - fuso) AS enc_bsb,
+  dateDiff('minute', toDateTime('2026-10-25 17:00:00', 'UTC'), toStartOfMinute(enc_bsb)) AS m
+SELECT uf, count() AS secoes,
+       countIf(m >= 1) AS depois_17h00, countIf(m >= 11) AS depois_17h10,
+       countIf(m >= 31) AS depois_17h30, countIf(m >= 61) AS depois_18h00,
+       countIf(m >= 121) AS depois_19h00, max(enc_bsb) AS ultimo_bsb
+FROM v_bu_ultima
+WHERE uf != 'zz'
+GROUP BY uf WITH TOTALS
+ORDER BY depois_17h30 DESC;
+
+-- apos_19h15.sql: mesmas expressões do WITH acima, seções depois de 19:15
+-- SELECT uf, cd_mun, zona, secao, hora_abertura, hora_encerramento, enc_bsb,
+--        recebimento, tipo_urna, comparecimento
+-- FROM v_bu_ultima WHERE uf != 'zz' AND m >= 136 ORDER BY enc_bsb DESC;
+```
+
+Para completar a contagem de votos depois das 17h com o log das seções que faltam (depende de baixar 15.929 arquivos do TSE), rodar o passo 2 com `--baixar-logs`; o cache é incremental e a amostra é estável.

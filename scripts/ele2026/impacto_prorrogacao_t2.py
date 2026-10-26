@@ -551,7 +551,11 @@ def cenario_descarte(df: pd.DataFrame, am: pd.DataFrame, t1: pd.DataFrame, dif: 
 
     Componentes (votos depois das 17h, por seção):
       exato_log         seções da amostra com log do 2º turno lido (contagem exata)
-      teto_sem_log      tardias e intermediárias sem log: teto = comparecimento
+      estimado_atrasada_sem_log  tardias e intermediárias sem log: comparecimento
+                        vezes a taxa de votos depois das 17h medida no log das
+                        seções do mesmo grupo (tardia ou intermediária); o teto
+                        (comparecimento inteiro) sai à parte em
+                        "teto_atrasadas_sem_log"
       estimado_horario  seções que fecharam até 17:10 sem log: o próprio 1º
                         turno (log) vezes a razão 2º/1º turno medida na
                         amostra aleatória de seções no horário
@@ -580,12 +584,20 @@ def cenario_descarte(df: pd.DataFrame, am: pd.DataFrame, t1: pd.DataFrame, dif: 
     normal = normal_t1.fillna(comp * taxa_ctrl)
     atrasada = d["grupo_t2"].isin(["tardia", "intermediaria"])
     tem_log = d["v17_log"].notna()
-    comp_ = "exato_log"
+    # taxa de votos depois das 17h / comparecimento no log, por grupo atrasado
+    taxa_grupo = {}
+    for g in ("tardia", "intermediaria"):
+        x = d[tem_log & (d["grupo_t2"] == g)]
+        taxa_grupo[g] = float(x["v17_log"].sum() / x["comparecimento"].sum()) if (
+            len(x) and x["comparecimento"].sum() > 0) else 1.0
+    taxa_atr = d["grupo_t2"].map(taxa_grupo).astype(float)
+    sem_log_atr = atrasada & ~tem_log
     d["componente"] = np.select(
-        [tem_log, atrasada & ~tem_log],
-        [comp_, "teto_sem_log"], default="estimado_horario")
+        [tem_log, sem_log_atr],
+        ["exato_log", "estimado_atrasada_sem_log"], default="estimado_horario")
     d["v17"] = np.where(tem_log, d["v17_log"],
-                        np.where(atrasada, comp, normal_t1.fillna(comp * taxa_ctrl) * razao))
+                        np.where(atrasada, comp * taxa_atr,
+                                 normal_t1.fillna(comp * taxa_ctrl) * razao))
     d["v17_extra"] = np.where(atrasada, np.clip(d["v17"] - normal, 0, None), 0.0)
     d["v17_extra_ctrl"] = np.where(atrasada, np.clip(d["v17"] - comp * taxa_ctrl, 0, None), 0.0)
     marg = ((d["votos_13"] - d["votos_22"]) / comp.where(comp > 0)).fillna(0)
@@ -613,13 +625,40 @@ def cenario_descarte(df: pd.DataFrame, am: pd.DataFrame, t1: pd.DataFrame, dif: 
     extra = float(d["v17_extra"].sum())
     saldo_extra = float(d["saldo_extra"].sum())
     so_tardias = d[atrasada]
+    exato = d[tem_log]
+    teto = d[sem_log_atr]
+    # sensibilidade: atrasadas sem log pela razão 2º/1º turno (votos depois das
+    # 17h no log) medida nas atrasadas do mesmo grupo que têm log
+    sens = {}
+    for g in ("tardia", "intermediaria"):
+        x = d[tem_log & (d["grupo_t2"] == g)]
+        base_t1 = float(x["votos_log_17h_t1"].fillna(0).sum())
+        r = float(x["v17_log"].sum()) / base_t1 if base_t1 > 0 else None
+        s = d[sem_log_atr & (d["grupo_t2"] == g)]
+        sens[g] = {"razao_t2_t1": None if r is None else round(r, 5),
+                   "secoes_sem_log": int(len(s)),
+                   "votos_t1_apos_17h_sem_log": int(s["votos_log_17h_t1"].fillna(0).sum()),
+                   "estimativa": None if r is None else round(
+                       float(s["votos_log_17h_t1"].fillna(0).sum()) * r, 1)}
+    # teto: as atrasadas sem log com o comparecimento inteiro depois das 17h,
+    # somado ao restante da estimativa
+    total_teto = total - float(teto["v17"].sum()) + float(teto["comparecimento"].fillna(0).sum())
+    saldo_teto = saldo - float(teto["saldo"].sum()) + float(
+        (teto["comparecimento"].fillna(0) * marg[teto.index]).sum())
     return {
         "diferenca_oficial_13_menos_22": dif,
+        "taxa_atrasadas_apos_17h_log": {k: round(v, 6) for k, v in taxa_grupo.items()},
         "taxa_controles_apos_17h": round(taxa_ctrl, 5),
         "razao_t2_t1_fila_normal": round(razao, 4),
         "secoes_amostra_aleatoria": int(len(alea)),
         "componentes": comps,
         "corte_17h00": _inverter(dif, total, saldo),
+        "corte_17h00_so_contagem_exata_do_log": _inverter(
+            dif, float(exato["v17"].sum()), float(exato["saldo"].sum())),
+        "sensibilidade_atrasadas_sem_log_razao_t1": sens,
+        "teto_atrasadas_sem_log": {"secoes": int(len(teto)),
+                                   "comparecimento": int(teto["comparecimento"].fillna(0).sum()),
+                                   **_inverter(dif, total_teto, saldo_teto)},
         "corte_17h00_so_tardias_e_intermediarias": _inverter(
             dif, float(so_tardias["v17"].sum()), float(so_tardias["saldo"].sum())),
         "corte_alem_do_normal": _inverter(dif, extra, saldo_extra),
@@ -853,7 +892,13 @@ def montar(args) -> dict:
         ctrl_log["votos_apos_17h00"].sum() / max(1, ctrl_log["comparecimento"].sum()))
     excesso = float((tard_log["votos_apos_17h00"] - esperado).sum())
 
-    oficial = total_oficial(arquivo=Path(args.total_oficial) if args.total_oficial else None)
+    if args.oficial_13 is not None and args.oficial_22 is not None:
+        oficial = {"fonte": args.oficial_fonte or "linha de comando", "dg": None, "hg": None,
+                   "secoes_totalizadas": None, "secoes_total": None,
+                   "votos_13": args.oficial_13, "votos_22": args.oficial_22,
+                   "comparecimento": args.oficial_comparecimento}
+    else:
+        oficial = total_oficial(arquivo=Path(args.total_oficial) if args.total_oficial else None)
     dif = int(oficial["votos_13"]) - int(oficial["votos_22"])
     cen = {"brasil": cenarios_impacto(tard_log, dif)}
     for uf, g in tard_log.groupby("uf"):
@@ -877,8 +922,8 @@ def montar(args) -> dict:
 
     resumo = {
         "gerado_em": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "observacao": ("Descritivo. 2º turno com cobertura parcial (BUs coletados até a "
-                       "execução de analisar_encerramento_t2.py). Encerramento em Brasília "
+        "observacao": ("Descritivo. 2º turno com os BUs coletados até a execução de "
+                       "analisar_encerramento_t2.py. Encerramento em Brasília "
                        "pelo minuto truncado. Tardia = depois de 17:30; controle = até 17:10 "
                        "no mesmo município e zona. Votos depois das 17h contados no log "
                        "da urna (data 25/10/2026, hora local convertida)."),
@@ -907,7 +952,9 @@ def montar(args) -> dict:
         "amostra_logs": {"tardias": int((amostra["papel"] == "tardia").sum()),
                          "controles": int((amostra["papel"] == "controle").sum()),
                          "tardias_sem_controle": int(len(tard) - (am["papel"] == "tardia").sum()),
-                         "com_contagem": int(len(ok)), "erros": erros_log},
+                         "com_contagem": int(len(ok)), "erros": erros_log,
+                         "sem_contagem_por_papel": {str(k): int(v) for k, v in am.loc[
+                             am["votos_apos_17h00"].isna(), "papel"].value_counts().items()}},
         "log_votos_apos_17h": log_res,
         "excesso_votos_apos_17h_sobre_controles": round(excesso, 1),
         "cenarios_impacto": cen,
@@ -958,6 +1005,10 @@ def main(argv: Optional[list[str]] = None) -> int:
                     help="baixa o -log.jez da amostra que ainda não está no cache")
     ap.add_argument("--rate", type=float, default=3.0, help="req/s no download (máximo 3)")
     ap.add_argument("--total-oficial", help="br-c0001-e006258-u.json local (resultado do TSE)")
+    ap.add_argument("--oficial-13", type=int, help="votos do 13 no total oficial (substitui o arquivo)")
+    ap.add_argument("--oficial-22", type=int, help="votos do 22 no total oficial")
+    ap.add_argument("--oficial-comparecimento", type=int, help="comparecimento no total oficial")
+    ap.add_argument("--oficial-fonte", help="descrição da fonte dos números oficiais")
     args = ap.parse_args(argv)
     args.rate = min(args.rate, 3.0)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
