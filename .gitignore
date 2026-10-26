@@ -104,3 +104,6 @@ data/versoes/
 
 # Análise de encerramento do 2º turno de 2026 (derivado dos BUs)
 data/parquet/2026/t2/encerramento/
+
+# Software e carga das urnas no 2º turno de 2026 (derivado dos BUs)
+data/parquet/2026/t2/software/
