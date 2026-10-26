@@ -480,6 +480,11 @@ async def run(args: argparse.Namespace) -> int:
     f_bus = E.HttpFetcher(concurrency=args.concorrencia, http2=True,
                           connections=args.conexoes, rate=args.taxa,
                           rate_max=args.taxa_max)
+    if f_bus.limiter:
+        # o padrão (piso 2 req/s, +0,02 por sucesso) leva horas para se recuperar
+        # depois de uma rajada de 429 do TSE
+        f_bus.limiter.rate_min = min(args.taxa_min, args.taxa)
+        f_bus.limiter.step = 0.2
     pool = ProcessPoolExecutor(max_workers=args.workers, initializer=_init_worker,
                                initargs=(SRC,))
     try:
@@ -546,6 +551,8 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--conexoes", type=int, default=2)
     ap.add_argument("--taxa", type=float, default=40.0)
     ap.add_argument("--taxa-max", type=float, default=70.0)
+    ap.add_argument("--taxa-min", type=float, default=10.0,
+                    help="piso da taxa adaptativa depois de 429 (req/s)")
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--lote", type=int, default=2000)
     ap.add_argument("--reverificar-a-cada", type=int, default=2,
