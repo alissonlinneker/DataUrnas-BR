@@ -374,3 +374,79 @@ def test_main_ponta_a_ponta(tmp_path):
     r2 = json.loads((saida / "resumo.json").read_text())
     assert r2["leitura"].get("bu_decodificados", 0) == 0
     assert r2["comparacao_br"]["bu_secoes"] == 1
+
+
+# ---------------------------------------------------------------------------
+# Curva recebimento x totalização, atrasos por município e Last-Modified
+# ---------------------------------------------------------------------------
+
+def _sec(cd, secao, rec, emissao="2026-10-25 17:05:00", uf="ba"):
+    return {"uf": uf, "cd_mun": cd, "zona": "0001", "secao": secao, "recebimento_bu": rec,
+            "emissao_bsb": emissao, "primeira_coleta_aux": None,
+            "atraso_recebimento_min": M.minutos(
+                datetime.strptime(emissao, "%Y-%m-%d %H:%M:%S"),
+                datetime.strptime(rec, "%Y-%m-%d %H:%M:%S"))}
+
+
+def test_curva_marca_excesso_e_lista_secoes():
+    secs = [_sec("38490", "0001", "2026-10-25 19:10:00"),
+            _sec("38490", "0002", "2026-10-25 19:31:00"),
+            _sec("38490", "0003", "2026-10-25 19:33:00")]
+    vs = [_versao("ba38490", "19:20:00", 1, 3, 1, 1, ht="19:19:50"),
+          _versao("ba38490", "19:30:00", 3, 3, 3, 3, ht="19:29:50")]
+    linhas, ultima = M.checar_versoes(vs, INI, FIM)
+    curva, exc = M.curva_recebimento_totalizacao(linhas, {"ba38490": secs}, ultima)
+    por_v = {c["versao"]: c for c in curva}
+    assert por_v[1]["excesso_hg"] == 0
+    assert por_v[2]["recebidas_ate_hg"] == 1 and por_v[2]["excesso_hg"] == 2
+    assert [e["secao"] for e in exc] == ["0002", "0003"]
+    assert [e["recebimento_menos_hg_s"] for e in exc] == [60, 180]
+
+
+def test_curva_ignora_cobertura_insuficiente():
+    secs = [_sec("38490", "0001", "2026-10-25 19:10:00")]
+    vs = [_versao("ba38490", "19:30:00", 2, 3, 3, 3)]
+    linhas, ultima = M.checar_versoes(vs, INI, FIM)
+    assert M.curva_recebimento_totalizacao(linhas, {"ba38490": secs}, ultima) == ([], [])
+
+
+def test_atraso_por_municipio_e_destaque_ba():
+    secs = [_sec("38490", "0001", "2026-10-25 21:05:00"),
+            _sec("38490", "0002", "2026-10-25 19:05:00"),
+            _sec("35157", "0001", "2026-10-25 19:35:00"),
+            _sec("00000", "0001", "2026-10-25 17:10:00")]
+    am = {(x["cd_mun"]): x for x in M.atraso_por_municipio(secs)}
+    assert am["38490"]["n"] == 2 and am["38490"]["max"] == 240.0
+    d = M.destaque_ba(secs)
+    assert d["Salvador"]["recebidos_depois_de_21h_pct"] == 50.0
+    assert d["Feira de Santana"]["n"] == 1
+    assert d["resto_da_ba"]["min"] == 5.0
+
+
+def test_head_last_modified_com_cache(tmp_path, monkeypatch):
+    chamadas = []
+
+    class Resp:
+        headers = {"Last-Modified": "Mon, 26 Oct 2026 00:06:34 GMT"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    def falso_urlopen(req, timeout=30):
+        chamadas.append(req.get_method())
+        return Resp()
+
+    monkeypatch.setattr(M.urllib.request, "urlopen", falso_urlopen)
+    monkeypatch.setattr(M.time, "sleep", lambda s: None)
+    ln = {**_sec("38490", "0002", "2026-10-25 21:06:30"), "nome_bu": "o-bu.dat",
+          "hash_bu": "h1", "sha512_bu": "s1"}
+    destino = tmp_path / "lm.parquet"
+    r = M.head_last_modified([ln], destino, 5, 9.0, [])
+    assert chamadas == ["HEAD"]
+    assert r["last_modified_menos_recebimento_s_por_grupo"]["Salvador"]["max"] == 4
+    r = M.head_last_modified([ln], destino, 5, 9.0, [])
+    assert chamadas == ["HEAD"]   # segunda vez vem do cache
+    assert r["com_last_modified"] == 1
