@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recontagem do RDV e linha do tempo do log (Presidente, 1º turno de 2026).
+"""Recontagem do RDV e linha do tempo do log (Presidente, 2026, 1º ou 2º turno).
 
 Para cada seção com RDV publicado, sem gravar arquivo bruto em disco:
   catálogo de integridade (ou aux.json) -> baixa -rdv.dat, -bu.dat e -log.jez
@@ -32,8 +32,26 @@ Lista de seções: por padrão o catálogo de integridade publicado na versão
 token do diretório e o SHA-512 de cada arquivo, sem pedir o aux.json.
 Com --fonte aux, percorre o -cs.json e o aux.json como fetch_integridade.py.
 
+Com --turno 2 (pleito 3221, eleição 6258, 25/10/2026) os caminhos padrão
+passam a data/parquet/2026/t2/ (rdv/, auditoria_v2/, auditoria/,
+integridade/), o log padrão a data/ele2026_t2_rdv.log, o secao_id da
+auditoria usa o prefixo "2T/" e a fonte padrão é --fonte aux (não há catálogo
+de integridade publicado do 2º turno; com --fonte catalogo valem os
+arquivos_<uf>*.parquet locais de --catalogo-local). O log do 2º turno acumula
+o do 1º: só os eventos de 25/10/2026 entram na linha do tempo, e os votos de
+04/10/2026 ficam em votos_turno_anterior. No 2º turno, seção sem aux.json ou
+sem conjunto de arquivos ainda não foi publicada: vai para erros-*.txt e é
+refeita no próximo run, em vez de entrar no checkpoint.
+
+Linha do tempo em horário de Brasília (log_tempo_secoes.parquet): o log está
+na hora local da urna; votos_log_apos_17h_brasilia conta os votos computados
+a partir das 17:00 de Brasília e ultimo_voto_brasilia dá a hora do último
+voto em Brasília (fuso por município em analyzer/timezones.py; nulos no
+exterior).
+
 Uso:
   python3 scripts/ele2026/fetch_rdv.py --ufs ac,rr     # teste
+  python3 scripts/ele2026/fetch_rdv.py --turno 2 --ufs ac,rr --saida /tmp/rdv_t2
   python3 scripts/ele2026/fetch_rdv.py                 # 27 UFs + zz
   python3 scripts/ele2026/fetch_rdv.py --so-consolidar
   python3 scripts/ele2026/fetch_rdv.py --secoes lista.txt  # reprocessa só a lista
@@ -56,6 +74,7 @@ import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 from pathlib import Path
 from typing import Optional
 
@@ -98,7 +117,7 @@ log = logging.getLogger("fetch_rdv")
 TODAS_UFS = ESTADOS + ["zz"]
 LIMITE_BYTES = 90 * 1024 * 1024
 ALVO_PARTE = 80 * 1024 * 1024
-DATA_ELEICAO = "04/10/2026"
+DATA_ELEICAO = E.parametros_turno(1)["data"]  # 1º turno (compatibilidade)
 TIPOS = ("rdv", "bu", "busa", "log", "logsa")
 CATEGORIAS_ALERTA = {"rdv_bu_diverge", "rdv_bu_diverge_sa", "rdv_registros_diverge",
                      "rdv_estrutura", "rdv_hash_diverge", "rdv_nao_decodificado"}
@@ -131,7 +150,13 @@ TEMPO_SCHEMA = pa.schema(IDENT + [
     ("ajustes_hora", pa.int16()), ("hist_intervalos", pa.list_(pa.int32())),
     ("flags", pa.list_(pa.string())), ("grupo", pa.int8()), ("origem_log", pa.string()),
     ("_lote", pa.string()),
+    # Colunas novas (2º turno); partes antigas ficam nulas na consolidação.
+    ("votos_turno_anterior", pa.int32()), ("votos_log_apos_17h_brasilia", pa.int32()),
+    ("ultimo_voto_brasilia", pa.string()),
 ])
+COLUNAS_TEMPO_NOVAS = (("votos_turno_anterior", "INTEGER"),
+                       ("votos_log_apos_17h_brasilia", "INTEGER"),
+                       ("ultimo_voto_brasilia", "VARCHAR"))
 SECOES_SCHEMA = pa.schema(IDENT + [
     ("status", pa.string()), ("motivo", pa.string()), ("hash_confere", pa.bool_()),
     ("comparecimento_bu", pa.int32()), ("origem_bu", pa.string()), ("n_cargos", pa.int16()),
@@ -310,6 +335,10 @@ async def carregar_catalogo(f: E.HttpFetcher, uf: str, manifesto: dict,
                "data_hora_tse", "disponivel"]
     tabelas = []
     nomes = [a["arquivo"] for a in manifesto.get("arquivos", []) if a.get("uf") == uf]
+    if not manifesto and dir_local is not None:
+        # sem manifesto publicado (2º turno): só os arquivos locais da UF
+        nomes = sorted(p.name for p in dir_local.glob(f"arquivos_{uf}.parquet"))
+        nomes += sorted(p.name for p in dir_local.glob(f"arquivos_{uf}_parte*.parquet"))
     for nome in nomes:
         local = dir_local / nome if dir_local else None
         if local and local.exists():
@@ -324,9 +353,14 @@ async def carregar_catalogo(f: E.HttpFetcher, uf: str, manifesto: dict,
     return secoes_do_catalogo(pa.concat_tables(tabelas))
 
 
-async def secoes_do_aux(f: E.HttpFetcher, uf: str) -> list[dict]:
+def _url_turno(p: Optional[dict]) -> dict:
+    p = p or E.parametros_turno(1)
+    return {"pleito": p["pleito"], "ciclo": p["ciclo"]}
+
+
+async def secoes_do_aux(f: E.HttpFetcher, uf: str, p: Optional[dict] = None) -> list[dict]:
     """Alternativa sem catálogo: -cs.json + aux.json de cada seção."""
-    cs = await f.get_json(E.url_secoes_uf(uf))
+    cs = await f.get_json(E.url_secoes_uf(uf, **_url_turno(p)))
     out = []
     for s in E.iter_secoes_cs(cs or {}):
         if s.get("secao_principal"):
@@ -336,8 +370,9 @@ async def secoes_do_aux(f: E.HttpFetcher, uf: str) -> list[dict]:
     return out
 
 
-async def resolver_aux(f: E.HttpFetcher, s: dict) -> Optional[dict]:
-    aux = await f.get_json(E.url_aux(s["uf"], s["cd_mun"], s["zona"], s["secao"]))
+async def resolver_aux(f: E.HttpFetcher, s: dict, p: Optional[dict] = None) -> Optional[dict]:
+    aux = await f.get_json(E.url_aux(s["uf"], s["cd_mun"], s["zona"], s["secao"],
+                                     **_url_turno(p)))
     hashes = [h for h in ((aux or {}).get("hashes") or []) if h.get("hash") not in (None, "0")]
     if not hashes:
         return None
@@ -367,12 +402,30 @@ def modelos_uf(uf: str, secoes_integridade: Path) -> dict[str, int]:
                                       t["modelo_urna"], strict=True) if mo in cod}
 
 
+def contexto_turno(turno: int = 1) -> dict:
+    """parametros_turno(turno) mais o que a recontagem usa: data_log (dia
+    filtrado no log), datas_anteriores (turnos anteriores, acumulados no log
+    do 2º turno) e refazer_sem_aux (seção sem aux.json fica pendente)."""
+    p = dict(E.parametros_turno(turno))
+    p["data_log"] = p["data"]
+    p["datas_anteriores"] = tuple(E.parametros_turno(t)["data"] for t in E.TURNOS
+                                  if t < p["turno"])
+    p["refazer_sem_aux"] = p["turno"] > 1
+    return p
+
+
 async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
-                    auditar: bool = False, modelo_cod: Optional[int] = None) -> dict:
+                    auditar: bool = False, modelo_cod: Optional[int] = None,
+                    p: Optional[dict] = None) -> dict:
+    p = p or contexto_turno(1)
     ident = {k: s[k] for k in ("uf", "cd_mun", "zona", "secao")}
     if s["arquivos"] is None:
-        s = await resolver_aux(f, s)
+        s = await resolver_aux(f, s, p)
         if s is None:
+            if p["refazer_sem_aux"]:
+                # 2º turno em publicação: o aux.json ainda não saiu (404) ou não
+                # tem conjunto; erro de rede, refeito no próximo run
+                raise RuntimeError("aux.json ainda sem conjunto de arquivos")
             return {"secao": {**ident, "status": "sem_arquivos", "motivo": "aux.json sem conjunto"},
                     "linhas": [], "tempo": None, "achados": [], "presidente": {}}
     tps = [tp for tp in TIPOS if tp in s["arquivos"]]
@@ -380,7 +433,7 @@ async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
         tps.remove("logsa")  # como na auditoria publicada: log da urna, senão o do SA
     corpos = await asyncio.gather(*[
         f.get(E.url_arquivo(s["uf"], s["cd_mun"], s["zona"], s["secao"], s["hash"],
-                            s["arquivos"][tp][0])) for tp in tps])
+                            s["arquivos"][tp][0], **_url_turno(p))) for tp in tps])
     faltando = [s["arquivos"][tp][0] for tp, b in zip(tps, corpos, strict=True) if b is None]
     if faltando:
         raise RuntimeError(f"HTTP 404: {','.join(faltando)}")
@@ -388,8 +441,9 @@ async def processar(f: E.HttpFetcher, pool: ProcessPoolExecutor, s: dict,
     sha = {tp: s["arquivos"][tp][1] for tp in tps if s["arquivos"][tp][1]}
     del corpos
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(pool, R.processar_secao, ident, arquivos, sha or None,
-                                      int(E.PLEITO), DATA_ELEICAO, auditar, modelo_cod)
+    fn = partial(R.processar_secao, turno=p["turno"], datas_anteriores=p["datas_anteriores"])
+    return await loop.run_in_executor(pool, fn, ident, arquivos, sha or None,
+                                      int(p["pleito"]), p["data_log"], auditar, modelo_cod)
 
 
 def ler_lista_secoes(path: Path) -> set[str]:
@@ -411,6 +465,7 @@ def registrar_execucao(out: Path, evento: dict) -> None:
 
 
 async def run(args: argparse.Namespace) -> int:
+    p = contexto_turno(args.turno)
     out = Path(args.saida)
     out.mkdir(parents=True, exist_ok=True)
     w = Writer(out, args.lote)
@@ -422,17 +477,24 @@ async def run(args: argparse.Namespace) -> int:
         ufs = [u for u in args.ufs if any(k.startswith(f"{u}/") for k in refazer)]
         log.info("--secoes: %d seções a refazer em %d UFs", len(refazer), len(ufs))
     inicio = time.strftime("%Y-%m-%dT%H:%M:%S")
-    registrar_execucao(out, {"inicio": inicio, "ufs": ufs, "pid": os.getpid(),
+    registrar_execucao(out, {"inicio": inicio, "turno": p["turno"], "pleito": p["pleito"],
+                             "ufs": ufs, "pid": os.getpid(),
                              "lista_secoes": Path(args.secoes).name if args.secoes else None, "n_refazer": len(refazer or ()),
                              "fonte": args.fonte, "taxa": args.taxa, "taxa_max": args.taxa_max,
                              "workers": args.workers})
     log.info("checkpoint: %d seções já processadas", len(done))
+    log.info("turno %d: pleito %s, eleição %s, data do log %s, fonte %s, saída %s",
+             p["turno"], p["pleito"], p["eleicao"], p["data_log"], args.fonte, out)
     f = E.HttpFetcher(concurrency=args.concorrencia, http2=args.http2,
                       connections=args.conexoes, rate=args.taxa, rate_max=args.taxa_max)
     pool = ProcessPoolExecutor(max_workers=args.workers, initializer=_init_worker,
                                initargs=(SRC,))
-    manifesto = json.loads(Path(args.manifesto).read_text(encoding="utf-8")) \
-        if args.fonte == "catalogo" else {}
+    manifesto = {}
+    if args.fonte == "catalogo" and Path(args.manifesto).exists():
+        manifesto = json.loads(Path(args.manifesto).read_text(encoding="utf-8"))
+    elif args.fonte == "catalogo":
+        log.warning("manifesto %s ausente; usando só os arquivos_<uf>*.parquet de %s",
+                    args.manifesto, args.catalogo_local)
     dir_local = Path(args.catalogo_local) if args.catalogo_local else None
     erros: list[str] = []
     t0 = time.time()
@@ -443,9 +505,9 @@ async def run(args: argparse.Namespace) -> int:
                 secoes = await carregar_catalogo(f, uf, manifesto, dir_local)
                 if secoes is None:
                     log.error("catálogo de %s indisponível; usando aux.json", uf)
-                    secoes = await secoes_do_aux(f, uf)
+                    secoes = await secoes_do_aux(f, uf, p)
             else:
-                secoes = await secoes_do_aux(f, uf)
+                secoes = await secoes_do_aux(f, uf, p)
             if refazer is not None:
                 secoes = [s for s in secoes
                           if E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"]) in refazer]
@@ -470,7 +532,7 @@ async def run(args: argparse.Namespace) -> int:
                         return
                     key = E.secao_key(s["uf"], s["cd_mun"], s["zona"], s["secao"])
                     try:
-                        r = await processar(f, pool, s, args.auditar, modelos.get(key))
+                        r = await processar(f, pool, s, args.auditar, modelos.get(key), p)
                     except Exception as e:  # noqa: BLE001 - refeito no próximo run
                         erros.append(f"{key}:{e!r}"[:300])
                         log.warning("erro em %s: %r", key, e)
@@ -508,7 +570,7 @@ async def run(args: argparse.Namespace) -> int:
         log.warning("erros gravados em %s; rode de novo para refazer", dst.name)
     if not args.sem_consolidar:
         consolidar(out, Path(args.base_votos), Path(args.saida_auditoria),
-                   Path(args.auditoria_publicada))
+                   Path(args.auditoria_publicada), args.turno)
     return 0 if not erros else 2
 
 
@@ -542,9 +604,10 @@ def _copiar(con, sel: str, dst: Path) -> list[str]:
 
 def consolidar(out: Path, base_votos: Optional[Path] = None,
                dst_auditoria: Optional[Path] = None,
-               auditoria_publicada: Optional[Path] = None) -> None:
+               auditoria_publicada: Optional[Path] = None, turno: int = 1) -> None:
     import duckdb
 
+    p = contexto_turno(turno)
     parts = out / "parts"
     if not any(parts.glob("secoes-*.parquet")):
         log.warning("nenhuma parte para consolidar")
@@ -562,9 +625,12 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
     # Partes gravadas antes da coluna origem_log: eram todas lidas como log de urna.
     con.execute("ALTER TABLE tempo ADD COLUMN IF NOT EXISTS origem_log VARCHAR")
     con.execute("UPDATE tempo SET origem_log = 'log' WHERE origem_log IS NULL")
+    for col, tipo in COLUNAS_TEMPO_NOVAS:  # partes gravadas antes das colunas novas
+        con.execute(f"ALTER TABLE tempo ADD COLUMN IF NOT EXISTS {col} {tipo}")
     auditoria = {}
     if dst_auditoria is not None and any(parts.glob("seclog-*.parquet")):
-        auditoria = consolidar_auditoria(con, parts, dst_auditoria, auditoria_publicada)
+        auditoria = consolidar_auditoria(con, parts, dst_auditoria, auditoria_publicada,
+                                         p["prefixo_id"])
     arquivos = []
     arquivos += _copiar(con, "SELECT * FROM recontagem ORDER BY uf, cd_mun, zona, secao, "
                              "id_eleicao, codigo_cargo", out / "recontagem_secoes.parquet")
@@ -594,13 +660,19 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
     # o log da digitação não tem eventos de voto.
     tempo_uf = {r[0]: {"votos_log": int(r[1] or 0), "comparecimento_bu": int(r[2] or 0),
                        "secoes_log_diverge": int(r[3]), "secoes_fora_sequencia": int(r[4]),
-                       "secoes_voto_antes_8h": int(r[5]), "secoes_log_sa": int(r[6])}
+                       "secoes_voto_antes_8h": int(r[5]), "secoes_log_sa": int(r[6]),
+                       "votos_apos_17h_brasilia": int(r[7] or 0),
+                       "secoes_voto_apos_17h_brasilia": int(r[8]),
+                       "votos_turno_anterior": int(r[9] or 0)}
                 for r in q("""SELECT uf, sum(votos_log) FILTER (WHERE NOT sa),
                     sum(comparecimento_bu) FILTER (WHERE NOT sa),
                     count(*) FILTER (WHERE diferenca_log_bu <> 0 AND NOT sa),
                     count(*) FILTER (WHERE list_contains(flags, 'log_voto_fora_sequencia')),
                     count(*) FILTER (WHERE votos_antes_8h > 0),
-                    count(*) FILTER (WHERE sa)
+                    count(*) FILTER (WHERE sa),
+                    sum(votos_log_apos_17h_brasilia) FILTER (WHERE NOT sa),
+                    count(*) FILTER (WHERE votos_log_apos_17h_brasilia > 0 AND NOT sa),
+                    sum(votos_turno_anterior)
                     FROM (SELECT *, origem_log = 'logsa' AS sa FROM tempo)
                     GROUP BY 1""")}
     for uf, v in tempo_uf.items():
@@ -624,7 +696,7 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
     if "presidente" in {r[0] for r in q("SHOW TABLES")}:
         presidente = {"rdv": {k: int(v) for k, v in q(
             "SELECT chave, sum(votos) FROM presidente GROUP BY 1 ORDER BY 2 DESC")}}
-        vp = (base_votos or PARQUET_2026_DIR) / "votos_presidente_2026.parquet"
+        vp = (base_votos or p["saida"]) / "votos_presidente_2026.parquet"
         if vp.exists():
             ok = "SELECT uf, cd_mun, zona, secao FROM s WHERE status = 'ok'"
             oficial = {}
@@ -689,7 +761,8 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
                 pendentes.add(k)
     resumo = {
         "gerado_em": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "pleito": E.PLEITO, "ciclo": E.CICLO, "data_eleicao": DATA_ELEICAO,
+        "turno": p["turno"], "pleito": p["pleito"], "eleicao": p["eleicao"],
+        "ciclo": p["ciclo"], "data_eleicao": p["data_log"],
         "metodo": {
             "rdv": "EntidadeResultadoRDV (spec/v2/rdv.asn1) decodificado em memória; cada "
                    "registro recontado por cargo: nominal pelo número digitado, legenda pelos "
@@ -713,7 +786,12 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
                    "idênticas repetidas entre arquivos do pacote (o mesmo log copiado mais de "
                    "uma vez) contadas uma vez. Seções só com log do SA (-logsa.jez, digitação "
                    "do BU, sem eventos de voto) ficam fora da comparação log x BU "
-                   "(origem_log = 'logsa', totais.log_secoes_log_sa).",
+                   "(origem_log = 'logsa', totais.log_secoes_log_sa). "
+                   "votos_log_apos_17h_brasilia: votos computados a partir das 17:00 de "
+                   "Brasília (hora local - offset do fuso do município; nulo no exterior); "
+                   "ultimo_voto_brasilia: hora do último voto em Brasília ('(+1d)' se passar "
+                   "da meia-noite). No 2º turno o log acumula o 1º: votos com a data do 1º "
+                   "turno ficam em votos_turno_anterior e fora da linha do tempo.",
             "grupos": "1 = indício direto (RDV x BU, registros, estrutura, hash); 2 = "
                       "inconsistência a investigar (log x BU, sequência, outra data, RDV não "
                       "decodificado, BU do SA); 3 = operacional (horários, rajadas, lacunas).",
@@ -743,14 +821,15 @@ def consolidar(out: Path, base_votos: Optional[Path] = None,
              totais.get("secoes", 0), len(divergencias), arquivos)
 
 
-def consolidar_auditoria(con, parts: Path, dst: Path, publicada: Optional[Path]) -> dict:
+def consolidar_auditoria(con, parts: Path, dst: Path, publicada: Optional[Path],
+                         prefixo_id: str = "1T/") -> dict:
     """secoes_log_2026.parquet e issues_2026.parquet (mesmo esquema da
     auditoria publicada, lote mais recente de cada seção) e comparacao.json
-    com a auditoria publicada."""
+    com a auditoria publicada. prefixo_id: '1T/' ou '2T/'."""
     dst.mkdir(parents=True, exist_ok=True)
     con.execute("""CREATE OR REPLACE TEMP TABLE sid AS
-        SELECT '1T/' || uf || '/' || cd_mun || '/' || zona || '/' || secao AS secao_id, _lote
-        FROM s""")
+        SELECT ? || uf || '/' || cd_mun || '/' || zona || '/' || secao AS secao_id, _lote
+        FROM s""", [prefixo_id])
     dl = dst / "secoes_log_2026.parquet"
     con.execute(f"""CREATE OR REPLACE TEMP TABLE seclog_n AS
         SELECT x.* EXCLUDE (_lote)
@@ -844,12 +923,18 @@ def comparar_auditorias(con, publicada: Path, dst: Path) -> dict:
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--turno", type=int, choices=E.TURNOS, default=1,
+                    help="turno da eleição: 1 (pleito 3220) ou 2 (pleito 3221); padrão: 1")
     ap.add_argument("--ufs", default=",".join(TODAS_UFS))
-    ap.add_argument("--fonte", choices=("catalogo", "aux"), default="catalogo",
-                    help="lista de seções e nomes: catálogo de integridade ou aux.json")
-    ap.add_argument("--manifesto", default=str(MANIFESTO))
-    ap.add_argument("--catalogo-local", default=str(PARQUET_2026_DIR / "integridade"),
-                    help="diretório com arquivos_<uf>.parquet locais (usados se existirem)")
+    ap.add_argument("--fonte", choices=("catalogo", "aux"), default=None,
+                    help="lista de seções e nomes: catálogo de integridade ou aux.json "
+                         "(padrão: catalogo no 1º turno, aux no 2º)")
+    ap.add_argument("--manifesto", default=None,
+                    help="catalogo_manifest.json da versão (padrão: o do 1º turno; no 2º, "
+                         "data/parquet/2026/t2/integridade/catalogo_manifest.json)")
+    ap.add_argument("--catalogo-local", default=None,
+                    help="diretório com arquivos_<uf>.parquet locais (usados se existirem; "
+                         "padrão: data/parquet/2026[/t2]/integridade)")
     ap.add_argument("--concorrencia", type=int, default=24,
                     help="seções em andamento ao mesmo tempo (padrão: 24)")
     ap.add_argument("--workers", type=int, default=3, help="processos de decodificação")
@@ -858,21 +943,45 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--taxa", type=float, default=20.0, help="req/s inicial (AIMD em 429)")
     ap.add_argument("--taxa-max", type=float, default=25.0, help="teto da taxa em req/s")
     ap.add_argument("--conexoes", type=int, default=2)
-    ap.add_argument("--base-votos", default=str(PARQUET_2026_DIR))
-    ap.add_argument("--saida", default=str(PARQUET_2026_DIR / "rdv"))
-    ap.add_argument("--log", default=str(ROOT / "data" / "ele2026_rdv.log"))
+    ap.add_argument("--base-votos", default=None,
+                    help="diretório de votos_presidente_2026.parquet "
+                         "(padrão: data/parquet/2026[/t2])")
+    ap.add_argument("--saida", default=None,
+                    help="diretório de saída (padrão: data/parquet/2026[/t2]/rdv)")
+    ap.add_argument("--log", default=None,
+                    help="arquivo de log (padrão: data/ele2026_rdv.log no 1º turno, "
+                         "data/ele2026_t2_rdv.log no 2º)")
     ap.add_argument("--auditar", action=argparse.BooleanOptionalAction, default=True,
                     help="regera a auditoria por seção de BU e log com o mesmo download")
-    ap.add_argument("--saida-auditoria", default=str(PARQUET_2026_DIR / "auditoria_v2"))
-    ap.add_argument("--auditoria-publicada", default=str(PARQUET_2026_DIR / "auditoria"))
-    ap.add_argument("--secoes-integridade",
-                    default=str(PARQUET_2026_DIR / "integridade" / "secoes.parquet"),
-                    help="modelo da urna por seção (lido do .vsc na integridade)")
+    ap.add_argument("--saida-auditoria", default=None,
+                    help="padrão: data/parquet/2026[/t2]/auditoria_v2")
+    ap.add_argument("--auditoria-publicada", default=None,
+                    help="auditoria a comparar (padrão: data/parquet/2026[/t2]/auditoria)")
+    ap.add_argument("--secoes-integridade", default=None,
+                    help="modelo da urna por seção, lido do .vsc na integridade "
+                         "(padrão: data/parquet/2026[/t2]/integridade/secoes.parquet)")
     ap.add_argument("--secoes", default=None,
                     help="arquivo com chaves uf/cd_mun/zona/secao a refazer (ignora o checkpoint)")
     ap.add_argument("--sem-consolidar", action="store_true")
     ap.add_argument("--so-consolidar", action="store_true")
     a = ap.parse_args(argv)
+    p = E.parametros_turno(a.turno)
+    base = Path(p["saida"])
+    padroes = {
+        "fonte": "catalogo" if a.turno == 1 else "aux",
+        "manifesto": str(MANIFESTO if a.turno == 1
+                         else base / "integridade" / "catalogo_manifest.json"),
+        "catalogo_local": str(base / "integridade"),
+        "base_votos": str(base),
+        "saida": str(base / "rdv"),
+        "log": str(ROOT / "data" / f"{p['prefixo_log']}rdv.log"),
+        "saida_auditoria": str(base / "auditoria_v2"),
+        "auditoria_publicada": str(base / "auditoria"),
+        "secoes_integridade": str(base / "integridade" / "secoes.parquet"),
+    }
+    for k, v in padroes.items():
+        if getattr(a, k) is None:
+            setattr(a, k, v)
     a.ufs = [u.strip().lower() for u in a.ufs.split(",") if u.strip()]
     return a
 
@@ -897,6 +1006,6 @@ if __name__ == "__main__":
     configurar_log(args.log)
     if args.so_consolidar:
         consolidar(Path(args.saida), Path(args.base_votos), Path(args.saida_auditoria),
-                   Path(args.auditoria_publicada))
+                   Path(args.auditoria_publicada), args.turno)
         sys.exit(0)
     sys.exit(asyncio.run(run(args)))
