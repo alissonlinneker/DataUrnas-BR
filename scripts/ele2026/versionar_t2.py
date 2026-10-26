@@ -436,11 +436,26 @@ class Bus:
         if len(self.versoes) >= self.lote:
             self.flush()
 
+    async def lista_secoes(self, uf: str) -> Optional[dict]:
+        """Lista de seções da UF (-cs.json), guardada em cache: ela quase não muda
+        e, com o TSE limitando por IP, não pode derrubar o ciclo."""
+        cache = self.dir / "cs" / f"{uf}.json"
+        try:
+            body = await self.f.get(E.url_secoes_uf(uf, **URL))
+        except RuntimeError as e:
+            log.warning("lista de seções de %s indisponível (%r); usando cache", uf, e)
+            body = None
+        if body:
+            cache.parent.mkdir(exist_ok=True)
+            cache.write_bytes(body)
+            return json.loads(body)
+        return json.loads(cache.read_bytes()) if cache.exists() else None
+
     async def ciclo(self, ufs: list[str], concorrencia: int) -> None:
         for uf in ufs:
-            cs = await self.f.get_json(E.url_secoes_uf(uf, **URL))
+            cs = await self.lista_secoes(uf)
             if not cs:
-                log.error("sem lista de seções para %s", uf)
+                log.error("sem lista de seções para %s; fica para o próximo ciclo", uf)
                 continue
             secoes = [s for s in E.iter_secoes_cs(cs) if not s.get("secao_principal")]
             q: asyncio.Queue = asyncio.Queue()
