@@ -116,3 +116,6 @@ data/parquet/2026/t2/impacto/
 
 # Auditoria de certificados e assinaturas do 2º turno (2026)
 data/parquet/2026/t2/certificados/
+
+# Viradas de liderança entre turnos (2026 x 2022, derivado)
+data/parquet/2026/t2/viradas/
