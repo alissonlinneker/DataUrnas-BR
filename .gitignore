@@ -113,3 +113,6 @@ data/parquet/2026/t2/linha_tempo/
 
 # Impacto da prorrogação no 2º turno de 2026 (derivado; contagens de log)
 data/parquet/2026/t2/impacto/
+
+# Auditoria de certificados e assinaturas do 2º turno (2026)
+data/parquet/2026/t2/certificados/
