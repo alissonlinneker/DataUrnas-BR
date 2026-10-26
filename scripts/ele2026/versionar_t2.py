@@ -270,6 +270,12 @@ class Bus:
                      "igual": 0, "erro": 0, "conferidos": 0, "alterados": 0}
         self.reverificar = False
         self._completar_md5()
+        # seções com BU guardado e sem a assinatura (.vsc): o TSE publica a
+        # assinatura minutos depois do BU, então ela é buscada de novo a cada ciclo
+        self.sem_vsc = {k for k in self.estado.bus
+                        if not any(r["tipo"] in ("vota", "sa")
+                                   for r in self.estado.arqs.get(k, {}).values())}
+        log.info("seções com BU e sem assinatura guardada: %d", len(self.sem_vsc))
 
     def _completar_md5(self) -> None:
         """Anota o MD5 dos arquivos gravados antes de o estado guardar o MD5."""
@@ -327,6 +333,27 @@ class Bus:
             self.pend_estado.append(reg)
         return sha
 
+    async def buscar_vsc(self, key: str, ident: dict, aux: dict) -> None:
+        """Busca a assinatura de pacotes cujo BU já está guardado."""
+        uf, mun, zona, secao = ident["uf"], ident["cd_mun"], ident["zona"], ident["secao"]
+        for h in aux.get("hashes") or []:
+            hv = h.get("hash")
+            if hv not in self.estado.bus.get(key, {}):
+                continue
+            arqs = {a.get("tp", ""): a.get("nm", "") for a in h.get("arq") or []
+                    if isinstance(a, dict)}
+            tp = "vota" if "vota" in arqs else ("sa" if "sa" in arqs else None)
+            if not tp or (hv, arqs[tp]) in self.estado.arqs.get(key, {}):
+                continue
+            raw = await self.f.get(E.url_arquivo(uf, mun, zona, secao, hv, arqs[tp], **URL))
+            if raw is None:
+                return
+            self._guardar(ident, tp, raw, nome=arqs[tp], hash=hv, st_secao=aux.get("st"),
+                          st_hash=h.get("st"), dt_recebimento=h.get("dr"),
+                          hr_recebimento=h.get("hr"))
+            self.cont["vsc_tardio"] = self.cont.get("vsc_tardio", 0) + 1
+        self.sem_vsc.discard(key)
+
     async def conferir(self, key: str, ident: dict) -> None:
         """Confere por HEAD (ETag = MD5) cada arquivo já guardado da seção.
         Arquivo trocado no mesmo endereço é baixado de novo e vira alerta."""
@@ -372,6 +399,8 @@ class Bus:
         sha_aux = hashlib.sha256(body).hexdigest()
         if self.estado.aux.get(key) == sha_aux:
             self.cont["igual"] += 1
+            if key in self.sem_vsc:
+                await self.buscar_vsc(key, ident, json.loads(body))
             if self.reverificar:
                 await self.conferir(key, ident)
             return
@@ -407,6 +436,8 @@ class Bus:
                                                          arqs[tp_vsc], **URL))
                 if raw_vsc is not None:
                     self._guardar(ident, tp_vsc, raw_vsc, nome=arqs[tp_vsc], **campos)
+                else:
+                    self.sem_vsc.add(key)
             loop = asyncio.get_running_loop()
             comp, votos = await loop.run_in_executor(self.pool, votos_bu, raw_bu)
             em = agora()
@@ -429,6 +460,9 @@ class Bus:
             vistos[hv] = reg
             self.pend_estado.append(reg)
             self.cont["bu_novo"] += 1
+        if key in self.sem_vsc:
+            # aux.json novo pode listar a assinatura de um pacote já guardado
+            await self.buscar_vsc(key, ident, aux)
         if completo:
             # com BU listado e ainda indisponível o aux.json é relido no próximo ciclo
             self.estado.aux[key] = sha_aux

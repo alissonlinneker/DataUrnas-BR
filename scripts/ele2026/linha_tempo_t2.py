@@ -369,7 +369,8 @@ def montar_secao(chave: tuple, sec: Secao, cache: dict[str, dict],
                 if p["hash"] == reg.get("hash"):
                     rec_bu = p["recebimento"]
         linha.update({
-            "tipo_arquivo": reg.get("tipo"), "hash_bu": reg.get("hash"), "sha512_bu": sha,
+            "tipo_arquivo": reg.get("tipo"), "nome_bu": reg.get("nome"),
+            "hash_bu": reg.get("hash"), "sha512_bu": sha,
             "origem_part": reg.get("origem_part"),
             "primeira_coleta_bu": fmt(min(filter(None, (parse_coletado(v.get("coletado_em"))
                                                         for _, v in versoes)), default=None)),
@@ -753,6 +754,184 @@ def marcar_recebimento_apos_totalizacao(versoes: list[dict],
             ln["m_recebimento_apos_totalizacao_15min"] = d is not None and d > LIMITE_APOS_TOT_S
 
 
+def curva_recebimento_totalizacao(versoes: list[dict], por_abr: dict[str, list[dict]],
+                                  ultima: dict[str, dict]) -> tuple[list[dict], list[dict]]:
+    """Curva acumulada por abrangência: seções com recebimento (dr/hr do aux.json)
+    <= t contra seções totalizadas (st) na versão gerada em t (hg, Brasília) e
+    na totalização dessa versão (ht convertido para Brasília).
+
+    Só entra abrangência em que o número de seções com BU é >= st da última
+    versão vista (cobertura suficiente): supondo que toda seção totalizada tem
+    BU publicado, as seções recebidas contadas aqui incluem todas as
+    totalizadas. Excesso > 0 quer dizer que o TSE já tinha totalizado mais
+    seções do que o aux.json mostra como recebidas até t.
+
+    Devolve (linhas da curva, seções do excesso). As seções do excesso são as k
+    de recebimento mais cedo depois de t (k = excesso em hg): o menor conjunto
+    que explicaria a contagem, não necessariamente as seções totalizadas."""
+    curva, excesso = [], []
+    for abr, ls in por_abr.items():
+        of = ultima.get(abr)
+        if not of or of.get("st") is None or len(ls) < of["st"]:
+            continue
+        recs = sorted((datetime.strptime(ln["recebimento_bu"], "%Y-%m-%d %H:%M:%S"), ln)
+                      for ln in ls if ln.get("recebimento_bu"))
+        tempos = [t for t, _ in recs]
+        for v in versoes:
+            if v["abr"] != abr or not v.get("secoes"):
+                continue
+            hg = parse_dr_hr(v.get("dg"), v.get("hg"))
+            ht = datetime.strptime(v["ht_bsb"], "%Y-%m-%d %H:%M:%S") if v.get("ht_bsb") else None
+            n_hg = _contar_ate(tempos, hg)
+            n_ht = _contar_ate(tempos, ht) if ht else None
+            exc = v["secoes"] - n_hg if n_hg is not None else None
+            curva.append({"abr": abr, "versao": v["versao"], "hg_bsb": fmt(hg),
+                          "ht_bsb": v.get("ht_bsb"), "secoes_totalizadas": v["secoes"],
+                          "secoes_total": v.get("secoes_total"), "bu_secoes": len(ls),
+                          "recebidas_ate_hg": n_hg, "recebidas_ate_ht": n_ht,
+                          "excesso_hg": exc,
+                          "excesso_ht": v["secoes"] - n_ht if n_ht is not None else None})
+            if exc and exc > 0:
+                for t, ln in recs[n_hg:n_hg + exc]:
+                    excesso.append({"abr": abr, "versao": v["versao"], "hg_bsb": fmt(hg),
+                                    "secoes_totalizadas": v["secoes"],
+                                    "recebidas_ate_hg": n_hg, "excesso_hg": exc,
+                                    "uf": ln["uf"], "cd_mun": ln["cd_mun"], "zona": ln["zona"],
+                                    "secao": ln["secao"], "recebimento_bu": ln["recebimento_bu"],
+                                    "recebimento_menos_hg_s": int((t - hg).total_seconds()),
+                                    "emissao_bsb": ln.get("emissao_bsb"),
+                                    "primeira_coleta_aux": ln.get("primeira_coleta_aux")})
+    return curva, excesso
+
+
+def _contar_ate(tempos: list[datetime], t: Optional[datetime]) -> Optional[int]:
+    if t is None:
+        return None
+    import bisect
+    return bisect.bisect_right(tempos, t)
+
+
+def atraso_por_municipio(linhas: list[dict]) -> list[dict]:
+    """Distribuição de (recebimento - emissão em Brasília), em minutos, por município."""
+    grupos: dict[tuple, list] = defaultdict(list)
+    for ln in linhas:
+        if ln.get("atraso_recebimento_min") is not None:
+            grupos[(ln["uf"], ln["cd_mun"])].append(ln["atraso_recebimento_min"])
+    return [{"uf": uf, "cd_mun": cd, **distribuicao(xs)} for (uf, cd), xs in sorted(grupos.items())]
+
+
+DESTAQUES_BA = {"38490": "Salvador", "36854": "Lauro de Freitas", "35157": "Feira de Santana"}
+
+
+def destaque_ba(linhas: list[dict]) -> dict:
+    """Atraso recebimento - emissão (min) nos municípios destacados contra o resto da BA."""
+    grupos: dict[str, list] = defaultdict(list)
+    for ln in linhas:
+        if ln["uf"] != "ba" or ln.get("atraso_recebimento_min") is None:
+            continue
+        grupos[DESTAQUES_BA.get(ln["cd_mun"], "resto_da_ba")].append(ln["atraso_recebimento_min"])
+    out = {}
+    for nome, xs in grupos.items():
+        d = distribuicao(xs)
+        d["recebidos_depois_de_21h_pct"] = None
+        out[nome] = d
+    rec21 = defaultdict(lambda: [0, 0])
+    for ln in linhas:
+        if ln["uf"] == "ba" and ln.get("recebimento_bu"):
+            g = DESTAQUES_BA.get(ln["cd_mun"], "resto_da_ba")
+            rec21[g][1] += 1
+            rec21[g][0] += ln["recebimento_bu"][11:16] >= "21:00"
+    for g, (a, b) in rec21.items():
+        if g in out:
+            out[g]["recebidos_depois_de_21h_pct"] = round(100.0 * a / b, 2) if b else None
+    return out
+
+
+def head_last_modified(linhas: list[dict], destino: Path, n_por_grupo: int, taxa: float,
+                       extras: list[dict]) -> dict:
+    """HEAD no bu.dat de uma amostra (no máximo 3 req/s), com cache por SHA-512.
+    Amostra: n_por_grupo seções de cada município destacado da BA, do resto da BA
+    e de cada outra UF com BU, mais as seções do excesso da curva."""
+    from email.utils import parsedate_to_datetime
+
+    from dataurnas.downloader import ele2026 as E
+    P = E.parametros_turno(2)
+    cache = {}
+    if destino.exists():
+        cache = {r["sha512_bu"]: r for r in pq.read_table(destino).to_pylist()}
+    grupos: dict[str, list] = defaultdict(list)
+    for ln in linhas:
+        if not ln.get("nome_bu") or not ln.get("hash_bu"):
+            continue
+        g = (DESTAQUES_BA.get(ln["cd_mun"], "resto_da_ba") if ln["uf"] == "ba" else ln["uf"])
+        grupos[g].append(ln)
+    idx = {(ln["uf"], ln["cd_mun"], ln["zona"], ln["secao"]): ln for ln in linhas}
+    amostra = []
+    for g, ls in sorted(grupos.items()):
+        passo = max(1, len(ls) // max(1, n_por_grupo))
+        amostra += [(g, ln) for ln in ls[::passo][:n_por_grupo]]
+    for e in extras:
+        ln = idx.get((e["uf"], e["cd_mun"], e["zona"], e["secao"]))
+        if ln and ln.get("nome_bu"):
+            amostra.append(("excesso_curva", ln))
+    intervalo = 1.0 / max(0.1, min(taxa, 3.0))
+    cont = Counter()
+    seguidos_429 = 0
+    parado = None
+    for g, ln in amostra:
+        sha = ln["sha512_bu"]
+        if sha in cache:
+            cache[sha]["grupo"] = g
+            continue
+        url = E.url_arquivo(ln["uf"], ln["cd_mun"], ln["zona"], ln["secao"], ln["hash_bu"],
+                            ln["nome_bu"], pleito=P["pleito"], ciclo=P["ciclo"])
+        time.sleep(intervalo)
+        try:
+            req = urllib.request.Request(url, method="HEAD",
+                                         headers={"User-Agent": "dataurnas-br"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                lm = resp.headers.get("Last-Modified")
+            seguidos_429 = 0
+        except urllib.error.HTTPError as e:
+            cont[f"http_{e.code}"] += 1
+            if e.code == 429:
+                seguidos_429 += 1
+                if seguidos_429 >= 3:
+                    parado = "429 repetido; amostra interrompida"
+                    break
+                time.sleep(30 * seguidos_429)
+            continue
+        except (urllib.error.URLError, TimeoutError):
+            cont["erro_rede"] += 1
+            continue
+        cont["ok"] += 1
+        lm_bsb = None
+        if lm:
+            try:
+                lm_bsb = (parsedate_to_datetime(lm) - timedelta(hours=3)).replace(tzinfo=None)
+            except (TypeError, ValueError):
+                pass
+        rec = ln.get("recebimento_bu")
+        cache[sha] = {"sha512_bu": sha, "grupo": g, "uf": ln["uf"], "cd_mun": ln["cd_mun"],
+                      "zona": ln["zona"], "secao": ln["secao"], "last_modified": lm,
+                      "last_modified_bsb": fmt(lm_bsb), "recebimento_bu": rec,
+                      "emissao_bsb": ln.get("emissao_bsb"),
+                      "last_modified_menos_recebimento_s": (
+                          int((lm_bsb - datetime.strptime(rec, "%Y-%m-%d %H:%M:%S"))
+                              .total_seconds()) if lm_bsb and rec else None)}
+    linhas_lm = list(cache.values())
+    if linhas_lm:
+        gravar(linhas_lm, destino)
+    por_grupo: dict[str, list] = defaultdict(list)
+    for r in linhas_lm:
+        if r.get("last_modified_menos_recebimento_s") is not None:
+            por_grupo[r["grupo"]].append(r["last_modified_menos_recebimento_s"])
+    return {"requisicoes": dict(cont), "parado": parado, "amostra": len(amostra),
+            "com_last_modified": sum(len(x) for x in por_grupo.values()),
+            "last_modified_menos_recebimento_s_por_grupo": {
+                g: distribuicao(xs) for g, xs in sorted(por_grupo.items())}}
+
+
 def distribuicao(xs: list[float]) -> dict:
     xs = sorted(xs)
     if not xs:
@@ -867,6 +1046,29 @@ def faixas_por_uf(linhas: list[dict]) -> list[dict]:
     return [{"uf": uf, "faixa": fx, **somar(ls)} for (uf, fx), ls in sorted(grupos.items())]
 
 
+def resumir_curva(curva: list[dict], excesso: list[dict], limite: int) -> dict:
+    """Contagens da curva acumulada e versões com excesso, por município e UF."""
+    com = [c for c in curva if c["excesso_hg"] and c["excesso_hg"] > 0]
+    com_ht = [c for c in curva if c["excesso_ht"] and c["excesso_ht"] > 0]
+    abrs = {c["abr"] for c in curva}
+    return {
+        "criterio": ("abrangências com seções com BU >= seções totalizadas na última "
+                     "versão; excesso = st da versão - seções com dr/hr <= t"),
+        "abrangencias": len(abrs),
+        "ufs": sorted(a for a in abrs if len(a) == 2),
+        "versoes": len(curva),
+        "versoes_excesso_em_hg": len(com),
+        "abrangencias_excesso_em_hg": len({c["abr"] for c in com}),
+        "secoes_excesso_em_hg_soma": sum(c["excesso_hg"] for c in com),
+        "versoes_excesso_em_ht": len(com_ht),
+        "excesso_hg_max": max((c["excesso_hg"] for c in com), default=0),
+        "recebimento_menos_hg_s_secoes_do_excesso": distribuicao(
+            [e["recebimento_menos_hg_s"] for e in excesso]),
+        "excesso_por_uf": dict(Counter(c["abr"][:2] for c in com)),
+        "versoes_com_excesso": sorted(com, key=lambda c: -c["excesso_hg"])[:limite],
+    }
+
+
 def resumir_pausa(versoes: list[dict], marca: str) -> dict:
     """Versões dos totais marcadas (gerada ou totalizada na pausa)."""
     sel = [v for v in versoes if v.get(marca)]
@@ -918,6 +1120,9 @@ def main(argv: Optional[list[str]] = None) -> int:
                     help="não baixa resultados municipais que faltarem")
     ap.add_argument("--taxa", type=float, default=2.0, help="req/s no download (máximo 5)")
     ap.add_argument("--max-downloads", type=int, default=400)
+    ap.add_argument("--head-amostra", type=int, default=0,
+                    help="seções por grupo para HEAD do bu.dat (Last-Modified); 0 desliga")
+    ap.add_argument("--head-taxa", type=float, default=2.0, help="req/s no HEAD (máximo 3)")
     ap.add_argument("--limite-lista", type=int, default=500,
                     help="itens por lista no resumo.json (os parquets têm todos)")
     args = ap.parse_args(argv)
@@ -1008,6 +1213,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     por_abr = {**por_mun, **por_uf}
     comparar_versoes_com_bus(versoes, por_abr, n_total)
     marcar_recebimento_apos_totalizacao(versoes, por_mun)
+    curva, excesso = curva_recebimento_totalizacao(versoes, por_abr, ultima)
+    lm = {"executado": False}
+    if args.head_amostra and not args.sem_download:
+        lm = head_last_modified(com_bu, saida / "last_modified.parquet", args.head_amostra,
+                                args.head_taxa, excesso[:args.head_amostra])
+        lm["executado"] = True
 
     # 3. faixas
     faixas = faixas_por_uf(com_bu)
@@ -1025,6 +1236,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     gravar(comp_uf, saida / "comparacao_uf.parquet")
     gravar(comp_mun, saida / "comparacao_municipio.parquet")
     gravar(faixas, saida / "faixas_uf.parquet")
+    gravar(curva, saida / "curva_recebimento_totalizacao.parquet")
+    gravar(excesso, saida / "curva_excesso_secoes.parquet")
+    gravar(atraso_por_municipio(linhas), saida / "atraso_municipio.parquet")
 
     # 4. resumo
     marcas_cont = {m: sum(1 for ln in linhas if ln.get(m)) for m in MARCAS}
@@ -1132,6 +1346,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         "recebimento_menos_totalizacao_s": distribuicao(
             [ln["recebimento_menos_totalizacao_s"] for ln in linhas
              if ln.get("recebimento_menos_totalizacao_s") is not None]),
+        "curva_recebimento_totalizacao": resumir_curva(curva, excesso, args.limite_lista),
+        "atraso_recebimento_emissao_ba_destaques_min": destaque_ba(linhas),
+        "last_modified_amostra": lm,
         "recebidos_mais_2h_por_uf": dict(Counter(ln["uf"] for ln in linhas
                                                  if ln.get("m_recebido_mais_2h"))),
     }
