@@ -216,3 +216,31 @@ def test_resumir_grupo_taxas_e_esperado():
     assert r["margem_viradas_media"] == 3.0
     assert r["troca_viradas_zero"] == 1
     assert r["atipicos"] == 1
+
+
+def test_tabela_grupos_soma_por_grupo_e_fecha_com_todas():
+    t1 = _turno([
+        ("ac", "01", "1", "1", 300, 200, 90, 100, 5, 3, 2),     # 22 lidera
+        ("ac", "01", "1", "2", 300, 200, 120, 70, 5, 3, 2),     # 13 lidera
+        ("ba", "02", "1", "1", 100, 80, 40, 30, 6, 2, 2),       # 13 lidera
+    ])
+    t2 = _turno([
+        ("ac", "01", "1", "1", 300, 210, 110, 95, 0, 2, 3),     # vira 22->13
+        ("ac", "01", "1", "2", 300, 195, 80, 110, 0, 3, 2),     # vira 13->22
+        ("ba", "02", "1", "1", 100, 82, 45, 33, 0, 2, 2),       # sem virada
+    ])
+    d = M.metricas(M.parear(t1, t2))
+    t = M.tabela_grupos(d, 2026)
+    br = t[(t["nivel"] == "brasil")].set_index("grupo_virada")
+    assert br.loc["22 para 13", "secoes"] == 1
+    assert br.loc["22 para 13", "v13_var"] == 20
+    assert br.loc["22 para 13", "abstencao_1"] == 100
+    assert br.loc["22 para 13", "abstencao_var"] == -10
+    assert br.loc["13 para 22", "v22_var"] == 40
+    assert br.loc["sem virada", "invalidos_var"] == 0
+    assert br.loc["todas", "secoes"] == 3
+    soma = br.drop(index="todas")[["v13_var", "v22_var", "outros_var", "abstencao_var"]].sum()
+    assert (soma == br.loc["todas", ["v13_var", "v22_var", "outros_var", "abstencao_var"]]).all()
+    nordeste = t[(t["nivel"] == "regiao") & (t["grupo"] == "Nordeste")
+                 & (t["grupo_virada"] == "todas")].iloc[0]
+    assert nordeste["comparecimento_var"] == 2

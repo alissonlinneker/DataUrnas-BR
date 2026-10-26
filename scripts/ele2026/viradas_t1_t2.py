@@ -56,11 +56,16 @@ Saída em data/parquet/2026/t2/viradas/ (ignorada pelo git):
   atipicos_2026.parquet/.csv, atipicos_2022.parquet/.csv
   resumo_uf.parquet       métricas por ano e UF/região/Brasil
   faixas.parquet          taxa de virada por faixa de margem e reserva
+  grupos.parquet          somas do 1º e do 2º turno por grupo de virada (Brasil,
+                          região e UF): seções, aptos, comparecimento, abstenção,
+                          13, 22, outros, brancos e nulos
   resumo.json             tudo acima resumido, coeficientes e calibração
 
 Uso:
   nice -n 20 python3 scripts/ele2026/viradas_t1_t2.py
   python3 scripts/ele2026/viradas_t1_t2.py --sem-bu   # não lê BU dos atípicos
+  # país inteiro, com o 2º turno exportado do ClickHouse (viradas_t2_ch.sql):
+  python3 scripts/ele2026/viradas_t1_t2.py --t2 t2.parquet --software t2.parquet --sem-bu
 """
 
 from __future__ import annotations
@@ -690,6 +695,41 @@ def tabela_swing(d22: pd.DataFrame, d26: pd.DataFrame) -> list[dict]:
     return out
 
 
+GRUPOS_VIRADA = (("22->13", "22 para 13"), ("13->22", "13 para 22"), ("", "sem virada"))
+
+
+def tabela_grupos(d: pd.DataFrame, ano: int) -> pd.DataFrame:
+    """Somas do 1º e do 2º turno por grupo de virada (22 para 13, 13 para 22, sem
+    virada e todas), no Brasil, por região e por UF: seções, aptos, comparecimento,
+    abstenção (aptos - comparecimento), 13, 22, outros, brancos e nulos."""
+    x = d.copy()
+    x["grupo_virada"] = x["virada"].map(dict(GRUPOS_VIRADA)).fillna("sem virada")
+    for t in ("1", "2"):
+        x[f"abstencao_{t}"] = x[f"aptos_{t}"] - x[f"comparecimento_{t}"]
+    soma = [f"{c}_{t}" for c in ("aptos", "comparecimento", "abstencao", "v13", "v22",
+                                  "outros", "brancos", "nulos") for t in ("1", "2")]
+    niveis = (("brasil", None), ("regiao", "regiao"), ("uf", "uf"))
+    partes = []
+    for nivel, col in niveis:
+        chave = x[col] if col else pd.Series("BR", index=x.index)
+        for todos in (False, True):
+            gr = [chave, pd.Series("todas", index=x.index) if todos else x["grupo_virada"]]
+            g = x.groupby(gr)[soma].sum()
+            g["secoes"] = x.groupby(gr).size()
+            g = g.reset_index()
+            g.columns = ["grupo", "grupo_virada"] + list(g.columns[2:])
+            g.insert(0, "nivel", nivel)
+            partes.append(g)
+    t = pd.concat(partes, ignore_index=True)
+    t.insert(0, "ano", ano)
+    for c in ("aptos", "comparecimento", "abstencao", "v13", "v22", "outros", "brancos", "nulos"):
+        t[f"{c}_var"] = t[f"{c}_2"] - t[f"{c}_1"]
+    for tt in ("1", "2"):
+        t[f"invalidos_{tt}"] = t[f"brancos_{tt}"] + t[f"nulos_{tt}"]
+    t["invalidos_var"] = t["invalidos_2"] - t["invalidos_1"]
+    return t.sort_values(["nivel", "grupo", "grupo_virada"]).reset_index(drop=True)
+
+
 def principais(at: pd.DataFrame, n: int = 40) -> list[dict]:
     if at.empty:
         return []
@@ -700,7 +740,8 @@ def principais(at: pd.DataFrame, n: int = 40) -> list[dict]:
     return json.loads(ordem[cols].to_json(orient="records", force_ascii=False))
 
 
-def executar(saida: Path = SAIDA, ler_bu: bool = True) -> dict:
+def executar(saida: Path = SAIDA, ler_bu: bool = True, enc_t2: Path = ENC_T2,
+             software_t2: Path = SOFTWARE_T2) -> dict:
     saida.mkdir(parents=True, exist_ok=True)
     log.info("carregando 2022")
     a22, b22 = carregar_2022()
@@ -708,7 +749,7 @@ def executar(saida: Path = SAIDA, ler_bu: bool = True) -> dict:
     log.info("2022: %d seções pareadas", len(d22))
     log.info("carregando 2026")
     t1 = carregar_2026_t1()
-    t2 = carregar_2026_t2()
+    t2 = carregar_2026_t2(enc_t2)
     d26 = preparar(t1, t2)
     log.info("2026: %d seções do 2º turno, %d pareadas com o 1º", len(t2), len(d26))
 
@@ -738,11 +779,13 @@ def executar(saida: Path = SAIDA, ler_bu: bool = True) -> dict:
     res.to_parquet(saida / "resumo_uf.parquet", index=False)
     tf = tabela_faixas(d22, d26)
     tf.to_parquet(saida / "faixas.parquet", index=False)
+    tg = pd.concat([tabela_grupos(d22, 2022), tabela_grupos(d26, 2026)], ignore_index=True)
+    tg.to_parquet(saida / "grupos.parquet", index=False)
 
     d22["ano"] = 2022
     d26["ano"] = 2026
     at26 = d26[d26["atipico"]].copy()
-    at26 = juntar_software(at26)
+    at26 = juntar_software(at26, software_t2)
     if ler_bu:
         at26 = completar_por_bu(at26)
     at26 = comparar_urna(at26)
@@ -769,6 +812,8 @@ def executar(saida: Path = SAIDA, ler_bu: bool = True) -> dict:
         "modelo": {"coeficientes": dict(zip(nomes_beta, [_r(b, 6) for b in beta], strict=True)),
                    "calibracao_2022": calibracao(d22), "calibracao_2026": calibracao(d26)},
         "resumo": json.loads(res.to_json(orient="records", force_ascii=False)),
+        "grupos": json.loads(tg[tg["nivel"] != "uf"].to_json(orient="records",
+                                                               force_ascii=False)),
         "principais_atipicos_2026": principais(at26),
         "principais_atipicos_2022": principais(at22),
         "atipicos_2026_urna": {
@@ -790,11 +835,17 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--saida", default=str(SAIDA))
+    ap.add_argument("--t2", default=str(ENC_T2),
+                    help="seções do 2º turno no formato de secoes_encerramento.parquet "
+                         "(por exemplo, a exportação de viradas_t2_ch.sql)")
+    ap.add_argument("--software", default=str(SOFTWARE_T2),
+                    help="número interno da urna e código de carga do 2º turno")
     ap.add_argument("--sem-bu", action="store_true",
                     help="não lê BU dos atípicos sem linha de software")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    r = executar(Path(args.saida), ler_bu=not args.sem_bu)
+    r = executar(Path(args.saida), ler_bu=not args.sem_bu, enc_t2=Path(args.t2),
+                 software_t2=Path(args.software))
     for linha in r["resumo"]:
         if linha["nivel"] in ("brasil", "comparavel"):
             log.info("%s %s: viradas 22->13 %s (esp %s), 13->22 %s (esp %s), atípicos %s",
