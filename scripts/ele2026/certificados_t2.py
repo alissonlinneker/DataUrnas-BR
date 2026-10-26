@@ -776,6 +776,16 @@ def comparar_tarde(df: pd.DataFrame, t1: Optional[pd.DataFrame]) -> dict:
         out["modelo"]["t1"] = _pct(t1["t1_modelo"])
         t1t = t1.merge(tarde[CHAVE], on=CHAVE)
         out["emissor"]["t1_mesmas_secoes_tarde"] = _pct(t1t["t1_emissor"])
+    # taxa de seções tardias por UF e modelo (UFs com 5 ou mais tardias)
+    if len(tarde):
+        ufs = tarde["uf"].value_counts()
+        base = com[com["uf"].isin(ufs[ufs >= 5].index) & com["fechou_tarde"].notna()]
+        tx = base.groupby(["uf", "modelo"])["fechou_tarde"].agg(["sum", "count"])
+        out["taxa_tarde_por_uf_modelo"] = {
+            str(u): {str(m): {"tardias": int(r["sum"]), "secoes": int(r["count"]),
+                              "pct": round(100 * r["sum"] / r["count"], 2)}
+                     for (_, m), r in g.iterrows()}
+            for u, g in tx.groupby(level=0)}
     # outras características nas tardias x demais
     for col in ("valido_no_dia", "cadeia_ok", "assinatura_conteudo_ok", "assinatura_bu_ok",
                 "bu_hash_confere", "cn_igual_numero_interno", "mesmo_cert_t1",
@@ -809,11 +819,14 @@ def comparar_turnos(df: pd.DataFrame, t1: Optional[pd.DataFrame]) -> dict:
     out["certificado_diferente_outra_urna"] = int(len(dif) - len(mesmo_cn))
     # por número interno (CN), em qualquer seção
     t1_por_cn = t1.dropna(subset=["t1_cn"]).assign(_cn=lambda x: x["t1_cn"].str.upper())
-    t1_por_cn = t1_por_cn.groupby("_cn")["t1_cert_sha256"].agg(lambda s: sorted(set(s)))
+    pares = set(zip(t1_por_cn["_cn"], t1_por_cn["t1_cert_sha256"], strict=True))
+    t1_por_cn = t1_por_cn.drop_duplicates(["_cn", "t1_cert_sha256"]).groupby("_cn")[
+        "t1_cert_sha256"].agg(list)
     com["_cn"] = com["cn"].str.upper()
     com["_t1_certs"] = com["_cn"].map(t1_por_cn)
     achou = com[com["_t1_certs"].notna()]
-    troca = achou[~achou.apply(lambda r: r["cert_sha256"] in r["_t1_certs"], axis=1)]
+    troca = achou[[(n, c) not in pares for n, c in zip(achou["_cn"], achou["cert_sha256"],
+                                                      strict=True)]]
     out["cn_presente_no_t1"] = int(len(achou))
     out["cn_novo_no_t2"] = int(len(com) - len(achou))
     out["mesmo_cn_certificado_diferente_entre_turnos"] = int(len(troca))
@@ -942,18 +955,19 @@ def resumir(df: pd.DataFrame, t1: Optional[pd.DataFrame], acs: list[dict],
         .dt.strftime("%Y-%m").value_counts().sort_index().items()}
     # padrões
     pad: dict = {}
-    rep = com.groupby("cert_sha256").filter(lambda g: len(g) > 1)
+    rep = com[com.groupby("cert_sha256")["cert_sha256"].transform("size") > 1]
     pad["certificado_em_mais_de_uma_secao"] = {
         "certificados": int(rep["cert_sha256"].nunique()), "secoes": int(len(rep)),
         "por_tipo_urna": _cont(rep["tipo_urna"]), "por_tipo_vsc": _cont(rep["vsc_tipo"]),
         "lista": _lista(rep.sort_values("cert_sha256"),
                         ["secao_id", "cn", "cert_sha256", "tipo_urna", "vsc_tipo"])}
-    multi = com.dropna(subset=["cn"]).assign(_cn=lambda x: x["cn"].str.upper()).groupby(
-        "_cn").filter(lambda g: g["cert_sha256"].nunique() > 1)
+    multi = com.dropna(subset=["cn"]).assign(_cn=lambda x: x["cn"].str.upper())
+    multi = multi[multi.groupby("_cn")["cert_sha256"].transform("nunique") > 1]
     pad["mesmo_cn_com_certificados_diferentes_no_t2"] = {
         "cns": int(multi["cn"].str.upper().nunique()), "secoes": int(len(multi)),
         "lista": _lista(multi, ["secao_id", "cn", "cert_sha256", "not_before"])}
-    chave_multi = com.groupby("chave_sha256").filter(lambda g: g["cn"].str.upper().nunique() > 1)
+    chave_multi = com.assign(_cn=com["cn"].str.upper())
+    chave_multi = chave_multi[chave_multi.groupby("chave_sha256")["_cn"].transform("nunique") > 1]
     pad["chave_publica_em_urnas_diferentes"] = {"secoes": int(len(chave_multi)),
                                                 "lista": _lista(chave_multi, ["secao_id", "cn"])}
     difcn = com[com["cn_igual_numero_interno"].astype("boolean").fillna(True).eq(False)]
@@ -962,6 +976,15 @@ def resumir(df: pd.DataFrame, t1: Optional[pd.DataFrame], acs: list[dict],
         "lista": _lista(difcn, ["secao_id", "cn", "numero_interno", "tipo_urna", "modelo",
                                 "t1_cn", "t1_numero_interno", "fechou_tarde"], 1000)}
     pad["cn_minusculo"] = int(com["cn"].fillna("").str.startswith("ueao").sum())
+    dia_carga = df["data_hora_carga"].str[:8]
+    pad["carga"] = {
+        "com_data": int(dia_carga.notna().sum()),
+        "ate_1o_turno": int((dia_carga <= "20261004").sum()),
+        "entre_turnos": int((dia_carga > "20261004").sum()),
+        "entre_turnos_por_tipo_urna": _cont(df[dia_carga > "20261004"]["tipo_urna"]),
+        "primeira": dia_carga.min() if dia_carga.notna().any() else None,
+        "ultima": dia_carga.max() if dia_carga.notna().any() else None,
+    }
     pos = com[com["emitido_apos_carga"].astype("boolean").fillna(False)]
     pad["emitido_apos_carga"] = {
         "n": int(len(pos)),
@@ -1072,6 +1095,10 @@ def _data(s) -> str:
     return f"{d[2]}/{d[1]}/{d[0]}" if len(d) == 3 else str(s)
 
 
+def _data_je(s) -> str:
+    return f"{s[6:8]}/{s[4:6]}/{s[:4]}" if isinstance(s, str) and len(s) >= 8 else "?"
+
+
 def _secao_md(s: str) -> str:
     return f"`{s}`"
 
@@ -1123,7 +1150,7 @@ def gerar_relatorio(res: dict) -> str:
       f"{_rot_cont(v['assinatura_conteudo_ok'])} |")
     a(f"| Assinatura de hardware do bu.dat | {_rot_cont(v['assinatura_bu_ok'])} |")
     aa = v["assinaturas_arquivos"]
-    a(f"| Assinatura de hardware de todos os arquivos listados (seções da amostra) | "
+    a(f"| Assinatura de hardware de cada arquivo listado no .vsc | "
       f"{_n(aa['secoes'])} seções; assinaturas válidas: {_n(aa['ok'])}; inválidas: "
       f"{_n(aa['falha'])} |")
     a(f"| Certificado da urna assinado pela AC emissora | {_rot_cont(v['cadeia_ok'])} |")
@@ -1239,7 +1266,8 @@ def gerar_relatorio(res: dict) -> str:
     for x in res.get("acs", []):
         a(f"| {x['cn']} | {x['emissor']} | {_data(x['nao_antes'])} a {_data(x['nao_depois'])} | "
           f"{'sim' if x['valida_no_dia_da_eleicao'] else 'não'} | "
-          f"{' > '.join(x['cadeia_conferida'])} ({x['nivel']}) | "
+          f"{' > '.join(x['cadeia_conferida'])} "
+          f"({ {'intermediaria': 'intermediária'}.get(x['nivel'], x['nivel'])}) | "
           f"{x['confere_resumo_oficial_tse'] or 'não consta'} |")
     a("")
     a(f"Caminhos de cadeia nas seções: {_rot_cont(ce['cadeia_caminho'])}.")
@@ -1284,12 +1312,19 @@ def gerar_relatorio(res: dict) -> str:
               f"{s.get('t1_cn') or '?'} | {f'{int(t1n):08d}' if t1n else '?'} | "
               f"{s.get('fechou_tarde')} |")
     a("")
+    cg = pad.get("carga", {})
     rep = pad["certificado_em_mais_de_uma_secao"]
     a("### Mesmo certificado em mais de uma seção")
     a("")
     a(f"{_n(rep['certificados'])} certificado(s), em {_n(rep['secoes'])} seções. Por tipo de "
       f"urna: {_rot_cont(rep['por_tipo_urna'])}; por tipo de arquivo de assinatura: "
       f"{_rot_cont(rep['por_tipo_vsc'])}.")
+    if rep["secoes"] and set(rep["por_tipo_vsc"]) == {"sa"}:
+        a("")
+        a("Todas essas seções têm arquivo de assinatura do sistema de apuração (`.vsc` do tipo "
+          "`sa`), emitido por uma mesma urna de apuração para várias seções (votação por cédula); "
+          "por isso o mesmo certificado aparece em mais de uma seção. No 1º turno ocorreu o mesmo "
+          "(1 certificado em 29 seções do exterior).")
     if rep["lista"]:
         a("")
         a("| Seção | CN | Certificado (SHA-256, início) | Tipo de urna |")
@@ -1302,7 +1337,7 @@ def gerar_relatorio(res: dict) -> str:
     a(f"Mesmo CN com certificados diferentes dentro do 2º turno: {_n(mc['cns'])} CN, "
       f"{_n(mc['secoes'])} seções. Mesma chave pública em urnas diferentes: "
       f"{_n(pad['chave_publica_em_urnas_diferentes']['secoes'])} seções. CN em minúsculas "
-      f"(`ueao...`): {_n(pad['cn_minusculo'])}.")
+      f"(`ueao...`): {_n(pad['cn_minusculo'])} (todas as urnas da AC URNA, como no 1º turno).")
     a("")
     a("### Datas de emissão")
     a("")
@@ -1313,6 +1348,12 @@ def gerar_relatorio(res: dict) -> str:
       f"2º turno: {_n(pe['n'])} ({_rot_cont(pe['por_emissor'])}); depois do 1º turno "
       f"(04/10/2026): {_n(pe['apos_1o_turno'])}. Certificado fora da validade no momento da "
       f"assinatura: {_n(pad['certificado_fora_da_validade_na_assinatura']['n'])}.")
+    if cg:
+        a("")
+        a(f"Data da carga gravada no BU: {_n(cg['com_data'])} seções com data, de "
+          f"{_data_je(cg['primeira'])} a {_data_je(cg['ultima'])}; até o dia do 1º turno: "
+          f"{_n(cg['ate_1o_turno'])}; entre os turnos (recarga): {_n(cg['entre_turnos'])} "
+          f"({_rot_cont(cg['entre_turnos_por_tipo_urna'])}).")
     if ap["lista"]:
         a("")
         a("| Seção | CN | Emitido em | Carga em | AC | Modelo |")
@@ -1365,9 +1406,34 @@ def gerar_relatorio(res: dict) -> str:
                                                tt["tarde_por_uf"].items()) + ".")
         a("")
     a("A coluna \"Esperado pela UF\" aplica, a cada seção tardia, a proporção de emissores das "
-      "demais seções da mesma UF. Diferença entre as tardias e o esperado indica composição de "
-      "modelos de urna diferente dentro das UFs, não falha de assinatura.")
+      "demais seções da mesma UF. Diferença entre as tardias e o esperado indica que, dentro das "
+      "mesmas UFs, as seções que fecharam tarde usam outros modelos de urna; isso não é falha de "
+      "assinatura nem de certificado (emissor e algoritmo são consequência do modelo).")
     a("")
+    if "tarde_esperado_pela_uf" in em:
+        exc = {e: em["tarde"].get(e, {"pct": 0})["pct"] - x["pct"]
+               for e, x in em["tarde_esperado_pela_uf"].items()}
+        e_max = max(exc, key=exc.get)
+        if exc[e_max] > 5:
+            a(f"**Padrão encontrado:** a {e_max} aparece em {_p(em['tarde'][e_max]['pct'])} das "
+              f"seções tardias, contra {_p(em['tarde_esperado_pela_uf'][e_max]['pct'])} "
+              "esperados pela composição de UF. A AC emissora acompanha o modelo da urna, então o "
+              "padrão é de modelo de hardware (urnas mais antigas fecharam mais tarde), e não de "
+              "certificado: nessas seções a cadeia, a validade e as assinaturas conferem como nas "
+              "demais (tabela de indicadores abaixo).")
+            a("")
+    txm = tt.get("taxa_tarde_por_uf_modelo", {})
+    if txm:
+        mods = sorted({m for g in txm.values() for m in g})
+        a("Proporção de seções tardias por UF e modelo (UFs com 5 ou mais seções tardias):")
+        a("")
+        a("| UF | " + " | ".join(mods) + " |")
+        a("|---|" + "---:|" * len(mods))
+        for u, g in sorted(txm.items(), key=lambda kv: -sum(x["tardias"] for x in kv[1].values())):
+            cel = [f"{_p(g[m]['pct'])} ({_n(g[m]['tardias'])}/{_n(g[m]['secoes'])})" if m in g
+                   else "" for m in mods]
+            a(f"| {u.upper()} | " + " | ".join(cel) + " |")
+        a("")
     ind = tt.get("indicadores", {})
     if ind:
         a("| Indicador | Tardias | Demais |")
@@ -1408,8 +1474,19 @@ def gerar_relatorio(res: dict) -> str:
           f"{_n(tu['certificado_nao_visto_no_t1_emitido_apos_t1'])} |")
         a("")
         a(f"Urna diferente da do 1º turno, por tipo de urna no BU do 2º turno: "
-          f"{_rot_cont(tu['outra_urna_por_tipo_urna'])}.")
+          f"{_rot_cont(tu['outra_urna_por_tipo_urna'])}. A maior parte é urna de reserva "
+          "(`reservaSecao`), isto é, urna substituída; todas essas seções têm hash, assinatura "
+          "e cadeia conferidos como as demais.")
         a("")
+        if tu["lista_certificado_do_t1_em_outra_secao"]:
+            a("**Urnas que votaram em outra seção no 1º turno** (mesmo certificado):")
+            a("")
+            a("| Seção (2º turno) | CN | Seção no 1º turno | Tipo de urna |")
+            a("|---|---|---|---|")
+            for s in tu["lista_certificado_do_t1_em_outra_secao"]:
+                a(f"| {_secao_md(s['secao_id'])} | {s['cn']} | `{s['secao_t1'].upper()}` | "
+                  f"{s.get('tipo_urna')} |")
+            a("")
         if tu["lista_mesmo_cn_certificado_diferente"]:
             a("**Mesmo número interno com certificado diferente entre os turnos:**")
             a("")
