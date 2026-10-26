@@ -66,7 +66,7 @@ Contexto do dia (prorrogação da votação até 19h por decisão do STF na Rcl 
 ### 2.1 Versão do software de votação
 
 - Nenhuma fonte web consultada informa o número da versão do software de votação de 2026. As reportagens citam só o sistema operacional Uenux e o programa "Vota".
-- **Dado do próprio projeto (não é fonte externa):** o campo de versão dos BUs publicados pelo TSE traz `10.23.0.0 - Praia da Barra do Cahy` em todas as 499.207 seções com BU do 1º turno (`data/parquet/2026/secoes_2026.parquet`) e em todas as 105.453 seções do 2º turno processadas até 25/10/2026 22h27 (`data/parquet/2026/t2/software/resumo.json`), sem seção com versão diferente e sem mudança de versão entre turnos nessas seções.
+- **Dado do próprio projeto (não é fonte externa):** o campo de versão dos BUs publicados pelo TSE traz `10.23.0.0 - Praia da Barra do Cahy` em todas as 499.207 seções com BU do 1º turno (`data/parquet/2026/secoes_2026.parquet`) e em todas as 499.207 seções com BU do 2º turno (coleta nacional completa, processada em 26/10/2026; `data/parquet/2026/t2/software/resumo.json` e [certificados-2turno-2026.md](certificados-2turno-2026.md)), sem seção com versão diferente e sem mudança de versão entre turnos nessas seções.
 - **Modelos de urna em 2026** (TSE, agosto de 2026, via resumo do buscador): UE2022 (217.145), UE2020 (222.323), UE2015 (95.065) e UE2013 (29.377) [39] [oficial, não lido]. A página de hashes de 2026 lista arquivos para os mesmos quatro modelos [30].
 
 ### 2.2 Cerimônia de assinatura digital e lacração (04/09/2026)
