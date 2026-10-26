@@ -110,3 +110,6 @@ data/parquet/2026/t2/software/
 
 # Linha do tempo e consistência dos totais do 2º turno de 2026 (derivado)
 data/parquet/2026/t2/linha_tempo/
+
+# Impacto da prorrogação no 2º turno de 2026 (derivado; contagens de log)
+data/parquet/2026/t2/impacto/
