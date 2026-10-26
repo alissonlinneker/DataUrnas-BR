@@ -106,7 +106,7 @@ def _df_secoes():
 
 
 def test_escolher_controles_mesmo_estrato_sem_reposicao():
-    am = M.escolher_controles(_df_secoes(), n_aleatoria=5)
+    am = M.escolher_controles(_df_secoes(), frac_aleatoria=1.0)
     tard = am[am["papel"] == "tardia"]
     ctrl = am[am["papel"] == "controle"]
     assert len(tard) == 3
@@ -118,7 +118,7 @@ def test_escolher_controles_mesmo_estrato_sem_reposicao():
     assert len(alea) == 2                      # sobram 1 do estrato A e o do mun 3
     assert not set(alea["secao"]) & set(ctrl["secao"])
     # determinístico com a mesma semente
-    am2 = M.escolher_controles(_df_secoes(), n_aleatoria=5)
+    am2 = M.escolher_controles(_df_secoes(), frac_aleatoria=1.0)
     assert am["secao"].tolist() == am2["secao"].tolist()
 
 

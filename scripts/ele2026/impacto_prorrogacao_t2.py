@@ -32,11 +32,11 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import importlib.util
 import json
 import logging
 import math
-import random
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -201,34 +201,40 @@ def contagens_log(raw: bytes, uf: str, cd_mun: str, comparecimento: Optional[int
 # Amostra e pareamento
 # ---------------------------------------------------------------------------
 
+def _ordem(seed: int, k: str) -> str:
+    """Ordem pseudoaleatória estável de uma seção (não muda quando chegam
+    seções novas à coleta, o que preserva o cache de logs entre execuções)."""
+    return hashlib.sha256(f"{seed}/{k}".encode()).hexdigest()
+
+
 def escolher_controles(df: pd.DataFrame, seed: int = 2026,
-                       n_aleatoria: int = 1500) -> pd.DataFrame:
+                       frac_aleatoria: float = 0.01) -> pd.DataFrame:
     """Para cada seção tardia (depois de 17:30), um controle da mesma UF,
-    município e zona que encerrou até 17:10, sorteado sem reposição. Zonas com
-    menos controles que tardias usam todos os controles disponíveis. As seções
-    intermediárias (17:11 a 17:30) entram inteiras, com papel 'intermediaria'.
-    Mais `n_aleatoria` seções sorteadas entre as que fecharam até 17:10 e não
-    foram escolhidas como controle (papel 'aleatoria_horario'): medem a fila
-    normal depois das 17h no país coletado, comparada com o 1º turno.
+    município e zona que encerrou até 17:10, sem reposição, na ordem
+    pseudoaleatória de _ordem. Zonas com menos controles que tardias usam todos
+    os controles disponíveis. As seções intermediárias (17:11 a 17:30) entram
+    inteiras, com papel 'intermediaria'. Mais uma fração `frac_aleatoria` das
+    demais seções que fecharam até 17:10 (papel 'aleatoria_horario'): medem a
+    fila normal depois das 17h no país coletado, comparada com o 1º turno.
     Devolve a amostra com as colunas 'papel' e 'estrato'."""
-    rng = random.Random(seed)
+    chaves = df["uf"] + "/" + df["cd_mun"] + "/" + df["zona"] + "/" + df["secao"]
+    ordem = chaves.map(lambda k: _ordem(seed, k))
     tard = df[df["grupo_t2"] == "tardia"]
     cont = df[df["grupo_t2"] == "no_horario"]
-    por_estrato = {k: g for k, g in cont.groupby(["uf", "cd_mun", "zona"], sort=True)}
-    escolhidos = []
+    por_estrato = {k: g.index for k, g in cont.groupby(["uf", "cd_mun", "zona"], sort=True)}
+    escolhidos: list = []
     for k, g in tard.groupby(["uf", "cd_mun", "zona"], sort=True):
-        disp = por_estrato.get(k)
-        if disp is None or disp.empty:
+        idx = por_estrato.get(k)
+        if idx is None or len(idx) == 0:
             continue
-        idx = sorted(disp.index.tolist())
-        n = min(len(g), len(idx))
-        escolhidos.extend(rng.sample(idx, n))
+        escolhidos.extend(sorted(idx, key=lambda i: ordem[i])[:len(g)])
     a = tard.assign(papel="tardia")
     b = df.loc[sorted(escolhidos)].assign(papel="controle")
     c = df[df["grupo_t2"] == "intermediaria"].assign(papel="intermediaria")
-    resto = sorted(set(cont.index) - set(escolhidos))
-    sorteio = sorted(rng.sample(resto, min(n_aleatoria, len(resto))))
-    e = df.loc[sorteio].assign(papel="aleatoria_horario")
+    limite = int(frac_aleatoria * 16 ** 8)
+    ja = set(escolhidos)
+    resto = [i for i in cont.index if i not in ja and int(ordem[i][:8], 16) < limite]
+    e = df.loc[sorted(resto)].assign(papel="aleatoria_horario")
     out = pd.concat([a, b, c, e], ignore_index=True)
     out["estrato"] = out["uf"] + "/" + out["cd_mun"] + "/" + out["zona"]
     return out
