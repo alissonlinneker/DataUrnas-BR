@@ -557,9 +557,12 @@ def cenario_descarte(df: pd.DataFrame, am: pd.DataFrame, t1: pd.DataFrame, dif: 
                         amostra aleatória de seções no horário
       estimado_nao_coletadas  seções do país sem BU coletado no 2º turno: o
                         1º turno da seção vezes a mesma razão (fila normal)
-    Corte "além do normal": desconta de cada tardia/intermediária o que a mesma
-    seção teve depois das 17h no 1º turno (ou, sem 1º turno, a taxa dos
-    controles); seções no horário e não coletadas contam zero. Saldo 13 - 22
+    Corte "além do normal", em duas versões: desconta de cada tardia ou
+    intermediária (a) o que a mesma seção teve depois das 17h no 1º turno ou
+    (b) a taxa de votos depois das 17h dos controles pareados do 2º turno vezes
+    o comparecimento; seções no horário e não coletadas contam zero. Teto
+    "fila do 1º turno": o número de votos depois das 17h do 1º turno em todas
+    as seções do país (como se a fila do 2º turno tivesse sido igual). Saldo 13 - 22
     de cada voto retirado: fatia da seção no 2º turno; não coletadas usam a
     fatia de dois candidatos do 1º turno vezes `frac_validos`."""
     chaves_am = dict(zip(am["chave"], am["votos_apos_17h00"], strict=True))
@@ -584,9 +587,11 @@ def cenario_descarte(df: pd.DataFrame, am: pd.DataFrame, t1: pd.DataFrame, dif: 
     d["v17"] = np.where(tem_log, d["v17_log"],
                         np.where(atrasada, comp, normal_t1.fillna(comp * taxa_ctrl) * razao))
     d["v17_extra"] = np.where(atrasada, np.clip(d["v17"] - normal, 0, None), 0.0)
+    d["v17_extra_ctrl"] = np.where(atrasada, np.clip(d["v17"] - comp * taxa_ctrl, 0, None), 0.0)
     marg = ((d["votos_13"] - d["votos_22"]) / comp.where(comp > 0)).fillna(0)
     d["saldo"] = d["v17"] * marg
     d["saldo_extra"] = d["v17_extra"] * marg
+    d["saldo_extra_ctrl"] = d["v17_extra_ctrl"] * marg
 
     cob = set(d["chave"])
     t = t1.copy()
@@ -618,6 +623,15 @@ def cenario_descarte(df: pd.DataFrame, am: pd.DataFrame, t1: pd.DataFrame, dif: 
         "corte_17h00_so_tardias_e_intermediarias": _inverter(
             dif, float(so_tardias["v17"].sum()), float(so_tardias["saldo"].sum())),
         "corte_alem_do_normal": _inverter(dif, extra, saldo_extra),
+        "corte_alem_do_normal_controles": _inverter(
+            dif, float(d["v17_extra_ctrl"].sum()), float(d["saldo_extra_ctrl"].sum())),
+        "teto_fila_do_t1_em_todo_o_pais": _inverter(
+            dif, float(t["votos_log_17h"].fillna(0).sum()),
+            float((t["votos_log_17h"].fillna(0) * (
+                (t["votos_13"] - t["votos_22"]) / (t["votos_13"] + t["votos_22"]).where(
+                    (t["votos_13"] + t["votos_22"]) > 0)).fillna(0) * frac_validos).sum())),
+        "maximo_votos_apos_17h_numa_secao_com_log": int(d["v17_log"].max())
+        if tem_log.any() else None,
         "referencia_t1_votos_apos_17h_brasil": int(t1["votos_log_17h"].fillna(0).sum()),
     }
 
