@@ -19,6 +19,12 @@ Saída em data/parquet/2026/t2/linha_tempo/ (ignorada pelo git):
   comparacao_uf.parquet     soma dos BUs x última versão oficial, por UF
   comparacao_municipio.parquet  idem, por município
   faixas_uf.parquet         seções e votos por faixa de recebimento (antes, pausa, depois)
+  curva_recebimento_totalizacao.parquet  por versão dos totais: seções com dr/hr <= t
+                            contra seções totalizadas (t = hg e ht), com o excesso
+  curva_excesso_secoes.parquet  seções que explicam cada excesso (as de dr/hr mais cedo
+                            depois de t)
+  atraso_municipio.parquet  distribuição de recebimento - emissão por município
+  last_modified.parquet     HEAD do bu.dat numa amostra (--head-amostra), com cache
   oficial_municipios/       JSON de resultado municipal baixados quando faltaram
   cache_bu.parquet          campos decodificados por SHA-512 do BU (acelera reexecuções)
   resumo.json               contagens e listas das ocorrências
@@ -770,15 +776,18 @@ def curva_recebimento_totalizacao(versoes: list[dict], por_abr: dict[str, list[d
     de recebimento mais cedo depois de t (k = excesso em hg): o menor conjunto
     que explicaria a contagem, não necessariamente as seções totalizadas."""
     curva, excesso = [], []
+    v_abr: dict[str, list[dict]] = defaultdict(list)
+    for v in versoes:
+        v_abr[v["abr"]].append(v)
     for abr, ls in por_abr.items():
         of = ultima.get(abr)
         if not of or of.get("st") is None or len(ls) < of["st"]:
             continue
-        recs = sorted((datetime.strptime(ln["recebimento_bu"], "%Y-%m-%d %H:%M:%S"), ln)
-                      for ln in ls if ln.get("recebimento_bu"))
+        recs = sorted(((datetime.strptime(ln["recebimento_bu"], "%Y-%m-%d %H:%M:%S"), ln)
+                       for ln in ls if ln.get("recebimento_bu")), key=lambda x: x[0])
         tempos = [t for t, _ in recs]
-        for v in versoes:
-            if v["abr"] != abr or not v.get("secoes"):
+        for v in v_abr.get(abr, []):
+            if not v.get("secoes"):
                 continue
             hg = parse_dr_hr(v.get("dg"), v.get("hg"))
             ht = datetime.strptime(v["ht_bsb"], "%Y-%m-%d %H:%M:%S") if v.get("ht_bsb") else None
