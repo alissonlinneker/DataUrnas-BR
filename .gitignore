@@ -120,3 +120,6 @@ data/parquet/2026/t2/certificados/
 # Viradas de liderança entre turnos (2026 x 2022, derivado)
 data/parquet/2026/t2/viradas/
 data/parquet/2026/t2/ordem_envio/
+
+# Biometria 1º x 2º turno de 2026 (derivado do BU e de amostra de logs)
+data/parquet/2026/t2/biometria/
