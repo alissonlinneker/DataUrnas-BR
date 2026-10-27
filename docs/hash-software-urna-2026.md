@@ -203,3 +203,106 @@ A zerésima não é publicada como arquivo; o log só registra que o relatório 
 - Os logs examinados são uma amostra (3.729 seções, concentradas nas coletas de biometria e de emissão tardia, com peso de SP e RJ), não as 499.207 seções. Os `.vsc` e os BUs cobrem todas as seções do 2º turno.
 - As linhas de verificação do log são o que o próprio software da urna escreve. Um software diferente do lacrado poderia escrever as mesmas linhas; por isso elas mostram consistência, não autenticidade.
 - A leitura de SEVIN como chave do TSE comum a todas as urnas vem do descritor igual em 100% dos `.vsc` e do uso do nome no log e no resumo digital; a origem exata da chave dentro da urna não é documentada nos arquivos públicos.
+
+## Confronto com a lista oficial de hashes
+
+Levantamento de 27/10/2026, 07h13 a 07h40 UTC. Os arquivos oficiais foram obtidos e estão guardados, sem nenhuma alteração, em `data/hashes-tse-2026/` (32 zips, `SHA256SUMS` e `download-log.txt` com URL, status e horário de cada requisição).
+
+### Como os arquivos foram obtidos
+
+| Data e hora (UTC) | Origem | URL | Resultado |
+|---|---|---|---|
+| 27/10 07:13:30 | Mac, `curl` com User-Agent de navegador | `https://www.tse.jus.br/eleicoes/urna-eletronica/seguranca-da-urna/hash/resumos-digitais-hashes-das-eleicoes-2026-1o-e-2o-turnos` | 403 (Akamai, "Access Denied") |
+| 27/10 07:13:30 | Mac, idem | mesma página sem `www` | 403 |
+| 27/10 07:13:39 | servidor de processamento (London), idem | página com e sem `www` | 403 e 403 |
+| 27/10 07:14:33 | Internet Archive, índice CDX | página de 2026 | uma captura com conteúdo: 05/10/2026 10:30:12, status 200 |
+| 27/10 07:15:11 | Internet Archive | `web.archive.org/web/20261005103012id_/...` | 200; dela saíram os 32 links reais (`.../hash/arquivos/2026/<ambiente>/<nome>`) |
+| 27/10 07:16:34 | Internet Archive, índice CDX | prefixo `.../hash/arquivos/2026/` | só 5 capturas, todas com status 204 (corpo vazio) |
+| 27/10 07:17:02 | Mac e London, User-Agent de navegador | `.../sistemas-em-ambiente-urna-eletronica/path1u20`, `.../path1u20/@@download/file`, `.../path1u20/@@display-file/file` | 403 nas seis tentativas |
+| 27/10 07:17:49 | Mac e London | cópia no TRE-PE (`www.tre-pe.jus.br/eleicoes/eleicoes-2026/resumos-digitais-hashes-das-eleicoes-2026-1o-turno-e-2o-turnos`) e `www.justicaeleitoral.jus.br` | 403 |
+| 27/10 07:18:42 | Mac, `curl` com o conjunto completo de cabeçalhos que um navegador envia (`Accept`, `Accept-Language`, `Accept-Encoding`, `sec-ch-ua*`, `Sec-Fetch-*`, `Upgrade-Insecure-Requests`, HTTP/2) | `.../path1u20` | **200**, `application/zip` |
+| 27/10 07:18:55 a 07:20:38 | Mac, mesmos cabeçalhos, uma requisição a cada 2 a 4 segundos | a página e os 32 arquivos | 200 em todos |
+
+O bloqueio do site recusa clientes sem os cabeçalhos de navegador; nenhum proxy, VPN ou troca de IP foi usado. Os links da página ao vivo são os mesmos da captura de 05/10, e a página continua com "Última atualização: 04.09.2026 18:08". O cabeçalho `Last-Modified` do `path1u20` é 04/09/2026 19:17:32 GMT.
+
+### Formato
+
+- Cada link devolve um zip com um único HTML (mais uma entrada `__MACOSX/._<nome>.html`, resto do compactador do macOS que só guarda o atributo `com.apple.provenance`). As entradas do zip têm data de 03/09/2026 18:41.
+- O HTML é uma tabela `Arquivo | SHA512b64 (radix)`: SHA-512 do arquivo, em base64. Título "Eleições Gerais 2026" e subtítulo com o sistema e a data (`Urna 2020 - 02/09/2026`, `GEDAI-UE - 02/09/2026`; as mídias de verificação VAD-PC têm 01/09/2026).
+- **Não há assinatura digital.** O zip não traz `.sig`, `.p7s` nem outro arquivo além do HTML; a página não aponta nenhuma assinatura; o HTML não tem bloco assinado. A única garantia de origem é o HTTPS do site do TSE. As assinaturas das entidades (MP, OAB, CONFEA) aparecem só como **arquivos listados** nas mídias de verificação (`90.pub`, `91.pub`, `97.pub`, `99.pub` e os `.vpe`), não como assinatura da lista.
+- Nas listas da urna (`path1u13`, `path1u15`, `path1u20`, `path1u22`) há uma seção `ARQUIVOS BASE` (135, 136, 140 e 140 arquivos) e 28 seções `UF = XX` (27 UFs e ZZ), cada uma com 17 arquivos de `/dsk/fi/estatico/chave/` e uma linha `HASH GERAL UF = XX`. O modo de cálculo do hash geral não é descrito; ele não foi reproduzido com as combinações simples testadas (concatenação dos hashes em base64, binário ou hexadecimal, com e sem a seção base, em ordem original ou alfabética).
+
+### (a) Pacotes verificados no log contra a lista do modelo
+
+Mesma amostra da seção 2 (6.732 logs; por modelo declarado no log: UE2022 2.639, UE2020 2.446, UE2015 1.195, UE2013 452). As 276.748 linhas `Verificação de assinatura de aplicação/dado por etapa` da carga terminam todas em `[SUCESSO]`, assim como as da inicialização. O resultado é o mesmo nos quatro modelos.
+
+**Carga (SCUE, 25 pacotes de aplicação, os mesmos em todos os logs):**
+
+| Situação | Pacotes |
+|---|---|
+| Na lista do modelo (16) | `/bin/avbin.vst`, `/boot/boot/avboot.vst`, `/etc/avetc.vst`, `/etc/RHVoice/avrhvoice.vst`, `/lib/avlib.vst`, `/lib/modules/avmod.vst`, `/lib/plugins/generic/avlibqtgeneric.vst`, `/lib/plugins/imageformats/avlibqtimageformats.vst`, `/lib/plugins/platforms/avlibqtplatforms.vst`, os quatro `.vst` de `/share/RHVoice/...`, `/uenux/bin/avusrbin.vst`, `/uenux/lib/avusrlib.vst` e `/dsk/fe/estatico/chave/avusrchave.vst` (na lista como `/dsk/fi/estatico/chave/avusrchave.vst`, um hash por UF) |
+| **Fora da lista pelo nome (9)** | `/boot/boot/avbootcfg.vst`; `/lib/modules/ue2013/avmodue2013.vst`, `ue2015/avmodue2015.vst`, `ue2020/avmodue2020.vst`, `ue2022/avmodue2022.vst`; `/uenux/lib/avusrlibue2013.vst`, `avusrlibue2015.vst`, `avusrlibue2020.vst`, `avusrlibue2022.vst` |
+
+A lista de cada modelo traz só o nome instalado: `/lib/modules/ue20NN/avmodue.vst` (só a pasta do próprio modelo) e `/uenux/lib/avusrlibue.vst` (um hash diferente em cada modelo). A leitura mais provável é que a mídia de carga leve os pacotes dos quatro modelos com o ano no nome e a urna instale o do seu modelo com o nome genérico, que é o verificado a cada inicialização (abaixo) e está na lista. Isso não está escrito em nenhum documento público, e os hashes dos pacotes com o ano no nome não são publicados. O `avbootcfg.vst` também não está na lista; a página do TSE só justifica a ausência de `uenux.cfg` e `avbootcfg.vsu` (gerados pela urna), não a do `.vst`.
+
+Na mesma etapa de carga a urna verifica, como "dado", os pacotes da mídia de votação `/dsk/fe/estatico/jez/vota_apl.vst`, `vota_ofi.vst` e `avpart_ofi.vst`. Eles **não** estão nas listas da urna, mas estão na lista do GEDAI (`D:\Aplic\SEVIN\GEDAIUE\aplic\uenux\vota_apl.vst`, `vota_ofi.vst`, `avpart_ofi.vst`, com os `.jez` correspondentes), o que é coerente com o GEDAI gerar a mídia de votação. O `avgm.vsc` e os pacotes de dados da eleição (`o<pleito><uf>00000-ca.vsc`, `-fo.vsc`, `-ce.vsc`) não estão em nenhuma lista, o que é esperado para dados.
+
+**Inicialização (GAP, 28 etapas):** os 22 pacotes de programa estão todos na lista do modelo: `/bin/avbin.vst`, `/boot/boot/avboot.vst`, `/etc/avetc.vst`, `/etc/RHVoice/avrhvoice.vst`, `/lib/avlib.vst`, `/lib/modules/avmod.vst`, `/lib/modules/ue20NN/avmodue.vst` (o do próprio modelo, em 100% dos logs de cada modelo), os três plugins Qt, os quatro de RHVoice, `/uenux/bin/avpart90.vst`, `avpart91.vst`, `avpart97.vst`, `avpart99.vst`, `/uenux/bin/avusrbin.vst`, `/uenux/lib/avusrlib.vst`, `/uenux/lib/avusrlibue.vst` e `/dsk/fi/estatico/chave/avusrchave.vst`. Fora da lista ficam só arquivos gerados ou de dados: `/boot/boot/avbootcfg.vsu` (exceção declarada pelo TSE), `/dsk/fi/estatico/dadoscarga.vsu`, `/dsk/fe/estatico/infomidia.vsc`, `<seção>-lo.vsc`, `o00000br-pu.vsc`, `o01219-cp.vsc` e os arquivos da UF `-ce.vsc` e `-ste.vsc`.
+
+**No sentido inverso**, dos 23 pacotes `.vst`/`.vsu`/`.vsc` de cada lista da urna, só um nunca aparece verificado em nenhum log: **`/uenux/bin/avusrbinof.vst`** (nos quatro modelos). Os demais itens das listas (binários, bibliotecas `.so`, módulos `.ko`, arquivos de voz e chaves) não são citados um a um no log; em tese estão cobertos pelos pacotes `.vst` que os assinam, mas o log não permite conferir isso.
+
+### (b) Versão 10.23.0.0
+
+As listas **não trazem número de versão**: só o título, a data e os hashes. O arquivo `/etc/versoes.properties` tem o mesmo SHA-512 (`aGN9HJl4/rSW3piRpoTa...`) nas quatro listas da urna e nas listas do GEDAI, do Sorteio e da Votação (`D:\Aplic\SEVIN\...\aplic\versoes.properties`); o mesmo vale para `dependencias.properties` (`BKTJ72c14pme3oSV...`). Isso mostra que os sistemas lacrados compartilham um único arquivo de versões, mas o conteúdo dele não é publicado. Logo, a versão `10.23.0.0 - Praia da Barra do Cahy` declarada em 100% dos logs e dos BUs **não pode ser ligada a um hash** com o que o TSE publica.
+
+### (c) Chaves e certificados
+
+| Item | Na lista oficial? | Confronto |
+|---|---|---|
+| `99.pub` (série `36452507285E23E9` no log) | Sim, nas mídias de verificação do TSE (VAD-PC e VAD-JEC), SHA-512 `XM+fsGzYpK2Ftp0v2DiXP2KMD9fu1iHIoeBokZWibI7Te8rztG2xBayGSILnvLRvpT4XB9eOX4uPX21L0almIQ==` | As outras entidades têm chave própria: `91.pub` (MP), `90.pub` (OAB), `97.pub` (CONFEA). Os pacotes `avpart90/91/97/99.vst` da urna, verificados em toda inicialização, seguem a mesma numeração. Nos logs só aparece a `99.pub` (262 logs nesta varredura), nunca 90, 91 ou 97. **Não dá para conferir** o número de série contra o hash: o arquivo `99.pub` não é publicado e o log só traz o número de série. |
+| `acue2020.pem` (`data/certificados/ac/`) | Sim, `D:\Aplic\SEVIN\Holocron\certificados\acue2020.cer` (lista HOLOCRON) | **Confere** byte a byte: `LLveJWbhgUEiPfm/WlQL...` |
+| `acue2022.pem` | Sim, `acue2022.cer` (HOLOCRON) | **Confere**: `nawawQDNRHwS4X5kYuMN...` |
+| `acurna.pem` (AC URNA) | Não, em nenhuma das 32 listas | Sem confronto (SHA-512 do nosso arquivo: `rMtCT745kgM9uj0IY6x5...`) |
+| `acraiz-ue.pem`, `acraizuev2.cer`, `acurnav2.cer` | Sim (HOLOCRON), com os mesmos hashes já registrados em `data/certificados/README.md` | Os arquivos continuam não obtidos |
+| Outros certificados | `uedadoschaves.cer`, `ACHSM-DesktopJE-RegistroAssinatura.cer`, `ACHSM-DesktopJE-RegistroSigilo.cer` (HOLOCRON); `acraiz-je.pem` (GEDAI, Sorteio e Votação, mesmo hash) | Não temos os arquivos |
+
+Nenhuma lista da urna traz certificado (`.cer`, `.pem`, `.crt`). As chaves da urna aparecem por UF em `/dsk/fi/estatico/chave/` (17 arquivos, inclusive `.pri`): `sevin.ber.pub`, `pu.ber.pub`, `sc.ber.pub`, `secad.ber.pub`, `secinp.ber.pub` e `seint.ber.pub` têm **um único hash** nas 28 UFs e nos quatro modelos; os outros 11 (`ue.ber.pri`, `ue.ber.pub`, `tse.ber.pub`, `log.ber.pri`, `cv.ber.pri`, `sc.ber.pri`, `bu.pk1`, `bio.sk1`, `jufa.pk1`, `wsq.pk1`, `avusrchave.vst`) mudam de UF para UF e são iguais entre modelos. O `sevin.ber.pub` único reforça a leitura da seção 1 de que a chave SEVIN é comum a todas as urnas, mas o arquivo não é publicado, então a assinatura de software do `.vsc` continua sem conferência.
+
+### (d) GEDAI
+
+A lista `pc1geda` ("GEDAI-UE - 02/09/2026", 69 arquivos) traz `gedai-ue.exe`, `gedai-ue.vst`, bibliotecas, chaves e os pacotes da mídia de votação; não traz versão. Nos logs de preparação (`~/dataurnas-t2/gedai/`, pacotes de 03/10, 04/10, 24/10 e 25/10):
+
+| Evento no log | 1º turno (56 zips) | 2º turno, 24/10 | 2º turno, 25/10 |
+|---|---:|---:|---:|
+| `Abertura do GEDAI-UE - Versão 8.23.0.0 - Praia da Barra do Cahy` | 108.956 | 84.463 | 86.086 |
+| `Serviço Holocron em execução - Versão 4.20.0.0 - Praia da Barra do Cahy` | 108.921 | 84.407 | 86.030 |
+| `Serviço HotSwapFlash em execução - Versão 8.12.0.0` | 247.944 | 194.201 | 197.324 |
+| `Serviço HotSwapFlash em execução - Versão 8.10.0.0` | 66 | 73 | 73 |
+| `Verificação de Assinatura \| Envelope: D:/Aplic/SEVIN/GEDAIUE/Aplic/gedai-ue.vst` | 108.708 | 84.233 | 85.853 |
+| `Verificação de Assinatura \| Envelope: D:/Aplic/SEVIN/GEDAIUE/Aplic/app.ini.vsc` | 108.642 | 84.158 | 85.778 |
+
+- O GEDAI-UE tem uma só versão (8.23.0.0) em todas as estações, e o envelope que ele verifica ao abrir (`gedai-ue.vst`) está na lista. O log não traz hash, então a versão não pode ser ligada ao hash publicado.
+- **`app.ini.vsc` é verificado em toda abertura e não está na lista do GEDAI.**
+- **Duas versões do HotSwapFlash.** No pacote de 25/10, quatro estações registraram a versão 8.10.0.0 entre 18/09 e 17/10/2026: `ZBA056WKS01` (BA, 11 registros, todos em 13/10; a estação também tem 52 registros da 8.12.0.0), `ZBA168WKS01` (BA, 31 registros de 18/09 a 17/10 e nenhum da 8.12.0.0), `ZPA052STD92` (PA, 12 registros de 29/09 a 16/10; 10 da 8.12.0.0) e `ZPI006STD01` (PI, 19 registros de 28/09 a 13/10; 21 da 8.12.0.0). A lista `pc1hsfg` publica um único conjunto de hashes (`HotSwapFlash.exe`, `NotificadorHSF.exe` e 5 bibliotecas) sem versão; duas versões em uso significam que ao menos uma delas não corresponde a esse conjunto. É ponto a esclarecer com o TSE; o log não mostra qual versão foi lacrada.
+
+### Divergências, em resumo
+
+1. Pacotes verificados na carga e ausentes da lista pelo nome: `/boot/boot/avbootcfg.vst`, `avmodue2013/2015/2020/2022.vst` e `avusrlibue2013/2015/2020/2022.vst` (nos quatro modelos).
+2. Pacote da lista nunca verificado nos logs: `/uenux/bin/avusrbinof.vst` (nos quatro modelos).
+3. Pacotes da mídia de votação (`vota_apl.vst`, `vota_ofi.vst`, `avpart_ofi.vst`) estão na lista do GEDAI, não nas da urna; `avgm.vsc` não está em nenhuma.
+4. GEDAI: `app.ini.vsc` verificado e ausente da lista; HotSwapFlash 8.10.0.0 em quatro estações, ao lado da 8.12.0.0.
+5. Nenhuma lista traz versão; a ligação entre `10.23.0.0`/`8.23.0.0` e os hashes depende do conteúdo de `versoes.properties`, que não é publicado.
+6. As listas não são assinadas digitalmente.
+7. Certificado da AC URNA (`acurna.pem`) e arquivo `99.pub` sem possibilidade de confronto (o primeiro não está nas listas; o segundo não é publicado).
+
+Com isso, o item 1 de "O que seria preciso para fechar a lacuna" fica atendido em parte: a lista oficial foi obtida, mas ela confere arquivos que estão dentro da urna e do GEDAI, e os arquivos públicos por seção continuam sem hash de software. O confronto acima é de **nomes** (o log não traz hash); o confronto de bytes continua dependendo da lista emitida pela própria urna.
+
+### Pedidos a fazer ao TSE
+
+- Explicação para os nove pacotes da carga ausentes da lista (`avbootcfg.vst` e os `avmodue20NN.vst`/`avusrlibue20NN.vst`) e os hashes deles; papel do `avusrbinof.vst`.
+- Inclusão de `app.ini.vsc` na lista do GEDAI ou explicação de por que não entra; versão do HotSwapFlash lacrada e motivo das estações com 8.10.0.0.
+- Publicação de `versoes.properties`, `99.pub` (e `90`, `91`, `97`), `acurna` (certificado renovado, se houver) e das raízes `acraiz-ue`, `acraizuev2`, `acurnav2`.
+- Assinatura digital das listas de resumos, e descrição do cálculo do `HASH GERAL UF`.
+- Acesso aos arquivos sem bloqueio para clientes automatizados (o mesmo endereço responde 403 sem os cabeçalhos de navegador).
+
+Scripts usados (não versionados): extração das tabelas e varredura dos logs em `/dev/shm/hashconf/` no servidor de processamento, removidos ao final.
