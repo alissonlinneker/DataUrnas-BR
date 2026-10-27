@@ -735,11 +735,11 @@ def dispersao(df: pd.DataFrame, ano: int, turno: int) -> tuple[dict, pd.DataFram
     taxas = []
     for _ in range(10):
         par = {}
-        for uf, zs in uf_z.groupby(uf_z):
+        for _uf, zs in uf_z.groupby(uf_z):
             lst = rng.permutation(zs.index.to_numpy())
             if len(lst) < 2:
                 continue
-            for a_, b_ in zip(lst, np.roll(lst, 1)):
+            for a_, b_ in zip(lst, np.roll(lst, 1), strict=True):
                 par[a_] = b_
         c2 = cont.assign(z2=cont.z.map(par)).dropna()
         m = c2.merge(cont.rename(columns={"z": "z2", "c": "c2"}), on=["z2", "v"])
@@ -836,7 +836,7 @@ def figuras(hists: dict, saida: Path, swings: dict) -> list[str]:
     from matplotlib.colors import LogNorm
     arquivos = []
     fig, axs = plt.subplots(2, 2, figsize=(11, 10), constrained_layout=True)
-    for ax, (k, H) in zip(axs.ravel(), sorted(hists.items())):
+    for ax, (k, H) in zip(axs.ravel(), sorted(hists.items()), strict=False):
         ano, t = k
         im = ax.imshow(H.T + 0.5, origin="lower", extent=[0, 100, 0, 100], aspect="auto",
                        norm=LogNorm(vmin=0.5, vmax=H.max()), cmap="viridis")
