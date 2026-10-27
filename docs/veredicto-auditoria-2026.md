@@ -6,7 +6,7 @@ Resultado oficial do 2º turno (25/10/2026, totalização final às 23:22): Lula
 
 ## Veredicto
 
-**Não foi encontrada nenhuma evidência de manipulação, de contagem errada de votos ou de dado impossível nos arquivos públicos, em nenhum dos dois turnos.** O resultado divulgado é exatamente a soma dos boletins assinados pelas urnas, os boletins são coerentes por dentro, com o registro digital de cada voto e com o log de cada eleitor, e nenhum padrão estatístico de 2026 foge do que se observou em 2022 com a mesma metodologia.
+**Não foi encontrada nenhuma evidência de manipulação, de contagem errada de votos ou de dado impossível nos arquivos públicos, em nenhum dos dois turnos.** O resultado divulgado é exatamente a soma dos boletins assinados pelas urnas; o registro digital de cada voto (RDV), recontado em todas as seções dos dois turnos, dá exatamente os mesmos números; os boletins são coerentes por dentro e com o log de cada eleitor, e nenhum padrão estatístico de 2026 foge do que se observou em 2022 com a mesma metodologia.
 
 Isso não equivale a provar que o software da urna é honesto. Os arquivos públicos não permitem ligar o programa que rodou em cada urna à lista de hashes lacrada; essa ligação só é feita por amostragem, em cerimônias cujos relatórios não são publicados. Esse é o limite real da auditoria, descrito na seção "O que não pode ser verificado".
 
@@ -21,7 +21,7 @@ Foram encontrados pontos de transparência e de registro que pedem esclareciment
 | 3 | Soma dos BUs x resultado oficial | Brasil, UFs e 5.757 municípios, dois turnos | Igual voto a voto (13, 22, brancos, nulos, comparecimento) | `docs/auditoria-consistencia-bu-2026.md` |
 | 4 | Totais divulgados ao longo da noite | 12 mil versões coletadas | Nunca diminuíram; sempre fecharam | `docs/verificacoes-externas-2turno-2026.md` |
 | 5 | Valores impossíveis no BU (comparecimento > aptos, total ≠ comparecimento, horários fora do dia, urna repetida, aptos que mudam) | 998.414 BUs | 0 impossíveis; repetições e zeros explicados e comparados com 2022 | `docs/auditoria-consistencia-bu-2026.md` |
-| 6 | Recontagem voto a voto pelo RDV x BU | 1º turno: todas as 499.206 seções com RDV (todos os cargos); 2º turno: 8.000 seções (incluindo 5.003 tardias), recontagem nacional em andamento | 0 divergências; assinatura do RDV válida em todas | `docs/rdv-log-2026.md` |
+| 6 | Recontagem voto a voto pelo RDV x BU | Todas as seções dos dois turnos: 499.206 no 1º e 499.205 no 2º (as 2 restantes do exterior tiveram comparecimento 0) | 0 divergências; soma nacional do RDV do 2º turno igual ao resultado oficial (13: 64.256.232; 22: 59.826.041); assinatura e hash do RDV válidos em todas | `docs/rdv-log-2026.md` |
 | 7 | Log eleitor a eleitor x BU | 2.997 seções, dois turnos | Votos no log = comparecimento em todas; 0 votos fora do horário; ritmo plausível | `docs/rdv-log-2026.md` |
 | 8 | Encerramento tardio (prorrogação até 19h) e impacto na margem | 497.897 seções; logs de 21.317 | 5.129 votos depois das 17h nas tardias; total estimado 31.792; margem nunca inverte (pior cenário 4.398.399) | `docs/encerramento-tardio-2turno-2026.md` |
 | 9 | 368 BUs emitidos mais de 1 h depois do encerramento | logs das 368 e de 368 controles | 0 votos depois do encerramento, 0 reabertura; urna parada na tela de registro de mesários | `docs/auditoria-consistencia-bu-2026.md` |

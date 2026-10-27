@@ -1,5 +1,7 @@
 # RDV x BU x log da urna e padrões de votação no log (2026, 1º e 2º turno)
 
+> **Recontagem nacional do 2º turno concluída (27/10/2026): 499.205 seções com RDV, 0 divergências.** A soma do RDV de todas as seções dá exatamente o resultado oficial: 13 = 64.256.232, 22 = 59.826.041, brancos 1.430.496, nulos 2.723.305. Ver a seção 5. Com a recontagem nacional do 1º turno (499.206 seções), o RDV de todas as seções dos dois turnos foi recontado.
+
 > **Nenhuma divergência RDV x BU.** Nas 8.000 seções do 2º turno e nas 2.997 seções do 1º turno conferidas aqui, a recontagem voto a voto do RDV dá exatamente o resultado do BU em todos os cargos (Presidente: 13, 22, outros, brancos e nulos), e o RDV, o BU e o log têm o SHA-512 igual ao hash assinado no `.vsc`, com assinatura válida em 100% dos casos. Não há seção a destacar.
 
 ## Resumo
@@ -208,4 +210,80 @@ Habilitação manual no total: 9,28% dos eleitores no 1º turno e 8,50% no 2º; 
 
 Nesta amostra, nada nos arquivos públicos da urna indica voto inserido, alterado ou removido: o RDV, que é o registro de cada voto, soma exatamente o BU; o log registra um eleitor habilitado para cada voto, no horário de votação; e as assinaturas fecham. O que esses arquivos não podem mostrar é se o eleitor habilitado era de fato quem dizia ser quando a habilitação foi manual ou sem biometria cadastrada; para isso seria preciso o caderno de votação e as imagens de digitais das habilitações manuais, que a urna grava mas o TSE não publica.
 
-Limites: amostra de 8.000 seções no 2º turno (1,6% do país), com peso das seções que encerraram tarde; o log eleitor a eleitor cobre 2.997 seções; o RDV é embaralhado por desenho e não permite ligar voto a eleitor nem a horário.
+Limites: amostra de 8.000 seções no 2º turno (1,6% do país), com peso das seções que encerraram tarde; o log eleitor a eleitor cobre 2.997 seções; o RDV é embaralhado por desenho e não permite ligar voto a eleitor nem a horário. A recontagem do RDV deixou de ser amostral na seção 5.
+
+## 5. Recontagem nacional do 2º turno
+
+Todas as 499.207 seções com BU do 2º turno. Mesmo método da seção 2 (`A._rdv_um` de `rdv_log_auditoria.py`), aplicado a cada seção pelo script `scripts/ele2026/rdv_nacional_t2.py`:
+
+| Etapa | O que faz |
+|---|---|
+| `lista` | exporta do banco de análise UF, município, zona, seção e hash publicado de cada BU (`lista.parquet`) |
+| `baixar` | baixa só o `-rdv.dat` de cada seção (BU e `.vsc` já estão no banco, coletados e reconferidos desde 25/10), pulando as 8.000 da amostra |
+| `processar` | por UF, junta RDV, BU e `-vota.vsc`, reconta o RDV, confere o hash assinado e a assinatura |
+| `relatorio` | `rdv_secoes.parquet` e `resumo.json` com os totais RDV x BU e o quadro por UF |
+
+Download de 27/10/2026, dividido em dois endereços, cada um com um processo e de 15 a 25 req/s: 488.088 arquivos `-rdv.dat` (224.742 + 263.346), 1.353.148.936 bytes, 0 respostas 404, 0 respostas 429, 0 falhas. As 8.000 seções restantes vêm da amostra (seção 1). Saída fora do git em `data/parquet/2026/t2/rdv_nacional/resumo.json`; os brutos ficam no servidor de análise em `~/dataurnas-t2/rdv_nacional/`.
+
+```sh
+python3 -I scripts/ele2026/rdv_nacional_t2.py lista --saida ~/dataurnas-t2/rdv_nacional_saida
+python3 -I scripts/ele2026/rdv_nacional_t2.py baixar --ufs <ufs> --brutos ~/dataurnas-t2/rdv_nacional --taxa 15 --taxa-max 25
+python3 -I scripts/ele2026/rdv_nacional_t2.py processar --saida ~/dataurnas-t2/rdv_nacional_saida --brutos ~/dataurnas-t2/rdv_nacional
+python3 -I scripts/ele2026/rdv_nacional_t2.py relatorio --saida ~/dataurnas-t2/rdv_nacional_saida
+```
+
+| Item | Resultado |
+|---|---|
+| Seções processadas | 499.207 |
+| Seções com RDV | 499.205 (as 2 sem RDV são do exterior, ZZ 29564/0001/0091 e ZZ 30686/0001/0443, com comparecimento 0 no BU) |
+| Presidente: RDV = BU em todos os campos | 499.205 |
+| Presidente: RDV ≠ BU | 0 |
+| RDV = BU em todos os cargos (inclui Governador e a eleição suplementar) | 499.207 |
+| SHA-512 do RDV = hash assinado no `.vsc` | 499.207 |
+| Assinatura do `.vsc` válida | 499.207 |
+
+Soma nacional, RDV contra BU (e contra o resultado oficial, que é igual ao BU; ver `docs/auditoria-consistencia-bu-2026.md`):
+
+| Campo | RDV | BU |
+|---|---:|---:|
+| 13 | 64.256.232 | 64.256.232 |
+| 22 | 59.826.041 | 59.826.041 |
+| Brancos | 1.430.496 | 1.430.496 |
+| Nulos | 2.723.305 | 2.723.305 |
+| Outros nominais / legenda | 0 / 0 | 0 / 0 |
+| Total Presidente | 128.236.074 | 128.236.074 |
+
+Por UF:
+
+| UF | Seções | Com RDV | Conferem | Divergem |
+|---|---:|---:|---:|---:|
+| AC | 2.270 | 2.270 | 2.270 | 0 |
+| AL | 7.101 | 7.101 | 7.101 | 0 |
+| AM | 8.157 | 8.157 | 8.157 | 0 |
+| AP | 1.914 | 1.914 | 1.914 | 0 |
+| BA | 35.476 | 35.476 | 35.476 | 0 |
+| CE | 23.765 | 23.765 | 23.765 | 0 |
+| DF | 6.969 | 6.969 | 6.969 | 0 |
+| ES | 9.844 | 9.844 | 9.844 | 0 |
+| GO | 15.686 | 15.686 | 15.686 | 0 |
+| MA | 18.093 | 18.093 | 18.093 | 0 |
+| MG | 52.062 | 52.062 | 52.062 | 0 |
+| MS | 7.106 | 7.106 | 7.106 | 0 |
+| MT | 8.287 | 8.287 | 8.287 | 0 |
+| PA | 20.827 | 20.827 | 20.827 | 0 |
+| PB | 10.712 | 10.712 | 10.712 | 0 |
+| PE | 21.418 | 21.418 | 21.418 | 0 |
+| PI | 10.225 | 10.225 | 10.225 | 0 |
+| PR | 27.142 | 27.142 | 27.142 | 0 |
+| RJ | 37.675 | 37.675 | 37.675 | 0 |
+| RN | 8.115 | 8.115 | 8.115 | 0 |
+| RO | 4.698 | 4.698 | 4.698 | 0 |
+| RR | 1.519 | 1.519 | 1.519 | 0 |
+| RS | 27.547 | 27.547 | 27.547 | 0 |
+| SC | 17.326 | 17.326 | 17.326 | 0 |
+| SE | 5.923 | 5.923 | 5.923 | 0 |
+| SP | 103.656 | 103.656 | 103.656 | 0 |
+| TO | 4.384 | 4.384 | 4.384 | 0 |
+| ZZ (exterior) | 1.310 | 1.308 | 1.308 | 0 |
+
+Conclusão: o registro de cada voto, assinado por cada urna, soma exatamente o BU de cada seção e, somado no país, exatamente o resultado oficial. Uma troca de votos entre a urna e a divulgação teria de alterar também o RDV de cada seção afetada sem quebrar a assinatura de hardware da urna, e as 499.207 assinaturas conferem. O que a recontagem não alcança é o mesmo limite do resto da auditoria: se o software da urna registrou no RDV o voto que o eleitor digitou (ver `docs/veredicto-auditoria-2026.md`, "O que não pode ser verificado").

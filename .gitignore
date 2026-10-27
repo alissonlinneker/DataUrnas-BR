@@ -136,5 +136,8 @@ data/parquet/2026/t2/efeito_urna/
 # Conferência RDV x BU x log e padrões de votação no log, 2026
 data/parquet/2026/t2/rdv_log/
 
+# National RDV recount of the 2nd round, 2026
+data/parquet/2026/t2/rdv_nacional/
+
 # Confronto dos produtos de dados abertos do TSE com os BUs, 2026
 data/parquet/2026/t2/dados_abertos/
