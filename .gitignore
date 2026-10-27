@@ -123,3 +123,15 @@ data/parquet/2026/t2/ordem_envio/
 
 # Biometria 1º x 2º turno de 2026 (derivado do BU e de amostra de logs)
 data/parquet/2026/t2/biometria/
+
+# Emissão tardia do BU no 2º turno e BH 0039/0168 (derivado dos logs)
+data/parquet/2026/t2/emissao_tardia/
+
+# Forense estatística por seção, 2026 com 2022 de controle (derivado)
+data/parquet/2026/t2/forense/
+
+# Efeito do equipamento (modelo, troca e reserva de urna) no voto, 2026
+data/parquet/2026/t2/efeito_urna/
+
+# Conferência RDV x BU x log e padrões de votação no log, 2026
+data/parquet/2026/t2/rdv_log/

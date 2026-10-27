@@ -17,16 +17,16 @@ Gravidade: **explicável** (há explicação benigna documentada ou demonstrada 
 | 5 | Aptos que mudam entre turnos | 55.722 seções; total idêntico (158.745.079); toda a mudança fecha pelo voto em trânsito | explicável |
 | 6 | BUs com o mesmo vetor de votos em seções distintas | 1.180 pares no 2º turno, espalhados pelo país, nenhum repetido no 1º turno, nenhum na mesma urna | explicável (coincidência) |
 | 7 | Mesmo número interno de urna em seções diferentes no mesmo turno | 0 entre BUs de urna; só os 2 equipamentos do Sistema de Apuração do exterior | explicável |
-| 8 | BU de contingência (Sistema de Apuração) | 29 no 2º turno e 31 no 1º; votos coerentes; 1 seção de Belo Horizonte com comparecimento baixo no 1º turno | explicável, com **1 seção a esclarecer** |
+| 8 | BU de contingência (Sistema de Apuração) | 29 no 2º turno e 31 no 1º; votos coerentes; Belo Horizonte 0039/0168 no 1º turno teve apuração mista (BU impresso da urna 2409879 digitado no SA mais 20 cédulas), com comparecimento baixo | explicável, com **1 seção a esclarecer** (urna 2409879 sem log nem BU publicados) |
 | 9 | Comparecimento de 100% | 12 seções no 2º turno, 15 no 1º; 3 seções com 100% nos dois turnos sem voto em trânsito | explicável, com **3 seções a esclarecer** |
 | 10 | Zero voto para um dos finalistas | 106 seções sem voto no 22 e 4 sem voto no 13 no 2º turno (2022: 141 e 2); 90 das 106 já tinham até 2 votos no 22 no 1º turno | explicável, com **1 seção a esclarecer** |
 | 11 | Emissão do BU antes da abertura, antes do encerramento ou fora do dia; abertura antes das 8h de Brasília; encerramento antes das 17h de Brasília | 0 em todos os casos, nos dois turnos | nenhum achado |
 | 12 | Abertura antes das 7h locais | 2.826 seções, todas nos fusos UTC-5 (6h locais = 8h de Brasília) | explicável |
 | 13 | Abertura às 9h de Brasília ou depois | 84 no 2º turno (47 com urna de reserva), 213 no 1º | explicável (operacional), com **1 zona a esclarecer** |
-| 14 | BU emitido mais de 1 hora depois do encerramento | **368 seções no 2º turno contra 6 no 1º**, 301 delas nas capitais SP, RJ, BA e PE; votos dessas seções iguais aos das vizinhas | **precisa esclarecimento** |
+| 14 | BU emitido mais de 1 hora depois do encerramento | **368 seções no 2º turno contra 6 no 1º**, 301 delas nas capitais SP, RJ, BA e PE. O log mostra 0 voto depois do encerramento, 0 reabertura e 1 BU por seção: a urna ficou parada na tela de registro de mesários (352) ou foi reiniciada/trocada (16) | explicável quanto à contagem; motivo da espera depende da ata |
 | 15 | Tipo de urna e fase | fase "oficial" em 100%; contingência só em BU do Sistema de Apuração; reserva subiu de 3.033 para 5.714, em proporção parecida com a de 2022 | explicável |
 
-Nenhuma checagem produziu indício sério. Os dois pontos que mais pedem resposta da Justiça Eleitoral são o atraso de emissão do BU em 368 seções do 2º turno (item 14) e o comparecimento baixo da seção 0039/0168 de Belo Horizonte no 1º turno, apurada por cédula (item 8). Nenhum dos dois altera a contagem de forma detectável: nas 368 seções o voto se moveu entre os turnos como nas vizinhas, e a seção de Belo Horizonte tem soma e comparecimento coerentes dentro do próprio BU.
+Nenhuma checagem produziu indício sério. Os dois pontos que mais pedem resposta da Justiça Eleitoral são o atraso de emissão do BU em 368 seções do 2º turno (item 14) e o comparecimento baixo da seção 0039/0168 de Belo Horizonte no 1º turno, de apuração mista no Sistema de Apuração (item 8). Os logs resolveram a parte de contagem dos dois (ver a última seção). Nenhum dos dois altera a contagem de forma detectável: nas 368 seções o voto se moveu entre os turnos como nas vizinhas, e a seção de Belo Horizonte tem soma e comparecimento coerentes dentro do próprio BU.
 
 ## Dados e método
 
@@ -107,7 +107,7 @@ Comparecimento zero não é impossível no BU e não esconde voto: aptos ficam n
 
 ### Seção a esclarecer: Belo Horizonte, zona 0039, seção 0168
 
-No 1º turno, a seção mg 41238 0039/0168 foi apurada por cédula (equipamento 2254078) e teve 281 eleitores de 501 aptos (56,1%). No 2º turno, com urna (2401024), teve 365 (72,9%). As 14 seções do mesmo local de votação tiveram entre 69,0% e 79,1% no 1º turno. Em 2022 a mesma seção teve 68,4% e 75,2%. A distância para o esperado é de cerca de 80 eleitores no 1º turno.
+No 1º turno, a seção mg 41238 0039/0168 foi apurada no Sistema de Apuração (equipamento 2254078; apuração mista, ver a última seção) e teve 281 eleitores de 501 aptos (56,1%). No 2º turno, com urna (2401024), teve 365 (72,9%). As 14 seções do mesmo local de votação tiveram entre 69,0% e 79,1% no 1º turno. Em 2022 a mesma seção teve 68,4% e 75,2%. A distância para o esperado é de cerca de 80 eleitores no 1º turno.
 
 | Seção | Aptos | 1º turno | 2º turno |
 |---|---:|---:|---:|
@@ -382,8 +382,8 @@ Nos 998.414 BUs dos dois turnos (499.207 por turno) não há número impossível
 
 Ficam para esclarecimento, em ordem de prioridade:
 
-1. **368 seções do 2º turno com BU emitido mais de 1 hora depois do encerramento** (6 no 1º turno), 301 nas capitais SP, RJ, BA e PE. Sem efeito detectável no voto. Resolve com o log dessas urnas.
-2. **Belo Horizonte 0039/0168 no 1º turno**, apurada por cédula, com cerca de 80 eleitores a menos que o esperado. Resolve com a ata da mesa e o log do Sistema de Apuração.
+1. **368 seções do 2º turno com BU emitido mais de 1 hora depois do encerramento** (6 no 1º turno), 301 nas capitais SP, RJ, BA e PE. Os logs mostram 0 voto depois do encerramento e nenhuma reabertura; resta saber, pela ata, por que a mesa esperou na tela de registro de mesários.
+2. **Belo Horizonte 0039/0168 no 1º turno**, apuração mista (BU impresso da urna 2409879 digitado no Sistema de Apuração mais 20 cédulas), com cerca de 80 eleitores a menos que o esperado. O log e o BU da urna 2409879 não foram publicados; resolve com a ata da mesa e esses arquivos.
 3. Baixa prioridade: Maués 0005/0176 (16 votos do 22 no 1º turno, 0 no 2º); comparecimento de 100% nos dois turnos em Santana do Acaraú 0044/0193, Deputado Irapuan Pinheiro 0055/0160 e Baião 0035/0238; quedas para 8,4% em Inácio Martins 0034/0133 e para 13,7% em Mangaratiba 0054/0140.
 
 Nenhum desses pontos, isolado ou somado, chega perto de alterar o resultado: o maior deles soma 368 seções, 0,07% do total, que votaram como as vizinhas.
@@ -630,3 +630,156 @@ Colunas: UF, município, zona/seção, 2º turno de 2026 (13 x 22), brancos mais
 | sp/71072/0375 | 1 | 0723 (113) |
 | sp/71072/0381 | 5 | 0141 (103), 0292 (65), 0449 (63), 0729 (62), 0774 (69) |
 | sp/71072/0422 | 8 | 0008 (79), 0056 (64), 0101 (66), 0238 (119), 0266 (72), 0297 (75), 0315 (72), 0317 (61) |
+
+## Resolução dos itens 14 e 8a pelos logs
+
+Esta seção lê o log da urna (`logd.dat`, dentro do `-log.jez`) das 368 seções do item 14 e o log do Sistema de Apuração da seção 0039/0168 de Belo Horizonte (item 8a). Script: `scripts/ele2026/emissao_tardia_logs.py`; saídas em `data/parquet/2026/t2/emissao_tardia/` (fora do git) e brutos no servidor de análise (`~/dataurnas-t2/emissao_tardia/`).
+
+### Dados e método
+
+- **Amostra.** As 368 seções do apêndice B (emissão mais de 1 hora depois do encerramento, refeitas a partir de `secoes_encerramento.parquet`, mesma lista) e 368 seções de **controle**: em cada zona, o mesmo número de seções com emissão até 10 minutos depois do encerramento, escolhidas por ordem pseudoaleatória fixa (sha256 da chave da seção). Todas as 368 tiveram controle na própria zona.
+- **Download.** Em 27/10/2026, do pleito 3221: o `aux.json` de cada seção e o log de cada hash listado. Um processo, no máximo 2,5 requisições por segundo, 1.482 requisições, nenhuma falha e nenhum 404. Para BH 0039/0168, todos os arquivos publicados no 1º turno (pleito 3220) e no 2º (3221).
+- **Correspondência entre BU e log.** A hora de encerramento do BU é a hora da linha `Procedimento de encerramento confirmado`; a hora de emissão é a da linha `Gerando relatório [BU] [INÍCIO]` (ou, quando o BU sai do Recuperador de Dados em outra urna, a da geração do `bu.dat`). Nas 736 seções as duas horas batem com o BU com diferença máxima de 1 segundo. O número de linhas `O voto do eleitor foi computado` do dia é igual ao comparecimento do BU nas 736.
+- **Intervalo analisado.** Todas as linhas do log de 25/10/2026 entre o encerramento e a emissão do BU, por horário. "Maior espera" é o maior intervalo entre duas ações do operador ou do sistema, sem contar as linhas que a urna grava sozinha a cada 30 minutos (espaço em mídia, memória e tensão da rede e da bateria).
+
+### Resposta a cada hipótese
+
+| Pergunta | 368 tardias | 368 controles |
+|---|---:|---:|
+| Votos computados depois da hora de encerramento do BU | **0** | 0 |
+| Nova `Urna pronta para receber votos` depois do encerramento (reabertura) | **0** | 0 |
+| BU gerado mais de uma vez no dia (`Gerando relatório [BU] [INÍCIO]` ou `bu.dat`) | 0 (1 em todas) | 0 (1 em todas) |
+| Mais de um hash publicado no `aux.json` | 0 | 0 |
+| Seções com via extra do BU impressa (2 a 5 vias) | 8 | 14 |
+| Seções com desligamento e religamento da urna no intervalo | 16 (31 ligações) | 0 |
+| Seções em que a urna ficou sem a rede elétrica em algum momento do intervalo | 19 | 2 |
+| Seções com erro que interrompeu o aplicativo (`Não é possível continuar a execução`) | 3 | 0 |
+| Seções com troca de urna (outra urna emitiu o BU) | 2 | 0 |
+| Seções que passaram pela tela de registro de mesários depois do encerramento | 368 | 368 |
+| Mesários registrados depois do encerramento | 1.332 (em 353 seções) | 1.366 (em 361 seções) |
+
+Classificação de cada seção pelo evento mais grave encontrado no intervalo (a ordem de prioridade é a da tabela):
+
+| Classe | Tardias | Controles |
+|---|---:|---:|
+| Voto computado depois do encerramento | 0 | 0 |
+| Reabertura da votação | 0 | 0 |
+| Troca de urna antes da emissão | 2 | 0 |
+| Urna desligada e religada antes da emissão | 14 | 0 |
+| Urna ligada, sem reinício, na tela de registro de mesários | 352 | 368 |
+
+**O log registra zero voto depois do encerramento nas 368 seções**, zero reabertura e um único BU por seção. Nada no log indica voto aceito, contagem refeita ou BU substituído entre o encerramento e a emissão.
+
+### O que aconteceu nas 352 seções sem reinício
+
+Na urna de 2026 o encerramento tem duas etapas. A primeira é `Procedimento de encerramento confirmado`: daí em diante a urna não aceita mais voto, e é essa a hora que vai para o BU como encerramento. Logo em seguida a urna pergunta `Operador indagado se ocorrerá registro de mesários` e abre a tela `Registrando mesários após a votação`, onde cada mesário se identifica por título e biometria. Só quando o operador fecha essa tela (`Operador encerrou ciclo de registro de mesários`) vêm `Inicio do Encerramento` e, um segundo depois, a geração do BU. Nos controles esse passo leva segundos: a maior espera mediana é de 0,3 minuto (máximo 4,2) e o atraso total mediano entre encerramento e emissão é de 2,0 minutos (máximo 7,8).
+
+Nas 352 seções a urna ficou parada nessa tela de registro de mesários:
+
+| Medida (352 seções) | Valor |
+|---|---|
+| Maior espera sem nenhuma ação | mediana 72,6 min; mínimo 16,9; máximo 122,8 |
+| Fração do atraso total ocupada pela maior espera | mediana 92,9% |
+| Início da espera (Brasília) | de 17:02:32 a 18:15:29, mediana 17:10:55 |
+| Retomada (Brasília) | de 17:41:36 a 19:10:58, mediana 18:30:50 |
+| Emissão do BU (Brasília) | de 18:02:19 a 19:12:08 |
+| Retomadas às 19:00:00 de Brasília ou depois | 73 |
+
+Retomada por faixa de horário de Brasília: 17:30 a 17:44, 1; 17:45 a 17:59, 16; 18:00 a 18:14, 83; 18:15 a 18:29, 77; 18:30 a 18:44, 47; 18:45 a 18:59, 93; 19:00 a 19:14, 35. Nenhuma das 352 retomou depois de 19:10:58 de Brasília.
+
+Última linha antes da espera: `Operador confirmou o registro de mesários` (151), `Operador indagado se continua registrando mesários` (86), `Operador indagado se finaliza registro mesários` (46), `Pedido de leitura da biometria do mesário` (25), `Registrando mesários após a votação` (16), `Digitado título inválido para o registro de mesário` (12), `Operador indagado se ocorrerá registro de mesários` (7) e outras 9. Primeira linha depois da espera: `Pedido de leitura da biometria do mesário` (128), `Operador confirmou o registro de mesários` (75), `Operador indagado se finaliza registro mesários` (45), `Operador cancelou o registro de mesários` (44), `Digitado título inválido para o registro de mesário` (27), `Operador encerrou ciclo de registro de mesários` (18) e outras 15. Ou seja, a espera começa e termina dentro do registro de mesários, com a urna aguardando um comando do operador.
+
+Exemplos (hora local, que nos quatro casos é a de Brasília):
+
+| Seção | Eventos |
+|---|---|
+| SP 71072 0328/0730 | 17:07:58 `Procedimento de encerramento confirmado`; 17:08:05 `Registrando mesários após a votação`; 17:08:36 `Mesário 424334810108 registrado`; 17:10:13 `Operador confirmou o registro de mesários`; **nenhuma linha de operador até** 19:01:28 `Pedido de leitura da biometria do mesário 338764790183`; 3 mesários registrados entre 19:01:38 e 19:03:05; 19:03:15 `Operador encerrou ciclo de registro de mesários`; 19:03:16 `Inicio do Encerramento`; 19:03:17 `Gerando relatório [BU] [INÍCIO]` |
+| RJ 60011 0009/0192 | 17:05:43 `Procedimento de encerramento confirmado`; 17:05:44 `Operador indagado se ocorrerá registro de mesários`; **nenhuma linha de operador até** 19:00:12 `Operador confirmou o registro de mesários`; 3 mesários registrados; 19:01:39 `Operador encerrou ciclo de registro de mesários`; 19:01:41 `Gerando relatório [BU] [INÍCIO]` |
+| PE 25313 0009/0499 | 17:05:12 `Procedimento de encerramento confirmado`; 17:05:41 `Mesário 060728040833 registrado`; 17:06:16 `Operador indagado se finaliza registro mesários`; 17:09:50 `Operador confirmou o registro de mesários`; **nenhuma linha de operador até** 19:00:01 `Pedido de leitura da biometria do mesário 106805000825`; 3 mesários registrados entre 19:00:06 e 19:02:12; 19:02:28 `Operador encerrou ciclo de registro de mesários`; 19:02:29 `Gerando relatório [BU] [INÍCIO]` |
+| BA 38490 0002/0019 | 17:11:56 `Procedimento de encerramento confirmado`; 17:12:24 `Mesário 147002490540 registrado`; 17:12:28 `Operador confirmou o registro de mesários`; **nenhuma linha de operador até** 18:28:12 `Pedido de leitura da biometria do mesário 176925810531`; 2 mesários registrados (18:28:17 e 18:30:02) e 4 títulos inválidos; 18:30:41 `Operador encerrou ciclo de registro de mesários`; 18:30:43 `Gerando relatório [BU] [INÍCIO]` |
+| Controle SP 71072 0328/0001 | 19:00:31 `Procedimento de encerramento confirmado`; 4 mesários registrados entre 19:01:02 e 19:02:34; 19:02:52 `Operador encerrou ciclo de registro de mesários`; 19:02:54 `Gerando relatório [BU] [INÍCIO]` |
+
+Durante as esperas a urna continuou gravando as linhas automáticas de 30 em 30 minutos, o que mostra que ficou ligada e com o aplicativo de votação aberto, sem voto computado.
+
+Nas mesmas zonas, 78 dos 368 controles encerraram às 19:00 de Brasília ou depois, isto é, continuaram recebendo votos até o horário da prorrogação e emitiram o BU em seguida. As 368 tardias fizeram o contrário: 367 confirmaram o encerramento até 17:59 de Brasília (336 até 17:10) e só fecharam o registro de mesários e emitiram o BU depois. O log não registra o motivo da espera (orientação recebida pela mesa, ausência de mesário, decisão do presidente da mesa); registra só que a urna estava encerrada para votos e parada na tela de registro de mesários. A coincidência da retomada com o horário de 19h e com a [prorrogação](prorrogacao-votacao-2turno-2026.md) é temporal; o motivo é matéria da ata da mesa.
+
+### As 16 seções com reinício ou troca de urna
+
+Todas com fuso UTC-3 (hora local = Brasília).
+
+| Seção | Encerramento | Emissão | O que o log registra no intervalo |
+|---|---|---|---|
+| BA 38490 0002/0032 | 17:11:51 | 18:18:53 | registro de mesários aberto; 17:18:19 `Urna desligada pela chave`; religada 17:21:26; volta ao registro 17:27:03; 4 mesários registrados entre 17:28:09 e 18:18:38; BU 18:18:53 |
+| BA 38490 0002/0513 | 17:09:56 | 18:27:53 | 3 mesários até 17:11:33; 18:21:46 desligada pela chave; religada 18:22:23; 1 mesário; BU 18:27:53 |
+| BA 38490 0006/0058 | 17:09:39 | 18:27:24 | 1 mesário 17:10:07; 17:41:25 desligada pela chave; religada 17:41:58; aplicativo aberto 17:44:18; volta ao registro só 18:25:26; BU 18:27:24 |
+| BA 38490 0006/0486 | 17:10:54 | 18:13:44 | 4 mesários até 17:13:33; 18:07:02 desligada pela chave; religada 18:07:33; BU 18:13:44 |
+| MG 40592 0097/0234 | 17:00:49 | 18:36:09 | urna religada às 17:03:31 sem registro de desligamento, já `Urna operando com bateria interna` e `Bateria interna com carga crítica`; registro de mesários aberto 17:08:51; nova ligação às 18:30:35, sem registro de desligamento, com `Urna operando com bateria externa`; BU 18:36:09 |
+| MG 41238 0039/0472 | 17:01:55 | 19:27:13 | 17:06:12 desligada pela chave; ligada 17:06:55 sem nenhuma linha seguinte; nova ligação 19:22:29, `Urna ligada desconectada da rede CA em [0.00V]`; BU 19:27:13 |
+| MG 52132 0250/0099 | 17:03:04 | 18:17:29 | 3 mesários até 17:04:24; 17:06:09 `Erro inesperado (5330) ERROR starting image acquisition` (leitor biométrico); 17:10:22 desligada pela chave; religada 18:14:23; BU 18:17:29 |
+| PA 04278 0098/0294 (reserva) | 17:04:07 | 18:23:28 | urna 02156713: 17:06:11 erro 5330 do leitor biométrico; 8 desligamentos pela chave e 7 religamentos até 18:09:46, com 7 erros no total (5330, 5328 e 5326, este `ERROR opening the biometric reader`); às 18:15:46 liga a urna 02192172, que lê a mídia da anterior, registra 2 mesários e emite o BU 18:23:28 |
+| PB 20516 0076/0383 | 19:00:38 | 20:48:40 | 19:00:38 `Gravando o estado da urna (1175) Ocorreu um erro durante a sincronização`; 4 desligamentos pela chave e religamentos (19:02, 19:37, 20:06, 20:19); aplicativo de votação aberto 20:26:59; BU 20:48:40 |
+| PE 25356 0028/0067 | 17:59:07 | 19:02:03 | 18:01:03 desligada pela chave; religada 18:05:20; registro aberto 18:10:56; 4 mesários entre 19:00:27 e 19:01:56; BU 19:02:03 |
+| RJ 58432 0107/0025 | 17:08:08 | 19:13:39 | 4 mesários até 17:10:22; 17:17:41 `Urna ligada desconectada da rede CA em [0.00V]`, 17:19:59 bateria `[CRÍTICA]`; sem linha até nova ligação 19:09:23 (com rede elétrica); BU 19:13:39 |
+| RJ 59250 0090/0232 | 17:00:46 | 19:45:31 | 17:00:55 desligada pela chave na pergunta do registro de mesários; ligada 17:02:56 sem nenhuma linha seguinte; nova ligação 19:33:28; BU 19:45:31 |
+| RJ 60011 0009/0213 | 17:07:58 | 19:03:22 | 17:32:54 desligada pela chave; religada 17:34:14; registro aberto 17:40:00; 3 mesários entre 19:00:49 e 19:03:02; BU 19:03:22 |
+| RJ 60011 0122/0304 | 17:04:29 | 19:16:03 | 18:12:17 desligada pela chave; religada 18:13:04; 15 segundos na bateria às 18:58:37; 4 mesários entre 19:14:00 e 19:15:46; BU 19:16:03 |
+| SP 61654 0014/0250 (reserva que encerrou a seção) | 17:02:28 | 19:17:53 | urna 01786184: 17:06:10 desligada pela chave no registro de mesários; às 18:57:43 liga a urna de contingência 01794345; 19:14:17 `Iniciando aplicação RECUPERADOR DE DADOS`; 19:15:44 `Recuperando urna de votação com resultado não gerado`; BU impresso e `bu.dat` gerado às 19:17:53 |
+| SP 71072 0004/0324 | 17:04:40 | 19:02:14 | 2 mesários até 17:05:18; 17:27:53 desligada pela chave; religada 17:28:29; registro aberto só 19:01:06; 2 mesários; BU 19:02:14 |
+
+Em nenhuma das 16 o log registra voto depois do encerramento ou nova abertura. Em 4 delas a urna voltou a ser ligada sem nenhum registro de desligamento antes (nem `Urna desligada pela chave`, nem `Desligando a urna`, nem `Fechando o arquivo de Log`), isto é, parou sem o desligamento normal: MG 40592 0234 (duas vezes), MG 41238 0472, RJ 58432 0025 e RJ 59250 0232. Na de São Paulo 61654 o BU não foi gerado pela urna da seção: o Recuperador de Dados leu a mídia de votação da urna original, que já tinha o encerramento confirmado.
+
+### Energia
+
+Em 19 tardias e 2 controles a urna registrou, no intervalo, `Urna operando na bateria interna` ou `Urna ligada desconectada da rede CA`. Em 13 dessas 19 tardias a urna não reiniciou e continuou na tela de registro de mesários; entre elas estão as três seções da zona 0065 de RJ 58777 (0044, 0045 e 0048), que passaram à bateria entre 18:47:23 e 18:50:47. Falta de energia ou cabo desligado aparece, portanto, em uma minoria das 368 e não explica o padrão; e em nenhuma delas houve voto depois do encerramento.
+
+### Conclusão do item 14
+
+O atraso de emissão nas 368 seções não é voto tardio, reabertura nem BU refeito. Em 352 a urna ficou encerrada para votos e parada, ligada, na tela de registro de mesários, por 17 a 123 minutos (mediana 73), e a mesa só voltou a operar a urna entre 17:41 e 19:11 de Brasília, com o BU emitido entre 18:02 e 19:12; em 16 a espera envolve desligamentos, falta de rede elétrica, erros do leitor biométrico ou da gravação de estado e, em 2, troca de urna. O conteúdo do BU (votos até o encerramento) é confirmado pelo log, com o número de votos do log igual ao comparecimento do BU em todas as 368. Gravidade revista: **explicável** quanto à integridade da contagem; o motivo da espera da mesa continua dependendo da ata.
+
+### Item 8a: Belo Horizonte, zona 0039, seção 0168, 1º turno
+
+Arquivos publicados no 1º turno (um único hash, recebido em 04/10/2026 às 22:15:29): `-logsa.jez`, `-sa.vsc`, `-rdv.dat` e `-busa.dat`. Não há `-log.jez` nem `-bu.dat` de urna de votação. A seção não foi apurada só por cédula: o BU do SA é do tipo `saMistaBUImpressoCedula`, com `tipoapuracao` = `mistaBU`, ou seja, **BU impresso de urna digitado no SA mais cédulas**.
+
+O que dizem o BU e o RDV do SA:
+
+| Campo | Valor |
+|---|---|
+| Equipamento do SA | 2254078, urna de contingência carregada em 22/09/2026 para a "seção 0000" da zona 0039 |
+| Urna de origem (`numeroInternoUrnaOrigem`) | **2409879** |
+| Junta e turma | 1 e 1 |
+| Motivo no BU (`motivoApuracao`) | valor 5 do enumerado `MotivoApuracaoMistaComBU`, que a especificação chama `urnaChegouAposInicioVotacao` |
+| Motivo no log do SA | `Motivo da apuração: Urna encerrada com eleitores na fila` |
+| Histórico de códigos de carga | 754795141680322122516390 e 178937178903421025448475 (este é o da urna 2254078) |
+| Emissão do BU do SA | 04/10/2026 22:07:21 |
+| Bloco do RDV com origem `bu` (urna 2409879) | 261 eleitores; Presidente: 13 = 118, 22 = 111, 30 = 3, 55 = 7, 70 = 5, 14 = 1, branco 3, nulo 13 |
+| Bloco do RDV com origem `cedula` | 20 eleitores; Presidente: 13 = 12, 22 = 6, 30 = 1, branco 1 |
+| Total do BU | 281 (13 = 130, 22 = 117, 30 = 4, 55 = 7, 70 = 5, 14 = 1, branco 4, nulo 13), igual à soma dos dois blocos |
+
+O nome do enumerado no BU e o texto do log não coincidem; os dois estão registrados como acima, e este relatório não escolhe entre eles.
+
+Linha do tempo do log do SA (04/10/2026, hora local de Brasília):
+
+| Hora | Evento |
+|---|---|
+| 20:31:49 | urna 2254078 ligada |
+| 20:33:41 | `Iniciando aplicação - SISTEMA DE APURAÇÃO OFICIAL PRIMEIRO TURNO` |
+| 20:34:58 | `Início dos trabalhos do SA`; zerésima de apuração impressa |
+| 20:36:13 | `Tipo de apuração selecionada (DIGITAÇÃO DO BU MAIS CÉDULAS)` |
+| 20:39:03 | seção em apuração: município 41238, zona 0039, seção 0168 |
+| 20:40:14 a 20:46:02 | `Código verificador aceito`; digitação dos códigos de carga |
+| 20:47:35 | `Apuração cancelada` |
+| 20:48:03 | `Tipo de apuração selecionada (RECEPÇÃO DE MÍDIA DE RESULTADO MAIS CÉDULAS)`; `Solicitada inserção de mídia com resultado parcial gerado pelo RED` |
+| 20:48:13 | volta a `DIGITAÇÃO DO BU MAIS CÉDULAS`; 20:48:41 seção 0168 de novo |
+| 20:49:29 a 20:51:06 | `Código verificador aceito`; digitação dos códigos de carga; `Código verificador aceito` |
+| 20:58:58 | `Informações complementares gravadas` |
+| 20:59:15 | `Motivo da apuração: Urna encerrada com eleitores na fila`; zerésima da seção impressa |
+| 21:00:56 a 21:45:25 | `Início da digitação de BU`: Dep. Fed. (21:00:56 a 21:18:19), Dep. Est. (até 21:41:26), Sen. (até 21:43:10), Gov. (até 21:44:20), Pres. (21:44:20 a 21:45:25) |
+| 21:45:28 a 22:07:19 | apuração das cédulas: majoritária federal (até 21:52:32), majoritária estadual (até 22:00:00), proporcional (até 22:07:19) |
+| 22:07:21 | BU gerado; 2 vias impressas |
+| 22:09:13 | `busa.dat`, `rdv.dat`, `imgbusa.dat` e `hash.dat` gravados |
+
+O log do SA não registra voto de urna (`O voto do eleitor foi computado`): 0 linhas, como esperado num equipamento de apuração.
+
+Leitura: dos 281 eleitores, **261 votaram na urna 2409879** e entraram pela digitação do BU impresso dessa urna; **20 votaram em cédula** e foram apurados no SA. A urna 2409879 não aparece como origem de nenhum BU publicado no 1º ou no 2º turno (consulta a `ref_secoes_2026_t1` e `v_bu_ultima`: 0 linhas), e o log dela não foi publicado. No 2º turno a seção usou a urna 2401024, carregada em 15/10/2026, cujo log só tem datas de 15/10, 19/10 e 25/10 e registra 365 votos, igual ao BU.
+
+Isto resolve o mecanismo: a apuração da seção foi mista, o BU impresso da urna original foi digitado e as cédulas foram apuradas no SA. O comparecimento de 56,1% se divide em 52,1% na urna (261 de 501) e 4,0% em cédula (20). Continua **precisando esclarecimento** o que o log do SA não mostra: a hora em que a urna 2409879 foi encerrada, quantos eleitores estavam na fila e por que o motivo do BU e o do log divergem. Isso está na ata da mesa e no log da urna 2409879, que não foi publicado.
