@@ -16,12 +16,12 @@ Foram encontrados pontos de transparência e de registro que pedem esclareciment
 
 | # | Verificação | Escopo | Resultado | Documento |
 |---|---|---|---|---|
-| 1 | Coleta versionada de todos os arquivos das seções, com reconferência periódica (ETag/MD5) para detectar troca posterior | 499.207 seções do 2º turno, várias voltas completas | 0 arquivos alterados ou removidos; nenhum BU com segunda versão | `docs/verificacoes-externas-2turno-2026.md` |
+| 1 | Coleta versionada de todos os arquivos das seções, com reconferência periódica (ETag/MD5) para detectar troca posterior | 499.207 seções do 2º turno, 8 voltas completas em cada coletor (25/10 a 27/10) | 0 arquivos alterados ou removidos até a última volta; nenhum BU com segunda versão | `docs/verificacoes-externas-2turno-2026.md` |
 | 2 | Assinatura digital de todos os arquivos de cada seção e cadeia de certificados | 499.207 seções, 5.487.289 assinaturas | 0 inválidas; SHA-512 do BU confere com o assinado em todas | `docs/certificados-2turno-2026.md` |
 | 3 | Soma dos BUs x resultado oficial | Brasil, UFs e 5.757 municípios, dois turnos | Igual voto a voto (13, 22, brancos, nulos, comparecimento) | `docs/auditoria-consistencia-bu-2026.md` |
 | 4 | Totais divulgados ao longo da noite | 12 mil versões coletadas | Nunca diminuíram; sempre fecharam | `docs/verificacoes-externas-2turno-2026.md` |
 | 5 | Valores impossíveis no BU (comparecimento > aptos, total ≠ comparecimento, horários fora do dia, urna repetida, aptos que mudam) | 998.414 BUs | 0 impossíveis; repetições e zeros explicados e comparados com 2022 | `docs/auditoria-consistencia-bu-2026.md` |
-| 6 | Recontagem voto a voto pelo RDV x BU | 10.997 seções-turno (8.000 no 2º, incluindo 5.003 tardias) | 0 divergências; assinatura do RDV válida em todas | `docs/rdv-log-2026.md` |
+| 6 | Recontagem voto a voto pelo RDV x BU | 1º turno: todas as 499.206 seções com RDV (todos os cargos); 2º turno: 8.000 seções (incluindo 5.003 tardias), recontagem nacional em andamento | 0 divergências; assinatura do RDV válida em todas | `docs/rdv-log-2026.md` |
 | 7 | Log eleitor a eleitor x BU | 2.997 seções, dois turnos | Votos no log = comparecimento em todas; 0 votos fora do horário; ritmo plausível | `docs/rdv-log-2026.md` |
 | 8 | Encerramento tardio (prorrogação até 19h) e impacto na margem | 497.897 seções; logs de 21.317 | 5.129 votos depois das 17h nas tardias; total estimado 31.792; margem nunca inverte (pior cenário 4.398.399) | `docs/encerramento-tardio-2turno-2026.md` |
 | 9 | 368 BUs emitidos mais de 1 h depois do encerramento | logs das 368 e de 368 controles | 0 votos depois do encerramento, 0 reabertura; urna parada na tela de registro de mesários | `docs/auditoria-consistencia-bu-2026.md` |
