@@ -378,3 +378,22 @@ O "esperado pelo tamanho" aplica a cada seção do grupo a frequência de varia�
 - "Leitor que não reconhece" é a leitura mais simples do padrão (falhas por eleitor altas, concentração em UE2013, normalização quando a urna é trocada), mas os arquivos públicos não dizem a causa. A urna registra erro de hardware do leitor só em poucas seções da amostra ("ERROR opening the biometric reader" em 2 seções no 1º turno e 3 no 2º; "Falha na captura da digital" em 18 e 15).
 - O exterior não tem detalhamento de biometria no BU e ficou fora.
 - Os campos do BU são o que a urna contou. Nada aqui verifica a identidade de eleitores; o log não traz número de título nem de CPF do eleitor, só o tipo de identificador digitado.
+
+## 9. Teste de votos inseridos sem biometria (29/10/2026)
+
+Pergunta: o aumento de comparecimento do 1º para o 2º turno tem cara de votos inseridos pelo mesário em nome de ausentes? Quem não tem biometria cadastrada, ou é habilitado pelo ano de nascimento, pode votar sem digital, então um voto inserido apareceria nesses dois campos do BU. Script: `scripts/ele2026/injecao_nao_biometricos.py`, sobre `secoes_biometria.parquet` (497.895 seções pareadas com detalhamento nos dois turnos).
+
+| Item | Resultado |
+|---|---|
+| Aumento de comparecimento 1T para 2T | +2.920.461 |
+| desse aumento, habilitados por digital | +2.318.918 (79,4%) |
+| desse aumento, sem digital (sem biometria cadastrada ou por ano de nascimento) | +601.543 (20,6%) |
+| Parcela sem digital no comparecimento | 12,23% no 1º turno, 12,42% no 2º |
+| Seções com comparecimento de 98% ou mais dos aptos | 60 no 1º, 66 no 2º |
+| Seções com 100% de comparecimento | 15 no 1º, 12 no 2º |
+
+Dentro de cada município (diferença de cada seção para a média do município, por eleitor apto), cada eleitor a mais habilitado **sem digital** acompanha +0,103 voto no 13 e +0,073 no 22 (59% e 41%); cada eleitor a mais habilitado **por digital** acompanha +0,307 no 13 e +0,201 no 22 (60% e 40%). O eleitor extra sem digital divide o voto na mesma proporção do eleitor extra com digital, que o mesário não consegue simular. Se houvesse votos inseridos sem digital a favor de um candidato, a primeira divisão seria puxada para ele e se afastaria da segunda.
+
+As 62 seções em que a parcela sem digital subiu 15 pontos ou mais tiveram a fatia do 13 subindo de 49,98% para 52,66% (+2,7 pontos), igual ao país (48,98% para 51,78%, +2,8 pontos); 58 delas usam UE2013 ou UE2015, o mesmo padrão de leitor que não reconhece da seção 6.
+
+Conclusão: o voto sem digital não favorece nenhum candidato além do que o voto com digital favorece, e o comparecimento extremo não aumentou. Limite: o teste pega inserção que mude o voto de forma desigual entre seções; uma inserção pequena e espalhada igualmente não aparece no BU, e a identidade de quem votou (falecido, ausente) não está em nenhum arquivo público.
