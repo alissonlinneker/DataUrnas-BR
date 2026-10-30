@@ -1,0 +1,219 @@
+{
+ "secoes": 499207,
+ "status": {
+  "ok": 499207
+ },
+ "com_rdv": 499205,
+ "presidente_confere": 499205,
+ "presidente_diverge": 0,
+ "rdv_confere_todos_cargos": 499207,
+ "hash_rdv_confere": 499207,
+ "hash_rdv_diverge": 0,
+ "vsc_assinatura_valida": 499207,
+ "vsc_assinatura_invalida": 0,
+ "totais": {
+  "13": {
+   "rdv": 64256232,
+   "bu": 64256232
+  },
+  "22": {
+   "rdv": 59826041,
+   "bu": 59826041
+  },
+  "brancos": {
+   "rdv": 1430496,
+   "bu": 1430496
+  },
+  "nulos": {
+   "rdv": 2723305,
+   "bu": 2723305
+  },
+  "outros_nominais": {
+   "rdv": 0,
+   "bu": 0
+  },
+  "legenda": {
+   "rdv": 0,
+   "bu": 0
+  },
+  "presidente_total": {
+   "rdv": 128236074,
+   "bu": 128236074
+  }
+ },
+ "sem_rdv": [
+  "zz/29564/0001/0091",
+  "zz/30686/0001/0443"
+ ],
+ "divergencias": [],
+ "por_uf": {
+  "ac": {
+   "secoes": 2270,
+   "com_rdv": 2270,
+   "confere": 2270,
+   "diverge": 0
+  },
+  "al": {
+   "secoes": 7101,
+   "com_rdv": 7101,
+   "confere": 7101,
+   "diverge": 0
+  },
+  "am": {
+   "secoes": 8157,
+   "com_rdv": 8157,
+   "confere": 8157,
+   "diverge": 0
+  },
+  "ap": {
+   "secoes": 1914,
+   "com_rdv": 1914,
+   "confere": 1914,
+   "diverge": 0
+  },
+  "ba": {
+   "secoes": 35476,
+   "com_rdv": 35476,
+   "confere": 35476,
+   "diverge": 0
+  },
+  "ce": {
+   "secoes": 23765,
+   "com_rdv": 23765,
+   "confere": 23765,
+   "diverge": 0
+  },
+  "df": {
+   "secoes": 6969,
+   "com_rdv": 6969,
+   "confere": 6969,
+   "diverge": 0
+  },
+  "es": {
+   "secoes": 9844,
+   "com_rdv": 9844,
+   "confere": 9844,
+   "diverge": 0
+  },
+  "go": {
+   "secoes": 15686,
+   "com_rdv": 15686,
+   "confere": 15686,
+   "diverge": 0
+  },
+  "ma": {
+   "secoes": 18093,
+   "com_rdv": 18093,
+   "confere": 18093,
+   "diverge": 0
+  },
+  "mg": {
+   "secoes": 52062,
+   "com_rdv": 52062,
+   "confere": 52062,
+   "diverge": 0
+  },
+  "ms": {
+   "secoes": 7106,
+   "com_rdv": 7106,
+   "confere": 7106,
+   "diverge": 0
+  },
+  "mt": {
+   "secoes": 8287,
+   "com_rdv": 8287,
+   "confere": 8287,
+   "diverge": 0
+  },
+  "pa": {
+   "secoes": 20827,
+   "com_rdv": 20827,
+   "confere": 20827,
+   "diverge": 0
+  },
+  "pb": {
+   "secoes": 10712,
+   "com_rdv": 10712,
+   "confere": 10712,
+   "diverge": 0
+  },
+  "pe": {
+   "secoes": 21418,
+   "com_rdv": 21418,
+   "confere": 21418,
+   "diverge": 0
+  },
+  "pi": {
+   "secoes": 10225,
+   "com_rdv": 10225,
+   "confere": 10225,
+   "diverge": 0
+  },
+  "pr": {
+   "secoes": 27142,
+   "com_rdv": 27142,
+   "confere": 27142,
+   "diverge": 0
+  },
+  "rj": {
+   "secoes": 37675,
+   "com_rdv": 37675,
+   "confere": 37675,
+   "diverge": 0
+  },
+  "rn": {
+   "secoes": 8115,
+   "com_rdv": 8115,
+   "confere": 8115,
+   "diverge": 0
+  },
+  "ro": {
+   "secoes": 4698,
+   "com_rdv": 4698,
+   "confere": 4698,
+   "diverge": 0
+  },
+  "rr": {
+   "secoes": 1519,
+   "com_rdv": 1519,
+   "confere": 1519,
+   "diverge": 0
+  },
+  "rs": {
+   "secoes": 27547,
+   "com_rdv": 27547,
+   "confere": 27547,
+   "diverge": 0
+  },
+  "sc": {
+   "secoes": 17326,
+   "com_rdv": 17326,
+   "confere": 17326,
+   "diverge": 0
+  },
+  "se": {
+   "secoes": 5923,
+   "com_rdv": 5923,
+   "confere": 5923,
+   "diverge": 0
+  },
+  "sp": {
+   "secoes": 103656,
+   "com_rdv": 103656,
+   "confere": 103656,
+   "diverge": 0
+  },
+  "to": {
+   "secoes": 4384,
+   "com_rdv": 4384,
+   "confere": 4384,
+   "diverge": 0
+  },
+  "zz": {
+   "secoes": 1310,
+   "com_rdv": 1308,
+   "confere": 1308,
+   "diverge": 0
+  }
+ }
+}

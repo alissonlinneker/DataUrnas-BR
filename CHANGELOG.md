@@ -6,6 +6,48 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não publicado]
 
+## [0.3.0] - 2026-10-30
+
+Auditoria completa do 2º turno da eleição presidencial de 2026 (25/10/2026, eleição 6258, pleito 3221) e veredicto da auditoria dos dois turnos. Resultado oficial do 2º turno: Lula (13) 64.256.232, Flávio Bolsonaro (22) 59.826.041, margem de 4.430.191 votos.
+
+### Adicionado
+
+- Veredicto da auditoria de 2026 (`docs/veredicto-auditoria-2026.md`): 19 verificações, o que não pode ser verificado com dados públicos e 12 pendências para esclarecimento do TSE. Nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos dois turnos.
+- Coleta versionada do 2º turno (`scripts/ele2026/versionar_t2.py`): totais, `aux.json`, BU e assinaturas guardados a cada versão publicada pelo TSE, reconferência dos arquivos guardados por ETag para detectar troca no lugar, progresso a cada 2.000 seções. Em 8 voltas completas (25 a 27/10), nenhum arquivo alterado ou removido e nenhum BU com segunda versão.
+- Banco ClickHouse das versões de 2026 (`scripts/ch/`): esquema, views, cargas de referência de 2026 e 2022, carregador incremental e scripts de servidor. Documentado em `docs/banco-clickhouse.md`.
+- Recontagem nacional do RDV do 2º turno (`scripts/ele2026/rdv_nacional_t2.py`): 499.207 seções, 499.205 com RDV (as 2 restantes, do exterior, tiveram comparecimento 0), nenhuma divergência com o BU, SHA-512 e assinatura do `.vsc` válidos em todas; soma nacional do RDV igual ao resultado oficial. Seção 5 de `docs/rdv-log-2026.md`.
+- RDV x BU x log eleitor a eleitor (`scripts/ele2026/rdv_log_auditoria.py`) em 10.997 pares seção x turno: nenhuma divergência, votos no log iguais ao comparecimento em todas as 2.997 seções com log nos dois turnos, nenhum voto fora do horário da urna e nenhum ritmo impossível.
+- Certificados e assinaturas do 2º turno em todas as 499.207 seções (`scripts/ele2026/certificados_t2.py`, `docs/certificados-2turno-2026.md`): 5.487.289 assinaturas de hardware válidas, nenhuma inválida, cadeia conferida em todas.
+- Consistência interna dos BUs dos dois turnos (`scripts/ele2026/auditoria_consistencia.sql`, `docs/auditoria-consistencia-bu-2026.md`): nenhum valor impossível em 998.414 BUs, soma dos BUs igual ao resultado oficial do 2º turno e aos 5.757 municípios do 1º turno.
+- Linha do tempo das seções do 2º turno e conferência dos totais (`scripts/ele2026/linha_tempo_t2.py`): emissão, recebimento e totalização, curva acumulada de seções recebidas x totalizadas, atrasos na BA e amostra de `Last-Modified`.
+- Encerramento tardio e prorrogação até 19h (`scripts/ele2026/analisar_encerramento_t2.py`, `scripts/ele2026/impacto_prorrogacao_t2.py`, `docs/encerramento-tardio-2turno-2026.md`, `docs/prorrogacao-votacao-2turno-2026.md`): inventário nacional, contagem exata dos votos depois das 17h nos logs, controles pareados, diferença em diferenças e cenários de descarte. Nenhum cenário inverte a margem (pior cenário 4.398.399).
+- BUs emitidos tarde e apuração mista de Belo Horizonte resolvidos pelos logs (`scripts/ele2026/emissao_tardia_logs.py`): nas 368 seções com BU emitido mais de 1 hora depois do encerramento, nenhum voto depois do encerramento e nenhuma reabertura.
+- Viradas de liderança por seção entre os turnos, com 2022 como modelo de esperado (`scripts/ele2026/viradas_t1_t2.py`, `docs/viradas-1t-2t-2026.md`): 31.341 viradas para o 13 contra 32.604 esperadas.
+- Ordem de chegada das seções e a "virada" da curva acumulada em 2022 e 2026, com embaralhamentos de controle (`scripts/ele2026/ordem_envio.py`, `docs/ordem-de-envio-viradas-2022-2026.md`).
+- Estatística forense por seção com 2022 de controle (`scripts/ele2026/forense_estatistica.py`, `docs/forense-estatistica-2026.md`): impressão digital eleitoral, dígitos, swing, transferência, dispersão e comparecimento.
+- Efeito do equipamento sobre o voto (`scripts/ele2026/efeito_urna.py`, `docs/efeito-urna-2026.md`): modelo, troca, recarga, reserva, contingência e carga fora do GEDAI; nenhum efeito capaz de mover a margem.
+- Biometria do 1º x 2º turno pelo BU e pelo log (`scripts/ele2026/biometria_t1_t2.py`, `docs/biometria-1t-2t-2026.md`) e teste de votos inseridos sem digital (`scripts/ele2026/injecao_nao_biometricos.py`): o eleitor extra sem digital divide o voto na mesma proporção do eleitor extra com digital.
+- Leitura dos logs de preparação GEDAI-UE e cruzamento dos códigos de carga com os BUs do 2º turno (`scripts/ele2026/gedai_t2.py`, `docs/gedai-2turno-2026.md`): 99,83% conferem em todos os campos; 862 cargas sem log publicado.
+- Versão do software, código de carga e certificado da urna por seção do 2º turno (`scripts/ele2026/software_carga_t2.py`) e confronto das listas oficiais de hashes com os pacotes verificados nos logs (`docs/hash-software-urna-2026.md`).
+- Confronto dos produtos de dados abertos do TSE e das correspondências urna x seção com os BUs assinados (`scripts/ele2026/confronto_dados_abertos.py`, `docs/confronto-dados-abertos-2026.md`): nenhuma divergência de voto.
+- Verificação das assinaturas JWS dos resultados divulgados e confronto com a soma dos BUs (`scripts/ele2026/verificar_jws.py`, `docs/jws-totalizacao-2026.md`): 11.572 assinaturas válidas nos dois turnos, nenhuma inválida e nenhuma divergência.
+- Verificações externas do 2º turno (teste de integridade, hashes, BU impresso e inspeção do código-fonte) em `docs/verificacoes-externas-2turno-2026.md`.
+- Opção `--turno` na análise de certificados e na recontagem do RDV, com colunas de horário de Brasília no log.
+- Testes para a linha do tempo, os certificados, o RDV, as viradas, o encerramento tardio, o GEDAI e o carregador do ClickHouse.
+
+### Corrigido
+
+- `analyzer/timezones.py` não tinha 4 municípios do oeste do Amazonas em UTC-5 (Jutaí, São Paulo de Olivença, Amaturá e Itamarati); os 11 municípios foram confirmados pelos BUs de 2026. Análises anteriores tinham erro de 1 hora só nessas seções, sem efeito nas conclusões.
+- O coletor do 2º turno passa a baixar os arquivos de assinatura publicados depois do BU.
+- Uma resposta 429 do TSE no `cs.json` não interrompe mais a volta do coletor: a lista de seções fica em cache.
+- Recuperação mais rápida depois de rajadas de 429, com piso de taxa de requisições.
+
+### Alterado
+
+- Horários de encerramento das seções do 2º turno analisados em horário de Brasília.
+- Verificação de padrões dos certificados do 2º turno vetorizada.
+- Versões brutas da coleta (`data/versoes/`) e saídas derivadas das análises do 2º turno (`data/parquet/2026/t2/<análise>/`) ficam fora do git.
+
 ## [0.2.2] - 2026-10-15
 
 ### Adicionado
@@ -104,7 +146,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Banco DuckDB, exportação Parquet com ZSTD e painel Streamlit com filtros e exportação.
 - Deploy no Hugging Face Spaces via GitHub Actions.
 
-[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.2...HEAD
+[Não publicado]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/alissonlinneker/DataUrnas-BR/compare/v0.1.0...v0.2.0

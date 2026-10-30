@@ -1,4 +1,4 @@
-"""Eleições 2026: Presidente, 1º turno (página inicial do dashboard).
+"""Eleições 2026: Presidente, 1º turno (a página inicial passou a ser a do 2º turno, ``eleicoes_2026_t2``).
 
 Resultado oficial (TSE) por país, UF e município, comparação com o 1º turno de
 2022 e auditoria por seção a partir dos boletins de urna, que ainda estão em
@@ -36,12 +36,14 @@ TTL_COLETA = 300  # boletins chegam em lotes; reavalia a cada 5 minutos
 # Cache (chaveado pela assinatura dos arquivos: novo lote invalida o cache)
 # ----------------------------------------------------------------------
 @st.cache_data(ttl=3600, show_spinner=False)
-def _oficial(sig: tuple):
-    cand = d26.load_candidatos()
-    res_uf = d26.load_resultado_uf()
-    res_mun = d26.load_resultado_municipio()
+def _oficial(sig: tuple, turno: int = 1):
+    """Official result of a round: summary, candidates and per-state/municipality tables with leaders."""
+    base = d26.base_dir(turno)
+    cand = d26.load_candidatos(base)
+    res_uf = d26.load_resultado_uf(base)
+    res_mun = d26.load_resultado_municipio(base)
     return (
-        d26.load_resumo(),
+        d26.load_resumo(base),
         cand,
         d26.add_leader(res_uf, cand) if not res_uf.empty else res_uf,
         d26.add_leader(res_mun, cand) if not res_mun.empty else res_mun,
@@ -185,7 +187,8 @@ def _ranking(cand: pd.DataFrame) -> None:
         )
 
 
-def _mapa(res_uf: pd.DataFrame, cand: pd.DataFrame) -> None:
+def _mapa(res_uf: pd.DataFrame, cand: pd.DataFrame, key: str = "2026") -> None:
+    """Choropleth by state; ``key`` keeps widget state separate per round page."""
     st.markdown("### Mapa por UF")
     df = res_uf[res_uf["uf"] != d26.UF_EXTERIOR].copy()
     df["sigla"] = df["uf"].str.upper()
@@ -194,7 +197,7 @@ def _mapa(res_uf: pd.DataFrame, cand: pd.DataFrame) -> None:
     opcoes = {"Líder em cada UF": None}
     opcoes.update({f"% de {r}": int(n) for n, r in zip(cand["numero"].head(6), cand["rotulo"].head(6), strict=False)})
     opcoes.update({"Comparecimento (%)": "pct_comparecimento", "Nulos (%)": "pct_nulos", "Brancos (%)": "pct_brancos"})
-    escolha = st.selectbox("Colorir o mapa por", list(opcoes), key="mapa2026_metrica")
+    escolha = st.selectbox("Colorir o mapa por", list(opcoes), key=f"mapa{key}_metrica")
     alvo = opcoes[escolha]
 
     geo = brazil_geojson()
@@ -231,20 +234,21 @@ def _mapa(res_uf: pd.DataFrame, cand: pd.DataFrame) -> None:
         })
 
 
-def _municipios(res_mun: pd.DataFrame, cand: pd.DataFrame) -> None:
+def _municipios(res_mun: pd.DataFrame, cand: pd.DataFrame, key: str = "2026") -> None:
+    """Searchable municipality table; ``key`` keeps widget state separate per round page."""
     st.markdown("### Municípios")
     if res_mun.empty:
         empty_state("Resultado por município indisponível", "O arquivo resultado_municipio.parquet não foi encontrado.")
         return
     c1, c2, c3 = st.columns([2, 1, 1])
-    busca = c1.text_input("Buscar município", key="mun2026_busca", placeholder="Ex.: Campinas")
+    busca = c1.text_input("Buscar município", key=f"mun{key}_busca", placeholder="Ex.: Campinas")
     ufs = sorted(res_mun["uf"].unique())
-    uf_sel = c2.multiselect("UF", ufs, key="mun2026_uf", format_func=lambda u: u.upper())
+    uf_sel = c2.multiselect("UF", ufs, key=f"mun{key}_uf", format_func=lambda u: u.upper())
     ordem_opcoes = {"Eleitorado": "eleitorado", "Abstenção (%)": "pct_abstencao", "Nulos (%)": "pct_nulos",
                     "Margem do líder (p.p.)": "margem_pp"}
     ordem_opcoes.update({f"% {r}": f"pct_{int(n)}" for n, r in zip(cand["numero"].head(4), cand["rotulo"].head(4), strict=False)})
-    ordem = c3.selectbox("Ordenar por", list(ordem_opcoes), key="mun2026_ordem")
-    top_n = st.slider("Quantidade de municípios (top N)", 10, 500, 50, step=10, key="mun2026_topn")
+    ordem = c3.selectbox("Ordenar por", list(ordem_opcoes), key=f"mun{key}_ordem")
+    top_n = st.slider("Quantidade de municípios (top N)", 10, 500, 50, step=10, key=f"mun{key}_topn")
 
     df = res_mun
     if uf_sel:

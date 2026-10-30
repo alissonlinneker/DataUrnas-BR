@@ -1,0 +1,81 @@
+{
+  "titulo": "Veredicto da auditoria independente: eleição presidencial de 2026 (1º e 2º turnos)",
+  "fonte": "docs/veredicto-auditoria-2026.md",
+  "data_referencia": "30/10/2026",
+  "escopo": "Auditoria feita sobre os arquivos públicos das urnas e da totalização (BU, RDV, log, assinaturas .vsc, aux.json, totais .json/.jws, dados abertos, logs de preparação GEDAI e listas oficiais de hashes), sem partir de nenhuma premissa sobre a confiabilidade do TSE nem sobre o resultado político.",
+  "resultado_oficial_2t": {
+    "data_eleicao": "25/10/2026",
+    "hora_totalizacao_final": "23:22",
+    "candidatos": [
+      {"numero": 13, "nome": "Lula", "votos": 64256232},
+      {"numero": 22, "nome": "Flávio Bolsonaro", "votos": 59826041}
+    ],
+    "margem": 4430191,
+    "brancos": 1430496,
+    "nulos": 2723305,
+    "secoes_total": 499248,
+    "secoes_nao_instaladas": 41,
+    "secoes_nao_instaladas_local": "exterior"
+  },
+  "indicadores": {
+    "verificacoes": 19,
+    "secoes_2t": 499207,
+    "assinaturas_verificadas_2t": 5487289,
+    "assinaturas_invalidas_2t": 0,
+    "bus_checados_dois_turnos": 998414,
+    "valores_impossiveis": 0,
+    "rdv_secoes_recontadas_1t": 499206,
+    "rdv_secoes_recontadas_2t": 499205,
+    "rdv_divergencias": 0,
+    "jws_assinaturas_validas": 11572,
+    "jws_assinaturas_invalidas": 0,
+    "pendencias": 12
+  },
+  "veredicto": {
+    "conclusao": "Não foi encontrada nenhuma evidência de manipulação, de contagem errada de votos ou de dado impossível nos arquivos públicos, em nenhum dos dois turnos.",
+    "detalhe": "O resultado divulgado é exatamente a soma dos boletins assinados pelas urnas; o registro digital de cada voto (RDV), recontado em todas as seções dos dois turnos, dá exatamente os mesmos números; os boletins são coerentes por dentro e com o log de cada eleitor, e nenhum padrão estatístico de 2026 foge do que se observou em 2022 com a mesma metodologia.",
+    "limite": "Isso não equivale a provar que o software da urna é honesto. Os arquivos públicos não permitem ligar o programa que rodou em cada urna à lista de hashes lacrada; essa ligação só é feita por amostragem, em cerimônias cujos relatórios não são publicados.",
+    "pendencias": "Foram encontrados pontos de transparência e de registro que pedem esclarecimento. Nenhum deles, isolado ou somado, mexe na contagem ou chega perto da margem."
+  },
+  "verificacoes": [
+    {"n": 1, "verificacao": "Coleta versionada de todos os arquivos das seções, com reconferência periódica (ETag/MD5) para detectar troca posterior", "escopo": "499.207 seções do 2º turno, 8 voltas completas em cada coletor (25/10 a 27/10)", "resultado": "0 arquivos alterados ou removidos até a última volta; nenhum BU com segunda versão", "situacao": "confere", "documento": "docs/verificacoes-externas-2turno-2026.md"},
+    {"n": 2, "verificacao": "Assinatura digital de todos os arquivos de cada seção e cadeia de certificados", "escopo": "499.207 seções, 5.487.289 assinaturas", "resultado": "0 inválidas; SHA-512 do BU confere com o assinado em todas", "situacao": "confere", "documento": "docs/certificados-2turno-2026.md"},
+    {"n": 3, "verificacao": "Soma dos BUs x resultado oficial", "escopo": "Brasil, UFs e 5.757 municípios, dois turnos", "resultado": "Igual voto a voto (13, 22, brancos, nulos, comparecimento)", "situacao": "confere", "documento": "docs/auditoria-consistencia-bu-2026.md"},
+    {"n": 4, "verificacao": "Totais divulgados ao longo da noite", "escopo": "12 mil versões coletadas", "resultado": "Nunca diminuíram; sempre fecharam", "situacao": "confere", "documento": "docs/verificacoes-externas-2turno-2026.md"},
+    {"n": 5, "verificacao": "Valores impossíveis no BU (comparecimento > aptos, total ≠ comparecimento, horários fora do dia, urna repetida, aptos que mudam)", "escopo": "998.414 BUs", "resultado": "0 impossíveis; repetições e zeros explicados e comparados com 2022", "situacao": "confere", "documento": "docs/auditoria-consistencia-bu-2026.md"},
+    {"n": 6, "verificacao": "Recontagem voto a voto pelo RDV x BU", "escopo": "Todas as seções dos dois turnos: 499.206 no 1º e 499.205 no 2º (as 2 restantes do exterior tiveram comparecimento 0)", "resultado": "0 divergências; soma nacional do RDV do 2º turno igual ao resultado oficial (13: 64.256.232; 22: 59.826.041); assinatura e hash do RDV válidos em todas", "situacao": "confere", "documento": "docs/rdv-log-2026.md"},
+    {"n": 7, "verificacao": "Log eleitor a eleitor x BU", "escopo": "2.997 seções, dois turnos", "resultado": "Votos no log = comparecimento em todas; 0 votos fora do horário; ritmo plausível", "situacao": "confere", "documento": "docs/rdv-log-2026.md"},
+    {"n": 8, "verificacao": "Encerramento tardio (prorrogação até 19h) e impacto na margem", "escopo": "497.897 seções; logs de 21.317", "resultado": "5.129 votos depois das 17h nas tardias; total estimado 31.792; margem nunca inverte (pior cenário 4.398.399)", "situacao": "confere", "documento": "docs/encerramento-tardio-2turno-2026.md"},
+    {"n": 9, "verificacao": "368 BUs emitidos mais de 1 h depois do encerramento", "escopo": "logs das 368 e de 368 controles", "resultado": "0 votos depois do encerramento, 0 reabertura; urna parada na tela de registro de mesários", "situacao": "confere", "documento": "docs/auditoria-consistencia-bu-2026.md"},
+    {"n": 10, "verificacao": "Viradas por seção 1º para 2º turno, com modelo de 2022", "escopo": "497.897 seções", "resultado": "31.341 viradas para o 13 contra 32.604 esperadas; contabilidade fecha em todas", "situacao": "confere", "documento": "docs/viradas-1t-2t-2026.md"},
+    {"n": 11, "verificacao": "Estatística forense (impressão digital eleitoral, dígitos, swing, transferência, dispersão) com 2022 de controle", "escopo": "todas as seções, 2022 e 2026", "resultado": "Nenhum padrão de 2026 maior que o de 2022", "situacao": "confere", "documento": "docs/forense-estatistica-2026.md"},
+    {"n": 12, "verificacao": "Efeito do modelo de urna, troca, recarga, reserva e contingência", "escopo": "499 mil seções, efeito fixo de local", "resultado": "Nenhum efeito capaz de mover a margem; maior pior caso 3.957 votos", "situacao": "confere", "documento": "docs/efeito-urna-2026.md"},
+    {"n": 13, "verificacao": "Biometria 1º x 2º turno (BU e log)", "escopo": "497.895 seções; logs de 2.997", "resultado": "Variações de décimos de ponto; sem relação com o voto", "situacao": "confere", "documento": "docs/biometria-1t-2t-2026.md"},
+    {"n": 14, "verificacao": "Cargas das urnas x logs de preparação GEDAI", "escopo": "499.207 BUs", "resultado": "99,83% conferem em todos os campos; 862 sem log", "situacao": "ressalva", "documento": "docs/gedai-2turno-2026.md"},
+    {"n": 15, "verificacao": "Linha do tempo: emissão, recebimento e totalização", "escopo": "todas as seções", "resultado": "Nenhum BU emitido depois de totalizado", "situacao": "confere", "documento": "docs/verificacoes-externas-2turno-2026.md"},
+    {"n": 16, "verificacao": "Produtos de dados abertos (votação por seção, detalhe, BU web, correspondências) x BU", "escopo": "dois turnos, todas as seções", "resultado": "0 divergências de voto; divergências de registro de urna (ver pendências)", "situacao": "ressalva", "documento": "docs/confronto-dados-abertos-2026.md"},
+    {"n": 17, "verificacao": "Lista oficial de hashes lacrados x programas verificados nos logs", "escopo": "32 listas; 6.732 logs", "resultado": "Todos os programas de inicialização estão na lista; divergências de nome e versão (ver pendências)", "situacao": "ressalva", "documento": "docs/hash-software-urna-2026.md"},
+    {"n": 18, "verificacao": "Assinatura JWS dos resultados divulgados x soma dos BUs", "escopo": "5.786 arquivos por turno (Brasil, 28 UFs, 5.757 municípios), dois turnos", "resultado": "11.572 assinaturas válidas, 0 inválidas; payload idêntico ao .json; 0 divergências com a soma dos BUs", "situacao": "confere", "documento": "docs/jws-totalizacao-2026.md"},
+    {"n": 19, "verificacao": "Alegações externas (vídeo sobre \"virada única\" e \"vales igualmente espaçados\")", "escopo": "2022 e 2026", "resultado": "Explicadas pela ordem geográfica de chegada; ordem aleatória não produz o padrão alegado", "situacao": "confere", "documento": "docs/ordem-de-envio-viradas-2022-2026.md"}
+  ],
+  "nao_verificavel": [
+    {"titulo": "Qual software rodou em cada urna", "descricao": "O .vsc assina só os arquivos de resultado; o log registra o nome de cada pacote verificado e \"SUCESSO\", nunca o hash; a assinatura de software (chave SEVIN, algoritmo CEPESC) não é verificável fora do TSE. A ligação entre a urna e a lista lacrada existe só nas verificações por amostragem (AVPART/VPP na preparação e Teste de Autenticidade no dia), cujos relatórios ficam em ata e não são publicados."},
+    {"titulo": "Adulteração idêntica em todas as urnas", "descricao": "Os testes comparativos (modelo, troca, região, 2022) não detectam uma alteração aplicada igualmente a todas as urnas, porque ela não deixa diferença entre grupos. A proteção contra isso é o Teste de Integridade (votação paralela), cujo relatório do 2º turno só sai até cerca de 24/11 (TREs) e 23/01/2027 (TSE)."},
+    {"titulo": "O que aconteceu na seção fora do arquivo", "descricao": "Como a razão de uma mesa esperar uma hora para emitir o BU. Isso está nas atas, não nos arquivos."}
+  ],
+  "pendencias_nota": "Ordem de relevância; nenhuma altera contagem.",
+  "pendencias": [
+    {"n": 1, "descricao": "Publicar, por seção, a lista de hashes emitida pela urna nas verificações de autenticidade e os relatórios do Teste de Autenticidade; publicar -hash.dat e -mr.ver, que o .vsc assina mas o TSE não divulga."},
+    {"n": 2, "descricao": "Listas oficiais de hashes sem assinatura digital (HTML com SHA-512, garantidas só pelo HTTPS do site), ao contrário do que diz a notícia sobre a cerimônia."},
+    {"n": 3, "descricao": "Divergências entre lista de hashes e logs: avbootcfg.vst, avmodue20XX.vst e avusrlibue20XX.vst verificados na carga e ausentes da lista pelo nome; avusrbinof.vst na lista e nunca verificado; app.ini.vsc (GEDAI) e acurna.pem fora das listas; HotSwapFlash 8.10.0.0 em 4 estações ao lado da 8.12.0.0, com um só conjunto de hashes publicado; versoes.properties não publicado, o que impede ligar a versão 10.23.0.0 a um hash."},
+    {"n": 4, "descricao": "3 seções assinadas por urna diferente da que recebeu a carga (SP 64777/0393/0312, RJ 58696/0027/0139, ES 57932/0009/0085); as urnas que assinaram são de contingência da própria zona."},
+    {"n": 5, "descricao": "Correspondência esperada do 2º turno com ST_CORRESP_ALTERADA=N em 372 seções que mudaram; 35 seções votaram com urna diferente da esperada, 8 delas com urna que não aparece em nenhum produto; 108 urnas de reserva vindas de fora da contingência da zona; correspondência efetivada e BU web do 2º turno ainda não publicados."},
+    {"n": 6, "descricao": "862 cargas sem log GEDAI (Parauapebas zona 0106, Guarulhos zona 0176, zona 0339 de MG, Juruá, Monte Alegre); 5 urnas carregadas em 25/10; 2 estações geradoras sem log publicado."},
+    {"n": 7, "descricao": "Erro \"Problema ao desmontar a MR\" em 2.993 de 2.997 urnas no dia do 2º turno e em nenhuma no 1º."},
+    {"n": 8, "descricao": "11 seções com falha de verificação de arquivos de dados no log (infomidia.vsc, vota.vsu, bu.vsu, turno2.vsc)."},
+    {"n": 9, "descricao": "368 seções com BU emitido mais de 1 hora depois do encerramento (urna parada na tela de registro de mesários) e Belo Horizonte 0039/0168 no 1º turno (apuração mista no Sistema de Apuração; log e BU da urna original não publicados)."},
+    {"n": 10, "descricao": "Horário de recebimento publicado (aux.json) posterior à totalização completa do município em 16.574 seções; o carimbo não representa a chegada real."},
+    {"n": 11, "descricao": "Certificado da AC URNA publicado vencido em 18/07/2026, com 53 certificados de urna emitidos depois dessa data."},
+    {"n": 12, "descricao": "187 arquivos de resultado do 1º turno no exterior regerados em 24/10/2026 (mesmos números da totalização de 05/10), sem explicação; lista de certificados revogados da AC de totalização (actot.tse.jus.br) inacessível (403), o que impede conferir revogação da chave que assina os resultados."}
+  ]
+}

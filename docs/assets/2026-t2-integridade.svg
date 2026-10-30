@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="734" viewBox="0 0 1000 734" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Integridade e recontagem, 2º turno de 2026</title>
+<desc id="descricao">499.207 seções com BU de 499.248 (41 não instaladas no exterior); 5.487.289 assinaturas válidas e 0 inválidas; 499.207 hashes SHA-512 do BU conferem; RDV recontado em 499.205 seções com 0 divergências. 13  Lula (PT): RDV 64.256.232, BUs 64.256.232, oficial 64.256.232; 22  Flávio Bolsonaro (PL): RDV 59.826.041, BUs 59.826.041, oficial 59.826.041; Brancos: RDV 1.430.496, BUs 1.430.496, oficial 1.430.496; Nulos: RDV 2.723.305, BUs 2.723.305, oficial 2.723.305; Total (comparecimento): RDV 128.236.074, BUs 128.236.074, oficial 128.236.074. Maior diferença entre as três somas: 0.</desc>
+<rect x="1" y="1" width="998" height="732" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Integridade e recontagem, 2º turno de 2026</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Assinatura da urna, hash do BU e recontagem voto a voto do RDV em todas as seções com BU</text>
+<rect x="32.0" y="96.0" width="222.0" height="104.0" rx="12" fill="#F2F6F9"/>
+<rect x="32.0" y="96.0" width="5.0" height="104.0" rx="2.5" fill="#0072B2"/>
+<text x="52.0" y="136.0" font-size="28" font-weight="800" fill="#0B3A5B" text-anchor="start">499.207</text>
+<text x="52.0" y="162.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">seções com BU</text>
+<text x="52.0" y="183.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">de 499.248; 41 não instaladas</text>
+<rect x="267.0" y="96.0" width="222.0" height="104.0" rx="12" fill="#F2F6F9"/>
+<rect x="267.0" y="96.0" width="5.0" height="104.0" rx="2.5" fill="#009E73"/>
+<text x="287.0" y="136.0" font-size="28" font-weight="800" fill="#0B3A5B" text-anchor="start">5.487.289</text>
+<text x="287.0" y="162.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">assinaturas válidas</text>
+<text x="287.0" y="183.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">0 inválidas</text>
+<rect x="502.0" y="96.0" width="222.0" height="104.0" rx="12" fill="#F2F6F9"/>
+<rect x="502.0" y="96.0" width="5.0" height="104.0" rx="2.5" fill="#56B4E9"/>
+<text x="522.0" y="136.0" font-size="28" font-weight="800" fill="#0B3A5B" text-anchor="start">499.207</text>
+<text x="522.0" y="162.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">hashes do BU conferem</text>
+<text x="522.0" y="183.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">SHA-512 assinado x publicado</text>
+<rect x="737.0" y="96.0" width="222.0" height="104.0" rx="12" fill="#F2F6F9"/>
+<rect x="737.0" y="96.0" width="5.0" height="104.0" rx="2.5" fill="#009E73"/>
+<text x="757.0" y="136.0" font-size="28" font-weight="800" fill="#0B3A5B" text-anchor="start">0</text>
+<text x="757.0" y="162.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">divergências RDV x BU</text>
+<text x="757.0" y="183.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">499.205 seções recontadas</text>
+<text x="32.0" y="244.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Três somas dos mesmos votos, o mesmo resultado</text>
+<text x="560.0" y="278.0" font-size="12.5" font-weight="700" fill="#4F6B80" text-anchor="end">Recontagem do RDV</text>
+<text x="720.0" y="278.0" font-size="12.5" font-weight="700" fill="#4F6B80" text-anchor="end">Soma dos BUs</text>
+<text x="880.0" y="278.0" font-size="12.5" font-weight="700" fill="#4F6B80" text-anchor="end">Resultado oficial</text>
+<text x="960.0" y="278.0" font-size="12.5" font-weight="700" fill="#4F6B80" text-anchor="end">Diferença</text>
+<line x1="32" y1="288" x2="968" y2="288" stroke="#D9E3EB"/>
+<rect x="24.0" y="294.0" width="952.0" height="32.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="315.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">13  Lula (PT)</text>
+<text x="560.0" y="315.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">64.256.232</text>
+<text x="720.0" y="315.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">64.256.232</text>
+<text x="880.0" y="315.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">64.256.232</text>
+<text x="960.0" y="315.0" font-size="14" font-weight="800" fill="#009E73" text-anchor="end">0</text>
+<text x="40.0" y="349.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">22  Flávio Bolsonaro (PL)</text>
+<text x="560.0" y="349.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">59.826.041</text>
+<text x="720.0" y="349.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">59.826.041</text>
+<text x="880.0" y="349.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">59.826.041</text>
+<text x="960.0" y="349.0" font-size="14" font-weight="800" fill="#009E73" text-anchor="end">0</text>
+<rect x="24.0" y="362.0" width="952.0" height="32.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="383.0" font-size="14" font-weight="500" fill="#0B3A5B" text-anchor="start">Brancos</text>
+<text x="560.0" y="383.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">1.430.496</text>
+<text x="720.0" y="383.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">1.430.496</text>
+<text x="880.0" y="383.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">1.430.496</text>
+<text x="960.0" y="383.0" font-size="14" font-weight="800" fill="#009E73" text-anchor="end">0</text>
+<text x="40.0" y="417.0" font-size="14" font-weight="500" fill="#0B3A5B" text-anchor="start">Nulos</text>
+<text x="560.0" y="417.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">2.723.305</text>
+<text x="720.0" y="417.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">2.723.305</text>
+<text x="880.0" y="417.0" font-size="14" font-weight="400" fill="#0B3A5B" text-anchor="end">2.723.305</text>
+<text x="960.0" y="417.0" font-size="14" font-weight="800" fill="#009E73" text-anchor="end">0</text>
+<rect x="24.0" y="430.0" width="952.0" height="32.0" rx="8" fill="#F2F6F9"/>
+<text x="40.0" y="451.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">Total (comparecimento)</text>
+<text x="560.0" y="451.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="end">128.236.074</text>
+<text x="720.0" y="451.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="end">128.236.074</text>
+<text x="880.0" y="451.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="end">128.236.074</text>
+<text x="960.0" y="451.0" font-size="14" font-weight="800" fill="#009E73" text-anchor="end">0</text>
+<text x="32.0" y="484.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">RDV: registro digital do voto, recontado voto a voto; BU: boletim de urna assinado; oficial: totalização divulgada pelo TSE.</text>
+<text x="32.0" y="526.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Recontagem do RDV por UF: seções recontadas, 0 divergências em todas</text>
+<rect x="32.0" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="62.6" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">AC</text>
+<text x="62.6" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">2.270</text>
+<rect x="99.3" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="129.9" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">AL</text>
+<text x="129.9" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">7.101</text>
+<rect x="166.6" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="197.2" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">AM</text>
+<text x="197.2" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">8.157</text>
+<rect x="233.9" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="264.5" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">AP</text>
+<text x="264.5" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">1.914</text>
+<rect x="301.1" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="331.8" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">BA</text>
+<text x="331.8" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">35.476</text>
+<rect x="368.4" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="399.1" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">CE</text>
+<text x="399.1" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">23.765</text>
+<rect x="435.7" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="466.4" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">DF</text>
+<text x="466.4" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">6.969</text>
+<rect x="503.0" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="533.6" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">ES</text>
+<text x="533.6" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">9.844</text>
+<rect x="570.3" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="600.9" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">GO</text>
+<text x="600.9" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">15.686</text>
+<rect x="637.6" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="668.2" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">MA</text>
+<text x="668.2" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">18.093</text>
+<rect x="704.9" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="735.5" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">MG</text>
+<text x="735.5" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">52.062</text>
+<rect x="772.1" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="802.8" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">MS</text>
+<text x="802.8" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">7.106</text>
+<rect x="839.4" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="870.1" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">MT</text>
+<text x="870.1" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">8.287</text>
+<rect x="906.7" y="542.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="937.4" y="562.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">PA</text>
+<text x="937.4" y="579.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">20.827</text>
+<rect x="32.0" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="62.6" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">PB</text>
+<text x="62.6" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">10.712</text>
+<rect x="99.3" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="129.9" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">PE</text>
+<text x="129.9" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">21.418</text>
+<rect x="166.6" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="197.2" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">PI</text>
+<text x="197.2" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">10.225</text>
+<rect x="233.9" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="264.5" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">PR</text>
+<text x="264.5" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">27.142</text>
+<rect x="301.1" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="331.8" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">RJ</text>
+<text x="331.8" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">37.675</text>
+<rect x="368.4" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="399.1" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">RN</text>
+<text x="399.1" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">8.115</text>
+<rect x="435.7" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="466.4" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">RO</text>
+<text x="466.4" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">4.698</text>
+<rect x="503.0" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="533.6" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">RR</text>
+<text x="533.6" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">1.519</text>
+<rect x="570.3" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="600.9" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">RS</text>
+<text x="600.9" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">27.547</text>
+<rect x="637.6" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="668.2" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">SC</text>
+<text x="668.2" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">17.326</text>
+<rect x="704.9" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="735.5" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">SE</text>
+<text x="735.5" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">5.923</text>
+<rect x="772.1" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="802.8" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">SP</text>
+<text x="802.8" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">103.656</text>
+<rect x="839.4" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="870.1" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">TO</text>
+<text x="870.1" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">4.384</text>
+<rect x="906.7" y="596.0" width="61.3" height="48.0" rx="8" fill="#DDF1EA"/>
+<text x="937.4" y="616.0" font-size="13" font-weight="700" fill="#0B3A5B" text-anchor="middle">EXT</text>
+<text x="937.4" y="633.0" font-size="11" font-weight="400" fill="#4F6B80" text-anchor="middle">1.308</text>
+<text x="32.0" y="668.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">EXT: exterior. As 2 seções do exterior sem RDV tiveram comparecimento 0.</text>
+<line x1="32" y1="688" x2="968" y2="688" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="712.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: arquivos de urna do 2º turno de 2026 (TSE); verificação DataUrnas-BR</text>
+<text x="968.0" y="712.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>
