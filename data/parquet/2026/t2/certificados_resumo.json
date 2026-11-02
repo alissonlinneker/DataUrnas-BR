@@ -1,0 +1,5565 @@
+{
+ "gerado_em": "2026-10-26T09:54:35",
+ "turno": 2,
+ "pleito": "3221",
+ "dia_eleicao": "2026-10-25",
+ "fontes": {
+  "ac": "app/data/certificados/ac",
+  "todas_fracao": 1.0,
+  "encerramento": "out/encerramento/secoes_encerramento.parquet",
+  "t1_catalogo": "app/data/parquet/2026/integridade/secoes.parquet",
+  "t1_bu": "app/data/parquet/2026/secoes_2026.parquet"
+ },
+ "cobertura": {
+  "secoes": 499207,
+  "com_bu": 499207,
+  "com_vsc": 499207,
+  "par_bu_vsc": 499207,
+  "bu_sem_vsc": 0,
+  "vsc_sem_bu": 0,
+  "com_certificado": 499207,
+  "verificadas": 499207,
+  "todas_assinaturas_verificadas": 499207,
+  "secoes_com_mais_de_um_hash": 0,
+  "ufs": [
+   "ac",
+   "al",
+   "am",
+   "ap",
+   "ba",
+   "ce",
+   "df",
+   "es",
+   "go",
+   "ma",
+   "mg",
+   "ms",
+   "mt",
+   "pa",
+   "pb",
+   "pe",
+   "pi",
+   "pr",
+   "rj",
+   "rn",
+   "ro",
+   "rr",
+   "rs",
+   "sc",
+   "se",
+   "sp",
+   "to",
+   "zz"
+  ],
+  "por_uf": {
+   "ac": {
+    "com_bu": 2270,
+    "com_vsc": 2270,
+    "par": 2270
+   },
+   "al": {
+    "com_bu": 7101,
+    "com_vsc": 7101,
+    "par": 7101
+   },
+   "am": {
+    "com_bu": 8157,
+    "com_vsc": 8157,
+    "par": 8157
+   },
+   "ap": {
+    "com_bu": 1914,
+    "com_vsc": 1914,
+    "par": 1914
+   },
+   "ba": {
+    "com_bu": 35476,
+    "com_vsc": 35476,
+    "par": 35476
+   },
+   "ce": {
+    "com_bu": 23765,
+    "com_vsc": 23765,
+    "par": 23765
+   },
+   "df": {
+    "com_bu": 6969,
+    "com_vsc": 6969,
+    "par": 6969
+   },
+   "es": {
+    "com_bu": 9844,
+    "com_vsc": 9844,
+    "par": 9844
+   },
+   "go": {
+    "com_bu": 15686,
+    "com_vsc": 15686,
+    "par": 15686
+   },
+   "ma": {
+    "com_bu": 18093,
+    "com_vsc": 18093,
+    "par": 18093
+   },
+   "mg": {
+    "com_bu": 52062,
+    "com_vsc": 52062,
+    "par": 52062
+   },
+   "ms": {
+    "com_bu": 7106,
+    "com_vsc": 7106,
+    "par": 7106
+   },
+   "mt": {
+    "com_bu": 8287,
+    "com_vsc": 8287,
+    "par": 8287
+   },
+   "pa": {
+    "com_bu": 20827,
+    "com_vsc": 20827,
+    "par": 20827
+   },
+   "pb": {
+    "com_bu": 10712,
+    "com_vsc": 10712,
+    "par": 10712
+   },
+   "pe": {
+    "com_bu": 21418,
+    "com_vsc": 21418,
+    "par": 21418
+   },
+   "pi": {
+    "com_bu": 10225,
+    "com_vsc": 10225,
+    "par": 10225
+   },
+   "pr": {
+    "com_bu": 27142,
+    "com_vsc": 27142,
+    "par": 27142
+   },
+   "rj": {
+    "com_bu": 37675,
+    "com_vsc": 37675,
+    "par": 37675
+   },
+   "rn": {
+    "com_bu": 8115,
+    "com_vsc": 8115,
+    "par": 8115
+   },
+   "ro": {
+    "com_bu": 4698,
+    "com_vsc": 4698,
+    "par": 4698
+   },
+   "rr": {
+    "com_bu": 1519,
+    "com_vsc": 1519,
+    "par": 1519
+   },
+   "rs": {
+    "com_bu": 27547,
+    "com_vsc": 27547,
+    "par": 27547
+   },
+   "sc": {
+    "com_bu": 17326,
+    "com_vsc": 17326,
+    "par": 17326
+   },
+   "se": {
+    "com_bu": 5923,
+    "com_vsc": 5923,
+    "par": 5923
+   },
+   "sp": {
+    "com_bu": 103656,
+    "com_vsc": 103656,
+    "par": 103656
+   },
+   "to": {
+    "com_bu": 4384,
+    "com_vsc": 4384,
+    "par": 4384
+   },
+   "zz": {
+    "com_bu": 1310,
+    "com_vsc": 1310,
+    "par": 1310
+   }
+  },
+  "tipo_vsc": {
+   "vota": 499178,
+   "sa": 29
+  }
+ },
+ "verificacoes": {
+  "bu_hash_confere": {
+   "True": 499207
+  },
+  "bu_nome_confere": {
+   "True": 499207
+  },
+  "sha512_coleta_bu_confere": {
+   "True": 499207
+  },
+  "sha512_coleta_vsc_confere": {
+   "True": 499207
+  },
+  "hw_conteudo_ok": {
+   "True": 499207
+  },
+  "sw_conteudo_ok": {
+   "True": 499207
+  },
+  "sw_hw_hashes_iguais": {
+   "True": 499207
+  },
+  "assinatura_conteudo_ok": {
+   "True": 499207
+  },
+  "assinatura_bu_ok": {
+   "True": 499207
+  },
+  "assinaturas_arquivos": {
+   "secoes": 499207,
+   "ok": 5487289,
+   "falha": 0
+  },
+  "assinatura_algoritmo": {
+   "Ed521": 399250,
+   "ECDSA-secp521r1-SHA512": 99957
+  },
+  "cadeia_ok": {
+   "True": 499207
+  },
+  "nivel_cadeia": {
+   "intermediaria": 499207
+  },
+  "valido_no_dia": {
+   "True": 499207
+  },
+  "ac_valida_no_dia": {
+   "True": 399250,
+   "False": 99957
+  },
+  "cert_valido_na_assinatura": {
+   "True": 499207
+  },
+  "emitido_na_validade_da_ac": {
+   "True": 499154,
+   "False": 53
+  },
+  "cn_confere_usuario": {
+   "True": 499207
+  },
+  "cn_igual_numero_interno": {
+   "True": 499204,
+   "False": 3
+  },
+  "erro_vsc": {},
+  "erro_bu": {}
+ },
+ "falhas": {
+  "bu_hash_diverge": {
+   "n": 0,
+   "secoes": []
+  },
+  "bu_nome_diverge": {
+   "n": 0,
+   "secoes": []
+  },
+  "conteudo_hw_hash_diverge": {
+   "n": 0,
+   "secoes": []
+  },
+  "conteudo_sw_hash_diverge": {
+   "n": 0,
+   "secoes": []
+  },
+  "hashes_sw_hw_divergem": {
+   "n": 0,
+   "secoes": []
+  },
+  "assinatura_conteudo_invalida": {
+   "n": 0,
+   "secoes": []
+  },
+  "assinatura_bu_invalida": {
+   "n": 0,
+   "secoes": []
+  },
+  "assinatura_arquivo_invalida": {
+   "n": 0,
+   "secoes": []
+  },
+  "cadeia_invalida": {
+   "n": 0,
+   "secoes": []
+  },
+  "vsc_ilegivel": {
+   "n": 0,
+   "secoes": []
+  },
+  "bu_ilegivel": {
+   "n": 0,
+   "secoes": []
+  },
+  "sha512_coleta_diverge": {
+   "n": 0,
+   "secoes": []
+  }
+ },
+ "certificados": {
+  "distribuicao": [
+   {
+    "modelo": "UE2013",
+    "emissor": "AC URNA",
+    "algoritmo": "ECDSA",
+    "secoes": 12455,
+    "pct": 2.49
+   },
+   {
+    "modelo": "UE2015",
+    "emissor": "AC URNA",
+    "algoritmo": "ECDSA",
+    "secoes": 87502,
+    "pct": 17.53
+   },
+   {
+    "modelo": "UE2020",
+    "emissor": "AC UE2020",
+    "algoritmo": "Ed521",
+    "secoes": 200504,
+    "pct": 40.16
+   },
+   {
+    "modelo": "UE2022",
+    "emissor": "AC UE2022",
+    "algoritmo": "Ed521",
+    "secoes": 198746,
+    "pct": 39.81
+   }
+  ],
+  "curvas": {
+   "E-521": 399250,
+   "secp521r1": 99957
+  },
+  "oid_assinatura_cert": {
+   "1.3.6.1.4.1.44588.2.1": 399250,
+   "1.2.840.10045.4.3.4": 99957
+  },
+  "versao": {
+   "v3": 499207
+  },
+  "extensoes": {
+   "authorityKeyIdentifier,basicConstraints,cRLDistributionPoints,certificatePolicies,keyUsage,subjectKeyIdentifier": 499207
+  },
+  "extensoes_incomuns": {},
+  "extensoes_criticas": {
+   "nenhuma": 499207
+  },
+  "basic_ca": {
+   "False": 499207
+  },
+  "key_usage": {
+   "digital_signature,key_encipherment,data_encipherment": 499207
+  },
+  "hw_alg_hash": {
+   "sha512": 499207
+  },
+  "sw_alg": {
+   "cepesc": 499207
+  },
+  "sw_usuario": {
+   "SEVIN": 499207
+  },
+  "sw_conjunto_chave": {
+   "202607021654": 499207
+  },
+  "cadeia_caminho": {
+   "AC UE2020": 200504,
+   "AC UE2022": 198746,
+   "AC URNA": 99957
+  },
+  "certificados_distintos": 499179,
+  "chaves_distintas": 499179,
+  "pares_emissor_serial": 499179,
+  "por_emissor_modelo": [
+   {
+    "emissor": "AC UE2020",
+    "modelo": "UE2020",
+    "secoes": 200504,
+    "nao_antes_min": "2022-04-01T22:12:17+00:00",
+    "nao_antes_max": "2026-10-22T12:55:11+00:00",
+    "nao_depois_min": "2035-12-09T22:12:17+00:00",
+    "nao_depois_max": "2038-01-15T16:49:02+00:00",
+    "duracao_dias": {
+     "5000": 199436,
+     "4853": 72,
+     "4896": 67,
+     "4959": 59,
+     "4841": 57,
+     "4870": 50,
+     "4913": 47,
+     "4931": 43,
+     "4848": 41,
+     "4882": 37,
+     "4922": 37,
+     "4867": 36,
+     "4871": 34,
+     "4951": 31,
+     "4838": 29,
+     "4851": 23,
+     "4861": 23,
+     "4845": 21,
+     "4843": 17,
+     "4151": 16,
+     "4844": 15,
+     "4553": 15,
+     "4864": 14,
+     "4831": 14,
+     "4836": 13,
+     "4889": 13,
+     "4644": 12,
+     "4451": 12,
+     "4409": 11,
+     "4433": 10,
+     "4847": 10,
+     "4865": 10,
+     "4140": 9,
+     "4297": 9,
+     "4185": 9,
+     "4168": 8,
+     "4860": 7,
+     "4175": 7,
+     "4550": 7,
+     "4536": 7,
+     "4630": 7,
+     "4269": 6,
+     "4572": 6,
+     "4599": 6,
+     "4619": 5,
+     "4339": 5,
+     "4131": 5,
+     "4840": 5,
+     "4479": 5,
+     "4368": 4,
+     "4320": 4,
+     "4222": 3,
+     "4376": 3,
+     "4672": 3,
+     "4675": 3,
+     "4835": 3,
+     "4948": 3,
+     "4514": 2,
+     "4664": 2,
+     "4137": 2,
+     "4866": 2,
+     "4349": 2,
+     "4111": 2,
+     "4804": 2,
+     "4530": 2,
+     "4830": 2,
+     "4129": 2,
+     "4108": 2,
+     "4123": 1,
+     "4128": 1,
+     "4125": 1,
+     "4115": 1,
+     "4591": 1,
+     "4699": 1,
+     "4405": 1,
+     "4355": 1,
+     "4585": 1,
+     "4816": 1,
+     "4088": 1,
+     "4102": 1,
+     "4093": 1,
+     "4109": 1,
+     "4096": 1,
+     "4112": 1,
+     "4118": 1,
+     "4522": 1
+    },
+    "ac_not_after": {
+     "2037-07-01": 200504
+    }
+   },
+   {
+    "emissor": "AC UE2022",
+    "modelo": "UE2022",
+    "secoes": 198746,
+    "nao_antes_min": "2023-05-19T12:29:22+00:00",
+    "nao_antes_max": "2026-10-02T11:57:59+00:00",
+    "nao_depois_min": "2037-01-25T12:29:22+00:00",
+    "nao_depois_max": "2038-01-15T18:26:12+00:00",
+    "duracao_dias": {
+     "5000": 195899,
+     "4942": 676,
+     "4872": 225,
+     "4941": 175,
+     "4931": 94,
+     "4451": 91,
+     "4922": 82,
+     "4409": 80,
+     "4553": 77,
+     "4951": 69,
+     "4959": 69,
+     "4545": 64,
+     "4550": 50,
+     "4572": 45,
+     "4479": 42,
+     "4222": 42,
+     "4896": 39,
+     "4509": 39,
+     "4853": 38,
+     "4913": 36,
+     "4522": 34,
+     "4151": 33,
+     "4168": 30,
+     "4514": 29,
+     "4510": 27,
+     "4870": 26,
+     "4530": 26,
+     "4848": 25,
+     "4591": 24,
+     "4140": 23,
+     "4297": 23,
+     "4599": 22,
+     "4841": 21,
+     "4845": 21,
+     "4269": 21,
+     "4368": 20,
+     "4675": 19,
+     "4175": 18,
+     "4838": 18,
+     "4536": 18,
+     "4131": 17,
+     "4868": 17,
+     "4137": 14,
+     "4836": 14,
+     "4349": 14,
+     "4433": 13,
+     "4882": 13,
+     "4320": 13,
+     "4851": 12,
+     "4664": 12,
+     "4630": 12,
+     "4644": 11,
+     "4185": 11,
+     "4339": 9,
+     "4889": 9,
+     "4843": 9,
+     "4585": 8,
+     "4376": 8,
+     "4619": 8,
+     "4405": 8,
+     "4844": 7,
+     "4847": 6,
+     "4860": 6,
+     "4861": 6,
+     "4831": 6,
+     "4948": 6,
+     "4864": 5,
+     "4516": 5,
+     "4867": 4,
+     "4840": 4,
+     "4672": 4,
+     "4835": 3,
+     "4865": 3,
+     "4866": 3,
+     "4130": 3,
+     "4697": 3,
+     "4712": 3,
+     "4804": 3,
+     "4123": 2,
+     "4822": 2,
+     "4699": 2,
+     "4118": 2,
+     "4719": 2,
+     "4112": 2,
+     "4126": 2,
+     "4129": 1,
+     "4823": 1,
+     "4355": 1,
+     "4182": 1,
+     "4108": 1,
+     "4829": 1,
+     "4117": 1,
+     "4818": 1,
+     "4830": 1,
+     "4111": 1
+    },
+    "ac_not_after": {
+     "2039-02-24": 198746
+    }
+   },
+   {
+    "emissor": "AC URNA",
+    "modelo": "UE2013",
+    "secoes": 12455,
+    "nao_antes_min": "2013-07-30T05:23:03+00:00",
+    "nao_antes_max": "2026-10-19T18:04:26+00:00",
+    "nao_depois_min": "2027-04-08T05:23:03+00:00",
+    "nao_depois_max": "2038-01-15T16:34:03+00:00",
+    "duracao_dias": {
+     "5000": 12405,
+     "4222": 7,
+     "4182": 6,
+     "4838": 4,
+     "4868": 4,
+     "4131": 3,
+     "4140": 3,
+     "4137": 3,
+     "4168": 2,
+     "4840": 2,
+     "4882": 2,
+     "4847": 2,
+     "4959": 2,
+     "4111": 1,
+     "4864": 1,
+     "4126": 1,
+     "4115": 1,
+     "4091": 1,
+     "4118": 1,
+     "4843": 1,
+     "4128": 1,
+     "4851": 1,
+     "4844": 1
+    },
+    "ac_not_after": {
+     "2026-07-18": 12455
+    }
+   },
+   {
+    "emissor": "AC URNA",
+    "modelo": "UE2015",
+    "secoes": 87502,
+    "nao_antes_min": "2016-06-14T00:31:23+00:00",
+    "nao_antes_max": "2026-10-18T17:55:29+00:00",
+    "nao_depois_min": "2030-02-21T00:31:23+00:00",
+    "nao_depois_max": "2038-01-15T16:34:37+00:00",
+    "duracao_dias": {
+     "5000": 87374,
+     "4185": 14,
+     "4222": 12,
+     "4882": 12,
+     "4868": 10,
+     "4853": 7,
+     "4123": 5,
+     "4168": 5,
+     "4838": 5,
+     "4836": 4,
+     "4182": 4,
+     "4369": 4,
+     "4841": 4,
+     "4140": 4,
+     "4122": 4,
+     "4896": 3,
+     "4951": 3,
+     "4959": 2,
+     "4109": 2,
+     "4131": 2,
+     "4913": 2,
+     "4864": 2,
+     "4865": 2,
+     "4848": 2,
+     "4851": 2,
+     "4843": 2,
+     "4175": 1,
+     "4922": 1,
+     "4117": 1,
+     "4125": 1,
+     "4823": 1,
+     "4931": 1,
+     "4847": 1,
+     "4861": 1,
+     "4948": 1,
+     "4092": 1
+    },
+    "ac_not_after": {
+     "2026-07-18": 87502
+    }
+   }
+  ],
+  "emissao_por_ano": {
+   "2013": 12039,
+   "2014": 133,
+   "2015": 10,
+   "2016": 86853,
+   "2017": 91,
+   "2018": 253,
+   "2019": 38,
+   "2020": 144,
+   "2022": 197507,
+   "2023": 151919,
+   "2024": 48809,
+   "2025": 898,
+   "2026": 513
+  },
+  "emissao_2026_por_mes": {
+   "2026-06": 64,
+   "2026-07": 71,
+   "2026-08": 133,
+   "2026-09": 86,
+   "2026-10": 12
+  }
+ },
+ "padroes": {
+  "certificado_em_mais_de_uma_secao": {
+   "certificados": 3,
+   "secoes": 31,
+   "por_tipo_urna": {
+    "contingencia": 29,
+    "secao": 1,
+    "reservaEncerrandoSecao": 1
+   },
+   "por_tipo_vsc": {
+    "sa": 29,
+    "vota": 2
+   },
+   "lista": [
+    {
+     "secao_id": "ES/57932/0009/0085",
+     "cn": "ueao01758779",
+     "cert_sha256": "2a339b6fb8c841940c1f10d21cca363c19d7445b54022c1ee8522189ae41cd4b",
+     "tipo_urna": "secao",
+     "vsc_tipo": "vota"
+    },
+    {
+     "secao_id": "ES/57932/0009/0112",
+     "cn": "ueao01758779",
+     "cert_sha256": "2a339b6fb8c841940c1f10d21cca363c19d7445b54022c1ee8522189ae41cd4b",
+     "tipo_urna": "reservaEncerrandoSecao",
+     "vsc_tipo": "vota"
+    },
+    {
+     "secao_id": "ZZ/30708/0001/0444",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29300/0001/0006",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30163/0001/0647",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30171/0001/1340",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29394/0001/0028",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29858/0001/1183",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30821/0001/1524",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29254/0001/0001",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29750/0001/1703",
+     "cn": "ueao01762246",
+     "cert_sha256": "73f3d72065ff13f4c90cd46b47a4ab88d45c6fef1f7b6ad9c598b37f4ce2a58b",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29173/0001/0494",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29297/0001/0495",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29777/0001/0127",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29912/0001/0150",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29580/0001/0096",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/39102/0001/0712",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29564/0001/0091",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29645/0001/0380",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/29270/0001/0003",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/99473/0001/1327",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30597/0001/1182",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30686/0001/0443",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/38962/0001/0558",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30333/0001/0353",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30430/0001/0384",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/99155/0001/1504",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30295/0001/0348",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30325/0001/0352",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/30546/0001/1764",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    },
+    {
+     "secao_id": "ZZ/99180/0001/1228",
+     "cn": "ueao01808076",
+     "cert_sha256": "c6b351defd689f2988247a4916921cf2325aca078de31c9e00deda7f512a5ed4",
+     "tipo_urna": "contingencia",
+     "vsc_tipo": "sa"
+    }
+   ]
+  },
+  "mesmo_cn_com_certificados_diferentes_no_t2": {
+   "cns": 0,
+   "secoes": 0,
+   "lista": []
+  },
+  "chave_publica_em_urnas_diferentes": {
+   "secoes": 0,
+   "lista": []
+  },
+  "cn_difere_numero_interno": {
+   "n": 3,
+   "lista": [
+    {
+     "secao_id": "SP/64777/0393/0312",
+     "cn": "UEAO02399743",
+     "numero_interno": 2396114,
+     "tipo_urna": "secao",
+     "modelo": "UE2022",
+     "t1_cn": "UEAO02396114",
+     "t1_numero_interno": 2396114.0,
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "RJ/58696/0027/0139",
+     "cn": "UEAO02189420",
+     "numero_interno": 2179194,
+     "tipo_urna": "secao",
+     "modelo": "UE2020",
+     "t1_cn": "UEAO02179194",
+     "t1_numero_interno": 2179194.0,
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "ES/57932/0009/0085",
+     "cn": "ueao01758779",
+     "numero_interno": 1841837,
+     "tipo_urna": "secao",
+     "modelo": "UE2015",
+     "t1_cn": "ueao01841837",
+     "t1_numero_interno": 1841837.0,
+     "fechou_tarde": false
+    }
+   ]
+  },
+  "cn_minusculo": 99957,
+  "carga": {
+   "com_data": 499207,
+   "ate_1o_turno": 496962,
+   "entre_turnos": 2245,
+   "entre_turnos_por_tipo_urna": {
+    "secao": 1970,
+    "reservaSecao": 275
+   },
+   "primeira": "20260915",
+   "ultima": "20261025"
+  },
+  "emitido_apos_carga": {
+   "n": 0,
+   "lista": []
+  },
+  "emitido_nos_60_dias_antes": {
+   "n": 137,
+   "apos_1o_turno": 6,
+   "por_emissor": {
+    "AC UE2022": 69,
+    "AC URNA": 35,
+    "AC UE2020": 33
+   },
+   "lista": [
+    {
+     "secao_id": "MT/90670/0039/0531",
+     "cn": "ueao01681706",
+     "not_before": "2026-08-31T15:56:32+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/23515/0054/0192",
+     "cn": "ueao01682260",
+     "not_before": "2026-08-31T15:56:42+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/64777/0394/0197",
+     "cn": "ueao01682724",
+     "not_before": "2026-08-31T15:56:47+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/67130/0074/0076",
+     "cn": "ueao01842388",
+     "not_before": "2026-08-31T15:59:24+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/33774/0071/0150",
+     "cn": "ueao01843885",
+     "not_before": "2026-08-31T15:59:29+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MT/91677/0020/0485",
+     "cn": "ueao01847378",
+     "not_before": "2026-08-31T15:59:34+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25631/0116/0020",
+     "cn": "ueao01848139",
+     "not_before": "2026-08-31T15:59:43+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/07226/0110/0264",
+     "cn": "UEAO02000066",
+     "not_before": "2026-08-31T16:01:19+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/77674/0027/0059",
+     "cn": "UEAO02013408",
+     "not_before": "2026-08-31T16:01:43+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/33634/0075/0240",
+     "cn": "UEAO02016370",
+     "not_before": "2026-08-31T16:02:52+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0001/0305",
+     "cn": "UEAO02041252",
+     "not_before": "2026-08-31T16:03:14+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/24910/0100/0626",
+     "cn": "UEAO02048505",
+     "not_before": "2026-08-31T16:03:37+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/07978/0032/0173",
+     "cn": "UEAO02101423",
+     "not_before": "2026-08-31T16:04:23+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/33634/0070/0109",
+     "cn": "UEAO02101595",
+     "not_before": "2026-08-31T16:04:46+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/63134/0303/0195",
+     "cn": "UEAO02101631",
+     "not_before": "2026-08-31T16:05:32+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/63134/0303/0447",
+     "cn": "UEAO02101905",
+     "not_before": "2026-08-31T16:06:41+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0447",
+     "cn": "UEAO02395949",
+     "not_before": "2026-08-31T16:08:49+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0403",
+     "cn": "UEAO02465612",
+     "not_before": "2026-08-31T16:09:15+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RS/88013/0001/0260",
+     "cn": "UEAO02470843",
+     "not_before": "2026-08-31T16:09:42+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0408/0424",
+     "cn": "UEAO02470890",
+     "not_before": "2026-08-31T16:10:08+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0551",
+     "cn": "UEAO02471130",
+     "not_before": "2026-08-31T16:11:01+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0442",
+     "cn": "UEAO02471199",
+     "not_before": "2026-08-31T16:11:54+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/75353/0177/0474",
+     "cn": "UEAO02471298",
+     "not_before": "2026-08-31T16:12:20+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/37397/0119/0148",
+     "cn": "UEAO02472016",
+     "not_before": "2026-08-31T16:12:47+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/08958/0083/0121",
+     "cn": "UEAO02472062",
+     "not_before": "2026-08-31T16:13:14+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25313/0003/0036",
+     "cn": "UEAO02472207",
+     "not_before": "2026-08-31T16:13:41+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0401",
+     "cn": "UEAO02472424",
+     "not_before": "2026-08-31T16:14:33+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25313/0007/0357",
+     "cn": "UEAO02472540",
+     "not_before": "2026-08-31T16:15:00+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38970/0088/0207",
+     "cn": "UEAO02472842",
+     "not_before": "2026-08-31T16:15:54+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38393/0111/0112",
+     "cn": "UEAO02472971",
+     "not_before": "2026-08-31T16:17:14+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38490/0018/0120",
+     "cn": "UEAO02473811",
+     "not_before": "2026-08-31T16:19:01+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25313/0007/0377",
+     "cn": "UEAO02474180",
+     "not_before": "2026-08-31T16:19:28+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/33812/0065/0217",
+     "cn": "UEAO02474272",
+     "not_before": "2026-08-31T16:20:22+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25313/0007/0142",
+     "cn": "UEAO02474313",
+     "not_before": "2026-08-31T16:20:49+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MT/90670/0055/0164",
+     "cn": "UEAO02474451",
+     "not_before": "2026-08-31T16:21:15+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PB/19291/0055/0004",
+     "cn": "UEAO02474471",
+     "not_before": "2026-08-31T16:21:42+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0564",
+     "cn": "UEAO02474586",
+     "not_before": "2026-08-31T16:22:10+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PI/12190/0097/0443",
+     "cn": "UEAO02474662",
+     "not_before": "2026-08-31T16:22:37+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/61310/0158/0339",
+     "cn": "UEAO02474677",
+     "not_before": "2026-08-31T16:23:04+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0280/0564",
+     "cn": "ueao01682525",
+     "not_before": "2026-09-03T17:43:25+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "ES/56995/0053/0384",
+     "cn": "ueao01682614",
+     "not_before": "2026-09-03T17:43:27+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25330/0041/0173",
+     "cn": "ueao01682785",
+     "not_before": "2026-09-03T17:43:30+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "PR/74357/0050/0133",
+     "cn": "UEAO02103296",
+     "not_before": "2026-09-03T17:44:46+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/74357/0050/0003",
+     "cn": "UEAO02247937",
+     "not_before": "2026-09-03T17:45:09+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0003/0516",
+     "cn": "UEAO02464105",
+     "not_before": "2026-09-03T17:45:36+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0082/0117",
+     "cn": "UEAO02464465",
+     "not_before": "2026-09-03T17:46:03+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0002/0759",
+     "cn": "UEAO02465624",
+     "not_before": "2026-09-03T17:46:30+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0003/0610",
+     "cn": "UEAO02471070",
+     "not_before": "2026-09-03T17:46:56+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/64777/0395/0456",
+     "cn": "UEAO02472506",
+     "not_before": "2026-09-03T17:47:50+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0003/0614",
+     "cn": "UEAO02472853",
+     "not_before": "2026-09-03T17:48:17+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0002/0398",
+     "cn": "UEAO02472854",
+     "not_before": "2026-09-03T17:48:44+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/66192/0065/0547",
+     "cn": "UEAO02473199",
+     "not_before": "2026-09-03T17:49:37+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/63231/0040/0218",
+     "cn": "UEAO02474074",
+     "not_before": "2026-09-03T17:50:04+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0002/0370",
+     "cn": "UEAO02474105",
+     "not_before": "2026-09-03T17:50:31+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0114/0217",
+     "cn": "UEAO02474113",
+     "not_before": "2026-09-03T17:50:57+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/66893/0339/0391",
+     "cn": "UEAO02474239",
+     "not_before": "2026-09-03T17:51:24+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0002/0533",
+     "cn": "UEAO02474322",
+     "not_before": "2026-09-03T17:51:50+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/69698/0265/0353",
+     "cn": "UEAO02474516",
+     "not_before": "2026-09-03T17:52:44+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/28894/0031/0159",
+     "cn": "ueao01679245",
+     "not_before": "2026-09-09T14:02:59+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27650/0039/0092",
+     "cn": "ueao01844078",
+     "not_before": "2026-09-09T14:04:18+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27472/0040/0031",
+     "cn": "ueao01847874",
+     "not_before": "2026-09-09T14:04:28+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/42870/0077/0083",
+     "cn": "UEAO02015219",
+     "not_before": "2026-09-09T14:06:12+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/35734/0026/0316",
+     "cn": "UEAO02015914",
+     "not_before": "2026-09-09T14:07:21+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "DF/97012/0020/0218",
+     "cn": "UEAO02096997",
+     "not_before": "2026-09-09T14:07:44+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/76678/0146/0438",
+     "cn": "UEAO02101503",
+     "not_before": "2026-09-09T14:08:07+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/48658/0184/0358",
+     "cn": "UEAO02101505",
+     "not_before": "2026-09-09T14:08:30+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0282",
+     "cn": "UEAO02446696",
+     "not_before": "2026-09-09T14:10:53+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0054/0536",
+     "cn": "UEAO02464496",
+     "not_before": "2026-09-09T14:11:19+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "DF/97012/0013/0030",
+     "cn": "UEAO02467741",
+     "not_before": "2026-09-09T14:11:46+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0051",
+     "cn": "UEAO02468286",
+     "not_before": "2026-09-09T14:12:13+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0367",
+     "cn": "UEAO02470882",
+     "not_before": "2026-09-09T14:12:39+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0288",
+     "cn": "UEAO02470884",
+     "not_before": "2026-09-09T14:13:06+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "TO/73440/0029/0531",
+     "cn": "UEAO02472262",
+     "not_before": "2026-09-09T14:14:52+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0052",
+     "cn": "UEAO02472539",
+     "not_before": "2026-09-09T14:15:45+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/62197/0387/0159",
+     "cn": "UEAO02472735",
+     "not_before": "2026-09-09T14:17:05+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/28479/0012/0156",
+     "cn": "UEAO02472923",
+     "not_before": "2026-09-09T14:18:02+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RO/00035/0006/0519",
+     "cn": "UEAO02473039",
+     "not_before": "2026-09-09T14:18:28+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0283",
+     "cn": "UEAO02473165",
+     "not_before": "2026-09-09T14:18:55+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "TO/92185/0007/0118",
+     "cn": "UEAO02474229",
+     "not_before": "2026-09-09T14:19:22+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0333/0191",
+     "cn": "UEAO02474483",
+     "not_before": "2026-09-09T14:19:48+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0054/0537",
+     "cn": "UEAO02474617",
+     "not_before": "2026-09-09T14:20:15+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27855/0003/0341",
+     "cn": "UEAO02474618",
+     "not_before": "2026-09-09T14:20:42+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0333/0172",
+     "cn": "UEAO02474632",
+     "not_before": "2026-09-09T14:21:09+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/28673/0051/0121",
+     "cn": "ueao01682873",
+     "not_before": "2026-09-09T17:29:04+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/27022/0039/0128",
+     "cn": "ueao01682879",
+     "not_before": "2026-09-09T17:29:06+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/62510/0298/0122",
+     "cn": "UEAO02471392",
+     "not_before": "2026-09-10T11:57:07+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0332/0106",
+     "cn": "UEAO02473269",
+     "not_before": "2026-09-10T11:57:33+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/43710/0093/0129",
+     "cn": "UEAO02474098",
+     "not_before": "2026-09-10T11:58:00+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/40444/0063/0178",
+     "cn": "UEAO02014792",
+     "not_before": "2026-09-11T21:24:25+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/40444/0063/0167",
+     "cn": "UEAO02234674",
+     "not_before": "2026-09-11T21:25:12+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13897/0082/0379",
+     "cn": "UEAO02463888",
+     "not_before": "2026-09-11T21:26:04+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/63711/0119/0173",
+     "cn": "ueao01682105",
+     "not_before": "2026-09-12T17:59:14+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "PR/78859/0199/0311",
+     "cn": "UEAO02013546",
+     "not_before": "2026-09-12T17:59:35+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PB/20516/0064/0355",
+     "cn": "ueao01682134",
+     "not_before": "2026-09-14T20:27:33+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0334/0115",
+     "cn": "UEAO02472194",
+     "not_before": "2026-09-14T20:28:44+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0331/0080",
+     "cn": "UEAO02474149",
+     "not_before": "2026-09-14T20:29:42+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "BA/34134/0171/0171",
+     "cn": "ueao01844121",
+     "not_before": "2026-09-15T17:46:33+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/84557/0169/0085",
+     "cn": "UEAO02015594",
+     "not_before": "2026-09-15T17:47:25+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/08494/0093/0405",
+     "cn": "ueao01844130",
+     "not_before": "2026-09-17T13:04:30+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/08079/0016/0032",
+     "cn": "ueao01844165",
+     "not_before": "2026-09-17T13:04:33+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/08893/0047/0458",
+     "cn": "ueao01844173",
+     "not_before": "2026-09-17T13:04:36+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MT/90670/0001/1108",
+     "cn": "ueao01847523",
+     "not_before": "2026-09-17T13:04:38+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/37133/0118/0144",
+     "cn": "UEAO02101728",
+     "not_before": "2026-09-17T13:05:30+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/35939/0095/0123",
+     "cn": "UEAO02471586",
+     "not_before": "2026-09-17T13:06:32+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/35939/0095/0124",
+     "cn": "UEAO02472368",
+     "not_before": "2026-09-17T13:07:02+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/65471/0052/0047",
+     "cn": "ueao01843888",
+     "not_before": "2026-09-17T19:40:00+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/24198/0056/0386",
+     "cn": "ueao01844163",
+     "not_before": "2026-09-18T19:25:44+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/23418/0061/0105",
+     "cn": "ueao01847549",
+     "not_before": "2026-09-18T19:25:49+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/24198/0056/0422",
+     "cn": "ueao01847748",
+     "not_before": "2026-09-18T19:25:51+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/23698/0132/0024",
+     "cn": "ueao01848222",
+     "not_before": "2026-09-18T19:25:54+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/74128/0150/0144",
+     "cn": "ueao01681993",
+     "not_before": "2026-09-22T21:14:48+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/54038/0335/0025",
+     "cn": "UEAO02101274",
+     "not_before": "2026-09-22T21:16:38+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/75353/0178/0357",
+     "cn": "UEAO02471491",
+     "not_before": "2026-09-22T21:19:33+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "PR/76678/0041/0247",
+     "cn": "UEAO02472350",
+     "not_before": "2026-09-22T21:20:02+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "AL/28258/0010/0271",
+     "cn": "ueao01848297",
+     "not_before": "2026-09-23T16:14:54+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MT/90646/0005/0193",
+     "cn": "UEAO02472373",
+     "not_before": "2026-09-23T16:15:30+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PB/19658/0057/0157",
+     "cn": "ueao01682759",
+     "not_before": "2026-09-25T13:02:02+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/74810/0009/0278",
+     "cn": "UEAO02072086",
+     "not_before": "2026-09-25T13:03:50+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/54011/0347/0121",
+     "cn": "UEAO02100634",
+     "not_before": "2026-09-28T21:36:24+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SC/81833/0021/0126",
+     "cn": "UEAO02472569",
+     "not_before": "2026-09-28T21:38:52+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25313/0002/0548",
+     "cn": "UEAO02472913",
+     "not_before": "2026-09-28T21:39:19+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PA/04472/0004/0378",
+     "cn": "ueao01682885",
+     "not_before": "2026-09-29T17:33:33+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/45519/0101/0131",
+     "cn": "UEAO02102451",
+     "not_before": "2026-09-29T17:34:33+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "PR/77534/0033/0001",
+     "cn": "UEAO02221958",
+     "not_before": "2026-09-29T20:24:57+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0331/0197",
+     "cn": "UEAO02474562",
+     "not_before": "2026-09-29T20:25:50+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/50431/0226/0230",
+     "cn": "UEAO02013432",
+     "not_before": "2026-10-01T11:55:13+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MA/09210/0076/0643",
+     "cn": "ueao01844177",
+     "not_before": "2026-10-01T18:57:51+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MA/09210/0076/0636",
+     "cn": "ueao01848205",
+     "not_before": "2026-10-01T18:57:56+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SC/83275/0084/0099",
+     "cn": "UEAO02472827",
+     "not_before": "2026-10-02T11:57:59+00:00",
+     "emissor": "AC UE2022",
+     "modelo": "UE2022",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/54011/0276/0125",
+     "cn": "UEAO02013659",
+     "not_before": "2026-10-02T19:48:37+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/54011/0276/0304",
+     "cn": "UEAO02248287",
+     "not_before": "2026-10-02T19:49:23+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/40339/0009/0177",
+     "cn": "UEAO02014666",
+     "not_before": "2026-10-08T12:20:50+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/47031/0148/0078",
+     "cn": "UEAO02103893",
+     "not_before": "2026-10-14T16:54:19+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/45551/0120/0100",
+     "cn": "UEAO02015548",
+     "not_before": "2026-10-17T20:53:27+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0004/0114",
+     "cn": "ueao01847509",
+     "not_before": "2026-10-18T17:55:29+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/62634/0214/0003",
+     "cn": "ueao01682541",
+     "not_before": "2026-10-19T18:04:26+00:00",
+     "emissor": "AC URNA",
+     "modelo": "UE2013",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/53716/0269/0215",
+     "cn": "UEAO02015461",
+     "not_before": "2026-10-22T12:55:11+00:00",
+     "emissor": "AC UE2020",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    }
+   ]
+  },
+  "ac_urna": {
+   "secoes": 99957,
+   "ac_valida_no_dia": {
+    "False": 99957
+   },
+   "cadeia_ok": {
+    "True": 99957
+   },
+   "emitidos_apos_vencimento_publicado": 53,
+   "lista_emitidos_apos_vencimento": [
+    {
+     "secao_id": "SP/71072/0254/0024",
+     "cn": "ueao01682534",
+     "not_before": "2026-07-20T18:25:51+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "ES/56995/0026/0355",
+     "cn": "ueao01682925",
+     "not_before": "2026-07-20T18:26:27+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/62170/0022/0119",
+     "cn": "ueao01682927",
+     "not_before": "2026-07-20T18:26:29+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "ES/56995/0026/0040",
+     "cn": "ueao01682953",
+     "not_before": "2026-07-20T18:26:31+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "ES/56995/0026/0005",
+     "cn": "ueao01682957",
+     "not_before": "2026-07-20T18:26:34+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "ES/56995/0026/0318",
+     "cn": "ueao01682962",
+     "not_before": "2026-07-20T18:26:36+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "BA/39632/0141/0103",
+     "cn": "ueao01844118",
+     "not_before": "2026-07-20T18:32:00+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "GO/96016/0094/0109",
+     "cn": "ueao01847655",
+     "not_before": "2026-07-20T18:32:05+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "BA/37532/0032/0150",
+     "cn": "ueao01847990",
+     "not_before": "2026-07-20T18:32:07+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "GO/96873/0125/0088",
+     "cn": "ueao01848317",
+     "not_before": "2026-07-20T18:32:12+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/09210/0089/0282",
+     "cn": "ueao01844126",
+     "not_before": "2026-07-27T15:33:59+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/66818/0400/0141",
+     "cn": "ueao01682645",
+     "not_before": "2026-08-03T18:10:52+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/08893/0047/0460",
+     "cn": "ueao01682741",
+     "not_before": "2026-08-03T18:10:54+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PA/05770/0085/0040",
+     "cn": "ueao01847529",
+     "not_before": "2026-08-03T18:12:12+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PA/05770/0085/0055",
+     "cn": "ueao01847646",
+     "not_before": "2026-08-03T18:12:19+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PA/05770/0085/0076",
+     "cn": "ueao01847690",
+     "not_before": "2026-08-03T18:12:29+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PA/04472/0050/0193",
+     "cn": "ueao01847746",
+     "not_before": "2026-08-03T18:12:36+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/70718/0273/0082",
+     "cn": "ueao01848224",
+     "not_before": "2026-08-03T18:12:44+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MT/90670/0039/0531",
+     "cn": "ueao01681706",
+     "not_before": "2026-08-31T15:56:32+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/23515/0054/0192",
+     "cn": "ueao01682260",
+     "not_before": "2026-08-31T15:56:42+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/64777/0394/0197",
+     "cn": "ueao01682724",
+     "not_before": "2026-08-31T15:56:47+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/67130/0074/0076",
+     "cn": "ueao01842388",
+     "not_before": "2026-08-31T15:59:24+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "BA/33774/0071/0150",
+     "cn": "ueao01843885",
+     "not_before": "2026-08-31T15:59:29+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MT/91677/0020/0485",
+     "cn": "ueao01847378",
+     "not_before": "2026-08-31T15:59:34+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/25631/0116/0020",
+     "cn": "ueao01848139",
+     "not_before": "2026-08-31T15:59:43+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/71072/0280/0564",
+     "cn": "ueao01682525",
+     "not_before": "2026-09-03T17:43:25+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "ES/56995/0053/0384",
+     "cn": "ueao01682614",
+     "not_before": "2026-09-03T17:43:27+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/25330/0041/0173",
+     "cn": "ueao01682785",
+     "not_before": "2026-09-03T17:43:30+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "AL/28894/0031/0159",
+     "cn": "ueao01679245",
+     "not_before": "2026-09-09T14:02:59+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "AL/27650/0039/0092",
+     "cn": "ueao01844078",
+     "not_before": "2026-09-09T14:04:18+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "AL/27472/0040/0031",
+     "cn": "ueao01847874",
+     "not_before": "2026-09-09T14:04:28+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "AL/28673/0051/0121",
+     "cn": "ueao01682873",
+     "not_before": "2026-09-09T17:29:04+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "AL/27022/0039/0128",
+     "cn": "ueao01682879",
+     "not_before": "2026-09-09T17:29:06+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/63711/0119/0173",
+     "cn": "ueao01682105",
+     "not_before": "2026-09-12T17:59:14+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PB/20516/0064/0355",
+     "cn": "ueao01682134",
+     "not_before": "2026-09-14T20:27:33+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "BA/34134/0171/0171",
+     "cn": "ueao01844121",
+     "not_before": "2026-09-15T17:46:33+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/08494/0093/0405",
+     "cn": "ueao01844130",
+     "not_before": "2026-09-17T13:04:30+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/08079/0016/0032",
+     "cn": "ueao01844165",
+     "not_before": "2026-09-17T13:04:33+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/08893/0047/0458",
+     "cn": "ueao01844173",
+     "not_before": "2026-09-17T13:04:36+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MT/90670/0001/1108",
+     "cn": "ueao01847523",
+     "not_before": "2026-09-17T13:04:38+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/65471/0052/0047",
+     "cn": "ueao01843888",
+     "not_before": "2026-09-17T19:40:00+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/24198/0056/0386",
+     "cn": "ueao01844163",
+     "not_before": "2026-09-18T19:25:44+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/23418/0061/0105",
+     "cn": "ueao01847549",
+     "not_before": "2026-09-18T19:25:49+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/24198/0056/0422",
+     "cn": "ueao01847748",
+     "not_before": "2026-09-18T19:25:51+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PE/23698/0132/0024",
+     "cn": "ueao01848222",
+     "not_before": "2026-09-18T19:25:54+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PR/74128/0150/0144",
+     "cn": "ueao01681993",
+     "not_before": "2026-09-22T21:14:48+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "AL/28258/0010/0271",
+     "cn": "ueao01848297",
+     "not_before": "2026-09-23T16:14:54+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PB/19658/0057/0157",
+     "cn": "ueao01682759",
+     "not_before": "2026-09-25T13:02:02+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "PA/04472/0004/0378",
+     "cn": "ueao01682885",
+     "not_before": "2026-09-29T17:33:33+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/09210/0076/0643",
+     "cn": "ueao01844177",
+     "not_before": "2026-10-01T18:57:51+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "MA/09210/0076/0636",
+     "cn": "ueao01848205",
+     "not_before": "2026-10-01T18:57:56+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/71072/0004/0114",
+     "cn": "ueao01847509",
+     "not_before": "2026-10-18T17:55:29+00:00",
+     "modelo": "UE2015",
+     "cadeia_ok": true
+    },
+    {
+     "secao_id": "SP/62634/0214/0003",
+     "cn": "ueao01682541",
+     "not_before": "2026-10-19T18:04:26+00:00",
+     "modelo": "UE2013",
+     "cadeia_ok": true
+    }
+   ],
+   "not_after_certificados": {
+    "2030-03-11": 8359,
+    "2030-04-22": 5732,
+    "2030-04-26": 5124,
+    "2030-03-09": 4949,
+    "2030-02-21": 4127,
+    "2030-03-31": 4046,
+    "2030-05-10": 3647,
+    "2030-04-19": 3593,
+    "2030-03-01": 3477,
+    "2030-03-03": 3438,
+    "2030-05-03": 2715,
+    "2030-04-14": 2602,
+    "2030-05-11": 2175,
+    "2030-05-02": 2124,
+    "2030-03-07": 2027,
+    "2030-04-13": 1912,
+    "2030-04-25": 1807,
+    "2030-04-07": 1804,
+    "2030-04-20": 1800,
+    "2030-04-04": 1749,
+    "2030-02-23": 1699,
+    "2030-03-16": 1696,
+    "2030-04-18": 1695,
+    "2030-03-29": 1655,
+    "2030-03-21": 1619,
+    "2030-04-27": 1399,
+    "2030-04-05": 1395,
+    "2030-05-09": 1168,
+    "2027-04-08": 1050,
+    "2030-06-09": 1024,
+    "2030-03-28": 931,
+    "2030-05-27": 896,
+    "2030-06-10": 861,
+    "2030-06-08": 860,
+    "2030-02-22": 850,
+    "2027-05-13": 815,
+    "2027-05-06": 732,
+    "2027-04-18": 634,
+    "2027-05-09": 629,
+    "2027-05-20": 600,
+    "2027-04-29": 533,
+    "2027-05-27": 521,
+    "2027-05-01": 508,
+    "2030-04-23": 502,
+    "2027-04-22": 498,
+    "2030-04-11": 447,
+    "2027-05-15": 422,
+    "2027-04-23": 419,
+    "2027-05-02": 385,
+    "2030-03-08": 377,
+    "2027-04-16": 356,
+    "2027-05-28": 337,
+    "2027-04-12": 333,
+    "2027-04-11": 269,
+    "2027-05-23": 263,
+    "2027-04-24": 248,
+    "2027-04-09": 236,
+    "2027-05-22": 219,
+    "2027-05-31": 218,
+    "2027-05-29": 216,
+    "2027-05-30": 197,
+    "2027-04-17": 197,
+    "2027-05-16": 189,
+    "2030-05-13": 183,
+    "2030-05-21": 179,
+    "2037-12-31": 178,
+    "2027-05-17": 161,
+    "2027-06-04": 158,
+    "2027-04-25": 147,
+    "2027-06-03": 143,
+    "2027-06-12": 117,
+    "2028-04-09": 111,
+    "2027-04-15": 98,
+    "2030-05-24": 73,
+    "2030-07-05": 68,
+    "2030-07-07": 60,
+    "2027-06-06": 58,
+    "2036-01-24": 50,
+    "2027-05-14": 43,
+    "2032-05-06": 36,
+    "2027-05-19": 33,
+    "2027-04-28": 29,
+    "2034-06-02": 26,
+    "2036-03-09": 21,
+    "2032-05-29": 21,
+    "2027-06-20": 21,
+    "2034-06-18": 18,
+    "2034-05-08": 17,
+    "2031-12-31": 17,
+    "2036-05-28": 17,
+    "2034-05-26": 17,
+    "2032-05-23": 16,
+    "2031-04-10": 14,
+    "2036-05-11": 13,
+    "2033-04-23": 13,
+    "2032-05-07": 12,
+    "2030-09-16": 12,
+    "2031-12-24": 12,
+    "2037-10-16": 11,
+    "2034-06-29": 11,
+    "2032-06-12": 11,
+    "2031-12-03": 11,
+    "2036-04-10": 11,
+    "2028-06-05": 10,
+    "2032-01-16": 10,
+    "2032-02-14": 10,
+    "2031-05-16": 9,
+    "2036-05-17": 9,
+    "2033-02-25": 9,
+    "2034-07-19": 8,
+    "2032-06-06": 8,
+    "2031-08-14": 8,
+    "2034-06-16": 8,
+    "2037-02-28": 8,
+    "2036-10-22": 7,
+    "2027-05-10": 7,
+    "2032-04-24": 7,
+    "2028-03-12": 7,
+    "2034-05-12": 7,
+    "2034-07-14": 7,
+    "2032-01-29": 7,
+    "2037-08-02": 6,
+    "2037-05-17": 6,
+    "2037-06-18": 6,
+    "2034-03-24": 6,
+    "2031-05-03": 6,
+    "2031-07-24": 6,
+    "2034-04-23": 5,
+    "2037-11-06": 5,
+    "2031-10-09": 5,
+    "2032-06-04": 5,
+    "2031-06-26": 5,
+    "2030-11-22": 5,
+    "2031-07-31": 5,
+    "2032-03-25": 5,
+    "2033-02-03": 4,
+    "2032-06-30": 4,
+    "2031-05-22": 4,
+    "2028-12-16": 4,
+    "2028-03-24": 4,
+    "2036-11-01": 4,
+    "2032-05-13": 4,
+    "2038-01-15": 4,
+    "2033-03-04": 4,
+    "2032-06-24": 4,
+    "2032-07-30": 4,
+    "2032-04-10": 4,
+    "2032-05-22": 4,
+    "2037-07-23": 4,
+    "2032-07-03": 4,
+    "2036-06-04": 4,
+    "2033-11-12": 4,
+    "2032-06-14": 4,
+    "2034-02-22": 4,
+    "2036-06-19": 3,
+    "2037-06-04": 3,
+    "2029-08-12": 3,
+    "2037-08-12": 3,
+    "2033-11-24": 3,
+    "2032-03-03": 3,
+    "2031-11-15": 3,
+    "2032-03-19": 3,
+    "2037-03-08": 3,
+    "2031-11-01": 3,
+    "2036-11-12": 2,
+    "2030-01-07": 2,
+    "2029-10-21": 2,
+    "2031-01-25": 2,
+    "2031-03-06": 2,
+    "2031-03-08": 2,
+    "2031-10-31": 2,
+    "2032-07-05": 2,
+    "2032-01-30": 2,
+    "2030-04-28": 2,
+    "2037-07-09": 2,
+    "2031-03-28": 2,
+    "2032-04-03": 2,
+    "2032-12-16": 2,
+    "2036-06-08": 2,
+    "2031-11-09": 2,
+    "2037-05-02": 2,
+    "2038-01-02": 2,
+    "2029-02-02": 2,
+    "2037-03-28": 2,
+    "2033-05-04": 2,
+    "2036-05-29": 1,
+    "2032-05-30": 1,
+    "2032-02-05": 1,
+    "2033-02-05": 1,
+    "2033-06-25": 1,
+    "2030-11-23": 1,
+    "2034-07-07": 1,
+    "2031-02-27": 1,
+    "2029-07-15": 1,
+    "2033-07-23": 1,
+    "2031-10-16": 1,
+    "2037-04-24": 1,
+    "2037-06-24": 1,
+    "2037-04-05": 1,
+    "2031-08-15": 1,
+    "2037-05-30": 1,
+    "2032-11-19": 1,
+    "2032-08-01": 1,
+    "2030-04-12": 1,
+    "2028-06-13": 1,
+    "2031-02-21": 1,
+    "2031-05-18": 1,
+    "2031-01-04": 1,
+    "2037-08-21": 1,
+    "2030-06-30": 1,
+    "2031-03-15": 1,
+    "2037-12-11": 1,
+    "2034-07-22": 1,
+    "2030-07-15": 1,
+    "2031-02-12": 1,
+    "2032-03-31": 1,
+    "2031-10-19": 1,
+    "2037-11-25": 1,
+    "2034-07-01": 1,
+    "2031-01-31": 1
+   }
+  },
+  "certificado_fora_da_validade_na_assinatura": {
+   "n": 0,
+   "lista": []
+  },
+  "tarde_x_demais": {
+   "limite_minutos_apos_17h": 30,
+   "secoes_tarde": 7611,
+   "secoes_demais": 490286,
+   "secoes_sem_horario": 1310,
+   "emissor": {
+    "tarde": {
+     "AC UE2020": {
+      "n": 3328,
+      "pct": 43.73
+     },
+     "AC UE2022": {
+      "n": 2770,
+      "pct": 36.39
+     },
+     "AC URNA": {
+      "n": 1513,
+      "pct": 19.88
+     }
+    },
+    "demais": {
+     "AC UE2020": {
+      "n": 197176,
+      "pct": 40.22
+     },
+     "AC UE2022": {
+      "n": 195976,
+      "pct": 39.97
+     },
+     "AC URNA": {
+      "n": 97134,
+      "pct": 19.81
+     }
+    },
+    "tarde_esperado_pela_uf": {
+     "AC UE2020": {
+      "n": 3026.9,
+      "pct": 39.77
+     },
+     "AC UE2022": {
+      "n": 2921.1,
+      "pct": 38.38
+     },
+     "AC URNA": {
+      "n": 1663.0,
+      "pct": 21.85
+     }
+    },
+    "t1": {
+     "AC UE2020": {
+      "n": 200463,
+      "pct": 40.16
+     },
+     "AC UE2022": {
+      "n": 198759,
+      "pct": 39.81
+     },
+     "AC URNA": {
+      "n": 99985,
+      "pct": 20.03
+     }
+    },
+    "t1_mesmas_secoes_tarde": {
+     "AC UE2020": {
+      "n": 3330,
+      "pct": 43.75
+     },
+     "AC UE2022": {
+      "n": 2768,
+      "pct": 36.37
+     },
+     "AC URNA": {
+      "n": 1513,
+      "pct": 19.88
+     }
+    }
+   },
+   "algoritmo": {
+    "tarde": {
+     "Ed521": {
+      "n": 6098,
+      "pct": 80.12
+     },
+     "ECDSA": {
+      "n": 1513,
+      "pct": 19.88
+     }
+    },
+    "demais": {
+     "Ed521": {
+      "n": 393152,
+      "pct": 80.19
+     },
+     "ECDSA": {
+      "n": 97134,
+      "pct": 19.81
+     }
+    },
+    "t1": {
+     "Ed521": {
+      "n": 399222,
+      "pct": 79.97
+     },
+     "ECDSA": {
+      "n": 99985,
+      "pct": 20.03
+     }
+    }
+   },
+   "modelo": {
+    "tarde": {
+     "UE2020": {
+      "n": 3328,
+      "pct": 43.73
+     },
+     "UE2022": {
+      "n": 2770,
+      "pct": 36.39
+     },
+     "UE2015": {
+      "n": 1315,
+      "pct": 17.28
+     },
+     "UE2013": {
+      "n": 198,
+      "pct": 2.6
+     }
+    },
+    "demais": {
+     "UE2020": {
+      "n": 197176,
+      "pct": 40.22
+     },
+     "UE2022": {
+      "n": 195976,
+      "pct": 39.97
+     },
+     "UE2015": {
+      "n": 85898,
+      "pct": 17.52
+     },
+     "UE2013": {
+      "n": 11236,
+      "pct": 2.29
+     }
+    },
+    "t1": {
+     "UE2020": {
+      "n": 200463,
+      "pct": 40.16
+     },
+     "UE2022": {
+      "n": 198759,
+      "pct": 39.81
+     },
+     "UE2015": {
+      "n": 88064,
+      "pct": 17.64
+     },
+     "UE2013": {
+      "n": 11921,
+      "pct": 2.39
+     }
+    }
+   },
+   "tarde_por_uf": {
+    "rj": 3320,
+    "sp": 1974,
+    "ba": 1051,
+    "pe": 716,
+    "pb": 316,
+    "se": 55,
+    "df": 33,
+    "pa": 19,
+    "ma": 17,
+    "mg": 17,
+    "ce": 14,
+    "pi": 14,
+    "mt": 13,
+    "am": 9,
+    "rs": 9,
+    "al": 7,
+    "rn": 7,
+    "go": 5,
+    "es": 4,
+    "pr": 3,
+    "sc": 3,
+    "ro": 2,
+    "ap": 1,
+    "ac": 1,
+    "ms": 1
+   },
+   "taxa_tarde_por_uf_modelo": {
+    "al": {
+     "UE2013": {
+      "tardias": 1,
+      "secoes": 338,
+      "pct": 0.3
+     },
+     "UE2015": {
+      "tardias": 1,
+      "secoes": 1157,
+      "pct": 0.09
+     },
+     "UE2020": {
+      "tardias": 1,
+      "secoes": 2654,
+      "pct": 0.04
+     },
+     "UE2022": {
+      "tardias": 4,
+      "secoes": 2952,
+      "pct": 0.14
+     }
+    },
+    "am": {
+     "UE2015": {
+      "tardias": 2,
+      "secoes": 2174,
+      "pct": 0.09
+     },
+     "UE2020": {
+      "tardias": 5,
+      "secoes": 2793,
+      "pct": 0.18
+     },
+     "UE2022": {
+      "tardias": 2,
+      "secoes": 3190,
+      "pct": 0.06
+     }
+    },
+    "ba": {
+     "UE2013": {
+      "tardias": 55,
+      "secoes": 1668,
+      "pct": 3.3
+     },
+     "UE2015": {
+      "tardias": 97,
+      "secoes": 6321,
+      "pct": 1.53
+     },
+     "UE2020": {
+      "tardias": 89,
+      "secoes": 13426,
+      "pct": 0.66
+     },
+     "UE2022": {
+      "tardias": 810,
+      "secoes": 14061,
+      "pct": 5.76
+     }
+    },
+    "ce": {
+     "UE2013": {
+      "tardias": 3,
+      "secoes": 754,
+      "pct": 0.4
+     },
+     "UE2015": {
+      "tardias": 1,
+      "secoes": 3529,
+      "pct": 0.03
+     },
+     "UE2020": {
+      "tardias": 3,
+      "secoes": 9627,
+      "pct": 0.03
+     },
+     "UE2022": {
+      "tardias": 7,
+      "secoes": 9855,
+      "pct": 0.07
+     }
+    },
+    "df": {
+     "UE2015": {
+      "tardias": 4,
+      "secoes": 1373,
+      "pct": 0.29
+     },
+     "UE2020": {
+      "tardias": 11,
+      "secoes": 4004,
+      "pct": 0.27
+     },
+     "UE2022": {
+      "tardias": 18,
+      "secoes": 1592,
+      "pct": 1.13
+     }
+    },
+    "go": {
+     "UE2013": {
+      "tardias": 1,
+      "secoes": 346,
+      "pct": 0.29
+     },
+     "UE2015": {
+      "tardias": 0,
+      "secoes": 2434,
+      "pct": 0.0
+     },
+     "UE2020": {
+      "tardias": 0,
+      "secoes": 6695,
+      "pct": 0.0
+     },
+     "UE2022": {
+      "tardias": 4,
+      "secoes": 6211,
+      "pct": 0.06
+     }
+    },
+    "ma": {
+     "UE2013": {
+      "tardias": 0,
+      "secoes": 676,
+      "pct": 0.0
+     },
+     "UE2015": {
+      "tardias": 2,
+      "secoes": 2944,
+      "pct": 0.07
+     },
+     "UE2020": {
+      "tardias": 10,
+      "secoes": 7297,
+      "pct": 0.14
+     },
+     "UE2022": {
+      "tardias": 5,
+      "secoes": 7176,
+      "pct": 0.07
+     }
+    },
+    "mg": {
+     "UE2013": {
+      "tardias": 1,
+      "secoes": 275,
+      "pct": 0.36
+     },
+     "UE2015": {
+      "tardias": 4,
+      "secoes": 8806,
+      "pct": 0.05
+     },
+     "UE2020": {
+      "tardias": 10,
+      "secoes": 20492,
+      "pct": 0.05
+     },
+     "UE2022": {
+      "tardias": 2,
+      "secoes": 22489,
+      "pct": 0.01
+     }
+    },
+    "mt": {
+     "UE2013": {
+      "tardias": 1,
+      "secoes": 127,
+      "pct": 0.79
+     },
+     "UE2015": {
+      "tardias": 1,
+      "secoes": 1295,
+      "pct": 0.08
+     },
+     "UE2020": {
+      "tardias": 9,
+      "secoes": 3239,
+      "pct": 0.28
+     },
+     "UE2022": {
+      "tardias": 2,
+      "secoes": 3626,
+      "pct": 0.06
+     }
+    },
+    "pa": {
+     "UE2013": {
+      "tardias": 0,
+      "secoes": 100,
+      "pct": 0.0
+     },
+     "UE2015": {
+      "tardias": 3,
+      "secoes": 4422,
+      "pct": 0.07
+     },
+     "UE2020": {
+      "tardias": 13,
+      "secoes": 8980,
+      "pct": 0.14
+     },
+     "UE2022": {
+      "tardias": 3,
+      "secoes": 7325,
+      "pct": 0.04
+     }
+    },
+    "pb": {
+     "UE2013": {
+      "tardias": 89,
+      "secoes": 689,
+      "pct": 12.92
+     },
+     "UE2015": {
+      "tardias": 225,
+      "secoes": 1867,
+      "pct": 12.05
+     },
+     "UE2020": {
+      "tardias": 1,
+      "secoes": 4483,
+      "pct": 0.02
+     },
+     "UE2022": {
+      "tardias": 1,
+      "secoes": 3673,
+      "pct": 0.03
+     }
+    },
+    "pe": {
+     "UE2013": {
+      "tardias": 7,
+      "secoes": 587,
+      "pct": 1.19
+     },
+     "UE2015": {
+      "tardias": 55,
+      "secoes": 3968,
+      "pct": 1.39
+     },
+     "UE2020": {
+      "tardias": 297,
+      "secoes": 8337,
+      "pct": 3.56
+     },
+     "UE2022": {
+      "tardias": 357,
+      "secoes": 8526,
+      "pct": 4.19
+     }
+    },
+    "pi": {
+     "UE2013": {
+      "tardias": 0,
+      "secoes": 142,
+      "pct": 0.0
+     },
+     "UE2015": {
+      "tardias": 3,
+      "secoes": 1898,
+      "pct": 0.16
+     },
+     "UE2020": {
+      "tardias": 4,
+      "secoes": 4123,
+      "pct": 0.1
+     },
+     "UE2022": {
+      "tardias": 7,
+      "secoes": 4062,
+      "pct": 0.17
+     }
+    },
+    "rj": {
+     "UE2013": {
+      "tardias": 14,
+      "secoes": 297,
+      "pct": 4.71
+     },
+     "UE2015": {
+      "tardias": 644,
+      "secoes": 8002,
+      "pct": 8.05
+     },
+     "UE2020": {
+      "tardias": 2008,
+      "secoes": 15696,
+      "pct": 12.79
+     },
+     "UE2022": {
+      "tardias": 654,
+      "secoes": 13680,
+      "pct": 4.78
+     }
+    },
+    "rn": {
+     "UE2015": {
+      "tardias": 3,
+      "secoes": 1477,
+      "pct": 0.2
+     },
+     "UE2020": {
+      "tardias": 2,
+      "secoes": 3830,
+      "pct": 0.05
+     },
+     "UE2022": {
+      "tardias": 2,
+      "secoes": 2808,
+      "pct": 0.07
+     }
+    },
+    "rs": {
+     "UE2013": {
+      "tardias": 1,
+      "secoes": 898,
+      "pct": 0.11
+     },
+     "UE2015": {
+      "tardias": 0,
+      "secoes": 3710,
+      "pct": 0.0
+     },
+     "UE2020": {
+      "tardias": 5,
+      "secoes": 9981,
+      "pct": 0.05
+     },
+     "UE2022": {
+      "tardias": 3,
+      "secoes": 12958,
+      "pct": 0.02
+     }
+    },
+    "se": {
+     "UE2013": {
+      "tardias": 1,
+      "secoes": 19,
+      "pct": 5.26
+     },
+     "UE2015": {
+      "tardias": 10,
+      "secoes": 907,
+      "pct": 1.1
+     },
+     "UE2020": {
+      "tardias": 18,
+      "secoes": 2615,
+      "pct": 0.69
+     },
+     "UE2022": {
+      "tardias": 26,
+      "secoes": 2382,
+      "pct": 1.09
+     }
+    },
+    "sp": {
+     "UE2013": {
+      "tardias": 24,
+      "secoes": 1614,
+      "pct": 1.49
+     },
+     "UE2015": {
+      "tardias": 255,
+      "secoes": 20229,
+      "pct": 1.26
+     },
+     "UE2020": {
+      "tardias": 837,
+      "secoes": 41053,
+      "pct": 2.04
+     },
+     "UE2022": {
+      "tardias": 858,
+      "secoes": 40760,
+      "pct": 2.11
+     }
+    }
+   },
+   "indicadores": {
+    "valido_no_dia": {
+     "tarde": {
+      "True": 7611
+     },
+     "demais": {
+      "True": 490286
+     }
+    },
+    "cadeia_ok": {
+     "tarde": {
+      "True": 7611
+     },
+     "demais": {
+      "True": 490286
+     }
+    },
+    "assinatura_conteudo_ok": {
+     "tarde": {
+      "True": 7611
+     },
+     "demais": {
+      "True": 490286
+     }
+    },
+    "assinatura_bu_ok": {
+     "tarde": {
+      "True": 7611
+     },
+     "demais": {
+      "True": 490286
+     }
+    },
+    "bu_hash_confere": {
+     "tarde": {
+      "True": 7611
+     },
+     "demais": {
+      "True": 490286
+     }
+    },
+    "cn_igual_numero_interno": {
+     "tarde": {
+      "True": 7611
+     },
+     "demais": {
+      "True": 490283,
+      "False": 3
+     }
+    },
+    "mesmo_cert_t1": {
+     "tarde": {
+      "True": 7517,
+      "False": 94
+     },
+     "demais": {
+      "True": 485962,
+      "False": 4324
+     }
+    },
+    "emitido_apos_carga": {
+     "tarde": {
+      "False": 7611
+     },
+     "demais": {
+      "False": 490286
+     }
+    }
+   },
+   "emissao_certificado": {
+    "tarde": {
+     "mediana": "2022-06-18T02:20:22+00:00",
+     "apos_1o_turno": 0,
+     "ultimos_30_dias": 0
+    },
+    "demais": {
+     "mediana": "2022-05-28T04:28:14.500000+00:00",
+     "apos_1o_turno": 6,
+     "ultimos_30_dias": 21
+    }
+   }
+  },
+  "turnos": {
+   "disponivel": true,
+   "secoes_t1_com_certificado": 499207,
+   "secoes_t2_com_certificado": 499207,
+   "secoes_comparadas": 499207,
+   "mesmo_certificado": 494767,
+   "certificado_diferente": 4440,
+   "certificado_diferente_mesmo_cn": 0,
+   "certificado_diferente_outra_urna": 4440,
+   "cn_presente_no_t1": 494852,
+   "cn_novo_no_t2": 4355,
+   "mesmo_cn_certificado_diferente_entre_turnos": 0,
+   "lista_mesmo_cn_certificado_diferente": [],
+   "certificado_do_t1_em_outra_secao": 104,
+   "lista_certificado_do_t1_em_outra_secao": [
+    {
+     "secao_id": "AC/01015/0002/0088",
+     "cn": "UEAO02264191",
+     "secao_t1": "ac/01015/0002/0093",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38490/0011/0599",
+     "cn": "UEAO02351617",
+     "secao_t1": "ba/38490/0018/0482",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38490/0016/0369",
+     "cn": "UEAO02352413",
+     "secao_t1": "ba/38490/0014/0512",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38490/0017/0401",
+     "cn": "UEAO02427178",
+     "secao_t1": "ba/38490/0015/0387",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/14818/0079/0214",
+     "cn": "ueao01671949",
+     "secao_t1": "ce/15350/0079/0034",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "CE/14818/0079/0241",
+     "cn": "ueao01819939",
+     "secao_t1": "ce/13064/0079/0246",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "PA/04707/0075/0674",
+     "cn": "UEAO02187576",
+     "secao_t1": "pa/04707/0075/0672",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "PA/04642/0078/0281",
+     "cn": "UEAO02192585",
+     "secao_t1": "pa/04642/0078/0249",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "BA/38490/0013/0339",
+     "cn": "UEAO02270014",
+     "secao_t1": "ba/38490/0017/0426",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/36633/0051/0052",
+     "cn": "ueao01767383",
+     "secao_t1": "ba/37818/0181/0279",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SE/31232/0028/0148",
+     "cn": "UEAO02175595",
+     "secao_t1": "se/31135/0015/0177",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/31879/0015/0300",
+     "cn": "UEAO02044283",
+     "secao_t1": "se/31410/0006/0111",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SE/31194/0024/0014",
+     "cn": "UEAO02307174",
+     "secao_t1": "se/31577/0009/0046",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/32336/0021/0075",
+     "cn": "UEAO02303588",
+     "secao_t1": "se/31950/0034/0385",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/31453/0024/0102",
+     "cn": "UEAO02313075",
+     "secao_t1": "se/32115/0018/0114",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/32239/0031/0042",
+     "cn": "UEAO02045938",
+     "secao_t1": "se/31879/0015/0300",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SE/31291/0014/0142",
+     "cn": "UEAO02174534",
+     "secao_t1": "se/32417/0022/0039",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/31712/0013/0042",
+     "cn": "UEAO02341842",
+     "secao_t1": "se/32239/0031/0042",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/31054/0002/0168",
+     "cn": "ueao01791133",
+     "secao_t1": "se/31054/0001/0346",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SE/31054/0027/0317",
+     "cn": "UEAO02042066",
+     "secao_t1": "se/31798/0014/0136",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SE/31054/0027/0392",
+     "cn": "UEAO02199511",
+     "secao_t1": "se/32336/0021/0264",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "ZZ/29297/0001/0495",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/29777/0001/0127",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/29912/0001/0150",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/29580/0001/0096",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/39102/0001/0712",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/29564/0001/0091",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/29645/0001/0380",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/29270/0001/0003",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/99473/0001/1327",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30597/0001/1182",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30686/0001/0443",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/38962/0001/0558",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30333/0001/0353",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30430/0001/0384",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/99155/0001/1504",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30295/0001/0348",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30325/0001/0352",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/30546/0001/1764",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "ZZ/99180/0001/1228",
+     "cn": "ueao01808076",
+     "secao_t1": "zz/29173/0001/0494",
+     "tipo_urna": "contingencia"
+    },
+    {
+     "secao_id": "SP/70335/0187/0123",
+     "cn": "ueao01820267",
+     "secao_t1": "sp/70335/0187/0057",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/70572/0306/0290",
+     "cn": "ueao01835060",
+     "secao_t1": "sp/70572/0306/0115",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/68756/0093/0515",
+     "cn": "ueao01786618",
+     "secao_t1": "sp/68756/0093/0201",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "CE/13234/0067/0034",
+     "cn": "UEAO02322962",
+     "secao_t1": "ce/13234/0067/0123",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/63614/0227/0350",
+     "cn": "ueao01836583",
+     "secao_t1": "sp/63614/0227/0023",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/66397/0399/0236",
+     "cn": "ueao01826264",
+     "secao_t1": "sp/66397/0399/0335",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/72095/0144/0013",
+     "cn": "ueao01840488",
+     "secao_t1": "sp/72095/0144/0150",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/63134/0388/0114",
+     "cn": "ueao01817812",
+     "secao_t1": "sp/63134/0388/0113",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/63134/0388/0113",
+     "cn": "ueao01819392",
+     "secao_t1": "sp/63134/0388/0114",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38490/0005/0100",
+     "cn": "UEAO02425552",
+     "secao_t1": "ba/38490/0004/0494",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "BA/38490/0016/0047",
+     "cn": "UEAO02288651",
+     "secao_t1": "ba/38490/0007/0003",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PR/77437/0091/0032",
+     "cn": "ueao01778782",
+     "secao_t1": "pr/76015/0091/0016",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "BA/39934/0183/0320",
+     "cn": "UEAO02386005",
+     "secao_t1": "ba/39934/0183/0343",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25356/0028/0061",
+     "cn": "ueao01816369",
+     "secao_t1": "pe/25836/0026/0131",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "PE/25577/0047/0066",
+     "cn": "ueao01814218",
+     "secao_t1": "pe/25291/0047/0001",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RN/16144/0018/0030",
+     "cn": "UEAO02057882",
+     "secao_t1": "rn/16055/0018/0046",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RN/16039/0029/0252",
+     "cn": "UEAO02372712",
+     "secao_t1": "rn/16039/0029/0121",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "RO/00035/0020/0116",
+     "cn": "UEAO02251902",
+     "secao_t1": "ro/00035/0020/0243",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SC/80454/0002/0109",
+     "cn": "UEAO02190835",
+     "secao_t1": "sc/80233/0002/0092",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/64955/0191/0086",
+     "cn": "ueao01653948",
+     "secao_t1": "sp/64955/0191/0068",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/70718/0273/0195",
+     "cn": "ueao01845124",
+     "secao_t1": "sp/70718/0273/0078",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/70718/0273/0224",
+     "cn": "ueao01823664",
+     "secao_t1": "sp/70718/0273/0305",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/69051/0135/0332",
+     "cn": "UEAO02181097",
+     "secao_t1": "sp/71358/0135/0206",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/62200/0427/0049",
+     "cn": "UEAO02182494",
+     "secao_t1": "sp/72176/0427/0035",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "GO/93734/0147/0124",
+     "cn": "UEAO02334021",
+     "secao_t1": "go/93734/0002/0285",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MT/90603/0021/0198",
+     "cn": "UEAO02006688",
+     "secao_t1": "mt/90689/0021/0124",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/71579/0416/0097",
+     "cn": "UEAO02144093",
+     "secao_t1": "sp/71579/0416/0141",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MT/90670/0051/0240",
+     "cn": "ueao01819757",
+     "secao_t1": "mt/90670/0051/0270",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MT/90670/0055/0192",
+     "cn": "ueao01839518",
+     "secao_t1": "mt/91677/0049/0011",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/70998/0412/0225",
+     "cn": "ueao01824662",
+     "secao_t1": "sp/70998/0412/0385",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/70998/0412/0334",
+     "cn": "ueao01834570",
+     "secao_t1": "sp/70998/0412/0371",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/71072/0249/0561",
+     "cn": "ueao01819671",
+     "secao_t1": "sp/71072/0249/0020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0257/0032",
+     "cn": "UEAO02362612",
+     "secao_t1": "sp/71072/0257/0305",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0352/0015",
+     "cn": "ueao01821132",
+     "secao_t1": "sp/71072/0352/0487",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/71072/0418/0150",
+     "cn": "ueao01819430",
+     "secao_t1": "sp/71072/0418/0133",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0418/0168",
+     "cn": "UEAO02276282",
+     "secao_t1": "sp/71072/0418/0073",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0418/0187",
+     "cn": "UEAO02398894",
+     "secao_t1": "sp/71072/0418/0114",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/71072/0418/0373",
+     "cn": "UEAO02403160",
+     "secao_t1": "sp/71072/0418/0418",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0418/0452",
+     "cn": "ueao01670355",
+     "secao_t1": "sp/71072/0418/0387",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71072/0418/0475",
+     "cn": "UEAO02397674",
+     "secao_t1": "sp/71072/0418/0363",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "SP/71153/0132/0048",
+     "cn": "ueao01830744",
+     "secao_t1": "sp/65099/0132/0289",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41114/0023/0103",
+     "cn": "UEAO02472105",
+     "secao_t1": "mg/41114/0023/0083",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/45950/0288/0066",
+     "cn": "UEAO02453198",
+     "secao_t1": "mg/40800/0288/0219",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/46272/0141/0395",
+     "cn": "UEAO02134760",
+     "secao_t1": "mg/46833/0141/0105",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/40282/0063/0081",
+     "cn": "UEAO02091118",
+     "secao_t1": "mg/40282/0063/0198",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/40282/0063/0140",
+     "cn": "UEAO02136884",
+     "secao_t1": "mg/40282/0063/0148",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/51578/0002/0073",
+     "cn": "UEAO02098259",
+     "secao_t1": "mg/40053/0002/0106",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/41238/0029/0034",
+     "cn": "UEAO02419683",
+     "secao_t1": "mg/41238/0332/0106",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/41238/0030/0267",
+     "cn": "UEAO02262011",
+     "secao_t1": "mg/41238/0332/0028",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/45136/0100/0119",
+     "cn": "ueao01758263",
+     "secao_t1": "mg/45136/0100/0118",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/46337/0132/0065",
+     "cn": "ueao01653361",
+     "secao_t1": "mg/46337/0132/0078",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "MG/54038/0314/0296",
+     "cn": "UEAO02084930",
+     "secao_t1": "mg/54038/0314/0063",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/54038/0314/0332",
+     "cn": "UEAO02131647",
+     "secao_t1": "mg/54038/0314/0208",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "RJ/60011/0162/0323",
+     "cn": "ueao01750285",
+     "secao_t1": "rj/60011/0162/0183",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RJ/60011/0185/0062",
+     "cn": "ueao01668090",
+     "secao_t1": "rj/60011/0118/0361",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "RJ/60011/0185/0158",
+     "cn": "ueao01793722",
+     "secao_t1": "rj/60011/0022/0202",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RJ/60011/0214/0100",
+     "cn": "ueao01819594",
+     "secao_t1": "rj/60011/0214/0167",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "RJ/60011/0219/0278",
+     "cn": "ueao01825823",
+     "secao_t1": "rj/60011/0185/0050",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RJ/58165/0040/0090",
+     "cn": "UEAO02430458",
+     "secao_t1": "rj/59153/0195/0303",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "RJ/59013/0089/0101",
+     "cn": "UEAO02231771",
+     "secao_t1": "rj/59013/0089/0464",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "ES/56472/0024/0104",
+     "cn": "ueao01751052",
+     "secao_t1": "es/56472/0024/0131",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "ES/56995/0053/0014",
+     "cn": "ueao01656698",
+     "secao_t1": "es/56995/0053/0028",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "ES/57053/0001/0574",
+     "cn": "UEAO02353044",
+     "secao_t1": "es/57053/0001/0046",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "ES/56251/0034/0918",
+     "cn": "ueao01824539",
+     "secao_t1": "es/56251/0034/0971",
+     "tipo_urna": "reservaSecao"
+    }
+   ],
+   "certificado_nao_visto_no_t1": 4355,
+   "certificado_nao_visto_no_t1_emitido_apos_t1": 6,
+   "lista_emitido_apos_t1": [
+    {
+     "secao_id": "SP/62634/0214/0003",
+     "cn": "ueao01682541",
+     "emissor": "AC URNA",
+     "not_before": "2026-10-19T18:04:26+00:00",
+     "modelo": "UE2013",
+     "tipo_urna": "reservaSecao"
+    },
+    {
+     "secao_id": "SP/71072/0004/0114",
+     "cn": "ueao01847509",
+     "emissor": "AC URNA",
+     "not_before": "2026-10-18T17:55:29+00:00",
+     "modelo": "UE2015",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/53716/0269/0215",
+     "cn": "UEAO02015461",
+     "emissor": "AC UE2020",
+     "not_before": "2026-10-22T12:55:11+00:00",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/40339/0009/0177",
+     "cn": "UEAO02014666",
+     "emissor": "AC UE2020",
+     "not_before": "2026-10-08T12:20:50+00:00",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/45551/0120/0100",
+     "cn": "UEAO02015548",
+     "emissor": "AC UE2020",
+     "not_before": "2026-10-17T20:53:27+00:00",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    },
+    {
+     "secao_id": "MG/47031/0148/0078",
+     "cn": "UEAO02103893",
+     "emissor": "AC UE2020",
+     "not_before": "2026-10-14T16:54:19+00:00",
+     "modelo": "UE2020",
+     "tipo_urna": "secao"
+    }
+   ],
+   "outra_urna_por_tipo_urna": {
+    "reservaSecao": 2815,
+    "secao": 1614,
+    "contingencia": 9,
+    "reservaEncerrandoSecao": 2
+   },
+   "lista_outra_urna": [
+    {
+     "secao_id": "AC/01392/0001/0685",
+     "t1_cn": "UEAO02046249",
+     "cn": "UEAO02044917",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01090/0004/0090",
+     "t1_cn": "UEAO02251858",
+     "cn": "UEAO02264225",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01015/0002/0079",
+     "t1_cn": "UEAO02267970",
+     "cn": "UEAO02296958",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01015/0002/0088",
+     "t1_cn": "UEAO02263093",
+     "cn": "UEAO02264191",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01015/0002/0093",
+     "t1_cn": "UEAO02264191",
+     "cn": "UEAO02293878",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01120/0008/0072",
+     "t1_cn": "UEAO02046562",
+     "cn": "UEAO02045984",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27057/0022/0043",
+     "t1_cn": "UEAO02074485",
+     "cn": "UEAO02072754",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27057/0055/0114",
+     "t1_cn": "UEAO02071468",
+     "cn": "UEAO02073563",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28894/0031/0139",
+     "t1_cn": "ueao01667527",
+     "cn": "ueao01667618",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28797/0048/0081",
+     "t1_cn": "UEAO02073353",
+     "cn": "UEAO02442712",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27855/0001/0395",
+     "t1_cn": "UEAO02036662",
+     "cn": "UEAO02036654",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28053/0046/0023",
+     "t1_cn": "ueao01763673",
+     "cn": "ueao01677015",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27553/0053/0090",
+     "t1_cn": "UEAO02457154",
+     "cn": "UEAO02458273",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27995/0027/0061",
+     "t1_cn": "ueao01664683",
+     "cn": "ueao01668382",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28134/0011/0097",
+     "t1_cn": "ueao01671233",
+     "cn": "ueao01682556",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28070/0029/0076",
+     "t1_cn": "UEAO02036781",
+     "cn": "UEAO02435862",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28673/0051/0090",
+     "t1_cn": "ueao01772608",
+     "cn": "ueao01662621",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06068/0010/0416",
+     "t1_cn": "UEAO02358864",
+     "cn": "UEAO02358613",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06076/0005/0010",
+     "t1_cn": "UEAO02241361",
+     "cn": "UEAO02001411",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06130/0007/0019",
+     "t1_cn": "UEAO02019951",
+     "cn": "UEAO02019172",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06041/0010/0461",
+     "t1_cn": "UEAO02358719",
+     "cn": "UEAO02343260",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06084/0011/0037",
+     "t1_cn": "UEAO02032264",
+     "cn": "UEAO02242659",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06017/0001/0018",
+     "t1_cn": "UEAO02016181",
+     "cn": "UEAO02016368",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06122/0007/0164",
+     "t1_cn": "UEAO02019795",
+     "cn": "UEAO02019470",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02356/0017/0102",
+     "t1_cn": "UEAO02339429",
+     "cn": "UEAO02337970",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0001/0666",
+     "t1_cn": "ueao01786044",
+     "cn": "ueao01786695",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0001/0778",
+     "t1_cn": "ueao01789291",
+     "cn": "ueao01828410",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0001/0924",
+     "t1_cn": "ueao01808022",
+     "cn": "ueao01789420",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0002/0578",
+     "t1_cn": "UEAO02017389",
+     "cn": "UEAO02081356",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0002/0595",
+     "t1_cn": "ueao01789215",
+     "cn": "ueao01837521",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0002/0599",
+     "t1_cn": "ueao01838758",
+     "cn": "ueao01843233",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0002/0755",
+     "t1_cn": "ueao01789537",
+     "cn": "ueao01831445",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0002/0799",
+     "t1_cn": "UEAO02038447",
+     "cn": "UEAO02085623",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0031/0507",
+     "t1_cn": "UEAO02017142",
+     "cn": "UEAO02040468",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0031/0577",
+     "t1_cn": "ueao01789757",
+     "cn": "ueao01760106",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0031/0737",
+     "t1_cn": "ueao01847266",
+     "cn": "ueao01811685",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0032/0714",
+     "t1_cn": "ueao01750932",
+     "cn": "ueao01787490",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0032/0848",
+     "t1_cn": "ueao01807528",
+     "cn": "ueao01760776",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0032/0861",
+     "t1_cn": "UEAO02015832",
+     "cn": "UEAO02016638",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0037/0606",
+     "t1_cn": "ueao01789731",
+     "cn": "ueao01773434",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0040/0434",
+     "t1_cn": "ueao01788680",
+     "cn": "ueao01787872",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0040/0504",
+     "t1_cn": "ueao01802660",
+     "cn": "ueao01798556",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0040/0502",
+     "t1_cn": "ueao01839288",
+     "cn": "ueao01789803",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0040/0626",
+     "t1_cn": "UEAO02084595",
+     "cn": "UEAO02125171",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0058/0779",
+     "t1_cn": "ueao01786766",
+     "cn": "ueao01786047",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0058/0849",
+     "t1_cn": "UEAO02355512",
+     "cn": "UEAO02340968",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0058/0876",
+     "t1_cn": "ueao01786997",
+     "cn": "ueao01761229",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0058/0988",
+     "t1_cn": "ueao01787389",
+     "cn": "ueao01788865",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0058/1055",
+     "t1_cn": "UEAO02346238",
+     "cn": "UEAO02086936",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0059/0618",
+     "t1_cn": "ueao01787597",
+     "cn": "ueao01759334",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0059/0617",
+     "t1_cn": "ueao01787685",
+     "cn": "ueao01805109",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0059/0663",
+     "t1_cn": "ueao01789058",
+     "cn": "ueao01798845",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0059/0792",
+     "t1_cn": "ueao01787400",
+     "cn": "ueao01842731",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0062/0426",
+     "t1_cn": "ueao01789395",
+     "cn": "ueao01843809",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0062/0605",
+     "t1_cn": "UEAO02088081",
+     "cn": "UEAO02018306",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0063/0615",
+     "t1_cn": "UEAO02358025",
+     "cn": "UEAO02082919",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0063/0644",
+     "t1_cn": "ueao01763007",
+     "cn": "ueao01780367",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0063/0664",
+     "t1_cn": "UEAO02034918",
+     "cn": "UEAO02086720",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0063/0688",
+     "t1_cn": "UEAO02086473",
+     "cn": "UEAO02018190",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0063/0755",
+     "t1_cn": "ueao01789027",
+     "cn": "ueao01786759",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0065/0250",
+     "t1_cn": "ueao01795853",
+     "cn": "ueao01845085",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0065/0383",
+     "t1_cn": "UEAO02040420",
+     "cn": "UEAO02086225",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0065/0433",
+     "t1_cn": "ueao01786926",
+     "cn": "ueao01788950",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0065/0522",
+     "t1_cn": "UEAO02016567",
+     "cn": "UEAO02086874",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0065/0608",
+     "t1_cn": "ueao01798059",
+     "cn": "ueao01780640",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0065/0675",
+     "t1_cn": "ueao01780405",
+     "cn": "ueao01788580",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0068/0520",
+     "t1_cn": "UEAO02040310",
+     "cn": "UEAO02088328",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02550/0068/0631",
+     "t1_cn": "ueao01779135",
+     "cn": "ueao01787614",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01392/0001/0097",
+     "t1_cn": "UEAO02046072",
+     "cn": "UEAO02047971",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01392/0001/0770",
+     "t1_cn": "UEAO02043646",
+     "cn": "UEAO02276503",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01392/0009/0403",
+     "t1_cn": "UEAO02285598",
+     "cn": "UEAO02048119",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01139/0007/0004",
+     "t1_cn": "UEAO02278939",
+     "cn": "UEAO02263087",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01473/0005/0010",
+     "t1_cn": "UEAO02278738",
+     "cn": "UEAO02279736",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AC/01473/0005/0015",
+     "t1_cn": "UEAO02262995",
+     "cn": "UEAO02283919",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27030/0048/0200",
+     "t1_cn": "UEAO02382020",
+     "cn": "UEAO02433479",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27057/0022/0581",
+     "t1_cn": "UEAO02072552",
+     "cn": "UEAO02069541",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27057/0055/0143",
+     "t1_cn": "UEAO02037642",
+     "cn": "UEAO02038540",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28894/0031/0147",
+     "t1_cn": "ueao01772972",
+     "cn": "ueao01673263",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27898/0014/0129",
+     "t1_cn": "UEAO02449761",
+     "cn": "UEAO02449910",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28371/0008/0067",
+     "t1_cn": "UEAO02036956",
+     "cn": "UEAO02442978",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28410/0040/0246",
+     "t1_cn": "ueao01669699",
+     "cn": "ueao01658739",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27316/0027/0017",
+     "t1_cn": "ueao01672851",
+     "cn": "ueao01820031",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27316/0027/0154",
+     "t1_cn": "ueao01774525",
+     "cn": "ueao01667652",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27855/0002/0355",
+     "t1_cn": "UEAO02030860",
+     "cn": "UEAO02036514",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27855/0002/0365",
+     "t1_cn": "UEAO02014749",
+     "cn": "UEAO02036027",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27855/0003/0078",
+     "t1_cn": "UEAO02072290",
+     "cn": "UEAO02205894",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27855/0054/0566",
+     "t1_cn": "UEAO02073421",
+     "cn": "UEAO02072168",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27871/0031/0163",
+     "t1_cn": "ueao01768178",
+     "cn": "ueao01671227",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/28835/0020/0084",
+     "t1_cn": "UEAO02071158",
+     "cn": "UEAO02071083",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AL/27472/0040/0100",
+     "t1_cn": "ueao01673513",
+     "cn": "ueao01675435",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AP/06033/0001/0059",
+     "t1_cn": "UEAO02019743",
+     "cn": "UEAO02016483",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02011/0034/0012",
+     "t1_cn": "UEAO02460665",
+     "cn": "UEAO02456949",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02810/0009/0026",
+     "t1_cn": "UEAO02350741",
+     "cn": "UEAO02350355",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "AM/02836/0019/0072",
+     "t1_cn": "UEAO02337744",
+     "cn": "UEAO02340850",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/30058/0188/0341",
+     "t1_cn": "UEAO02154692",
+     "cn": "UEAO02233079",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0007/0003",
+     "t1_cn": "UEAO02288651",
+     "cn": "UEAO02253959",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0011/0486",
+     "t1_cn": "UEAO02392468",
+     "cn": "UEAO02391275",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0011/0599",
+     "t1_cn": "UEAO02272843",
+     "cn": "UEAO02351617",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0014/0512",
+     "t1_cn": "UEAO02352413",
+     "cn": "UEAO02414741",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0016/0369",
+     "t1_cn": "UEAO02343467",
+     "cn": "UEAO02352413",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0017/0331",
+     "t1_cn": "UEAO02343482",
+     "cn": "UEAO02428034",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38490/0017/0401",
+     "t1_cn": "UEAO02315195",
+     "cn": "UEAO02427178",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/35238/0151/0019",
+     "t1_cn": "ueao01793537",
+     "cn": "ueao01656336",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/35971/0027/0280",
+     "t1_cn": "UEAO02173865",
+     "cn": "UEAO02174973",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/33030/0158/0122",
+     "t1_cn": "ueao01774021",
+     "cn": "ueao01671509",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/34819/0061/0007",
+     "t1_cn": "ueao01768795",
+     "cn": "ueao01654345",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/35556/0134/0099",
+     "t1_cn": "UEAO02222622",
+     "cn": "UEAO02238472",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/33278/0126/0055",
+     "t1_cn": "UEAO02216253",
+     "cn": "UEAO02238621",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/35947/0189/0088",
+     "t1_cn": "UEAO02067510",
+     "cn": "UEAO02227723",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/37877/0105/0145",
+     "t1_cn": "UEAO02306347",
+     "cn": "UEAO02303690",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38032/0059/0089",
+     "t1_cn": "UEAO02051691",
+     "cn": "UEAO02049671",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38075/0122/0504",
+     "t1_cn": "UEAO02049072",
+     "cn": "UEAO02171551",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38075/0122/0602",
+     "t1_cn": "UEAO02247603",
+     "cn": "UEAO02137011",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/39578/0031/0020",
+     "t1_cn": "ueao01791608",
+     "cn": "ueao01758545",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/33537/0077/0242",
+     "t1_cn": "UEAO02309762",
+     "cn": "UEAO02306223",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/36293/0140/0037",
+     "t1_cn": "UEAO02168469",
+     "cn": "UEAO02102683",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/36293/0140/0158",
+     "t1_cn": "UEAO02220711",
+     "cn": "UEAO02230519",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/36293/0140/0204",
+     "t1_cn": "UEAO02172251",
+     "cn": "UEAO02233784",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/38156/0060/0169",
+     "t1_cn": "UEAO02051154",
+     "cn": "UEAO02049308",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/39594/0120/0181",
+     "t1_cn": "UEAO02219798",
+     "cn": "UEAO02231241",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/33731/0059/0341",
+     "t1_cn": "UEAO02051218",
+     "cn": "UEAO02039808",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "BA/39926/0166/0071",
+     "t1_cn": "UEAO02034849",
+     "cn": "UEAO02171719",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14273/0041/0296",
+     "t1_cn": "UEAO02236120",
+     "cn": "UEAO02234160",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14290/0017/0043",
+     "t1_cn": "UEAO02208335",
+     "cn": "UEAO02043371",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14290/0017/0242",
+     "t1_cn": "UEAO02237670",
+     "cn": "UEAO02042282",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13110/0053/0079",
+     "t1_cn": "UEAO02014624",
+     "cn": "UEAO02203522",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13455/0096/0077",
+     "t1_cn": "UEAO02181782",
+     "cn": "UEAO02203634",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13951/0025/0018",
+     "t1_cn": "ueao01669716",
+     "cn": "ueao01767112",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13951/0025/0117",
+     "t1_cn": "ueao01659994",
+     "cn": "ueao01671945",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14893/0099/0004",
+     "t1_cn": "UEAO02237300",
+     "cn": "UEAO02248094",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15415/0044/0031",
+     "t1_cn": "ueao01659621",
+     "cn": "ueao01791052",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15415/0044/0048",
+     "t1_cn": "ueao01767039",
+     "cn": "ueao01667772",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15415/0044/0072",
+     "t1_cn": "ueao01817391",
+     "cn": "ueao01657148",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15415/0044/0099",
+     "t1_cn": "ueao01657209",
+     "cn": "ueao01656129",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15598/0024/0081",
+     "t1_cn": "ueao01680965",
+     "cn": "ueao01680804",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15598/0024/0189",
+     "t1_cn": "ueao01819108",
+     "cn": "ueao01667127",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15598/0024/0330",
+     "t1_cn": "ueao01652409",
+     "cn": "ueao01677960",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15598/0121/0293",
+     "t1_cn": "ueao01679085",
+     "cn": "ueao01667322",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13137/0086/0003",
+     "t1_cn": "ueao01817859",
+     "cn": "ueao01656647",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13170/0050/0004",
+     "t1_cn": "ueao01808889",
+     "cn": "ueao01666307",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15989/0055/0127",
+     "t1_cn": "ueao01762121",
+     "cn": "ueao01659508",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15059/0109/0063",
+     "t1_cn": "UEAO02288909",
+     "cn": "UEAO02291587",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15776/0023/0041",
+     "t1_cn": "UEAO02240671",
+     "cn": "UEAO02043051",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15776/0023/0141",
+     "t1_cn": "UEAO02237598",
+     "cn": "UEAO02042962",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13730/0037/0008",
+     "t1_cn": "UEAO02292953",
+     "cn": "UEAO02317775",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0001/0792",
+     "t1_cn": "UEAO02308858",
+     "cn": "UEAO02314214",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0002/0736",
+     "t1_cn": "UEAO02446385",
+     "cn": "UEAO02318030",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0080/0438",
+     "t1_cn": "UEAO02349956",
+     "cn": "UEAO02302612",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0083/0657",
+     "t1_cn": "UEAO02284606",
+     "cn": "UEAO02291620",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0083/0784",
+     "t1_cn": "UEAO02394966",
+     "cn": "UEAO02282732",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0093/0306",
+     "t1_cn": "UEAO02311237",
+     "cn": "UEAO02333181",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0112/0428",
+     "t1_cn": "UEAO02412404",
+     "cn": "UEAO02323097",
+     "tipo_urna": "secao",
+     "fechou_tarde": true
+    },
+    {
+     "secao_id": "CE/13897/0112/0441",
+     "t1_cn": "UEAO02452676",
+     "cn": "UEAO02455265",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0113/0022",
+     "t1_cn": "UEAO02259106",
+     "cn": "UEAO02301677",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0113/0169",
+     "t1_cn": "UEAO02399706",
+     "cn": "UEAO02323495",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0113/0346",
+     "t1_cn": "UEAO02285304",
+     "cn": "UEAO02412078",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0114/0051",
+     "t1_cn": "UEAO02299608",
+     "cn": "UEAO02452531",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0115/0337",
+     "t1_cn": "UEAO02282453",
+     "cn": "UEAO02336825",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0117/0149",
+     "t1_cn": "UEAO02304373",
+     "cn": "UEAO02330781",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0117/0294",
+     "t1_cn": "UEAO02402628",
+     "cn": "UEAO02457846",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0117/0471",
+     "t1_cn": "UEAO02300494",
+     "cn": "UEAO02300598",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13897/0118/0328",
+     "t1_cn": "UEAO02452006",
+     "cn": "UEAO02409916",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14192/0040/0025",
+     "t1_cn": "ueao01667565",
+     "cn": "ueao01656295",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13145/0052/0109",
+     "t1_cn": "ueao01757642",
+     "cn": "ueao01655921",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14656/0024/0606",
+     "t1_cn": "ueao01793765",
+     "cn": "ueao01671966",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15334/0052/0050",
+     "t1_cn": "ueao01659928",
+     "cn": "ueao01819497",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13382/0006/0404",
+     "t1_cn": "UEAO02248454",
+     "cn": "UEAO02233361",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13382/0006/0442",
+     "t1_cn": "UEAO02207809",
+     "cn": "UEAO02232471",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13633/0071/0149",
+     "t1_cn": "UEAO02206294",
+     "cn": "UEAO02235725",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14311/0105/0147",
+     "t1_cn": "UEAO02100806",
+     "cn": "UEAO02246631",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14354/0072/0041",
+     "t1_cn": "ueao01772742",
+     "cn": "ueao01655747",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14370/0072/0078",
+     "t1_cn": "ueao01817183",
+     "cn": "ueao01659671",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14419/0075/0056",
+     "t1_cn": "ueao01772172",
+     "cn": "ueao01773558",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14613/0045/0017",
+     "t1_cn": "ueao01659729",
+     "cn": "ueao01659733",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14613/0045/0092",
+     "t1_cn": "ueao01818460",
+     "cn": "ueao01652491",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15377/0009/0220",
+     "t1_cn": "ueao01767247",
+     "cn": "ueao01653228",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15377/0009/0253",
+     "t1_cn": "ueao01656899",
+     "cn": "ueao01657263",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15377/0009/0319",
+     "t1_cn": "ueao01659643",
+     "cn": "ueao01656266",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13811/0064/0005",
+     "t1_cn": "ueao01656537",
+     "cn": "ueao01657059",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13811/0064/0004",
+     "t1_cn": "ueao01659471",
+     "cn": "ueao01784345",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13811/0064/0109",
+     "t1_cn": "ueao01659635",
+     "cn": "ueao01660072",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14478/0119/0242",
+     "t1_cn": "UEAO02235287",
+     "cn": "UEAO02185310",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14516/0014/0046",
+     "t1_cn": "UEAO02227190",
+     "cn": "UEAO02246589",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14958/0057/0329",
+     "t1_cn": "UEAO02320569",
+     "cn": "UEAO02301850",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15717/0097/0061",
+     "t1_cn": "UEAO02187657",
+     "cn": "UEAO02237338",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13072/0101/0023",
+     "t1_cn": "UEAO02243658",
+     "cn": "UEAO02243741",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13510/0032/0050",
+     "t1_cn": "ueao01672580",
+     "cn": "ueao01651858",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13510/0032/0189",
+     "t1_cn": "ueao01757371",
+     "cn": "ueao01657991",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/13510/0032/0202",
+     "t1_cn": "ueao01659433",
+     "cn": "ueao01659424",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14532/0029/0064",
+     "t1_cn": "ueao01659397",
+     "cn": "ueao01659527",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14818/0079/0214",
+     "t1_cn": "ueao01794159",
+     "cn": "ueao01671949",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14818/0079/0241",
+     "t1_cn": "ueao01766001",
+     "cn": "ueao01819939",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/14818/0079/0243",
+     "t1_cn": "ueao01759968",
+     "cn": "ueao01671711",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15270/0006/0389",
+     "t1_cn": "UEAO02203691",
+     "cn": "UEAO02239142",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15610/0055/0003",
+     "t1_cn": "ueao01659413",
+     "cn": "ueao01815317",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "CE/15610/0055/0008",
+     "t1_cn": "ueao01772805",
+     "cn": "ueao01750692",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "MA/07137/0109/0001",
+     "t1_cn": "ueao01766364",
+     "cn": "ueao01761446",
+     "tipo_urna": "secao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "MA/07137/0109/0039",
+     "t1_cn": "ueao01812436",
+     "cn": "ueao01664080",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "MA/07528/0075/0055",
+     "t1_cn": "UEAO02074648",
+     "cn": "UEAO02122504",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    },
+    {
+     "secao_id": "MA/08630/0045/0109",
+     "t1_cn": "UEAO02318843",
+     "cn": "UEAO02311624",
+     "tipo_urna": "reservaSecao",
+     "fechou_tarde": false
+    }
+   ],
+   "distribuicao_t1": [
+    {
+     "modelo": "UE2013",
+     "emissor": "AC URNA",
+     "algoritmo": "ECDSA",
+     "secoes": 11921,
+     "pct": 2.39
+    },
+    {
+     "modelo": "UE2015",
+     "emissor": "AC URNA",
+     "algoritmo": "ECDSA",
+     "secoes": 88064,
+     "pct": 17.64
+    },
+    {
+     "modelo": "UE2020",
+     "emissor": "AC UE2020",
+     "algoritmo": "Ed521",
+     "secoes": 200463,
+     "pct": 40.16
+    },
+    {
+     "modelo": "UE2022",
+     "emissor": "AC UE2022",
+     "algoritmo": "Ed521",
+     "secoes": 198759,
+     "pct": 39.81
+    }
+   ]
+  }
+ },
+ "acs": [
+  {
+   "arquivo": "acue2020.pem",
+   "cn": "AC UE2020",
+   "emissor": "AC URNA v2",
+   "serial": "5",
+   "sha256_der": "77f31bef3d8eb35f0cc969a2b9bba3ff2a498cc339d29a375d3181e0547c0376",
+   "nao_antes": "2021-07-05T21:31:56+00:00",
+   "nao_depois": "2037-07-01T21:31:56+00:00",
+   "valida_no_dia_da_eleicao": true,
+   "ski": "bcb3545deeea432e1e832e81283cb8ae948e400b",
+   "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+   "cadeia_conferida": [
+    "AC UE2020"
+   ],
+   "nivel": "intermediaria",
+   "confere_resumo_oficial_tse": "acue2020.cer"
+  },
+  {
+   "arquivo": "acue2022.pem",
+   "cn": "AC UE2022",
+   "emissor": "AC URNA v2",
+   "serial": "8",
+   "sha256_der": "6ae65790dae7cc5d97394e461204744c8e2f7a810d0303af828d4d3dbecfa293",
+   "nao_antes": "2023-02-28T13:46:49+00:00",
+   "nao_depois": "2039-02-24T13:46:49+00:00",
+   "valida_no_dia_da_eleicao": true,
+   "ski": "bb7c517f294a5b96f9bf6a964c4f255a755f698a",
+   "aki": "d02566c491034b3a9313b3074921eca9b500e21f",
+   "cadeia_conferida": [
+    "AC UE2022"
+   ],
+   "nivel": "intermediaria",
+   "confere_resumo_oficial_tse": "acue2022.cer"
+  },
+  {
+   "arquivo": "acurna.pem",
+   "cn": "AC URNA",
+   "emissor": "AC RAIZ UE",
+   "serial": "3",
+   "sha256_der": "dc20a4c3b8aef01794b80efe8e143e1fbf719707e00bb0d4ba8865191dc2731d",
+   "nao_antes": "2011-07-22T21:59:57+00:00",
+   "nao_depois": "2026-07-18T21:59:57+00:00",
+   "valida_no_dia_da_eleicao": false,
+   "ski": "cdaaf4b29701b3f0deb2b54258594a6d34ada48a",
+   "aki": "8668837bbbe348cd19b61030a489d5dfde6742c0",
+   "cadeia_conferida": [
+    "AC URNA"
+   ],
+   "nivel": "intermediaria",
+   "confere_resumo_oficial_tse": null
+  }
+ ]
+}

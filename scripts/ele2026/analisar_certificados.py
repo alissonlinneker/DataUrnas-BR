@@ -31,11 +31,17 @@ de certificados_resumo.json.
 
 Saída: data/parquet/2026/integridade/certificados_resumo.json (pequeno).
 
+Com --turno 2 (pleito 3221, 25/10/2026) os caminhos padrão passam a
+data/parquet/2026/t2/ (integridade/ de fetch_integridade.py --turno 2 e
+secoes_2026.parquet de fetch_secoes.py --turno 2), os .vsc são lidos do
+pleito 3221 e a validade dos certificados é conferida no dia 25/10/2026.
+
 Uso:
   python3 scripts/ele2026/analisar_certificados.py
   python3 scripts/ele2026/analisar_certificados.py --amostra 300 --vsc-dir /tmp/vsc
   python3 scripts/ele2026/analisar_certificados.py --vsc-dir /tmp/vsc --ac certs/
   python3 scripts/ele2026/analisar_certificados.py --todas [--uf rr --limite 50]
+  python3 scripts/ele2026/analisar_certificados.py --turno 2 --todas --uf rr
 """
 
 from __future__ import annotations
@@ -68,6 +74,27 @@ BU_PADRAO = ROOT / "data" / "parquet" / "2026" / "secoes_2026.parquet"
 SAIDA_PADRAO = DIR_INTEGRIDADE / "certificados_resumo.json"
 AC_PADRAO = ROOT / "data" / "certificados" / "ac"
 DIA_ELEICAO = datetime(2026, 10, 4, 12, 0, tzinfo=timezone.utc)
+
+
+def contexto_turno(turno: int = 1) -> dict:
+    """Caminhos padrão, pleito e dia da eleição (12h UTC) de um turno.
+
+    O 1º turno mantém os caminhos e a data de sempre; o 2º lê de
+    data/parquet/2026/t2/ e confere a validade em 25/10/2026.
+    """
+    from dataurnas.downloader import ele2026 as E
+
+    p = E.parametros_turno(turno)
+    if p["turno"] == 1:
+        integ, bu, dia = DIR_INTEGRIDADE, BU_PADRAO, DIA_ELEICAO
+    else:
+        base = Path(p["saida"])
+        integ, bu = base / "integridade", base / "secoes_2026.parquet"
+        d, m, a = (int(x) for x in p["data"].split("/"))
+        dia = datetime(a, m, d, 12, 0, tzinfo=timezone.utc)
+    return {"turno": p["turno"], "pleito": p["pleito"], "ciclo": p["ciclo"],
+            "integridade": integ, "bu": bu, "saida": integ / "certificados_resumo.json",
+            "dia": dia}
 MAX_EXEMPLOS = 50
 
 # SHA-512 (base64) dos arquivos de certificado de AC publicados pelo TSE no
@@ -595,10 +622,12 @@ def escolher_amostra(cat: pd.DataFrame, n: int, seed: int = 2026) -> pd.DataFram
     return pd.concat(partes).head(max(n, len(partes)))
 
 
-async def baixar_amostra(amostra: pd.DataFrame, dest: Path, concorrencia: int = 4) -> int:
+async def baixar_amostra(amostra: pd.DataFrame, dest: Path, concorrencia: int = 4,
+                        pleito: Optional[str] = None) -> int:
     """Baixa o -vota.vsc das seções da amostra para dest (pula os já baixados)."""
     from dataurnas.downloader import ele2026 as E
 
+    url = {"pleito": pleito or E.PLEITO}
     dest.mkdir(parents=True, exist_ok=True)
     f = E.HttpFetcher(concurrency=concorrencia, http2=False, rate=float(concorrencia),
                       rate_max=float(concorrencia))
@@ -611,7 +640,7 @@ async def baixar_amostra(amostra: pd.DataFrame, dest: Path, concorrencia: int = 
         if p.exists():
             return
         async with sem:
-            aux = await f.get_json(E.url_aux(r.uf, r.cd_mun, r.zona, r.secao))
+            aux = await f.get_json(E.url_aux(r.uf, r.cd_mun, r.zona, r.secao, **url))
             esc = E.escolher_hash(aux) if aux else None
             if not esc:
                 return
@@ -619,7 +648,8 @@ async def baixar_amostra(amostra: pd.DataFrame, dest: Path, concorrencia: int = 
                 (v for v in esc["arquivos"].values() if v.endswith(".vsc")), None)
             if not nm:
                 return
-            raw = await f.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, esc["hash"], nm))
+            raw = await f.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, esc["hash"], nm,
+                                            **url))
             if raw:
                 p.write_bytes(raw)
                 n += 1
@@ -720,20 +750,23 @@ def nome_vsc(uf: str, mun: str, zona: str, secao: str, fase: str = "o",
     return f"{fase}{p:05d}{uf.lower()}{mun}{zona}{secao}-vota.vsc"
 
 
-async def baixar_vsc(fetcher, r, via_aux: bool = False) -> tuple[Optional[bytes], str]:
+async def baixar_vsc(fetcher, r, via_aux: bool = False,
+                     pleito: Optional[str] = None) -> tuple[Optional[bytes], str]:
     """(bytes, origem). Tenta o caminho direto com o hash já conhecido
     (secoes_2026.parquet) e, se faltar o hash ou vier 404, lê o -aux.json para
     descobrir hash e nome. Bytes None quando o arquivo não existe."""
     from dataurnas.downloader import ele2026 as E
 
+    url = {"pleito": pleito or E.PLEITO}
     h = getattr(r, "hash", None)
     fase = {"oficial": "o"}.get(getattr(r, "fase", "oficial") or "oficial")
     if not via_aux and isinstance(h, str) and h and h != "0" and fase:
         raw = await fetcher.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, h,
-                                              nome_vsc(r.uf, r.cd_mun, r.zona, r.secao, fase)))
+                                              nome_vsc(r.uf, r.cd_mun, r.zona, r.secao, fase,
+                                                       url["pleito"]), **url))
         if raw is not None:
             return raw, "direto"
-    aux = await fetcher.get_json(E.url_aux(r.uf, r.cd_mun, r.zona, r.secao))
+    aux = await fetcher.get_json(E.url_aux(r.uf, r.cd_mun, r.zona, r.secao, **url))
     esc = E.escolher_hash(aux) if aux else None
     if not esc:
         return None, "aux sem hash"
@@ -741,7 +774,8 @@ async def baixar_vsc(fetcher, r, via_aux: bool = False) -> tuple[Optional[bytes]
         (v for v in esc["arquivos"].values() if v.endswith(".vsc")), None)
     if not nm:
         return None, "aux sem .vsc"
-    raw = await fetcher.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, esc["hash"], nm))
+    raw = await fetcher.get(E.url_arquivo(r.uf, r.cd_mun, r.zona, r.secao, esc["hash"], nm,
+                                          **url))
     return raw, ("aux" if raw is not None else "vsc ausente (404)")
 
 
@@ -826,11 +860,16 @@ def consolidar(tabela: Path) -> pd.DataFrame:
 async def coletar_todas(secoes: pd.DataFrame, fetcher, tabela: Path,
                         ac_dir: Optional[Path], processos: int = 0,
                         lote: int = 1000, intervalo: float = 30.0,
-                        via_aux: bool = False, tarefas: int = 16, log=print) -> dict:
+                        via_aux: bool = False, tarefas: int = 16, log=print,
+                        pleito: Optional[str] = None,
+                        dia: datetime = DIA_ELEICAO) -> dict:
     """Baixa e avalia o .vsc de cada seção ainda não feita. processos = 0
-    avalia no próprio processo (testes); > 0 usa um pool de processos."""
+    avalia no próprio processo (testes); > 0 usa um pool de processos.
+    pleito e dia: do turno (padrão: 1º turno, 04/10/2026)."""
     from concurrent.futures import ProcessPoolExecutor
+    from functools import partial
 
+    avaliar = partial(avaliar_vsc, dia_iso=dia.isoformat())
     partes = partes_de(tabela)
     feitas = chaves_feitas(partes)
     pend = [r for r in secoes.itertuples(index=False)
@@ -857,7 +896,7 @@ async def coletar_todas(secoes: pd.DataFrame, fetcher, tabela: Path,
             except asyncio.QueueEmpty:
                 return
             try:
-                raw, origem = await baixar_vsc(fetcher, r, via_aux)
+                raw, origem = await baixar_vsc(fetcher, r, via_aux, pleito)
             except Exception as e:  # noqa: BLE001 - fica pendente para a próxima
                 st["falhas_rede"] += 1
                 if st["falhas_rede"] <= 5:
@@ -867,9 +906,9 @@ async def coletar_todas(secoes: pd.DataFrame, fetcher, tabela: Path,
             if raw is None:
                 linha = {"motivo": origem}
             elif pool is not None:
-                linha = await loop.run_in_executor(pool, avaliar_vsc, raw)
+                linha = await loop.run_in_executor(pool, avaliar, raw)
             else:
-                linha = avaliar_vsc(raw)
+                linha = avaliar(raw)
             linha.update(uf=r.uf, cd_mun=r.cd_mun, zona=r.zona, secao=r.secao,
                          origem=origem, coletado_em=datetime.now(timezone.utc))
             buf.append(linha)
@@ -993,6 +1032,7 @@ def atualizar_resumo(saida: Path, bloco: dict, chave: str = "todas") -> dict:
 def executar_todas(args) -> int:
     from dataurnas.downloader import ele2026 as E
 
+    ctx = contexto_turno(args.turno)
     ufs = [u.strip() for u in args.uf.split(",")] if args.uf else None
     secoes, total_ok = carregar_secoes_ok(Path(args.bu), ufs, args.limite, args.fracao)
     tabela = Path(args.tabela)
@@ -1005,7 +1045,8 @@ def executar_todas(args) -> int:
                           rate_max=float(args.taxa_max or 5 * c))
         try:
             return await coletar_todas(secoes, f, tabela, ac_dir, procs,
-                                       via_aux=args.via_aux, tarefas=2 * c)
+                                       via_aux=args.via_aux, tarefas=2 * c,
+                                       pleito=ctx["pleito"], dia=ctx["dia"])
         finally:
             st_http = dict(f.stats)
             await f.close()
@@ -1015,7 +1056,9 @@ def executar_todas(args) -> int:
     df = consolidar(tabela)
     bloco = resumir_tabela(df, total_ok)
     bloco["gerado_em"] = time.strftime("%Y-%m-%dT%H:%M:%S")
-    bloco["acs"] = descrever_acs(ac_dir) if ac_dir else []
+    bloco["turno"], bloco["pleito"] = ctx["turno"], ctx["pleito"]
+    bloco["dia_eleicao"] = ctx["dia"].date().isoformat()
+    bloco["acs"] = descrever_acs(ac_dir, ctx["dia"]) if ac_dir else []
     bloco["ultima_execucao"] = st
     if args.fracao:
         if bloco["secoes_processadas"] >= len(secoes):
@@ -1038,16 +1081,18 @@ def executar_todas(args) -> int:
 
 def analisar(cat: pd.DataFrame, bu: Optional[pd.DataFrame],
              infos: Optional[dict] = None, acs: Optional[list] = None,
-             fonte: Optional[dict] = None) -> dict:
+             fonte: Optional[dict] = None, dia: datetime = DIA_ELEICAO,
+             turno: int = 1) -> dict:
     anom = Anomalias()
     res = {
         "gerado_em": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "dia_eleicao": DIA_ELEICAO.date().isoformat(),
+        "turno": int(turno),
+        "dia_eleicao": dia.date().isoformat(),
         "fonte": fonte or {},
         "catalogo": analisar_catalogo(cat, bu, anom),
     }
     if infos is not None:
-        res["vsc"] = analisar_vscs(infos, cat, anom, acs)
+        res["vsc"] = analisar_vscs(infos, cat, anom, acs, dia)
     res["cadeia_validada"] = bool(acs) and infos is not None
     res["n_anomalias"] = anom.total()
     res["anomalias"] = anom.resumo()
@@ -1091,9 +1136,16 @@ def imprimir(res: dict) -> None:
 
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--integridade", default=str(DIR_INTEGRIDADE))
-    ap.add_argument("--bu", default=str(BU_PADRAO))
-    ap.add_argument("--saida", default=str(SAIDA_PADRAO))
+    ap.add_argument("--turno", type=int, choices=(1, 2), default=1,
+                    help="turno da eleição: 1 (pleito 3220, 04/10/2026) ou 2 (pleito 3221, "
+                         "25/10/2026); padrão: 1")
+    ap.add_argument("--integridade", default=None,
+                    help="diretório da auditoria de integridade "
+                         "(padrão: data/parquet/2026[/t2]/integridade)")
+    ap.add_argument("--bu", default=None,
+                    help="secoes_2026.parquet (padrão: data/parquet/2026[/t2]/)")
+    ap.add_argument("--saida", default=None,
+                    help="resumo JSON (padrão: <integridade padrão>/certificados_resumo.json)")
     ap.add_argument("--vsc-dir", help="diretório com vsc_<uf>_m<mun>_z<zona>_s<secao>.bin")
     ap.add_argument("--amostra", type=int, default=0,
                     help="baixa o .vsc de N seções (estratificado) para --vsc-dir")
@@ -1117,6 +1169,10 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     ap.add_argument("--via-aux", action="store_true",
                     help="em --todas: sempre lê o -aux.json antes do .vsc")
     args = ap.parse_args(argv)
+    ctx = contexto_turno(args.turno)
+    for k in ("integridade", "bu", "saida"):
+        if getattr(args, k) is None:
+            setattr(args, k, str(ctx[k]))
     if args.concorrencia is None:
         args.concorrencia = 8 if args.todas else 4
     if args.tabela is None:
@@ -1126,6 +1182,7 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
 
 def main(argv: Optional[list[str]] = None) -> int:
     args = parse_args(argv)
+    ctx = contexto_turno(args.turno)
     if args.todas:
         return executar_todas(args)
     cat, fonte = carregar_catalogo(Path(args.integridade))
@@ -1136,14 +1193,14 @@ def main(argv: Optional[list[str]] = None) -> int:
             print("--amostra exige --vsc-dir", file=sys.stderr)
             return 2
         n = asyncio.run(baixar_amostra(escolher_amostra(cat, args.amostra),
-                                       Path(args.vsc_dir), args.concorrencia))
+                                       Path(args.vsc_dir), args.concorrencia, ctx["pleito"]))
         print(f".vsc baixados: {n}")
     if args.vsc_dir:
         infos = ler_vsc_dir(Path(args.vsc_dir))
     acs = carregar_acs(Path(args.ac)) if args.ac else None
-    res = analisar(cat, bu, infos, acs, fonte)
+    res = analisar(cat, bu, infos, acs, fonte, ctx["dia"], ctx["turno"])
     if args.ac:
-        res["acs"] = descrever_acs(Path(args.ac))
+        res["acs"] = descrever_acs(Path(args.ac), ctx["dia"])
     saida = Path(args.saida)
     if saida.exists():  # preserva o bloco do modo --todas
         try:

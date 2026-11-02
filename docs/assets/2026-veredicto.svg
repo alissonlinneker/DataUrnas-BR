@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1088" viewBox="0 0 1000 1088" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Veredicto da auditoria: eleição presidencial de 2026</title>
+<desc id="descricao">Infográfico do veredicto: nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos arquivos públicos, em nenhum dos dois turnos. Verificado: Coleta versionada, 8 voltas de reconferência: 0 arquivos alterados ou removidos; Assinatura digital de todos os arquivos: 5.487.289 válidas, 0 inválidas; Soma dos BUs x resultado oficial: igual voto a voto: Brasil, UFs e 5.757 municípios; Totais divulgados durante a apuração: 12 mil versões; nunca diminuíram; Valores impossíveis no BU: 0 em 998.414 BUs dos dois turnos; Recontagem do RDV x BU: 0 divergências: 499.206 seções (1º) e 499.205 (2º); Log eleitor a eleitor x BU: votos no log = comparecimento em 2.997 seções; Encerramento tardio e margem: pior cenário ainda mantém 4.398.399 de margem; BUs emitidos mais de 1 h após o encerramento: 368 seções; 0 votos depois do fim; Viradas por seção do 1º para o 2º turno: 31.341 observadas x 32.604 esperadas; Estatística forense com 2022 como controle: nenhum padrão maior que o de 2022; Modelo de urna, troca e contingência: maior pior caso: 3.957 votos; Biometria do 1º x 2º turno: variações de décimos de ponto, sem relação com o voto; Cargas x logs de preparação (GEDAI): 99,83% conferem; 862 cargas sem log; Linha do tempo de emissão e totalização: nenhum BU emitido depois de totalizado; Dados abertos x BU: 0 divergências de voto; Hashes lacrados x programas nos logs: todos os de inicialização estão na lista; Assinatura JWS dos resultados divulgados: 11.572 válidas, 0 inválidas; Alegações externas sobre viradas: explicadas pela ordem geográfica de chegada. Não pode ser verificado com dados públicos: Qual software rodou em cada urna (a ligação com a lista lacrada só é feita por amostragem, com relatórios não publicados); Adulteração idêntica em todas as urnas (não deixa diferença entre grupos; depende do Teste de Integridade (relatório até 23/01/2027)); O que aconteceu na seção fora do arquivo (por exemplo, a demora de uma mesa para emitir o BU: está nas atas, não nos arquivos). 12 pontos pedem esclarecimento do TSE, nenhum altera a contagem.</desc>
+<rect x="1" y="1" width="998" height="1086" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Veredicto da auditoria: eleição presidencial de 2026</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">19 verificações sobre os arquivos públicos dos dois turnos; método e números em docs/</text>
+<rect x="32.0" y="96.0" width="936.0" height="82.0" rx="12" fill="#E7F5EF"/>
+<rect x="32.0" y="96.0" width="6.0" height="82.0" rx="3" fill="#009E73"/>
+<circle cx="70.0" cy="137.0" r="16" fill="#009E73"/><path d="M62.8,137.3 L68.1,142.6 L77.7,131.2" stroke="#FFFFFF" stroke-width="3.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="100.0" y="130.0" font-size="17" font-weight="700" fill="#0B3A5B" text-anchor="start">Nenhuma evidência de manipulação, de contagem errada ou de dado</text>
+<text x="100.0" y="154.0" font-size="17" font-weight="700" fill="#0B3A5B" text-anchor="start">impossível nos arquivos públicos, em nenhum dos dois turnos.</text>
+<text x="32.0" y="220.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">O que foi verificado e o resultado (19)</text>
+<circle cx="43.0" cy="257.0" r="10" fill="#009E73"/><path d="M38.5,257.2 L41.8,260.5 L47.8,253.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="256.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">1. Coleta versionada, 8 voltas de reconferência</text>
+<text x="62.0" y="275.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">0 arquivos alterados ou removidos</text>
+<circle cx="43.0" cy="307.0" r="10" fill="#009E73"/><path d="M38.5,307.2 L41.8,310.5 L47.8,303.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="306.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">2. Assinatura digital de todos os arquivos</text>
+<text x="62.0" y="325.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">5.487.289 válidas, 0 inválidas</text>
+<circle cx="43.0" cy="357.0" r="10" fill="#009E73"/><path d="M38.5,357.2 L41.8,360.5 L47.8,353.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="356.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">3. Soma dos BUs x resultado oficial</text>
+<text x="62.0" y="375.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">igual voto a voto: Brasil, UFs e 5.757 municípios</text>
+<circle cx="43.0" cy="407.0" r="10" fill="#009E73"/><path d="M38.5,407.2 L41.8,410.5 L47.8,403.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="406.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">4. Totais divulgados durante a apuração</text>
+<text x="62.0" y="425.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">12 mil versões; nunca diminuíram</text>
+<circle cx="43.0" cy="457.0" r="10" fill="#009E73"/><path d="M38.5,457.2 L41.8,460.5 L47.8,453.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="456.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">5. Valores impossíveis no BU</text>
+<text x="62.0" y="475.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">0 em 998.414 BUs dos dois turnos</text>
+<circle cx="43.0" cy="507.0" r="10" fill="#009E73"/><path d="M38.5,507.2 L41.8,510.5 L47.8,503.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="506.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">6. Recontagem do RDV x BU</text>
+<text x="62.0" y="525.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">0 divergências: 499.206 seções (1º) e 499.205 (2º)</text>
+<circle cx="43.0" cy="557.0" r="10" fill="#009E73"/><path d="M38.5,557.2 L41.8,560.5 L47.8,553.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="556.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">7. Log eleitor a eleitor x BU</text>
+<text x="62.0" y="575.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">votos no log = comparecimento em 2.997 seções</text>
+<circle cx="43.0" cy="607.0" r="10" fill="#009E73"/><path d="M38.5,607.2 L41.8,610.5 L47.8,603.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="606.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">8. Encerramento tardio e margem</text>
+<text x="62.0" y="625.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">pior cenário ainda mantém 4.398.399 de margem</text>
+<circle cx="43.0" cy="657.0" r="10" fill="#009E73"/><path d="M38.5,657.2 L41.8,660.5 L47.8,653.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="656.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">9. BUs emitidos mais de 1 h após o encerramento</text>
+<text x="62.0" y="675.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">368 seções; 0 votos depois do fim</text>
+<circle cx="43.0" cy="707.0" r="10" fill="#009E73"/><path d="M38.5,707.2 L41.8,710.5 L47.8,703.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62.0" y="706.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">10. Viradas por seção do 1º para o 2º turno</text>
+<text x="62.0" y="725.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">31.341 observadas x 32.604 esperadas</text>
+<circle cx="523.0" cy="257.0" r="10" fill="#009E73"/><path d="M518.5,257.2 L521.8,260.5 L527.8,253.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="256.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">11. Estatística forense com 2022 como controle</text>
+<text x="542.0" y="275.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">nenhum padrão maior que o de 2022</text>
+<circle cx="523.0" cy="307.0" r="10" fill="#009E73"/><path d="M518.5,307.2 L521.8,310.5 L527.8,303.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="306.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">12. Modelo de urna, troca e contingência</text>
+<text x="542.0" y="325.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">maior pior caso: 3.957 votos</text>
+<circle cx="523.0" cy="357.0" r="10" fill="#009E73"/><path d="M518.5,357.2 L521.8,360.5 L527.8,353.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="356.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">13. Biometria do 1º x 2º turno</text>
+<text x="542.0" y="375.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">variações de décimos de ponto, sem relação com o voto</text>
+<circle cx="523.0" cy="407.0" r="10" fill="#009E73"/><path d="M518.5,407.2 L521.8,410.5 L527.8,403.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="406.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">14. Cargas x logs de preparação (GEDAI)</text>
+<text x="542.0" y="425.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">99,83% conferem; 862 cargas sem log</text>
+<circle cx="523.0" cy="457.0" r="10" fill="#009E73"/><path d="M518.5,457.2 L521.8,460.5 L527.8,453.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="456.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">15. Linha do tempo de emissão e totalização</text>
+<text x="542.0" y="475.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">nenhum BU emitido depois de totalizado</text>
+<circle cx="523.0" cy="507.0" r="10" fill="#009E73"/><path d="M518.5,507.2 L521.8,510.5 L527.8,503.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="506.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">16. Dados abertos x BU</text>
+<text x="542.0" y="525.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">0 divergências de voto</text>
+<circle cx="523.0" cy="557.0" r="10" fill="#009E73"/><path d="M518.5,557.2 L521.8,560.5 L527.8,553.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="556.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">17. Hashes lacrados x programas nos logs</text>
+<text x="542.0" y="575.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">todos os de inicialização estão na lista</text>
+<circle cx="523.0" cy="607.0" r="10" fill="#009E73"/><path d="M518.5,607.2 L521.8,610.5 L527.8,603.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="606.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">18. Assinatura JWS dos resultados divulgados</text>
+<text x="542.0" y="625.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">11.572 válidas, 0 inválidas</text>
+<circle cx="523.0" cy="657.0" r="10" fill="#009E73"/><path d="M518.5,657.2 L521.8,660.5 L527.8,653.4" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="542.0" y="656.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">19. Alegações externas sobre viradas</text>
+<text x="542.0" y="675.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">explicadas pela ordem geográfica de chegada</text>
+<line x1="32" y1="762" x2="968" y2="762" stroke="#D9E3EB"/>
+<text x="32.0" y="790.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="start">Não pode ser verificado com dados públicos (3)</text>
+<circle cx="43" cy="827" r="10" fill="#FFFFFF" stroke="#B07800" stroke-width="2"/>
+<text x="43.0" y="832.0" font-size="13" font-weight="800" fill="#B07800" text-anchor="middle">?</text>
+<text x="62.0" y="826.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">Qual software rodou em cada urna</text>
+<text x="62.0" y="845.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">a ligação com a lista lacrada só é feita por amostragem, com relatórios não publicados</text>
+<circle cx="43" cy="877" r="10" fill="#FFFFFF" stroke="#B07800" stroke-width="2"/>
+<text x="43.0" y="882.0" font-size="13" font-weight="800" fill="#B07800" text-anchor="middle">?</text>
+<text x="62.0" y="876.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">Adulteração idêntica em todas as urnas</text>
+<text x="62.0" y="895.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">não deixa diferença entre grupos; depende do Teste de Integridade (relatório até 23/01/2027)</text>
+<circle cx="43" cy="927" r="10" fill="#FFFFFF" stroke="#B07800" stroke-width="2"/>
+<text x="43.0" y="932.0" font-size="13" font-weight="800" fill="#B07800" text-anchor="middle">?</text>
+<text x="62.0" y="926.0" font-size="13.5" font-weight="700" fill="#0B3A5B" text-anchor="start">O que aconteceu na seção fora do arquivo</text>
+<text x="62.0" y="945.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">por exemplo, a demora de uma mesa para emitir o BU: está nas atas, não nos arquivos</text>
+<rect x="32.0" y="972.0" width="936.0" height="40.0" rx="10" fill="#F2F6F9"/>
+<text x="48.0" y="997.0" font-size="13" font-weight="400" fill="#0B3A5B" text-anchor="start">12 pontos de transparência e registro pedem esclarecimento do TSE; nenhum deles altera a contagem.</text>
+<line x1="32" y1="1042" x2="968" y2="1042" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="1066.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: docs/veredicto-auditoria-2026.md e documentos citados nele</text>
+<text x="968.0" y="1066.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>

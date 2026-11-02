@@ -21,6 +21,10 @@ _AM_UTC5 = {
     2313: "Envira",
     2020: "Guajará",
     2399: "Ipixuna",
+    2496: "Jutaí",
+    2755: "São Paulo de Olivença",
+    2917: "Amaturá",
+    98370: "Itamarati",
     98477: "Tabatinga",
 }
 

@@ -7,12 +7,14 @@ abstract: >-
   públicos da urna eletrônica brasileira publicados pelo TSE (Boletim de Urna,
   log e assinaturas), refaz a totalização a partir dos dados brutos e aplica
   verificações de integridade, consistência e estatística. Cobre as Eleições
-  Presidenciais de 2022 e o 1º turno de 2026.
+  Presidenciais de 2022 e os dois turnos da eleição presidencial de 2026, com a
+  recontagem do Registro Digital do Voto em todas as seções e o veredicto da
+  auditoria de 2026.
 authors:
   - family-names: Linneker
     given-names: Alisson
-version: 0.2.2
-date-released: "2026-10-15"
+version: 0.3.0
+date-released: "2026-10-30"
 license: MIT
 repository-code: "https://github.com/alissonlinneker/DataUrnas-BR"
 url: "https://huggingface.co/spaces/alissonlinneker/dataurnas-br"

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="540" viewBox="0 0 1000 540" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Presidente, 2º turno de 2026: resultado nacional</title>
+<desc id="descricao">Barra dividida com o resultado do 2º turno. Lula (PT): 64.256.232 votos, 51,79% dos válidos; Flávio Bolsonaro (PL): 59.826.041 votos, 48,21% dos válidos. Diferença de 4.430.191 votos. Comparecimento 128.236.074 (80,78%), abstenção 30.509.005, brancos 1.430.496 e nulos 2.723.305.</desc>
+<rect x="1" y="1" width="998" height="538" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Presidente, 2º turno de 2026: resultado nacional</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Percentual dos votos válidos; eleitorado de 158.745.502 e 499.207 seções instaladas</text>
+<circle cx="52" cy="122" r="20" fill="#E69F00"/>
+<text x="52.0" y="128.0" font-size="16" font-weight="800" fill="#0B3A5B" text-anchor="middle">13</text>
+<text x="84.0" y="128.0" font-size="19" font-weight="700" fill="#0B3A5B" text-anchor="start">Lula (PT)</text>
+<rect x="191.1" y="110.0" width="66.0" height="24.0" rx="12" fill="#009E73"/>
+<text x="224.1" y="127.0" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">Eleito</text>
+<text x="32.0" y="196.0" font-size="46" font-weight="800" fill="#0B3A5B" text-anchor="start">51,79%</text>
+<text x="32.0" y="222.0" font-size="15" font-weight="400" fill="#4F6B80" text-anchor="start">64.256.232 votos</text>
+<circle cx="948" cy="122" r="20" fill="#0072B2"/>
+<text x="948.0" y="128.0" font-size="16" font-weight="800" fill="#FFFFFF" text-anchor="middle">22</text>
+<text x="916.0" y="128.0" font-size="19" font-weight="700" fill="#0B3A5B" text-anchor="end">Flávio Bolsonaro (PL)</text>
+<text x="968.0" y="196.0" font-size="46" font-weight="800" fill="#0B3A5B" text-anchor="end">48,21%</text>
+<text x="968.0" y="222.0" font-size="15" font-weight="400" fill="#4F6B80" text-anchor="end">59.826.041 votos</text>
+<rect x="32.0" y="244.0" width="482.7" height="46.0" rx="8" fill="#E69F00"/>
+<rect x="518.7" y="244.0" width="449.3" height="46.0" rx="8" fill="#0072B2"/>
+<line x1="500.0" y1="234" x2="500.0" y2="300" stroke="#0B3A5B" stroke-width="2" stroke-dasharray="4 4"/>
+<text x="500.0" y="318.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="middle">50% dos válidos</text>
+<text x="500.0" y="350.0" font-size="15" font-weight="700" fill="#0B3A5B" text-anchor="middle">Diferença: 4.430.191 votos (3,57 pontos percentuais dos 124.082.273 válidos)</text>
+<rect x="32.0" y="368.0" width="222.0" height="100.0" rx="12" fill="#F2F6F9"/>
+<rect x="32.0" y="368.0" width="5.0" height="100.0" rx="2.5" fill="#0B3A5B"/>
+<text x="52.0" y="408.0" font-size="24" font-weight="800" fill="#0B3A5B" text-anchor="start">128.236.074</text>
+<text x="52.0" y="434.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">comparecimento</text>
+<text x="52.0" y="455.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">80,78% do eleitorado</text>
+<rect x="267.0" y="368.0" width="222.0" height="100.0" rx="12" fill="#F2F6F9"/>
+<rect x="267.0" y="368.0" width="5.0" height="100.0" rx="2.5" fill="#9FB8CB"/>
+<text x="287.0" y="408.0" font-size="24" font-weight="800" fill="#0B3A5B" text-anchor="start">30.509.005</text>
+<text x="287.0" y="434.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">abstenção</text>
+<text x="287.0" y="455.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">19,22% do eleitorado</text>
+<rect x="502.0" y="368.0" width="222.0" height="100.0" rx="12" fill="#F2F6F9"/>
+<rect x="502.0" y="368.0" width="5.0" height="100.0" rx="2.5" fill="#56B4E9"/>
+<text x="522.0" y="408.0" font-size="24" font-weight="800" fill="#0B3A5B" text-anchor="start">1.430.496</text>
+<text x="522.0" y="434.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">votos brancos</text>
+<text x="522.0" y="455.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">1,12% dos votos</text>
+<rect x="737.0" y="368.0" width="222.0" height="100.0" rx="12" fill="#F2F6F9"/>
+<rect x="737.0" y="368.0" width="5.0" height="100.0" rx="2.5" fill="#4F6B80"/>
+<text x="757.0" y="408.0" font-size="24" font-weight="800" fill="#0B3A5B" text-anchor="start">2.723.305</text>
+<text x="757.0" y="434.0" font-size="14" font-weight="700" fill="#0B3A5B" text-anchor="start">votos nulos</text>
+<text x="757.0" y="455.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="start">2,12% dos votos</text>
+<line x1="32" y1="494" x2="968" y2="494" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="518.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: TSE, resultados oficiais do 2º turno de 2026</text>
+<text x="968.0" y="518.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>
