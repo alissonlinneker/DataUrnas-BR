@@ -1,0 +1,39 @@
+{
+  "pacote_last_modified": {
+    "AC": "Mon, 26 Oct 2026 19:56:12 GMT",
+    "AL": "Mon, 26 Oct 2026 19:58:35 GMT",
+    "AM": "Mon, 26 Oct 2026 21:10:41 GMT",
+    "AP": "Mon, 26 Oct 2026 20:01:26 GMT",
+    "BA": "Mon, 26 Oct 2026 20:11:24 GMT",
+    "CE": "Mon, 26 Oct 2026 21:19:34 GMT",
+    "DF": "Mon, 26 Oct 2026 21:21:22 GMT",
+    "ES": "Mon, 26 Oct 2026 20:20:14 GMT",
+    "GO": "Mon, 26 Oct 2026 20:23:58 GMT",
+    "MA": "Mon, 26 Oct 2026 20:29:50 GMT",
+    "MG": "Mon, 26 Oct 2026 20:46:16 GMT",
+    "MS": "Mon, 26 Oct 2026 20:48:04 GMT",
+    "MT": "Mon, 26 Oct 2026 20:50:26 GMT",
+    "PA": "Mon, 26 Oct 2026 20:55:18 GMT",
+    "PB": "Mon, 26 Oct 2026 20:58:35 GMT",
+    "PE": "Mon, 26 Oct 2026 21:05:03 GMT",
+    "PI": "Mon, 26 Oct 2026 21:24:07 GMT",
+    "PR": "Mon, 26 Oct 2026 21:31:02 GMT",
+    "RJ": "Mon, 26 Oct 2026 20:57:15 GMT",
+    "RN": "Mon, 26 Oct 2026 18:19:28 GMT",
+    "RO": "Mon, 26 Oct 2026 18:24:31 GMT",
+    "RR": "Mon, 26 Oct 2026 18:26:09 GMT",
+    "RS": "Mon, 26 Oct 2026 18:55:48 GMT",
+    "SC": "Mon, 26 Oct 2026 19:14:49 GMT",
+    "SE": "Mon, 26 Oct 2026 18:03:16 GMT",
+    "SP": "Mon, 26 Oct 2026 19:32:38 GMT",
+    "TO": "Mon, 26 Oct 2026 18:08:00 GMT",
+    "ZZ": "Mon, 26 Oct 2026 18:09:31 GMT"
+  },
+  "membros": 998356,
+  "por_tipo_classe": {
+    "bu:igual_ultima": 499178,
+    "vota:igual_ultima": 499178
+  },
+  "nomes_guardados_fora_do_pacote": 0,
+  "diferentes": []
+}

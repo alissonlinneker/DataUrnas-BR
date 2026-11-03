@@ -266,6 +266,27 @@ python3 scripts/ele2026/linha_tempo_t2.py \
 
 A execução leu 675.765 versões de aux.json e 501.454 de BU e levou cerca de 4 minutos. As colunas `m_emissao_apos_totalizacao`, `emissao_menos_totalizacao_s` e o arquivo `curva_emissao_totalizacao.parquet` foram acrescentados ao script nesta versão.
 
+## 6. Pacote oficial do 2º turno e reconferência de 03/11/2026
+
+### 6.1 Pacote oficial x arquivos guardados na apuração
+
+O TSE publicou em 26/10/2026, entre 18:03 e 21:31 GMT (cabeçalho `Last-Modified`), um zip por UF com todos os arquivos das seções (`bu_imgbu_logjez_rdv_vscmr_2026_2t_<UF>.zip`). Em 03/11/2026, `scripts/ele2026/confronto_pacote_t2.py` leu só o diretório central de cada zip, por requisições HTTP Range (sem baixar os pacotes inteiros). Depois comparou o CRC-32 e o tamanho de cada `-bu.dat` e `-vota.vsc` com todas as versões guardadas pelos coletores durante a apuração.
+
+| Tipo | Arquivos no pacote | Igual à última versão guardada | Igual a versão anterior | Diferente | Sem versão guardada |
+|---|---|---|---|---|---|
+| BU (`-bu.dat`) | 499.178 | 499.178 | 0 | 0 | 0 |
+| Assinatura (`-vota.vsc`) | 499.178 | 499.178 | 0 | 0 | 0 |
+
+Nenhum arquivo guardado pelos coletores ficou fora do pacote. **O pacote oficial é idêntico ao que foi publicado na noite da eleição.** O resumo está em `data/parquet/2026/t2/pacote_oficial_resumo.json`.
+
+### 6.2 Totais divulgados
+
+Os coletores voltaram a baixar o resultado do Brasil, das 27 UFs, do exterior e dos municípios em 03/11/2026. O último arquivo continua sendo o de 25/10/2026, 23:27:02: 499.248 seções, 128.236.074 votos, 13 com 64.256.232 e 22 com 59.826.041. Nenhuma versão nova apareceu depois da noite da eleição, nem nos 2.072 municípios do coletor do servidor.
+
+### 6.3 Reconferência dos arquivos por seção
+
+Uma volta completa das 499.207 seções começou em 03/11/2026, com a conferência por HEAD (ETag = MD5) de todos os arquivos guardados. Ela roda nos mesmos dois coletores e nas mesmas faixas de UF de 25/10 a 27/10. O resultado será acrescentado aqui ao terminar.
+
 ## Limitações
 
 - **Bloqueio do TSE e TREs:** todas as páginas de `tse.jus.br` e `tre-*.jus.br` responderam 403. Os conteúdos marcados "não lido" vêm de trechos de buscador ou de reportagens e podem estar incompletos ou desatualizados. Só foram lidas na íntegra as páginas do TSE com cópia no Internet Archive: hashes de 2026 [30], índice de hashes [31], lacração [33], teste de integridade [4], códigos-fonte [48] e relatórios de 2022 [24].

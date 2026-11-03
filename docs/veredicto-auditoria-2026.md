@@ -35,8 +35,11 @@ Foram encontrados pontos de transparência e de registro que pedem esclareciment
 | 17 | Lista oficial de hashes lacrados x programas verificados nos logs | 32 listas; 6.732 logs | Todos os programas de inicialização estão na lista; divergências de nome e versão (ver pendências) | `docs/hash-software-urna-2026.md` |
 | 18 | Assinatura JWS dos resultados divulgados x soma dos BUs | 5.786 arquivos por turno (Brasil, 28 UFs, 5.757 municípios), dois turnos | 11.572 assinaturas válidas, 0 inválidas; payload idêntico ao `.json`; 0 divergências com a soma dos BUs | `docs/jws-totalizacao-2026.md` |
 | 19 | Alegações externas (vídeo sobre "virada única" e "vales igualmente espaçados") | 2022 e 2026 | Explicadas pela ordem geográfica de chegada; ordem aleatória não produz o padrão alegado | `docs/ordem-de-envio-viradas-2022-2026.md` |
+| 20 | Pacote oficial do 2º turno (zips por UF de 26/10) x BUs e assinaturas guardados na noite da eleição; totais de novo em 03/11 | 998.356 arquivos; Brasil, UFs e municípios | 998.356 idênticos à última versão guardada; nenhum total novo depois de 25/10 23:27:02 | `docs/verificacoes-externas-2turno-2026.md` |
 
 ## O que não pode ser verificado com dados públicos
+
+A explicação completa (quem garante o quê, quais assinaturas existem, o que é impossível sem código-fonte e compilação reproduzível, e alertas) está em `docs/cadeia-de-confianca-2026.md`.
 
 1. **Qual software rodou em cada urna.** O `.vsc` assina só os arquivos de resultado; o log registra o nome de cada pacote verificado e "SUCESSO", nunca o hash; a assinatura de software (chave SEVIN, algoritmo CEPESC) não é verificável fora do TSE. A ligação entre a urna e a lista lacrada existe só nas verificações por amostragem (AVPART/VPP na preparação e Teste de Autenticidade no dia), cujos relatórios ficam em ata e não são publicados.
 2. **Adulteração idêntica em todas as urnas.** Os testes comparativos (modelo, troca, região, 2022) não detectam uma alteração aplicada igualmente a todas as urnas, porque ela não deixa diferença entre grupos. A proteção contra isso é o Teste de Integridade (votação paralela), cujo relatório do 2º turno só sai até cerca de 24/11 (TREs) e 23/01/2027 (TSE).
