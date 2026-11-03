@@ -76,11 +76,11 @@
 <rect x="580.4" y="312.7" width="46.0" height="31.0" rx="6" fill="#FFFFFF" fill-opacity="0.92"/>
 <text x="584.4" y="325.7" font-size="12" font-weight="700" fill="#0B3A5B" text-anchor="start">AL</text>
 <text x="584.4" y="338.7" font-size="10.5" font-weight="400" fill="#4F6B80" text-anchor="start">54,7%</text>
-<line x1="523.6" y1="320.4" x2="561.8" y2="349.1" stroke="#4F6B80" stroke-width="1"/>
+<line x1="523.6" y1="320.4" x2="561.8" y2="353.2" stroke="#4F6B80" stroke-width="1"/>
 <circle cx="523.6" cy="320.4" r="2" fill="#0B3A5B"/>
-<rect x="561.8" y="338.1" width="46.0" height="31.0" rx="6" fill="#FFFFFF" fill-opacity="0.92"/>
-<text x="565.8" y="351.1" font-size="12" font-weight="700" fill="#0B3A5B" text-anchor="start">SE</text>
-<text x="565.8" y="364.1" font-size="10.5" font-weight="400" fill="#4F6B80" text-anchor="start">62,7%</text>
+<rect x="561.8" y="342.2" width="46.0" height="31.0" rx="6" fill="#FFFFFF" fill-opacity="0.92"/>
+<text x="565.8" y="355.2" font-size="12" font-weight="700" fill="#0B3A5B" text-anchor="start">SE</text>
+<text x="565.8" y="368.2" font-size="10.5" font-weight="400" fill="#4F6B80" text-anchor="start">62,7%</text>
 <text x="467.4" y="345.2" font-size="12" font-weight="700" fill="#0B3A5B" text-anchor="middle">BA</text>
 <text x="467.4" y="358.2" font-size="10.5" font-weight="400" fill="#0B3A5B" text-anchor="middle">66,2%</text>
 <text x="433.8" y="443.0" font-size="12" font-weight="700" fill="#0B3A5B" text-anchor="middle">MG</text>

@@ -1,0 +1,70 @@
+{
+  "eleicao": "6258",
+  "pleito": "3221",
+  "ciclo": "ele2026",
+  "cargo": "Presidente",
+  "turno": 2,
+  "data_eleicao": "25/10/2026",
+  "data_geracao_tse": "25/10/2026 23:27:02",
+  "totais": {
+    "secoes_total": 499248,
+    "secoes_totalizadas": 499248,
+    "secoes_nao_totalizadas": 0,
+    "secoes_instaladas": 499207,
+    "secoes_nao_instaladas": 41,
+    "eleitorado": 158745502,
+    "eleitorado_secoes_totalizadas": 158745502,
+    "comparecimento": 128236074,
+    "abstencao": 30509005,
+    "pct_comparecimento": 80.781133379,
+    "pct_abstencao": 19.218866621,
+    "votos_total": 128236074,
+    "votos_validos": 124082273,
+    "votos_nominais": 124082273,
+    "votos_legenda": 0,
+    "votos_brancos": 1430496,
+    "votos_nulos": 2723305,
+    "votos_nulos_tecnicos": 0,
+    "votos_nulos_total": 2723305,
+    "votos_anulados_apuracao_separada": 0,
+    "pct_brancos": 1.115517619,
+    "pct_nulos": 2.123665296,
+    "data_totalizacao": "25/10/2026",
+    "hora_totalizacao": "23:26:38"
+  },
+  "candidatos": [
+    {
+      "numero": 13,
+      "nome_urna": "LULA",
+      "partido_sigla": "PT",
+      "votos": 64256232,
+      "pct_validos": 51.785182884,
+      "situacao": "Eleito"
+    },
+    {
+      "numero": 22,
+      "nome_urna": "FLAVIO BOLSONARO",
+      "partido_sigla": "PL",
+      "votos": 59826041,
+      "pct_validos": 48.214817116,
+      "situacao": "Não eleito"
+    }
+  ],
+  "n_ufs": 28,
+  "n_municipios": 5757,
+  "municipios_faltando": [],
+  "checagem": {
+    "soma_uf_votos_validos": 124082273,
+    "soma_mun_votos_validos": 124082273,
+    "br_votos_validos": 124082273
+  },
+  "http": {
+    "ok": 5787,
+    "404": 0,
+    "429": 0,
+    "retry": 0,
+    "fail": 0,
+    "bytes": 18489974
+  },
+  "segundos": 44.4
+}

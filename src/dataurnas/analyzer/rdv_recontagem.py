@@ -252,6 +252,17 @@ def _hms(s: Optional[int]) -> Optional[str]:
     return f"{s // 3600:02d}:{s % 3600 // 60:02d}:{s % 60:02d}"
 
 
+def _hms_dia(s: Optional[int]) -> Optional[str]:
+    """Como _hms, mas marca a virada do dia: '00:30:00 (+1d)' ou '23:30:00 (-1d)'."""
+    if s is None:
+        return None
+    if s >= 86400:
+        return f"{_hms(s - 86400)} (+1d)"
+    if s < 0:
+        return f"{_hms(s + 86400)} (-1d)"
+    return _hms(s)
+
+
 def _faixa(d: int) -> int:
     for i, lim in enumerate(FAIXAS_INTERVALO):
         if d < lim:
@@ -260,7 +271,8 @@ def _faixa(d: int) -> int:
 
 
 def analisar_log_tempo(texto: str, uf: str, cd_mun, comparecimento: Optional[int],
-                       data_eleicao: str = "04/10/2026") -> dict:
+                       data_eleicao: str = "04/10/2026",
+                       datas_anteriores: tuple[str, ...] = ()) -> dict:
     """Métricas de horário dos votos de um log (hora local da urna).
 
     Abertura oficial: 8h de Brasília, que é 8h + offset na hora local
@@ -268,15 +280,26 @@ def analisar_log_tempo(texto: str, uf: str, cd_mun, comparecimento: Optional[int
     Eleitor na fila depois das 17h vota legalmente: o que se marca é voto
     computado depois do "Inicio do Encerramento" da mesma urna, sem nova
     "Urna pronta para receber votos" no meio.
+
+    datas_anteriores: datas (DD/MM/AAAA) de turnos anteriores. O log do 2º
+    turno acumula o do 1º; votos dessas datas vão para votos_turno_anterior
+    e não contam como voto de outra data. Sem datas, votos_turno_anterior
+    fica nulo (1º turno).
+
+    votos_log_apos_17h_brasilia e ultimo_voto_brasilia convertem a hora local
+    para Brasília pelo fuso do município (hora de Brasília = hora local -
+    offset). No exterior (zz) ficam nulos: a urna segue o horário do país.
     """
     offset = get_tz_offset(uf, cd_mun)
-    if (uf or "").lower() == "zz":
+    exterior = (uf or "").lower() == "zz"
+    if exterior:
         offset = 0  # exterior: urna no horário local do país, 8h às 17h locais
     abertura_oficial = (8 + offset) * 3600
     fim_oficial = (17 + offset) * 3600
 
     votos: list[tuple[int, str]] = []     # (segundos, id_urna) na ordem do arquivo
     outras_datas = 0
+    turno_anterior = 0
     fora_seq = 0
     antes_pronta = 0
     apos_enc = 0
@@ -309,7 +332,10 @@ def analisar_log_tempo(texto: str, uf: str, cd_mun, comparecimento: Optional[int
         if EVENTO_VOTO not in desc:
             continue
         if data != data_eleicao:
-            outras_datas += 1
+            if data in datas_anteriores:
+                turno_anterior += 1
+            else:
+                outras_datas += 1
             continue
         st = estado.get(p[2], "fechada")
         if st != "aberta":
@@ -340,12 +366,14 @@ def analisar_log_tempo(texto: str, uf: str, cd_mun, comparecimento: Optional[int
     intervalos_ord = sorted(intervalos)
     mediana = intervalos_ord[len(intervalos_ord) // 2] if intervalos_ord else None
     max_min = por_minuto.most_common(1)[0] if por_minuto else (None, 0)
+    ts_bsb = [] if exterior else [t - offset * 3600 for t in ts]
     r = {
         "fuso_offset": offset,
         "comparecimento_bu": comparecimento,
         "votos_log": n,
         "diferenca_log_bu": (n - comparecimento) if comparecimento is not None else None,
         "votos_outras_datas": outras_datas,
+        "votos_turno_anterior": turno_anterior if datas_anteriores else None,
         "n_urnas_log": len(urnas_voto),
         "aberturas": len(prontas),
         "hora_pronta": _hms(min(prontas)) if prontas else None,
@@ -367,6 +395,9 @@ def analisar_log_tempo(texto: str, uf: str, cd_mun, comparecimento: Optional[int
         "inversoes_relogio": inversoes,
         "ajustes_hora": ajustes_hora,
         "hist_intervalos": hist,
+        "votos_log_apos_17h_brasilia": None if exterior else
+        sum(1 for t in ts_bsb if t >= 17 * 3600),
+        "ultimo_voto_brasilia": _hms_dia(max(ts_bsb)) if ts_bsb else None,
     }
     flags = []
     if comparecimento is not None and n != comparecimento:
@@ -396,7 +427,8 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
                     sha_catalogo: Optional[dict[str, str]] = None,
                     pleito: Optional[int] = None,
                     data_eleicao: str = "04/10/2026", auditar: bool = False,
-                    modelo_cod: Optional[int] = None) -> dict:
+                    modelo_cod: Optional[int] = None, turno: int = 1,
+                    datas_anteriores: tuple[str, ...] = ()) -> dict:
     """Recontagem e linha do tempo de uma seção.
 
     arquivos: tipo -> (nome, bytes) com 'rdv', 'bu' (ou 'busa') e 'log'
@@ -406,6 +438,9 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
     (integrity.analisar_secao_2026, mesmas regras da auditoria publicada) e
     devolve "secao_log" e "issues"; modelo_cod é o código do modelo da urna
     (20 para UE2020), que vem do .vsc na auditoria de integridade.
+    turno: prefixo do secao_id da auditoria ('1T/' ou '2T/'); o log da
+    auditoria é filtrado por data_eleicao. datas_anteriores: ver
+    analisar_log_tempo (no 2º turno, a data do 1º).
     """
     from ..parsers.bu import BUParser
 
@@ -431,7 +466,7 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
         try:
             auditoria = analisar_secao_2026(
                 ident, {"arquivos": [(tp, nm, b) for tp, (nm, b) in arquivos.items()]},
-                modelo_cod)
+                modelo_cod, turno=turno, data=data_eleicao)
             bu = auditoria.pop("bu_obj", None)
         except Exception as e:  # noqa: BLE001 - registrado como motivo da seção
             sec["motivo"] = f"auditoria BU/log falhou: {e!r}"[:200]
@@ -495,9 +530,11 @@ def processar_secao(ident: dict, arquivos: dict[str, tuple[str, bytes]],
             tipo_log = "logsa" if sa else tipo_log
             tempo = {**ident, "origem_log": tipo_log,
                      **analisar_log_tempo(txt, ident["uf"], ident["cd_mun"],
-                                          None if sa else comp, data_eleicao)}
+                                          None if sa else comp, data_eleicao,
+                                          datas_anteriores)}
             if sa:
-                tempo.update(comparecimento_bu=comp, votos_log=None)
+                tempo.update(comparecimento_bu=comp, votos_log=None,
+                             votos_log_apos_17h_brasilia=None)
             for f in tempo["flags"]:
                 if CATEGORIAS[f] <= GRUPO_2:
                     det = {k: tempo[k] for k in ("votos_log", "comparecimento_bu",

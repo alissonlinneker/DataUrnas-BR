@@ -14,6 +14,11 @@ unidos e deduplicados (fica o lote mais recente de cada seção), e arquivos
 ilegíveis (ex.: um lote sendo gravado) são ignorados.
 
 Nada aqui depende do Streamlit: o cache fica na camada de página.
+
+2nd round files live in ``data/parquet/2026/t2`` with the same official-result
+schema (read them with ``base=base_dir(2)``), plus ``secoes_t2.parquet`` (one
+row per section with its BU totals), ``rdv_nacional_resumo.json`` (national RDV
+recount) and ``veredicto_2026.json`` (the audit verdict shown by the dashboard).
 """
 
 from __future__ import annotations
@@ -46,8 +51,12 @@ UF_NOMES = {
 BENFORD_1 = {d: math.log10(1 + 1 / d) for d in range(1, 10)}
 
 
-def base_dir() -> Path:
-    return Path(PARQUET_2026_DIR)
+TURNO_SUBDIR = {1: "", 2: "t2"}
+
+
+def base_dir(turno: int = 1) -> Path:
+    """Directory with the official results of a round (1st round at the root, 2nd in ``t2/``)."""
+    return Path(PARQUET_2026_DIR) / TURNO_SUBDIR[turno]
 
 
 def _sql_list(paths: list[Path]) -> str:
@@ -85,11 +94,7 @@ def files_signature(base: Path | None = None) -> tuple:
 # Resultado oficial
 # ----------------------------------------------------------------------
 def load_resumo(base: Path | None = None) -> dict:
-    path = (base or base_dir()) / "resumo_br.json"
-    if not path.exists():
-        return {}
-    with path.open(encoding="utf-8") as fh:
-        return json.load(fh)
+    return load_json("resumo_br.json", base)
 
 
 # Prenomes que o TSE publica sem acento e cuja grafia é inequívoca
@@ -397,3 +402,129 @@ def compare_2022_2026(res_uf: pd.DataFrame, t1_2022: pd.DataFrame) -> pd.DataFra
     out["eleitorado_var_pct"] = (out["eleitorado"] / out["eleitorado_2022"] - 1) * 100
     out["nome"] = out["uf"].map(UF_NOMES)
     return out
+
+
+# ----------------------------------------------------------------------
+# 2nd round: comparison with the 1st round, BU sums and audit verdict
+# ----------------------------------------------------------------------
+def load_json(name: str, base: Path | None = None) -> dict:
+    """Read a JSON file from the 2026 data directory; empty dict when it does not exist."""
+    path = (base or base_dir()) / name
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def compare_turnos_by_uf(res_t1: pd.DataFrame, res_t2: pd.DataFrame, numeros: list[int]) -> pd.DataFrame:
+    """Per-state share of each runoff candidate and turnout in both rounds, with the change in p.p.
+
+    Shares are over valid votes of each round, so the 1st round share of a
+    candidate ignores the votes that went to the eliminated candidates.
+    """
+    if res_t1.empty or res_t2.empty:
+        return pd.DataFrame()
+
+    def _shares(df: pd.DataFrame, sufixo: str) -> pd.DataFrame:
+        validos = df["votos_validos"].where(df["votos_validos"] > 0)
+        out = pd.DataFrame({"uf": df["uf"]})
+        out[f"comparecimento_pct_{sufixo}"] = df["comparecimento"] / df["eleitorado"].where(df["eleitorado"] > 0) * 100
+        out[f"comparecimento_{sufixo}"] = df["comparecimento"]
+        for n in numeros:
+            col = f"v_{n}"
+            out[f"pct_{n}_{sufixo}"] = (df[col] / validos * 100) if col in df.columns else float("nan")
+        return out
+
+    out = _shares(res_t1, "t1").merge(_shares(res_t2, "t2"), on="uf", how="inner")
+    out["comparecimento_var_pp"] = out["comparecimento_pct_t2"] - out["comparecimento_pct_t1"]
+    for n in numeros:
+        out[f"pct_{n}_var_pp"] = out[f"pct_{n}_t2"] - out[f"pct_{n}_t1"]
+    out["nome"] = out["uf"].map(UF_NOMES)
+    return out.sort_values("uf").reset_index(drop=True)
+
+
+def soma_bus_por_uf(path: Path) -> pd.DataFrame:
+    """Sum the per-section BU totals of the 2nd round (``secoes_t2.parquet``) by state."""
+    if not path.exists():
+        return pd.DataFrame()
+    con = duckdb.connect()
+    try:
+        return con.execute(
+            """
+            SELECT uf, COUNT(*) AS secoes_bu, SUM(comparecimento) AS comparecimento,
+                   SUM(v13) AS v_13, SUM(v22) AS v_22, SUM(brancos) AS votos_brancos,
+                   SUM(nulos) AS votos_nulos
+            FROM read_parquet(?) GROUP BY uf ORDER BY uf
+            """,
+            [str(path)],
+        ).fetchdf()
+    finally:
+        con.close()
+
+
+ITENS_CONFERENCIA_T2 = {
+    "secoes_bu": ("Seções com BU", "secoes_instaladas"),
+    "comparecimento": ("Comparecimento", "comparecimento"),
+    "v_13": ("Candidato 13", "v_13"),
+    "v_22": ("Candidato 22", "v_22"),
+    "votos_brancos": ("Brancos", "votos_brancos"),
+    "votos_nulos": ("Nulos", "votos_nulos_total"),
+}
+
+
+def reconcile_bus_t2(soma: pd.DataFrame, res_uf: pd.DataFrame) -> pd.DataFrame:
+    """One row per state and item: BU sum, official value, difference and whether it matches exactly."""
+    if soma.empty or res_uf.empty:
+        return pd.DataFrame()
+    oficial = res_uf.set_index("uf")
+    linhas = []
+    for _, row in soma.iterrows():
+        if row["uf"] not in oficial.index:
+            continue
+        of = oficial.loc[row["uf"]]
+        for col_bu, (item, col_of) in ITENS_CONFERENCIA_T2.items():
+            soma_bu, ref = int(row[col_bu]), int(of.get(col_of, 0) or 0)
+            linhas.append({"uf": row["uf"], "item": item, "soma_bu": soma_bu, "oficial": ref,
+                           "diferenca": soma_bu - ref, "confere": soma_bu == ref})
+    return pd.DataFrame(linhas)
+
+
+def load_veredicto(base: Path | None = None) -> dict:
+    """Audit verdict (``veredicto_2026.json``, kept with the 2nd round data)."""
+    return load_json("veredicto_2026.json", base or base_dir(2))
+
+
+def load_rdv_resumo(base: Path | None = None) -> dict:
+    """National RDV x BU recount of the 2nd round (``rdv_nacional_resumo.json``)."""
+    return load_json("rdv_nacional_resumo.json", base or base_dir(2))
+
+
+SITUACAO_VERIFICACAO = {
+    "confere": "Sem anomalia",
+    "ressalva": "Contagem confere; pendência de registro",
+}
+
+
+def verificacoes_df(veredicto: dict) -> pd.DataFrame:
+    """Table of the audit checks with a readable status label, ordered by check number."""
+    df = pd.DataFrame(veredicto.get("verificacoes", []))
+    if df.empty:
+        return df
+    df["situacao_label"] = df["situacao"].map(SITUACAO_VERIFICACAO).fillna(df["situacao"])
+    return df.sort_values("n").reset_index(drop=True)
+
+
+RDV_ITENS = {
+    "13": "Candidato 13", "22": "Candidato 22", "brancos": "Brancos", "nulos": "Nulos",
+    "outros_nominais": "Outros nominais", "legenda": "Legenda", "presidente_total": "Total (Presidente)",
+}
+
+
+def rdv_totais_df(rdv: dict) -> pd.DataFrame:
+    """National RDV recount totals against the BU totals, one row per item."""
+    linhas = [
+        {"item": RDV_ITENS.get(chave, chave), "rdv": int(v["rdv"]), "bu": int(v["bu"]),
+         "diferenca": int(v["rdv"]) - int(v["bu"]), "confere": int(v["rdv"]) == int(v["bu"])}
+        for chave, v in rdv.get("totais", {}).items()
+    ]
+    return pd.DataFrame(linhas)

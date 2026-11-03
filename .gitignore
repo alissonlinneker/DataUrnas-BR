@@ -98,3 +98,46 @@ data/parquet/2026/rdv/erros-*.txt
 data/parquet/2026/rdv/execucoes.jsonl
 data/parquet/2026/rdv/*.tmp
 data/parquet/2026/auditoria_v2/*.tmp
+
+# Versões do 2º turno de 2026 (BU, aux.json e totais brutos)
+data/versoes/
+
+# Análise de encerramento do 2º turno de 2026 (derivado dos BUs)
+data/parquet/2026/t2/encerramento/
+
+# Software e carga das urnas no 2º turno de 2026 (derivado dos BUs)
+data/parquet/2026/t2/software/
+
+# Linha do tempo e consistência dos totais do 2º turno de 2026 (derivado)
+data/parquet/2026/t2/linha_tempo/
+
+# Impacto da prorrogação no 2º turno de 2026 (derivado; contagens de log)
+data/parquet/2026/t2/impacto/
+
+# Auditoria de certificados e assinaturas do 2º turno (2026)
+data/parquet/2026/t2/certificados/
+
+# Viradas de liderança entre turnos (2026 x 2022, derivado)
+data/parquet/2026/t2/viradas/
+data/parquet/2026/t2/ordem_envio/
+
+# Biometria 1º x 2º turno de 2026 (derivado do BU e de amostra de logs)
+data/parquet/2026/t2/biometria/
+
+# Emissão tardia do BU no 2º turno e BH 0039/0168 (derivado dos logs)
+data/parquet/2026/t2/emissao_tardia/
+
+# Forense estatística por seção, 2026 com 2022 de controle (derivado)
+data/parquet/2026/t2/forense/
+
+# Efeito do equipamento (modelo, troca e reserva de urna) no voto, 2026
+data/parquet/2026/t2/efeito_urna/
+
+# Conferência RDV x BU x log e padrões de votação no log, 2026
+data/parquet/2026/t2/rdv_log/
+
+# National RDV recount of the 2nd round, 2026
+data/parquet/2026/t2/rdv_nacional/
+
+# Confronto dos produtos de dados abertos do TSE com os BUs, 2026
+data/parquet/2026/t2/dados_abertos/

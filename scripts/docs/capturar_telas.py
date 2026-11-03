@@ -8,7 +8,10 @@ precisa do pacote ``playwright`` em Python.
 
 Telas geradas:
 
-- ``2026-desktop.png`` (1440x900): página inicial, resultado de 2026.
+- ``2026-t2-desktop.png`` (1440x900): página inicial, 2º turno de 2026.
+- ``2026-t2-mobile.png`` (390x844): a mesma página em tela de celular.
+- ``2026-veredicto.png`` (1440x900): veredicto da auditoria de 2026.
+- ``2026-desktop.png`` (1440x900): 1º turno de 2026.
 - ``2026-mobile.png`` (390x844): a mesma página em tela de celular.
 - ``2022-veredicto.png`` (1440x900): veredicto da auditoria de 2022.
 - ``2022-benford.png`` (1440x900): Lei de Benford, 2022.
@@ -55,9 +58,6 @@ LIMITE_BYTES = 400 * 1024
 FLAGS_CHROME = [
     "--headless",
     "--mute-audio",
-    "--use-angle=metal",
-    "--enable-gpu",
-    "--ignore-gpu-blocklist",
     "--hide-scrollbars",
     "--no-first-run",
     "--no-default-browser-check",
@@ -65,6 +65,16 @@ FLAGS_CHROME = [
     "--disable-background-networking",
     "--lang=pt-BR",
 ]
+# GPU flags only make sense on macOS (Metal); on the Linux render node the
+# headless shell uses software rendering and /dev/shm may be small. The node
+# disables unprivileged user namespaces, so the sandbox is off there (as
+# Playwright does by default on Linux); it only loads the local dashboard.
+if sys.platform == "darwin":
+    FLAGS_CHROME += ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist"]
+else:
+    # Without hinting=none, Linux headless renders uneven letter spacing.
+    FLAGS_CHROME += ["--disable-gpu", "--disable-dev-shm-usage", "--no-sandbox",
+                     "--font-render-hinting=none"]
 
 
 @dataclass(frozen=True)
@@ -79,9 +89,13 @@ class Tela:
 
 
 TELAS = [
-    # A página de 2026 é a padrão do st.navigation e responde na raiz
-    Tela("2026-desktop", "/", 1440, 900),
-    Tela("2026-mobile", "/", 390, 844, movel=True),
+    # The 2nd round page is the st.navigation default; explicit url_paths keep
+    # each capture pinned to its page even if the default changes again.
+    Tela("2026-t2-desktop", "/eleicoes-2026-2turno", 1440, 900),
+    Tela("2026-t2-mobile", "/eleicoes-2026-2turno", 390, 844, movel=True),
+    Tela("2026-veredicto", "/veredicto-2026", 1440, 900),
+    Tela("2026-desktop", "/eleicoes-2026", 1440, 900),
+    Tela("2026-mobile", "/eleicoes-2026", 390, 844, movel=True),
     Tela("2022-veredicto", "/veredicto", 1440, 900),
     Tela("2022-benford", "/benford", 1440, 900),
 ]

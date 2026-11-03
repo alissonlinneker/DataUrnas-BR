@@ -541,6 +541,13 @@ class HttpFetcher:
 
     async def get(self, url: str) -> Optional[bytes]:
         """Retorna o corpo, None em 404, levanta exceção após esgotar tentativas."""
+        return await self._request("GET", url)
+
+    async def head(self, url: str) -> Optional[dict]:
+        """Retorna os cabeçalhos (chaves em minúsculas), None em 404."""
+        return await self._request("HEAD", url)
+
+    async def _request(self, method: str, url: str):
         last: Optional[BaseException] = None
         for attempt in range(self.retries):
             pause = 0.0
@@ -548,7 +555,7 @@ class HttpFetcher:
                 if self.limiter:
                     await self.limiter.acquire()
                 async with self.sem:
-                    r = await self._next_client().get(url)
+                    r = await self._next_client().request(method, url)
                 if r.status_code == 404:
                     self.stats["404"] += 1
                     return None
@@ -566,6 +573,8 @@ class HttpFetcher:
                 self.stats["bytes"] += len(r.content)
                 if self.limiter:
                     self.limiter.success()
+                if method == "HEAD":
+                    return {k.lower(): v for k, v in r.headers.items()}
                 return r.content
             except (self._httpx.HTTPError, OSError) as e:
                 last = e

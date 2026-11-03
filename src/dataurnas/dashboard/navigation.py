@@ -15,6 +15,7 @@ from dataurnas.dashboard.pages import (
     benford,
     biometria,
     eleicoes_2026,
+    eleicoes_2026_t2,
     estados,
     explorador,
     geografia,
@@ -27,6 +28,7 @@ from dataurnas.dashboard.pages import (
     timing,
     turnos,
     veredicto,
+    veredicto_2026,
     votacao,
 )
 from dataurnas.dashboard.state import clear_caches, get_store
@@ -72,8 +74,12 @@ def _page(render_fn: Callable, titulo: str, slug: str, icon: str) -> st.Page:
 def build_navigation() -> dict[str, list]:
     return {
         "Eleições 2026": [
-            st.Page(eleicoes_2026.render, title="Presidente 1º turno", url_path="eleicoes-2026",
+            st.Page(eleicoes_2026_t2.render, title="Presidente 2º turno", url_path="eleicoes-2026-2turno",
                     icon=":material/how_to_vote:", default=True),
+            st.Page(eleicoes_2026.render, title="Presidente 1º turno", url_path="eleicoes-2026",
+                    icon=":material/ballot:"),
+            st.Page(veredicto_2026.render, title="Veredicto da auditoria 2026", url_path="veredicto-2026",
+                    icon=":material/gavel:"),
             st.Page(integridade_2026.render, title="Integridade dos arquivos (2026)", url_path="integridade-2026",
                     icon=":material/verified_user:"),
         ],
