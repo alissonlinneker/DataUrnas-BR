@@ -874,7 +874,7 @@ def integridade_t2() -> str:
 # ----------------------------------------------------------------------
 # g) Veredicto da auditoria (resumo de docs/veredicto-auditoria-2026.md)
 # ----------------------------------------------------------------------
-# Short labels for the 23 checks of the verdict table; keep in sync with the document.
+# Short labels for the 26 checks of the verdict table; keep in sync with the document.
 VERIFICADO = [
     ("Coleta versionada, 8 voltas de reconferência", "0 arquivos alterados ou removidos"),
     ("Assinatura digital de todos os arquivos", "5.487.289 válidas, 0 inválidas"),
@@ -899,6 +899,9 @@ VERIFICADO = [
     ("Imagem do BU e log x BU, pacote completo", "votos iguais nas 499.207 seções por turno"),
     ("Ordem e horário de chegada dos BUs", "nenhum sinal de injeção; segue a geografia"),
     ("Plausibilidade da virada", "chance perto de 50% pela margem do 1º turno"),
+    ("Zerésima em todas as urnas", "nenhum voto antes da zerésima em 998.354 logs"),
+    ("Coerência entre cargos no mesmo BU", "0 BUs com cargos incoerentes em 787.986"),
+    ("Últimas seções do 1º turno (PR, 07/10)", "já somadas em 05/10; 07/10 é reenvio"),
 ]
 NAO_VERIFICAVEL = [
     ("Qual software rodou em cada urna",
@@ -953,7 +956,7 @@ def veredicto() -> str:
                       "TSE; nenhum deles altera a contagem.", size=13, fill=INK))
     h = int(y + 40 + 76)
     titulo = "Veredicto da auditoria: eleição presidencial de 2026"
-    subt = "23 verificações sobre os arquivos públicos dos dois turnos; método e números em docs/"
+    subt = "26 verificações sobre os arquivos públicos dos dois turnos; método e números em docs/"
     desc = ("Infográfico do veredicto: nenhuma evidência de manipulação, de contagem errada ou de "
             "dado impossível nos arquivos públicos, em nenhum dos dois turnos. Verificado: "
             + "; ".join(f"{rot}: {res}" for rot, res in VERIFICADO)
