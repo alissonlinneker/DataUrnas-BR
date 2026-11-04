@@ -18,7 +18,7 @@ Atualizado em 03/11/2026.
 | Log eleitor a eleitor x BU, todas as seções | feito em 04/11 | votos no log = comparecimento em 499.167 seções (1º) e 499.171 (2º); 16 com log faltando ou sobrando no pacote, todas com RDV igual ao BU | `rdv-log-2026.md`, `pacote-nacional-imgbu-logs-2026.md` |
 | Liberações sem biometria, sequências rápidas de votos e votos na última hora, todas as seções | feito em 04/11 | nenhum intervalo abaixo de 10 s; 1 sequência rápida só sem biometria no Brasil (6 votos); sem relação com o voto | `biometria-1t-2t-2026.md`, `pacote-nacional-imgbu-logs-2026.md` |
 | Pacote oficial do 2º turno x arquivos publicados na noite | feito | 998.356 de 998.356 idênticos | `verificacoes-externas-2turno-2026.md`, seção 6 |
-| Reconferência periódica dos arquivos publicados (troca no mesmo endereço) | feito até 27/10; volta nova em andamento desde 03/11 | 0 alterações | idem |
+| Reconferência periódica dos arquivos publicados (troca no mesmo endereço) | feito até 27/10 e de novo em 03/11 | 0 alterações, 0 remoções, 0 BU com segunda versão em 989.290 arquivos conferidos | idem |
 | Coerência entre cargos no mesmo BU (Presidente x Governador no 2º turno; todos os cargos no 1º) | falta | o 2º turno só teve Presidente decodificado; conferir comparecimento e padrão de voto dividido | `auditoria-consistencia-bu-2026.md` |
 | Zerésima de cada urna (relatório de zero votos antes da abertura) | falta parcial | o log só registra que foi impressa; conferir horário e presença em todos os logs | `hash-software-urna-2026.md` |
 | `-hash.dat` e `-mr.ver` (assinados pela urna, não publicados) | depende do TSE | pedir publicação | `hash-software-urna-2026.md` |

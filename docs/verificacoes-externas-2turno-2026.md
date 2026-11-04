@@ -285,7 +285,20 @@ Os coletores voltaram a baixar o resultado do Brasil, das 27 UFs, do exterior e 
 
 ### 6.3 Reconferência dos arquivos por seção
 
-Uma volta completa das 499.207 seções começou em 03/11/2026, com a conferência por HEAD (ETag = MD5) de todos os arquivos guardados. Ela roda nos mesmos dois coletores e nas mesmas faixas de UF de 25/10 a 27/10. O resultado será acrescentado aqui ao terminar.
+Uma volta completa das 499.207 seções rodou em 03/11/2026, com a conferência por HEAD (ETag = MD5) de todos os arquivos guardados, nos mesmos dois coletores e nas mesmas faixas de UF de 25/10 a 27/10. A volta terminou às 17:54 num coletor e às 20:13 no outro.
+
+| | Coletor 1 | Coletor 2 | Total |
+|---|---:|---:|---:|
+| Arquivos conferidos por HEAD | 514.354 | 474.936 | 989.290 |
+| Arquivos alterados no mesmo endereço | 0 | 0 | 0 |
+| Arquivos removidos | 0 | 0 | 0 |
+| BU com segunda versão (alerta `bu_votos_diferentes` ou `bu_nova_versao_mesmos_votos`) | 0 | 0 | 0 |
+| Falhas HTTP definitivas | 0 | 0 | 0 |
+
+- **Nenhum alerta** foi registrado em nenhum dos dois coletores.
+- **Arquivos que um coletor ainda não tinha.** O coletor 1 baixou 868 BUs e 8.289 arquivos de assinatura (`vota.vsc`), todos da BA, que não estavam no estado dele. Eram seções cujo BU ou cuja assinatura ele não tinha conseguido guardar na noite da eleição: 7.421 seções tinham BU sem assinatura. Os 9.157 arquivos têm CRC-32 e tamanho idênticos aos do pacote oficial de 26/10.
+- **aux.json relidos.** Em 39.196 seções (37.631 e 1.565), o aux.json foi guardado de novo, porque o coletor não tinha a versão final ou ela mudou. Em todas elas, os arquivos já guardados foram reconferidos, sem nenhuma diferença.
+- **Totais.** Continuam iguais à versão de 25/10/2026 23:27:02 (13 = 64.256.232; 22 = 59.826.041; 499.248 de 499.248 seções).
 
 ## Limitações
 
