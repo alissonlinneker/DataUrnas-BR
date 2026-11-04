@@ -1,0 +1,198 @@
+{
+  "municipios": 5571,
+  "sem_populacao": 1,
+  "eleitorado_total": 157824642,
+  "pop_12_mais_2022_total": 171206952,
+  "municipios_eleitorado_acima_pop_12_mais": 2866,
+  "municipios_acima_em_2022": 3785,
+  "excesso_somado": 2436157,
+  "correlacao_razao_swing": -0.28,
+  "correlacao_razao_delta_comparecimento": -0.319,
+  "correlacao_dentro_uf_razao_swing": -0.236,
+  "correlacao_dentro_uf_razao_delta_comparecimento": -0.353,
+  "swing_acima_x_resto_pp": [
+    2.05,
+    3.15
+  ],
+  "por_faixa": [
+    {
+      "faixa_razao": "(0.0, 0.8]",
+      "municipios": 136,
+      "eleitorado": 5388712,
+      "swing_13_pp_ponderado": 3.32,
+      "delta_comparecimento_pp": 1.65
+    },
+    {
+      "faixa_razao": "(0.8, 0.9]",
+      "municipios": 887,
+      "eleitorado": 58524087,
+      "swing_13_pp_ponderado": 3.36,
+      "delta_comparecimento_pp": 2.07
+    },
+    {
+      "faixa_razao": "(0.9, 1.0]",
+      "municipios": 1681,
+      "eleitorado": 66200623,
+      "swing_13_pp_ponderado": 2.96,
+      "delta_comparecimento_pp": 2.05
+    },
+    {
+      "faixa_razao": "(1.0, 1.1]",
+      "municipios": 1327,
+      "eleitorado": 17195238,
+      "swing_13_pp_ponderado": 2.09,
+      "delta_comparecimento_pp": 1.28
+    },
+    {
+      "faixa_razao": "(1.1, 1.2]",
+      "municipios": 792,
+      "eleitorado": 6281529,
+      "swing_13_pp_ponderado": 1.9,
+      "delta_comparecimento_pp": 0.44
+    },
+    {
+      "faixa_razao": "(1.2, inf]",
+      "municipios": 747,
+      "eleitorado": 4234453,
+      "swing_13_pp_ponderado": 2.07,
+      "delta_comparecimento_pp": -0.83
+    }
+  ],
+  "maiores_razoes": [
+    {
+      "uf": "go",
+      "nome": "DAVINÓPOLIS",
+      "eleitorado_2026": 4145,
+      "eleitorado_2022": 3589.0,
+      "pop_12_mais": 1640,
+      "razao": 2.527,
+      "swing_13_pp": 2.403
+    },
+    {
+      "uf": "ap",
+      "nome": "ITAUBAL",
+      "eleitorado_2026": 8881,
+      "eleitorado_2022": 7331.0,
+      "pop_12_mais": 4069,
+      "razao": 2.183,
+      "swing_13_pp": 3.006
+    },
+    {
+      "uf": "go",
+      "nome": "ANHANGÜERA",
+      "eleitorado_2026": 1738,
+      "eleitorado_2022": 1229.0,
+      "pop_12_mais": 808,
+      "razao": 2.151,
+      "swing_13_pp": 2.438
+    },
+    {
+      "uf": "to",
+      "nome": "CHAPADA DE AREIA",
+      "eleitorado_2026": 2545,
+      "eleitorado_2022": 2195.0,
+      "pop_12_mais": 1224,
+      "razao": 2.079,
+      "swing_13_pp": 1.355
+    },
+    {
+      "uf": "rn",
+      "nome": "TIBAU",
+      "eleitorado_2026": 9238,
+      "eleitorado_2022": 6609.0,
+      "pop_12_mais": 4605,
+      "razao": 2.006,
+      "swing_13_pp": 4.175
+    },
+    {
+      "uf": "go",
+      "nome": "PILAR DE GOIÁS",
+      "eleitorado_2026": 3938,
+      "eleitorado_2022": 3659.0,
+      "pop_12_mais": 1998,
+      "razao": 1.971,
+      "swing_13_pp": 3.053
+    },
+    {
+      "uf": "pi",
+      "nome": "NOVO SANTO ANTÔNIO",
+      "eleitorado_2026": 4732,
+      "eleitorado_2022": 4341.0,
+      "pop_12_mais": 2417,
+      "razao": 1.958,
+      "swing_13_pp": 0.566
+    },
+    {
+      "uf": "ap",
+      "nome": "CUTIAS",
+      "eleitorado_2026": 6300,
+      "eleitorado_2022": 5033.0,
+      "pop_12_mais": 3308,
+      "razao": 1.904,
+      "swing_13_pp": 4.673
+    },
+    {
+      "uf": "rn",
+      "nome": "BODÓ",
+      "eleitorado_2026": 3784,
+      "eleitorado_2022": 3590.0,
+      "pop_12_mais": 1994,
+      "razao": 1.898,
+      "swing_13_pp": 1.728
+    },
+    {
+      "uf": "pi",
+      "nome": "AROEIRAS DO ITAIM",
+      "eleitorado_2026": 4352,
+      "eleitorado_2022": 3679.0,
+      "pop_12_mais": 2334,
+      "razao": 1.865,
+      "swing_13_pp": 0.443
+    },
+    {
+      "uf": "mg",
+      "nome": "SÃO SEBASTIÃO DO RIO PRETO",
+      "eleitorado_2026": 2043,
+      "eleitorado_2022": 1867.0,
+      "pop_12_mais": 1101,
+      "razao": 1.856,
+      "swing_13_pp": 1.972
+    },
+    {
+      "uf": "pb",
+      "nome": "SÃO JOSÉ DO BREJO DO CRUZ",
+      "eleitorado_2026": 2613,
+      "eleitorado_2022": 2195.0,
+      "pop_12_mais": 1428,
+      "razao": 1.83,
+      "swing_13_pp": 2.11
+    },
+    {
+      "uf": "to",
+      "nome": "OLIVEIRA DE FÁTIMA",
+      "eleitorado_2026": 1692,
+      "eleitorado_2022": 1586.0,
+      "pop_12_mais": 926,
+      "razao": 1.827,
+      "swing_13_pp": 2.347
+    },
+    {
+      "uf": "pi",
+      "nome": "SÃO LUIS DO PIAUÍ",
+      "eleitorado_2026": 3574,
+      "eleitorado_2022": 2659.0,
+      "pop_12_mais": 1972,
+      "razao": 1.812,
+      "swing_13_pp": 0.993
+    },
+    {
+      "uf": "mg",
+      "nome": "QUELUZITO",
+      "eleitorado_2026": 2785,
+      "eleitorado_2022": 2525.0,
+      "pop_12_mais": 1565,
+      "razao": 1.78,
+      "swing_13_pp": 1.846
+    }
+  ]
+}

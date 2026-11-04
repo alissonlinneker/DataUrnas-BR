@@ -266,6 +266,40 @@ python3 scripts/ele2026/linha_tempo_t2.py \
 
 A execução leu 675.765 versões de aux.json e 501.454 de BU e levou cerca de 4 minutos. As colunas `m_emissao_apos_totalizacao`, `emissao_menos_totalizacao_s` e o arquivo `curva_emissao_totalizacao.parquet` foram acrescentados ao script nesta versão.
 
+## 6. Pacote oficial do 2º turno e reconferência de 03/11/2026
+
+### 6.1 Pacote oficial x arquivos guardados na apuração
+
+O TSE publicou em 26/10/2026, entre 18:03 e 21:31 GMT (cabeçalho `Last-Modified`), um zip por UF com todos os arquivos das seções (`bu_imgbu_logjez_rdv_vscmr_2026_2t_<UF>.zip`). Em 03/11/2026, `scripts/ele2026/confronto_pacote_t2.py` leu só o diretório central de cada zip, por requisições HTTP Range (sem baixar os pacotes inteiros). Depois comparou o CRC-32 e o tamanho de cada `-bu.dat` e `-vota.vsc` com todas as versões guardadas pelos coletores durante a apuração.
+
+| Tipo | Arquivos no pacote | Igual à última versão guardada | Igual a versão anterior | Diferente | Sem versão guardada |
+|---|---|---|---|---|---|
+| BU (`-bu.dat`) | 499.178 | 499.178 | 0 | 0 | 0 |
+| Assinatura (`-vota.vsc`) | 499.178 | 499.178 | 0 | 0 | 0 |
+
+Nenhum arquivo guardado pelos coletores ficou fora do pacote. **O pacote oficial é idêntico ao que foi publicado na noite da eleição.** O resumo está em `data/parquet/2026/t2/pacote_oficial_resumo.json`.
+
+### 6.2 Totais divulgados
+
+Os coletores voltaram a baixar o resultado do Brasil, das 27 UFs, do exterior e dos municípios em 03/11/2026. O último arquivo continua sendo o de 25/10/2026, 23:27:02: 499.248 seções, 128.236.074 votos, 13 com 64.256.232 e 22 com 59.826.041. Nenhuma versão nova apareceu depois da noite da eleição, nem nos 2.072 municípios do coletor do servidor.
+
+### 6.3 Reconferência dos arquivos por seção
+
+Uma volta completa das 499.207 seções rodou em 03/11/2026, com a conferência por HEAD (ETag = MD5) de todos os arquivos guardados, nos mesmos dois coletores e nas mesmas faixas de UF de 25/10 a 27/10. A volta terminou às 17:54 num coletor e às 20:13 no outro.
+
+| | Coletor 1 | Coletor 2 | Total |
+|---|---:|---:|---:|
+| Arquivos conferidos por HEAD | 514.354 | 474.936 | 989.290 |
+| Arquivos alterados no mesmo endereço | 0 | 0 | 0 |
+| Arquivos removidos | 0 | 0 | 0 |
+| BU com segunda versão (alerta `bu_votos_diferentes` ou `bu_nova_versao_mesmos_votos`) | 0 | 0 | 0 |
+| Falhas HTTP definitivas | 0 | 0 | 0 |
+
+- **Nenhum alerta** foi registrado em nenhum dos dois coletores.
+- **Arquivos que um coletor ainda não tinha.** O coletor 1 baixou 868 BUs e 8.289 arquivos de assinatura (`vota.vsc`), todos da BA, que não estavam no estado dele. Eram seções cujo BU ou cuja assinatura ele não tinha conseguido guardar na noite da eleição: 7.421 seções tinham BU sem assinatura. Os 9.157 arquivos têm CRC-32 e tamanho idênticos aos do pacote oficial de 26/10.
+- **aux.json relidos.** Em 39.196 seções (37.631 e 1.565), o aux.json foi guardado de novo, porque o coletor não tinha a versão final ou ela mudou. Em todas elas, os arquivos já guardados foram reconferidos, sem nenhuma diferença.
+- **Totais.** Continuam iguais à versão de 25/10/2026 23:27:02 (13 = 64.256.232; 22 = 59.826.041; 499.248 de 499.248 seções).
+
 ## Limitações
 
 - **Bloqueio do TSE e TREs:** todas as páginas de `tse.jus.br` e `tre-*.jus.br` responderam 403. Os conteúdos marcados "não lido" vêm de trechos de buscador ou de reportagens e podem estar incompletos ou desatualizados. Só foram lidas na íntegra as páginas do TSE com cópia no Internet Archive: hashes de 2026 [30], índice de hashes [31], lacração [33], teste de integridade [4], códigos-fonte [48] e relatórios de 2022 [24].

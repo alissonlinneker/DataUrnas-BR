@@ -1,0 +1,173 @@
+{
+  "secoes_2026": 497895,
+  "totais": {
+    "turno_1": {
+      "comparecimento": 124933510,
+      "sem_biometria_cadastrada": 6940334,
+      "habilitados_ano_nascimento": 8342249,
+      "habilitados_digital": 109650927,
+      "sem_digital_total": 15282583,
+      "pct_sem_digital": 12.233
+    },
+    "turno_2": {
+      "comparecimento": 127853971,
+      "sem_biometria_cadastrada": 7251695,
+      "habilitados_ano_nascimento": 8632431,
+      "habilitados_digital": 111969845,
+      "sem_digital_total": 15884126,
+      "pct_sem_digital": 12.424
+    },
+    "variacao_sem_digital": 601543,
+    "variacao_digital": 2318918
+  },
+  "impossiveis": {
+    "secoes_mesmos_aptos": 442489,
+    "aptos_diferentes_entre_turnos": 55406,
+    "sem_bio_2_acima_do_possivel": 0,
+    "sem_bio_1_acima_do_possivel": 0,
+    "comparecimento_acima_aptos": 0,
+    "exemplos": []
+  },
+  "excesso_por_secao": {
+    "2026": {
+      "secoes": 497895,
+      "dp_z": 2.3,
+      "z_maior_4": 219,
+      "z_menor_menos_4": 157,
+      "esperado_normal_cada_lado_4": 15.77,
+      "z_maior_6": 79,
+      "z_menor_menos_6": 116,
+      "esperado_normal_cada_lado_6": 0.0
+    },
+    "2022": {
+      "secoes": 470246,
+      "dp_z": 0.275,
+      "z_maior_4": 1,
+      "z_menor_menos_4": 2,
+      "esperado_normal_cada_lado_4": 14.89,
+      "z_maior_6": 0,
+      "z_menor_menos_6": 0,
+      "esperado_normal_cada_lado_6": 0.0
+    },
+    "2026_so_sem_cadastro": {
+      "secoes": 497895,
+      "dp_z": 0.313,
+      "z_maior_4": 1,
+      "z_menor_menos_4": 0,
+      "esperado_normal_cada_lado_4": 15.77,
+      "z_maior_6": 1,
+      "z_menor_menos_6": 0,
+      "esperado_normal_cada_lado_6": 0.0
+    },
+    "2026_so_ano_nascimento": {
+      "secoes": 497895,
+      "dp_z": 1.019,
+      "z_maior_4": 660,
+      "z_menor_menos_4": 154,
+      "esperado_normal_cada_lado_4": 15.77,
+      "z_maior_6": 170,
+      "z_menor_menos_6": 110,
+      "esperado_normal_cada_lado_6": 0.0
+    },
+    "pct_sem_digital_2022": [
+      16.002,
+      16.071
+    ]
+  },
+  "divisao_do_voto_extra": {
+    "2026": {
+      "fatia_13_extra_sem_digital": 0.6302,
+      "fatia_13_extra_com_digital": 0.6302,
+      "diferenca": 0.0,
+      "ic95_diferenca": [
+        -0.003,
+        0.0036
+      ]
+    },
+    "2022": {
+      "fatia_13_extra_sem_digital": 0.5646,
+      "fatia_13_extra_com_digital": 0.5417,
+      "diferenca": 0.0229,
+      "ic95_diferenca": [
+        -0.0008,
+        0.0503
+      ]
+    }
+  },
+  "excesso_x_swing": {
+    "2026": {
+      "secoes_excesso": 219,
+      "swing_relativo_excesso_pp": -0.171,
+      "swing_relativo_resto_pp": 0.0,
+      "dp_swing_relativo_pp": 2.099
+    },
+    "2022": {
+      "secoes_excesso": 1,
+      "swing_relativo_excesso_pp": 3.991,
+      "swing_relativo_resto_pp": -0.0,
+      "dp_swing_relativo_pp": 2.046
+    }
+  },
+  "poder_de_deteccao": [
+    {
+      "votos_injetados": 99577,
+      "secoes_com_injecao": 99579,
+      "pct_sem_digital_t2": 12.492,
+      "z_maior_4": 227,
+      "fatia_13_extra_sem_digital": 0.6328,
+      "ic95_diferenca": [
+        -0.0009,
+        0.0055
+      ],
+      "detectado": false
+    },
+    {
+      "votos_injetados": 199150,
+      "secoes_com_injecao": 99579,
+      "pct_sem_digital_t2": 12.56,
+      "z_maior_4": 237,
+      "fatia_13_extra_sem_digital": 0.6393,
+      "ic95_diferenca": [
+        0.0031,
+        0.0079
+      ],
+      "detectado": true
+    },
+    {
+      "votos_injetados": 597169,
+      "secoes_com_injecao": 99579,
+      "pct_sem_digital_t2": 12.831,
+      "z_maior_4": 351,
+      "fatia_13_extra_sem_digital": 0.7,
+      "ic95_diferenca": [
+        0.0376,
+        0.0466
+      ],
+      "detectado": true
+    },
+    {
+      "votos_injetados": 1588134,
+      "secoes_com_injecao": 99579,
+      "pct_sem_digital_t2": 13.498,
+      "z_maior_4": 2681,
+      "fatia_13_extra_sem_digital": 0.8591,
+      "ic95_diferenca": [
+        0.1305,
+        0.1431
+      ],
+      "detectado": true
+    },
+    {
+      "votos_injetados": 4243855,
+      "secoes_com_injecao": 99579,
+      "pct_sem_digital_t2": 15.237,
+      "z_maior_4": 37299,
+      "fatia_13_extra_sem_digital": 0.9698,
+      "ic95_diferenca": [
+        0.1931,
+        0.2135
+      ],
+      "detectado": true
+    }
+  ]
+}

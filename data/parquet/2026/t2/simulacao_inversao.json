@@ -1,0 +1,119 @@
+{
+  "secoes": 497897,
+  "votos_a_mover": 2215096,
+  "observado": {
+    "swing_medio_pp": 2.906,
+    "swing_dp_pp": 2.369,
+    "secoes_z_maior_4": 664,
+    "secoes_z_maior_6": 82,
+    "curtose_excesso": 1.92
+  },
+  "cenarios": [
+    {
+      "cenario": "todas as seções (uniforme)",
+      "secoes_alteradas": 497897,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 4.4,
+      "swing_medio_pp": 4.684,
+      "swing_dp_pp": 2.605,
+      "secoes_z_maior_4": 667,
+      "secoes_z_maior_6": 86,
+      "curtose_excesso": 1.83
+    },
+    {
+      "cenario": "50% das seções, sorteadas",
+      "secoes_alteradas": 248948,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 8.9,
+      "swing_medio_pp": 4.685,
+      "swing_dp_pp": 3.221,
+      "secoes_z_maior_4": 125,
+      "secoes_z_maior_6": 16,
+      "curtose_excesso": 0.18
+    },
+    {
+      "cenario": "25% das seções, sorteadas",
+      "secoes_alteradas": 124474,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 17.8,
+      "swing_medio_pp": 4.684,
+      "swing_dp_pp": 4.181,
+      "secoes_z_maior_4": 1008,
+      "secoes_z_maior_6": 17,
+      "curtose_excesso": 0.23
+    },
+    {
+      "cenario": "10% das seções, sorteadas",
+      "secoes_alteradas": 49789,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 44.5,
+      "swing_medio_pp": 4.682,
+      "swing_dp_pp": 6.237,
+      "secoes_z_maior_4": 43079,
+      "secoes_z_maior_6": 32998,
+      "curtose_excesso": 6.2
+    },
+    {
+      "cenario": "5% das seções, sorteadas",
+      "secoes_alteradas": 24894,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 89.0,
+      "swing_medio_pp": 4.689,
+      "swing_dp_pp": 8.659,
+      "secoes_z_maior_4": 24816,
+      "secoes_z_maior_6": 23391,
+      "curtose_excesso": 18.87
+    },
+    {
+      "cenario": "1% das seções, sorteadas",
+      "secoes_alteradas": 4978,
+      "viavel": false
+    },
+    {
+      "cenario": "25% das seções mais favoráveis ao 13 no 1º turno",
+      "secoes_alteradas": 124484,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 17.8,
+      "swing_medio_pp": 4.745,
+      "swing_dp_pp": 3.479,
+      "secoes_z_maior_4": 1356,
+      "secoes_z_maior_6": 34,
+      "curtose_excesso": 1.16
+    },
+    {
+      "cenario": "10% das seções mais favoráveis ao 13 no 1º turno",
+      "secoes_alteradas": 49801,
+      "viavel": false
+    },
+    {
+      "cenario": "só o Nordeste",
+      "secoes_alteradas": 140828,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 15.7,
+      "swing_medio_pp": 4.632,
+      "swing_dp_pp": 3.538,
+      "secoes_z_maior_4": 699,
+      "secoes_z_maior_6": 68,
+      "curtose_excesso": 1.58
+    },
+    {
+      "cenario": "25% menores seções",
+      "secoes_alteradas": 126325,
+      "viavel": true,
+      "votos_movidos": 2215096,
+      "votos_por_secao_alterada": 17.5,
+      "swing_medio_pp": 5.365,
+      "swing_dp_pp": 5.21,
+      "secoes_z_maior_4": 11507,
+      "secoes_z_maior_6": 194,
+      "curtose_excesso": 1.35
+    }
+  ]
+}

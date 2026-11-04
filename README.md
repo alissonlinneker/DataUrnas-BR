@@ -48,7 +48,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 
 - **2022 completo:** 941.987 seções dos dois turnos da eleição presidencial, em todas as 27 UFs, decodificadas e auditadas.
 - **2026 completo, nos dois turnos:** resultado oficial agregado (Brasil, 27 UFs, exterior e 5.757 municípios) e os Boletins de Urna de todas as 499.207 seções instaladas em cada turno. A soma dos BUs reproduz exatamente o resultado oficial: no 1º turno em todas as 28 UFs (27 mais o exterior) e nos 5.757 municípios; no 2º turno, voto a voto no total do Brasil (13: 64.256.232; 22: 59.826.041).
-- **[Veredicto da auditoria 2026](#veredicto-da-auditoria-2026):** 19 verificações nos dois turnos, sem nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos arquivos públicos. O limite real também está descrito: o software que rodou em cada urna não é verificável com dados públicos.
+- **[Veredicto da auditoria 2026](#veredicto-da-auditoria-2026):** 23 verificações nos dois turnos, sem nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos arquivos públicos. O limite real também está descrito: o software que rodou em cada urna não é verificável com dados públicos.
 - **RDV recontado em todas as seções dos dois turnos:** no 1º turno, 749.119.391 registros de voto em 499.206 seções, iguais ao BU em todos os cargos; no 2º turno, 499.205 seções com RDV, iguais ao BU, e a soma nacional do RDV é exatamente o resultado oficial. Nenhuma divergência. Detalhes na [recontagem do 1º turno](#recontagem-voto-a-voto-pelo-rdv-2026) e na [do 2º turno](#integridade-e-recontagem-do-2º-turno).
 - **Integridade dos arquivos de 2026 concluída nos dois turnos:** no 1º turno, 1.497.620 SHA-512 de BU, RDV e log conferem com o valor assinado pela urna; no 2º turno, 5.487.289 assinaturas de hardware de todos os arquivos listados no `.vsc` são válidas. Nenhum hash divergente e nenhuma assinatura inválida. Detalhes no [resultado do 1º turno](#integridade-dos-arquivos-resultado), no [relatório de integridade](docs/relatorio-integridade-2026.md) e nos [certificados do 2º turno](docs/certificados-2turno-2026.md).
 - **Resultados assinados pelo TSE conferidos:** as 11.572 assinaturas JWS dos resultados divulgados nos dois turnos (Brasil, 28 UFs e 5.757 municípios) são válidas e iguais à soma dos BUs ([JWS](docs/jws-totalizacao-2026.md)).
@@ -63,7 +63,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 ## Veredicto da auditoria 2026
 
 <p align="center">
-  <img src="docs/assets/2026-veredicto.svg" alt="Resumo do veredicto da auditoria de 2026: 19 verificações nos dois turnos, nenhuma evidência de manipulação, de contagem errada ou de dado impossível; RDV recontado em 499.206 seções no 1º turno e 499.205 no 2º, sem divergência; 11.572 assinaturas JWS dos resultados válidas; margem oficial do 2º turno de 4.430.191 votos" width="100%">
+  <img src="docs/assets/2026-veredicto.svg" alt="Resumo do veredicto da auditoria de 2026: 23 verificações nos dois turnos, nenhuma evidência de manipulação, de contagem errada ou de dado impossível; RDV recontado em 499.206 seções no 1º turno e 499.205 no 2º, sem divergência; 11.572 assinaturas JWS dos resultados válidas; margem oficial do 2º turno de 4.430.191 votos" width="100%">
 </p>
 
 > **Não foi encontrada nenhuma evidência de manipulação, de contagem errada de votos ou de dado impossível nos arquivos públicos, em nenhum dos dois turnos de 2026.**
@@ -72,7 +72,7 @@ O resultado divulgado é exatamente a soma dos boletins assinados pelas urnas. O
 
 Isso não prova que o software da urna é honesto. Os arquivos públicos não permitem ligar o programa que rodou em cada urna à lista de hashes lacrada: o `.vsc` assina só os arquivos de resultado, e o log registra o nome de cada pacote verificado e "SUCESSO", nunca o hash. Essa ligação só é feita por amostragem, em cerimônias cujos relatórios não são publicados. Uma alteração aplicada igualmente a todas as urnas também não aparece em testes que comparam grupos de urnas; a proteção contra ela é o Teste de Integridade, cujo relatório do 2º turno ainda não saiu. A próxima verificação independente ao alcance de qualquer pessoa é o **confronto dos BUs do TSE com os boletins impressos** afixados nas seções, lidos pelo QR Code: no 1º turno, 38 de 38 conferiram ([confronto com fontes externas](docs/confronto-fontes-externas.md)); no 2º turno, a Totalização Paralela do CMInd tinha 59 BUs às 22h30 de 25/10 ([verificações externas](docs/verificacoes-externas-2turno-2026.md), seção 3).
 
-Foram encontrados pontos de transparência e de registro que pedem esclarecimento do TSE (12 pendências, listadas no veredicto). Nenhum deles, isolado ou somado, mexe na contagem ou chega perto da margem.
+Foram encontrados pontos de transparência e de registro que pedem esclarecimento do TSE (13 pendências, listadas no veredicto). Nenhum deles, isolado ou somado, mexe na contagem ou chega perto da margem.
 
 | # | Verificação | Escopo | Resultado | Documento |
 |---|---|---|---|---|
@@ -95,8 +95,12 @@ Foram encontrados pontos de transparência e de registro que pedem esclareciment
 | 17 | Lista oficial de hashes x programas verificados nos logs | 32 listas; 6.732 logs | Todos os programas de inicialização estão na lista | [Hash do software](docs/hash-software-urna-2026.md) |
 | 18 | Assinatura JWS dos resultados divulgados x soma dos BUs | 5.786 arquivos por turno, dois turnos | 11.572 assinaturas válidas; 0 divergências | [JWS](docs/jws-totalizacao-2026.md) |
 | 19 | Alegações externas ("virada única", "vales igualmente espaçados") | 2022 e 2026 | Explicadas pela ordem geográfica de chegada | [Ordem de envio](docs/ordem-de-envio-viradas-2022-2026.md) |
+| 20 | Pacote oficial do 2º turno x arquivos guardados na noite da eleição | 998.356 arquivos | Todos idênticos; nenhum total novo depois de 25/10 | [Verificações externas](docs/verificacoes-externas-2turno-2026.md) |
+| 21 | Imagem do BU x BU e log eleitor a eleitor x BU no pacote completo | 499.207 seções por turno | Votos iguais em todas; diferenças de log explicadas e sem efeito no voto | [Pacote nacional](docs/pacote-nacional-imgbu-logs-2026.md) |
+| 22 | Ordem e horário de chegada dos BUs x voto | 499.205 seções, 2022 de controle | Nenhum sinal de injeção | [Chegada dos BUs](docs/chegada-bus-2026.md) |
+| 23 | Plausibilidade da virada (história, pesquisas, transferências, simulação de fraude, eleitorado x população) | Brasil 1994 a 2026 e 31 casos internacionais | Chance de virada perto de 50% pela margem; fraude concentrada apareceria | [Virada e probabilidades](docs/virada-2026-probabilidades.md) |
 
-O texto completo, com o que não pode ser verificado e as 12 pendências para o TSE, está em [docs/veredicto-auditoria-2026.md](docs/veredicto-auditoria-2026.md).
+O texto completo, com o que não pode ser verificado e as 13 pendências para o TSE, está em [docs/veredicto-auditoria-2026.md](docs/veredicto-auditoria-2026.md).
 
 ---
 
@@ -531,10 +535,10 @@ O painel é uma aplicação Streamlit com várias páginas. A página inicial, *
   </tr>
 </table>
 
-A página **Veredicto da auditoria 2026** resume as 19 verificações, o que não pode ser verificado com dados públicos e as pendências para o TSE:
+A página **Veredicto da auditoria 2026** resume as verificações, o que não pode ser verificado com dados públicos e as pendências para o TSE:
 
 <p align="center">
-  <img src="docs/assets/telas/2026-veredicto.png" alt="Página Veredicto da auditoria 2026 do painel: nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos dois turnos, com a tabela das 19 verificações e o RDV recontado em todas as seções" width="100%">
+  <img src="docs/assets/telas/2026-veredicto.png" alt="Página Veredicto da auditoria 2026 do painel: nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos dois turnos, com a tabela das 23 verificações e o RDV recontado em todas as seções" width="100%">
 </p>
 
 A página **Presidente 1º turno** apresenta o resultado do 1º turno de 2026:
@@ -745,7 +749,7 @@ DataUrnas-BR/
 | [Investigação log x BU (2026)](docs/investigacao-log-bu-2026.md) | Seções em que a contagem de votos no log difere do BU: causas, correções do leitor e casos encaminhados ao TSE |
 | [Confronto com fontes externas](docs/confronto-fontes-externas.md) | BUs do TSE confrontados com leituras independentes do QR Code dos boletins impressos |
 | [Ocorrências para o TSE](docs/relatorio-tse-ocorrencias-2026.md) | Pontos de publicação, de certificação e de log a esclarecer com o TSE |
-| [Veredicto da auditoria 2026](docs/veredicto-auditoria-2026.md) | Veredicto dos dois turnos de 2026: 19 verificações, limites e 12 pendências para o TSE |
+| [Veredicto da auditoria 2026](docs/veredicto-auditoria-2026.md) | Veredicto dos dois turnos de 2026: 23 verificações, limites e 13 pendências para o TSE |
 | [RDV x BU x log (2026)](docs/rdv-log-2026.md) | RDV, BU e log eleitor a eleitor nos dois turnos e recontagem nacional do RDV do 2º turno |
 | [Certificados do 2º turno](docs/certificados-2turno-2026.md) | Assinaturas de todos os arquivos e cadeia de certificados nas 499.207 seções do 2º turno |
 | [Consistência dos BUs (2026)](docs/auditoria-consistencia-bu-2026.md) | Valores impossíveis, somas, repetições e horários nos BUs dos dois turnos |
@@ -754,6 +758,11 @@ DataUrnas-BR/
 | [Encerramento tardio](docs/encerramento-tardio-2turno-2026.md) | Seções encerradas depois das 17h, votos depois das 17h e cenários de impacto na margem |
 | [Viradas entre turnos](docs/viradas-1t-2t-2026.md) | Viradas de liderança por seção em 2026 contra o modelo de 2022 |
 | [Ordem de envio](docs/ordem-de-envio-viradas-2022-2026.md) | Ordem de chegada das seções e a "virada" da curva acumulada em 2022 e 2026 |
+| [Virada de 2026 e probabilidades](docs/virada-2026-probabilidades.md) | Aritmética da virada, base histórica de 2º turnos, pesquisas, transferências, simulação de fraude e eleitorado x população |
+| [Chegada dos BUs](docs/chegada-bus-2026.md) | Ordem e horário de chegada dos BUs à totalização e o voto de cada seção |
+| [Pacote nacional: imagem do BU e logs](docs/pacote-nacional-imgbu-logs-2026.md) | Imagem do BU x BU e log eleitor a eleitor x BU em todas as seções dos dois turnos |
+| [Cadeia de confiança 2026](docs/cadeia-de-confianca-2026.md) | Software, assinaturas e limites do que é verificável sem código-fonte e compilação reproduzível |
+| [Mapa de verificações](docs/mapa-verificacoes-2026.md) | O que foi feito, o que falta e o que depende do TSE |
 | [Forense estatística](docs/forense-estatistica-2026.md) | Impressão digital eleitoral, dígitos, swing, transferência, dispersão e comparecimento, com 2022 de controle |
 | [Efeito da urna](docs/efeito-urna-2026.md) | Modelo, troca, recarga, reserva e contingência de urna e o voto |
 | [Biometria 1º x 2º turno](docs/biometria-1t-2t-2026.md) | Habilitação por biometria no BU e no log e teste de votos inseridos sem digital |

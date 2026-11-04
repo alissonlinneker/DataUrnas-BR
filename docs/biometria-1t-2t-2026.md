@@ -397,3 +397,89 @@ Dentro de cada município (diferença de cada seção para a média do municípi
 As 62 seções em que a parcela sem digital subiu 15 pontos ou mais tiveram a fatia do 13 subindo de 49,98% para 52,66% (+2,7 pontos), igual ao país (48,98% para 51,78%, +2,8 pontos); 58 delas usam UE2013 ou UE2015, o mesmo padrão de leitor que não reconhece da seção 6.
 
 Conclusão: o voto sem digital não favorece nenhum candidato além do que o voto com digital favorece, e o comparecimento extremo não aumentou. Limite: o teste pega inserção que mude o voto de forma desigual entre seções; uma inserção pequena e espalhada igualmente não aparece no BU, e a identidade de quem votou (falecido, ausente) não está em nenhum arquivo público.
+
+## 10. Estudo completo dos votos sem digital, com probabilidade e poder de detecção (03/11/2026)
+
+Pergunta: o voto sem digital subiu de forma desproporcional no 2º turno, a ponto de indicar votos inseridos por mesários em nome de ausentes ou pelo próprio sistema? Há algum valor impossível?
+
+Um voto sem digital só entra na urna por dois caminhos do BU: eleitor **sem biometria cadastrada** (`comp_sem_biometria`) ou eleitor **com** biometria cadastrada liberado pelo **ano de nascimento** depois de quatro leituras falhas, com a digital do mesário (`habilitados_biografia`). Qualquer voto inserido sem digital tem de aparecer num desses dois campos.
+
+Script: `scripts/ele2026/sem_biometria_probabilidade.py`, com as exportações `scripts/ele2026/sem_biometria_ch.sql` (2026) e `scripts/ele2026/sem_biometria_2022_ch.sql` (2022, controle). Resultado completo: `data/parquet/2026/t2/sem_biometria_probabilidade.json`. Base: 497.895 seções do Brasil com o detalhamento nos dois turnos.
+
+### 10.1 Totais
+
+| | 1º turno | 2º turno | Variação |
+|---|---:|---:|---:|
+| Comparecimento | 124.933.510 | 127.853.971 | +2.920.461 (+2,34%) |
+| Sem biometria cadastrada | 6.940.334 | 7.251.695 | +311.361 (+4,49%) |
+| Liberados pelo ano de nascimento | 8.342.249 | 8.632.431 | +290.182 (+3,48%) |
+| **Total sem digital** | **15.282.583 (12,23%)** | **15.884.126 (12,42%)** | **+601.543 (+3,94%)** |
+| Com digital | 109.650.927 | 111.969.845 | +2.318.918 (+2,11%) |
+
+O voto sem digital cresceu um pouco mais que o voto com digital (3,9% contra 2,1%), e a parcela dele no comparecimento passou de 12,23% para 12,42% (+0,19 ponto). Em 2022, medido pelos campos do BU daquela versão, a parcela sem digital foi de 16,00% para 16,07%. Não há salto: para inverter o resultado com votos inseridos, seriam necessários pelo menos 4,43 milhões de votos sem digital a mais para um candidato, sete vezes todo o aumento observado (601.543), e a parcela sem digital teria de ir a cerca de 15,2%.
+
+### 10.2 Valores impossíveis
+
+O cadastro biométrico fecha meses antes da eleição. Quem foi reconhecido pela digital ou liberado pelo ano de nascimento num turno **tem** biometria cadastrada e não pode ser contado como "sem biometria cadastrada" no outro. Numa seção com os mesmos eleitores nos dois turnos, vale então:
+
+- sem biometria no 2º turno ≤ aptos - (digital + ano de nascimento do 1º turno);
+- sem biometria no 1º turno ≤ aptos - (digital + ano de nascimento do 2º turno).
+
+| Verificação | Resultado |
+|---|---:|
+| Seções com os mesmos aptos nos dois turnos | 442.489 |
+| Violações da primeira desigualdade | **0** |
+| Violações da segunda desigualdade | **0** |
+| Seções com comparecimento acima dos aptos, em qualquer turno | **0** |
+
+As outras 55.406 seções tiveram o número de aptos alterado entre os turnos (30.566 para mais e 24.840 para menos, mediana de 1 eleitor), em geral pelo voto em trânsito, que muda o eleitorado da seção de um turno para o outro. Nelas a desigualdade não se aplica. Uma primeira versão do teste, que usava o menor dos dois aptos, apontou 36 seções. Todas eram desse grupo, com aptos diferentes, e nenhuma é impossível.
+
+### 10.3 Excesso de votos sem digital por seção
+
+Para cada seção, o número esperado no 2º turno é o comparecimento do 2º turno vezes a parcela da própria seção no 1º turno, ajustada pela variação nacional. O desvio é medido em z (variação binomial mais a incerteza da parcela do 1º turno).
+
+| Série | Seções | Desvio padrão de z | z > 4 | z < -4 |
+|---|---:|---:|---:|---:|
+| 2026, sem biometria cadastrada | 497.895 | 0,31 | **1** | 0 |
+| 2026, liberados pelo ano de nascimento | 497.895 | 1,02 | 660 | 154 |
+| 2026, total sem digital | 497.895 | 2,30 | 219 | 157 |
+| 2022, total sem digital (controle) | 470.246 | 0,28 | 1 | 2 |
+
+1. **Eleitores sem biometria cadastrada se comportam como um grupo fixo de pessoas**: a variação entre turnos é menor que a de um sorteio (desvio de z de 0,31) e só uma seção do país foge do esperado. Inserir votos por esse caminho exigiria mais eleitores sem cadastro votando do que a seção teve no 1º turno, e isso não aparece.
+2. **A variação está na liberação pelo ano de nascimento**, que depende do leitor de digitais. As 660 seções com excesso somam só **15.414 votos** a mais que o esperado (0,35% da margem). Mediana de liberação pelo ano de nascimento nessas seções: 1,8% no 1º turno e 8,3% no 2º. A UE2013 é 10,6% dessas seções, contra 2,2% do país, e 123 das 154 seções com falta (a liberação caiu) também são UE2013: é o leitor que falha num turno e não no outro, como na seção 6.
+3. A comparação direta com 2022 vale só para a soma, porque o BU de 2022 não separa os dois caminhos. A dispersão maior de 2026 vem da liberação pelo ano de nascimento, que em 2022 não tinha campo próprio.
+
+### 10.4 Para quem votaram os eleitores extras sem digital
+
+Dentro de cada município, a variação de votos do 13 e do 22 em cada seção foi regredida sobre a variação de eleitores com digital e sem digital, com intervalo de 95% por reamostragem de municípios (200 repetições).
+
+| | Fatia do 13 entre os eleitores extras sem digital | Fatia do 13 entre os eleitores extras com digital | Diferença (IC 95%) |
+|---|---:|---:|---:|
+| 2026 | 63,02% | 63,02% | 0,00 ponto (-0,30 a +0,36) |
+| 2022 (controle) | 56,46% | 54,17% | +2,29 pontos (-0,08 a +5,03) |
+
+O eleitor a mais sem digital votou exatamente como o eleitor a mais com digital. Um mesário não consegue falsificar o voto de quem tem a digital reconhecida, então essa é a referência do eleitor real. Se houvesse votos inseridos sem digital a favor de um candidato, a primeira coluna se afastaria da segunda.
+
+Nas seções com excesso de voto sem digital (z > 4), a fatia do 13 subiu **0,17 ponto a menos** que no resto do mesmo município. Nas 660 com excesso de liberação pelo ano de nascimento, subiu 0,05 ponto a menos. A correlação, dentro do município, entre a variação da liberação pelo ano de nascimento e a variação da fatia do 13 é -0,001.
+
+### 10.5 Poder de detecção: quanto voto inserido o teste enxergaria
+
+Para saber se o teste 10.4 é capaz de ver uma fraude, votos para o 13 foram inseridos artificialmente nos dados reais, como votos sem biometria cadastrada, em 20% das seções sorteadas (99.579 seções), sem passar dos aptos de cada uma.
+
+| Votos inseridos para o 13 | Parcela sem digital no 2º turno | Seções com z > 4 | Fatia do 13 entre os extras sem digital | Diferença (IC 95%) | Detectado |
+|---:|---:|---:|---:|---:|---|
+| 0 (dados reais) | 12,42% | 219 | 63,02% | 0,00 (-0,30 a +0,36) | |
+| 99.577 | 12,49% | 227 | 63,28% | -0,09 a +0,55 | não |
+| 199.150 | 12,56% | 237 | 63,93% | +0,31 a +0,79 | **sim** |
+| 597.169 | 12,83% | 351 | 70,00% | +3,76 a +4,66 | **sim** |
+| 1.588.134 | 13,50% | 2.681 | 85,91% | +13,05 a +14,31 | **sim** |
+| 4.243.855 | 15,24% | 37.299 | 96,98% | +19,31 a +21,35 | **sim** |
+
+O teste detecta, com 95% de confiança, uma inserção a partir de cerca de 200 mil votos espalhados em 100 mil seções, ou seja, 4,5% da margem. Uma inserção capaz de inverter o resultado (2,2 milhões de votos trocados ou 4,4 milhões inseridos) seria evidente, nos números totais e por seção. O último cenário ficou abaixo de 4,43 milhões porque muitas seções sorteadas não tinham ausentes suficientes.
+
+### 10.6 Conclusão
+
+- **Nada impossível:** 0 violações do cadastro fechado em 442.489 seções e 0 seções com mais votantes que aptos.
+- **Nada desproporcional:** o voto sem digital subiu 0,19 ponto na parcela do comparecimento, e o comparecimento dos eleitores sem biometria cadastrada é quase idêntico entre turnos em cada seção.
+- **Nada direcionado:** o eleitor extra sem digital votou na mesma proporção do eleitor extra com digital (63,02% e 63,02%), e as seções com excesso de voto sem digital deram **menos** ao 13 que o resto do município.
+- **Limite do método:** inserções abaixo de cerca de 200 mil votos, espalhadas e na mesma proporção do eleitor real, não são distinguíveis pelo BU. Elas não mudariam o resultado (a margem é 22 vezes maior). A identidade de quem votou (falecido, ausente) não está em nenhum arquivo público. A análise do log de cada eleitor em todas as seções (sequências rápidas de liberação sem digital, horários, mesário) está em `docs/pacote-nacional-imgbu-logs-2026.md`.

@@ -1,0 +1,806 @@
+{
+ "perfil_2026": {
+  "margem_pp": 1.87,
+  "lider_pct_t1": 47.03,
+  "outros_pct_t1": 7.81,
+  "eh_prefeito": 0.0
+ },
+ "n_total": 466,
+ "n_modelo": 454,
+ "excluidas_par_diferente": 5,
+ "modelos": {
+  "todas:margem": {
+   "n": 454,
+   "viradas": 116,
+   "coef": [
+    -0.22424,
+    -0.09377
+   ],
+   "se": [
+    0.17912,
+    0.01787
+   ],
+   "loglik": -241.512,
+   "aic": 487.02,
+   "p_2026": 0.4014,
+   "ic95": [
+    0.3313,
+    0.4758
+   ]
+  },
+  "todas:lider_pct": {
+   "n": 454,
+   "viradas": 116,
+   "coef": [
+    1.95765,
+    -0.07634
+   ],
+   "se": [
+    0.64327,
+    0.01628
+   ],
+   "loglik": -246.575,
+   "aic": 497.15,
+   "p_2026": 0.1635,
+   "ic95": [
+    0.1224,
+    0.2149
+   ]
+  },
+  "todas:margem_outros": {
+   "n": 454,
+   "viradas": 116,
+   "coef": [
+    -0.83277,
+    -0.0963,
+    0.0212
+   ],
+   "se": [
+    0.31879,
+    0.018,
+    0.00897
+   ],
+   "loglik": -238.666,
+   "aic": 483.33,
+   "p_2026": 0.3,
+   "ic95": [
+    0.2082,
+    0.4113
+   ]
+  },
+  "todas:margem_outros_cargo": {
+   "n": 454,
+   "viradas": 116,
+   "coef": [
+    -0.74924,
+    -0.09604,
+    0.02298,
+    -0.18433
+   ],
+   "se": [
+    0.34046,
+    0.018,
+    0.00937,
+    0.27099
+   ],
+   "loglik": -238.437,
+   "aic": 484.87,
+   "p_2026": 0.321,
+   "ic95": [
+    0.2123,
+    0.4532
+   ]
+  },
+  "presidente_governador:margem": {
+   "n": 109,
+   "viradas": 29,
+   "coef": [
+    0.2155,
+    -0.15995
+   ],
+   "se": [
+    0.36443,
+    0.04529
+   ],
+   "loglik": -54.341,
+   "aic": 112.68,
+   "p_2026": 0.4791,
+   "ic95": [
+    0.3361,
+    0.6256
+   ]
+  },
+  "presidente_governador:lider_pct": {
+   "n": 109,
+   "viradas": 29,
+   "coef": [
+    2.5171,
+    -0.08373
+   ],
+   "se": [
+    1.54744,
+    0.03674
+   ],
+   "loglik": -60.487,
+   "aic": 124.97,
+   "p_2026": 0.1945,
+   "ic95": [
+    0.1189,
+    0.3017
+   ]
+  },
+  "presidente_governador:margem_outros": {
+   "n": 109,
+   "viradas": 29,
+   "coef": [
+    -0.25748,
+    -0.17676,
+    0.02544
+   ],
+   "se": [
+    0.51307,
+    0.04831,
+    0.01919
+   ],
+   "loglik": -53.45,
+   "aic": 112.9,
+   "p_2026": 0.4039,
+   "ic95": [
+    0.2413,
+    0.5907
+   ]
+  },
+  "prefeito:margem": {
+   "n": 345,
+   "viradas": 87,
+   "coef": [
+    -0.35386,
+    -0.07779
+   ],
+   "se": [
+    0.20715,
+    0.01949
+   ],
+   "loglik": -185.608,
+   "aic": 375.22,
+   "p_2026": 0.3777,
+   "ic95": [
+    0.2991,
+    0.4633
+   ]
+  },
+  "prefeito:lider_pct": {
+   "n": 345,
+   "viradas": 87,
+   "coef": [
+    2.03041,
+    -0.08028
+   ],
+   "se": [
+    0.72792,
+    0.01884
+   ],
+   "loglik": -185.243,
+   "aic": 374.49,
+   "p_2026": 0.1487,
+   "ic95": [
+    0.1033,
+    0.2093
+   ]
+  },
+  "prefeito:margem_outros": {
+   "n": 345,
+   "viradas": 87,
+   "coef": [
+    -1.19611,
+    -0.07643,
+    0.0261
+   ],
+   "se": [
+    0.42045,
+    0.01953,
+    0.01104
+   ],
+   "loglik": -182.714,
+   "aic": 371.43,
+   "p_2026": 0.2432,
+   "ic95": [
+    0.1437,
+    0.381
+   ]
+  },
+  "prefeito_capital:margem": {
+   "n": 119,
+   "viradas": 23,
+   "coef": [
+    -0.68001,
+    -0.08046
+   ],
+   "se": [
+    0.37078,
+    0.03586
+   ],
+   "loglik": -55.412,
+   "aic": 114.82,
+   "p_2026": 0.3035,
+   "ic95": [
+    0.1882,
+    0.4504
+   ]
+  },
+  "prefeito_capital:lider_pct": {
+   "n": 119,
+   "viradas": 23,
+   "coef": [
+    2.63063,
+    -0.11032
+   ],
+   "se": [
+    1.39951,
+    0.03882
+   ],
+   "loglik": -53.857,
+   "aic": 111.71,
+   "p_2026": 0.0719,
+   "ic95": [
+    0.0278,
+    0.1735
+   ]
+  },
+  "prefeito_capital:margem_outros": {
+   "n": 119,
+   "viradas": 23,
+   "coef": [
+    -2.41992,
+    -0.07067,
+    0.0461
+   ],
+   "se": [
+    1.07469,
+    0.03659,
+    0.02594
+   ],
+   "loglik": -53.724,
+   "aic": 113.45,
+   "p_2026": 0.1005,
+   "ic95": [
+    0.0203,
+    0.3755
+   ]
+  }
+ },
+ "empirico": {
+  "todas": {
+   "por_faixa": [
+    {
+     "faixa": "0-1",
+     "n": 33,
+     "viradas": 11,
+     "taxa": 0.3333,
+     "ic95": [
+      0.1975,
+      0.5039
+     ]
+    },
+    {
+     "faixa": "1-2",
+     "n": 30,
+     "viradas": 13,
+     "taxa": 0.4333,
+     "ic95": [
+      0.2738,
+      0.608
+     ]
+    },
+    {
+     "faixa": "2-3",
+     "n": 23,
+     "viradas": 6,
+     "taxa": 0.2609,
+     "ic95": [
+      0.1255,
+      0.4647
+     ]
+    },
+    {
+     "faixa": "3-5",
+     "n": 50,
+     "viradas": 18,
+     "taxa": 0.36,
+     "ic95": [
+      0.2414,
+      0.4986
+     ]
+    },
+    {
+     "faixa": "5-7.5",
+     "n": 64,
+     "viradas": 26,
+     "taxa": 0.4062,
+     "ic95": [
+      0.2946,
+      0.5286
+     ]
+    },
+    {
+     "faixa": "7.5-10",
+     "n": 54,
+     "viradas": 14,
+     "taxa": 0.2593,
+     "ic95": [
+      0.1612,
+      0.3893
+     ]
+    },
+    {
+     "faixa": "10-15",
+     "n": 80,
+     "viradas": 18,
+     "taxa": 0.225,
+     "ic95": [
+      0.1473,
+      0.3279
+     ]
+    },
+    {
+     "faixa": "15-20",
+     "n": 64,
+     "viradas": 6,
+     "taxa": 0.0938,
+     "ic95": [
+      0.0437,
+      0.1898
+     ]
+    },
+    {
+     "faixa": "20-100",
+     "n": 56,
+     "viradas": 4,
+     "taxa": 0.0714,
+     "ic95": [
+      0.0281,
+      0.1698
+     ]
+    }
+   ],
+   "perfil_margem_lt3_outros_lt15": {
+    "n": 21,
+    "viradas": 8,
+    "taxa": 0.381,
+    "ic95": [
+     0.2075,
+     0.5912
+    ]
+   },
+   "total": {
+    "n": 454,
+    "viradas": 116
+   }
+  },
+  "presidente_governador": {
+   "por_faixa": [
+    {
+     "faixa": "0-1",
+     "n": 10,
+     "viradas": 5,
+     "taxa": 0.5,
+     "ic95": [
+      0.2366,
+      0.7634
+     ]
+    },
+    {
+     "faixa": "1-2",
+     "n": 10,
+     "viradas": 5,
+     "taxa": 0.5,
+     "ic95": [
+      0.2366,
+      0.7634
+     ]
+    },
+    {
+     "faixa": "2-3",
+     "n": 3,
+     "viradas": 2,
+     "taxa": 0.6667,
+     "ic95": [
+      0.2077,
+      0.9385
+     ]
+    },
+    {
+     "faixa": "3-5",
+     "n": 11,
+     "viradas": 3,
+     "taxa": 0.2727,
+     "ic95": [
+      0.0975,
+      0.5657
+     ]
+    },
+    {
+     "faixa": "5-7.5",
+     "n": 20,
+     "viradas": 7,
+     "taxa": 0.35,
+     "ic95": [
+      0.1812,
+      0.5671
+     ]
+    },
+    {
+     "faixa": "7.5-10",
+     "n": 11,
+     "viradas": 3,
+     "taxa": 0.2727,
+     "ic95": [
+      0.0975,
+      0.5657
+     ]
+    },
+    {
+     "faixa": "10-15",
+     "n": 16,
+     "viradas": 3,
+     "taxa": 0.1875,
+     "ic95": [
+      0.0659,
+      0.4301
+     ]
+    },
+    {
+     "faixa": "15-20",
+     "n": 18,
+     "viradas": 0,
+     "taxa": 0.0,
+     "ic95": [
+      0.0,
+      0.1759
+     ]
+    },
+    {
+     "faixa": "20-100",
+     "n": 10,
+     "viradas": 1,
+     "taxa": 0.1,
+     "ic95": [
+      0.0179,
+      0.4042
+     ]
+    }
+   ],
+   "perfil_margem_lt3_outros_lt15": {
+    "n": 12,
+    "viradas": 7,
+    "taxa": 0.5833,
+    "ic95": [
+     0.3195,
+     0.8067
+    ]
+   },
+   "total": {
+    "n": 109,
+    "viradas": 29
+   }
+  },
+  "prefeito": {
+   "por_faixa": [
+    {
+     "faixa": "0-1",
+     "n": 23,
+     "viradas": 6,
+     "taxa": 0.2609,
+     "ic95": [
+      0.1255,
+      0.4647
+     ]
+    },
+    {
+     "faixa": "1-2",
+     "n": 20,
+     "viradas": 8,
+     "taxa": 0.4,
+     "ic95": [
+      0.2188,
+      0.6134
+     ]
+    },
+    {
+     "faixa": "2-3",
+     "n": 20,
+     "viradas": 4,
+     "taxa": 0.2,
+     "ic95": [
+      0.0807,
+      0.416
+     ]
+    },
+    {
+     "faixa": "3-5",
+     "n": 39,
+     "viradas": 15,
+     "taxa": 0.3846,
+     "ic95": [
+      0.2489,
+      0.541
+     ]
+    },
+    {
+     "faixa": "5-7.5",
+     "n": 44,
+     "viradas": 19,
+     "taxa": 0.4318,
+     "ic95": [
+      0.2968,
+      0.5778
+     ]
+    },
+    {
+     "faixa": "7.5-10",
+     "n": 43,
+     "viradas": 11,
+     "taxa": 0.2558,
+     "ic95": [
+      0.1493,
+      0.4024
+     ]
+    },
+    {
+     "faixa": "10-15",
+     "n": 64,
+     "viradas": 15,
+     "taxa": 0.2344,
+     "ic95": [
+      0.1475,
+      0.3513
+     ]
+    },
+    {
+     "faixa": "15-20",
+     "n": 46,
+     "viradas": 6,
+     "taxa": 0.1304,
+     "ic95": [
+      0.0612,
+      0.2567
+     ]
+    },
+    {
+     "faixa": "20-100",
+     "n": 46,
+     "viradas": 3,
+     "taxa": 0.0652,
+     "ic95": [
+      0.0224,
+      0.175
+     ]
+    }
+   ],
+   "perfil_margem_lt3_outros_lt15": {
+    "n": 9,
+    "viradas": 1,
+    "taxa": 0.1111,
+    "ic95": [
+     0.0199,
+     0.435
+    ]
+   },
+   "total": {
+    "n": 345,
+    "viradas": 87
+   }
+  },
+  "prefeito_capital": {
+   "por_faixa": [
+    {
+     "faixa": "0-1",
+     "n": 7,
+     "viradas": 1,
+     "taxa": 0.1429,
+     "ic95": [
+      0.0257,
+      0.5131
+     ]
+    },
+    {
+     "faixa": "1-2",
+     "n": 8,
+     "viradas": 3,
+     "taxa": 0.375,
+     "ic95": [
+      0.1368,
+      0.6943
+     ]
+    },
+    {
+     "faixa": "2-3",
+     "n": 11,
+     "viradas": 1,
+     "taxa": 0.0909,
+     "ic95": [
+      0.0162,
+      0.3774
+     ]
+    },
+    {
+     "faixa": "3-5",
+     "n": 9,
+     "viradas": 3,
+     "taxa": 0.3333,
+     "ic95": [
+      0.1206,
+      0.6458
+     ]
+    },
+    {
+     "faixa": "5-7.5",
+     "n": 16,
+     "viradas": 6,
+     "taxa": 0.375,
+     "ic95": [
+      0.1848,
+      0.6136
+     ]
+    },
+    {
+     "faixa": "7.5-10",
+     "n": 14,
+     "viradas": 3,
+     "taxa": 0.2143,
+     "ic95": [
+      0.0757,
+      0.4759
+     ]
+    },
+    {
+     "faixa": "10-15",
+     "n": 18,
+     "viradas": 5,
+     "taxa": 0.2778,
+     "ic95": [
+      0.125,
+      0.5087
+     ]
+    },
+    {
+     "faixa": "15-20",
+     "n": 16,
+     "viradas": 1,
+     "taxa": 0.0625,
+     "ic95": [
+      0.0111,
+      0.2833
+     ]
+    },
+    {
+     "faixa": "20-100",
+     "n": 20,
+     "viradas": 0,
+     "taxa": 0.0,
+     "ic95": [
+      0.0,
+      0.1611
+     ]
+    }
+   ],
+   "perfil_margem_lt3_outros_lt15": {
+    "n": 1,
+    "viradas": 0,
+    "taxa": 0.0,
+    "ic95": [
+     0.0,
+     0.7935
+    ]
+   },
+   "total": {
+    "n": 119,
+    "viradas": 23
+   }
+  }
+ },
+ "contagem_por_cargo": {
+  "governador": {
+   "disputas": 103,
+   "viradas": 29
+  },
+  "prefeito": {
+   "disputas": 345,
+   "viradas": 87
+  },
+  "presidente": {
+   "disputas": 6,
+   "viradas": 0
+  }
+ },
+ "contagem_por_cargo_ano": {
+  "governador:1994": {
+   "disputas": 18,
+   "viradas": 6
+  },
+  "governador:1998": {
+   "disputas": 12,
+   "viradas": 4
+  },
+  "governador:2002": {
+   "disputas": 14,
+   "viradas": 3
+  },
+  "governador:2006": {
+   "disputas": 10,
+   "viradas": 3
+  },
+  "governador:2010": {
+   "disputas": 9,
+   "viradas": 2
+  },
+  "governador:2014": {
+   "disputas": 14,
+   "viradas": 5
+  },
+  "governador:2018": {
+   "disputas": 14,
+   "viradas": 2
+  },
+  "governador:2022": {
+   "disputas": 12,
+   "viradas": 4
+  },
+  "prefeito:1996": {
+   "disputas": 31,
+   "viradas": 7
+  },
+  "prefeito:2000": {
+   "disputas": 31,
+   "viradas": 6
+  },
+  "prefeito:2004": {
+   "disputas": 41,
+   "viradas": 12
+  },
+  "prefeito:2008": {
+   "disputas": 30,
+   "viradas": 5
+  },
+  "prefeito:2012": {
+   "disputas": 50,
+   "viradas": 13
+  },
+  "prefeito:2016": {
+   "disputas": 56,
+   "viradas": 14
+  },
+  "prefeito:2020": {
+   "disputas": 57,
+   "viradas": 17
+  },
+  "prefeito:2024": {
+   "disputas": 49,
+   "viradas": 13
+  },
+  "presidente:2002": {
+   "disputas": 1,
+   "viradas": 0
+  },
+  "presidente:2006": {
+   "disputas": 1,
+   "viradas": 0
+  },
+  "presidente:2010": {
+   "disputas": 1,
+   "viradas": 0
+  },
+  "presidente:2014": {
+   "disputas": 1,
+   "viradas": 0
+  },
+  "presidente:2018": {
+   "disputas": 1,
+   "viradas": 0
+  },
+  "presidente:2022": {
+   "disputas": 1,
+   "viradas": 0
+  }
+ }
+}
