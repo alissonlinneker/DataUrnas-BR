@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Quando cada região chegou: 2º turno de 2026</title>
+<desc id="descricao">Curvas de chegada acumulada por região; mostram a ordem geográfica em que os boletins foram recebidos.</desc>
+<rect x="1" y="1" width="998" height="558" rx="18" fill="#FFFFFF" stroke="#CBD8E3" stroke-width="1.5"/>
+<g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect x="32.0" y="30.0" width="6.0" height="30.0" rx="3" fill="#E69F00"/>
+<text x="50.0" y="50.0" font-size="22" font-weight="700" fill="#0B3A5B" text-anchor="start">Quando cada região chegou: 2º turno de 2026</text>
+<text x="50.0" y="74.0" font-size="14" font-weight="400" fill="#4F6B80" text-anchor="start">Seções de cada região com BU recebido, a cada 5 minutos; entre parênteses, a fatia do 13 nos válidos</text>
+<line x1="90.0" y1="430.0" x2="950.0" y2="430.0" stroke="#D9E3EB" stroke-width="1.6"/>
+<text x="82.0" y="434.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">0%</text>
+<line x1="90.0" y1="362.5" x2="950.0" y2="362.5" stroke="#D9E3EB" stroke-width="1"/>
+<text x="82.0" y="366.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">25%</text>
+<line x1="90.0" y1="295.0" x2="950.0" y2="295.0" stroke="#D9E3EB" stroke-width="1"/>
+<text x="82.0" y="299.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">50%</text>
+<line x1="90.0" y1="227.5" x2="950.0" y2="227.5" stroke="#D9E3EB" stroke-width="1"/>
+<text x="82.0" y="231.5" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">75%</text>
+<line x1="90.0" y1="160.0" x2="950.0" y2="160.0" stroke="#D9E3EB" stroke-width="1"/>
+<text x="82.0" y="164.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="end">100%</text>
+<line x1="131.0" y1="430.0" x2="131.0" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="131.0" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">17h</text>
+<line x1="253.8" y1="430.0" x2="253.8" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="253.8" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">18h</text>
+<line x1="376.7" y1="430.0" x2="376.7" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="376.7" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">19h</text>
+<line x1="499.5" y1="430.0" x2="499.5" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="499.5" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">20h</text>
+<line x1="622.4" y1="430.0" x2="622.4" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="622.4" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">21h</text>
+<line x1="745.2" y1="430.0" x2="745.2" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="745.2" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">22h</text>
+<line x1="868.1" y1="430.0" x2="868.1" y2="435.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="868.1" y="450.0" font-size="12" font-weight="400" fill="#4F6B80" text-anchor="middle">23h</text>
+<line x1="90.0" y1="430.0" x2="950.0" y2="430.0" stroke="#4F6B80" stroke-width="1"/>
+<text x="520.0" y="470.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="middle">Horário de Brasília, 25/10/2026</text>
+<text x="90.0" y="148.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Seções da região já recebidas</text>
+<polyline points="141.2,430.0 151.4,428.7 386.9,425.4 397.1,424.3 407.4,422.4 417.6,419.4 427.9,414.2 438.1,406.2 448.3,395.4 458.6,382.9 468.8,369.5 479.0,361.5 489.3,348.3 499.5,330.5 509.8,308.9 520.0,288.0 530.2,267.2 540.5,248.7 550.7,232.3 561.0,218.0 571.2,204.6 581.4,192.6 591.7,183.4 601.9,176.3 612.1,170.0 622.4,164.8 632.6,161.9 642.9,160.7 653.1,160.1 663.3,160.0 673.6,160.0 694.0,160.0" fill="none" stroke="#009E73" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="151.4,429.9 386.9,429.4 397.1,429.4 407.4,429.3 417.6,428.9 427.9,428.1 438.1,426.7 448.3,424.5 458.6,421.8 468.8,418.8 479.0,416.9 489.3,413.2 499.5,407.9 509.8,399.7 520.0,390.1 530.2,379.2 540.5,366.9 550.7,353.2 561.0,337.4 571.2,321.3 581.4,303.6 591.7,285.1 601.9,264.2 612.1,241.9 622.4,218.9 632.6,194.6 642.9,167.4 653.1,160.7 663.3,160.6 673.6,160.4 683.8,160.4 694.0,160.3 704.3,160.3 714.5,160.2 724.8,160.2 735.0,160.2 745.2,160.1 755.5,160.1 765.7,160.1 776.0,160.1 786.2,160.1 796.4,160.0 806.7,160.0 816.9,160.0 827.1,160.0 837.4,160.0 888.6,160.0" fill="none" stroke="#0072B2" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="151.4,429.0 386.9,423.1 397.1,422.2 407.4,421.1 417.6,417.1 427.9,410.5 438.1,400.7 448.3,384.0 458.6,369.5 468.8,355.2 479.0,346.1 489.3,330.5 499.5,315.5 509.8,296.5 520.0,279.2 530.2,261.3 540.5,246.2 550.7,231.9 561.0,219.7 571.2,208.5 581.4,197.2 591.7,187.3 601.9,177.6 612.1,170.2 622.4,165.3 632.6,163.4 642.9,161.2 653.1,160.7 663.3,160.4 673.6,160.0 683.8,160.0 694.0,160.0 735.0,160.0" fill="none" stroke="#56B4E9" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="131.0,430.0 141.2,429.6 151.4,425.7 386.9,422.9 397.1,419.2 407.4,412.2 417.6,405.9 427.9,397.2 438.1,383.0 448.3,363.0 458.6,345.6 468.8,328.9 479.0,320.0 489.3,308.4 499.5,293.4 509.8,276.0 520.0,258.8 530.2,244.6 540.5,232.2 550.7,219.4 561.0,208.4 571.2,201.4 581.4,195.0 591.7,188.0 601.9,179.9 612.1,172.9 622.4,167.6 632.6,164.2 642.9,161.1 653.1,160.7 663.3,160.5 673.6,160.3 683.8,160.1 694.0,160.1 714.5,160.1 724.8,160.0 735.0,160.0 765.7,160.0 796.4,160.0" fill="none" stroke="#0B3A5B" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="141.2,430.0 151.4,429.6 386.9,429.4 397.1,428.9 407.4,427.4 417.6,426.2 427.9,423.9 438.1,419.5 448.3,412.4 458.6,405.5 468.8,398.9 479.0,394.5 489.3,389.0 499.5,382.0 509.8,370.8 520.0,355.8 530.2,340.4 540.5,324.2 550.7,307.7 561.0,289.8 571.2,271.4 581.4,254.4 591.7,236.6 601.9,221.8 612.1,206.7 622.4,192.7 632.6,178.5 642.9,166.4 653.1,160.9 663.3,160.8 673.6,160.7 683.8,160.6 694.0,160.5 704.3,160.4 714.5,160.2 724.8,160.1 735.0,160.0 745.2,160.0 755.5,160.0 786.2,160.0 806.7,160.0 837.4,160.0 847.6,160.0 919.3,160.0" fill="none" stroke="#E69F00" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="151.4,269.8 438.1,269.4 448.3,268.0 458.6,267.8 468.8,266.9 479.0,264.4 489.3,263.6 509.8,263.0 520.0,262.4 530.2,260.1 540.5,259.7 550.7,259.1 561.0,258.1 571.2,255.0 581.4,254.3 591.7,253.3 601.9,251.0 612.1,248.6 622.4,235.8 632.6,231.4 642.9,204.6 653.1,170.9 683.8,169.9 694.0,168.5 745.2,160.0" fill="none" stroke="#CC79A7" stroke-width="2.2" stroke-linejoin="round"/>
+<line x1="90.0" y1="98.0" x2="116.0" y2="98.0" stroke="#009E73" stroke-width="3"/>
+<text x="122.0" y="102.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">Sul (37,4% no 13)</text>
+<line x1="236.8" y1="98.0" x2="262.8" y2="98.0" stroke="#0072B2" stroke-width="3"/>
+<text x="268.8" y="102.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">Sudeste (47,2% no 13)</text>
+<line x1="413.1" y1="98.0" x2="439.1" y2="98.0" stroke="#56B4E9" stroke-width="3"/>
+<text x="445.1" y="102.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">Centro-Oeste (40,0% no 13)</text>
+<line x1="90.0" y1="122.0" x2="116.0" y2="122.0" stroke="#0B3A5B" stroke-width="3"/>
+<text x="122.0" y="126.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">Norte (50,0% no 13)</text>
+<line x1="253.1" y1="122.0" x2="279.1" y2="122.0" stroke="#E69F00" stroke-width="3"/>
+<text x="285.1" y="126.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">Nordeste (69,4% no 13)</text>
+<line x1="436.1" y1="122.0" x2="462.1" y2="122.0" stroke="#CC79A7" stroke-width="3"/>
+<text x="468.1" y="126.0" font-size="12.5" font-weight="400" fill="#0B3A5B" text-anchor="start">Exterior (53,9% no 13)</text>
+<line x1="32" y1="514" x2="968" y2="514" stroke="#D9E3EB" stroke-width="1"/>
+<text x="32.0" y="538.0" font-size="12.5" font-weight="400" fill="#4F6B80" text-anchor="start">Fonte: TSE, aux.json e BUs do 2º turno de 2026 (coleta DataUrnas-BR)</text>
+<text x="968.0" y="538.0" font-size="12.5" font-weight="700" fill="#0B3A5B" text-anchor="end">DataUrnas-BR</text>
+</g></svg>
