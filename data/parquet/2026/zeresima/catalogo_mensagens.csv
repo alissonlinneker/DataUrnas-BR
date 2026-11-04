@@ -1,0 +1,39 @@
+turno,aplicacao,mensagem,classe_data,ocorrencias,secoes
+1,VOTA,Aguardando confirmação para emissão da zerésima,dia,502004,499175
+1,VOTA,Gerando relatório [RESUMO DA ZERÉSIMA] [INÍCIO],dia,499557,499175
+1,VOTA,Gerando relatório [RESUMO DA ZERÉSIMA] [TÉRMINO],dia,499556,499175
+1,VOTA,Gerando relatório [ZERÉSIMA] [INÍCIO],dia,499560,499175
+1,VOTA,Gerando relatório [ZERÉSIMA] [TÉRMINO],dia,499558,499175
+1,VOTA,Imprimindo relatório [RESUMO DA ZERÉSIMA] via nº [N],dia,505515,499175
+1,VOTA,Imprimindo relatório [ZERÉSIMA] via nº [N],dia,504173,499175
+1,VOTA,Aguardando data e hora para emissão da zerésima,outra_data,1117338,496162
+1,VOTA,Aguardando data e hora para emissão da zerésima,dia,25337,22126
+1,VOTA,Mesário indagado se quer imprimir a zerésima,dia,12858,11308
+1,GAP,GAP erro N | Validação do ADH | Aplicativo de Ajuste de Data e Hora não pode ser executado após a impressão da zerésima. Desligue a urna.,dia,23,14
+1,GAP,"Contingência de urna | Validando horário (N) | A contingência não pode ser feita. A mídia de votação é de seção com zerésima gerada, e o horário desta urna é anterior a N:N do dia da eleição. Desligue",outra_data,3,1
+1,GAP,"WHAT: gap::impl::CContingenciaUrna::ValidaHorarioUrnaCompativelFaseCicloVota() const::<lambda()>:N:N - A contingência não pode ser feita. A mídia de votação é de seção com zerésima gerada, e o horário",outra_data,3,1
+2,VOTA,Aguardando confirmação para emissão da zerésima,dia,501508,499177
+2,VOTA,Gerando relatório [RESUMO DA ZERÉSIMA] [INÍCIO],dia,499473,499177
+2,VOTA,Gerando relatório [RESUMO DA ZERÉSIMA] [TÉRMINO],dia,499472,499177
+2,VOTA,Gerando relatório [ZERÉSIMA] [INÍCIO],dia,499475,499177
+2,VOTA,Gerando relatório [ZERÉSIMA] [TÉRMINO],dia,499473,499177
+2,VOTA,Imprimindo relatório [RESUMO DA ZERÉSIMA] via nº [N],dia,503151,499177
+2,VOTA,Imprimindo relatório [ZERÉSIMA] via nº [N],dia,502619,499177
+2,VOTA,Aguardando data e hora para emissão da zerésima,outra_data,2182667,498294
+2,VOTA,Aguardando confirmação para emissão da zerésima,outro_turno,500448,497591
+2,VOTA,Gerando relatório [RESUMO DA ZERÉSIMA] [INÍCIO],outro_turno,498013,497590
+2,VOTA,Gerando relatório [RESUMO DA ZERÉSIMA] [TÉRMINO],outro_turno,498012,497590
+2,VOTA,Gerando relatório [ZERÉSIMA] [INÍCIO],outro_turno,498016,497590
+2,VOTA,Gerando relatório [ZERÉSIMA] [TÉRMINO],outro_turno,498014,497590
+2,VOTA,Imprimindo relatório [RESUMO DA ZERÉSIMA] via nº [N],outro_turno,503931,497590
+2,VOTA,Imprimindo relatório [ZERÉSIMA] via nº [N],outro_turno,502587,497590
+2,VOTA,Aguardando data e hora para emissão da zerésima,outro_turno,25291,22081
+2,VOTA,Aguardando data e hora para emissão da zerésima,dia,24786,21985
+2,VOTA,Mesário indagado se quer imprimir a zerésima,outro_turno,12769,11237
+2,VOTA,Mesário indagado se quer imprimir a zerésima,dia,6669,5835
+2,GAP,GAP erro N | Validação do ADH | Aplicativo de Ajuste de Data e Hora não pode ser executado após a impressão da zerésima. Desligue a urna.,outro_turno,19,13
+2,GAP,GAP erro N | Validação do ADH | Aplicativo de Ajuste de Data e Hora não pode ser executado após a impressão da zerésima. Desligue a urna.,dia,10,6
+2,SA,Imprimindo relatório [ZERÉSIMA DE APURAÇÃO],outro_turno,6,6
+2,GAP,"Contingência de urna | Validando horário (N) | A contingência não pode ser feita. A mídia de votação é de seção com zerésima gerada, e o horário desta urna é anterior a N:N do dia da eleição. Desligue",outra_data,3,1
+2,GAP,"WHAT: gap::impl::CContingenciaUrna::ValidaHorarioUrnaCompativelFaseCicloVota() const::<lambda()>:N:N - A contingência não pode ser feita. A mídia de votação é de seção com zerésima gerada, e o horário",outra_data,3,1
+2,SA,Imprimindo relatório [ZERÉSIMA DE APURAÇÃO],outra_data,1,1
