@@ -1,0 +1,61 @@
+msg,tardia,controle,pct_tardia,pct_controle,dif
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NCNDNF - NFNFA,360,40,72.0,13.0,59.0
+INFO|VOTA|Justificativa recebida,48,121,9.6,39.4,-29.799999999999997
+INFO|GAP|Urna operando com bateria interna,123,154,24.6,50.2,-25.6
+INFO|VOTA|Urna ligada desconectada da rede CA em [N.NV] e na Bateria Interna com [N.NV/-N.NA],122,143,24.4,46.6,-22.200000000000003
+INFO|GAP|Bateria interna com carga parcial,69,103,13.8,33.6,-19.8
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NAANC - CNDNF,31,79,6.2,25.7,-19.5
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NAANC - CNDNF,31,79,6.2,25.7,-19.5
+INFO|VOTA|Teste de Teclado do TE não executado,358,161,71.6,52.4,19.199999999999996
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NDNDNA - CNBN,89,0,17.8,0.0,17.8
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NDNDNA - CNBN,89,0,17.8,0.0,17.8
+INFO|VOTA|Carga da [ALIMENTAÇÃO BATERIA INTERNA]: [PARCIAL],91,103,18.2,33.6,-15.400000000000002
+INFO|VOTA|Urna operando na bateria interna,327,243,65.4,79.2,-13.799999999999997
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NCNEENC - NCDN,1,40,0.2,13.0,-12.8
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NBNBNF - NFEBNDN,1,40,0.2,13.0,-12.8
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NDEANCN - NFNCN,1,40,0.2,13.0,-12.8
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NENE - NBNDN,2,40,0.4,13.0,-12.6
+INFO|SCUE|Identificador da mídia de carga: NDNBEN,2,40,0.4,13.0,-12.6
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NBN - NFNFA,60,0,12.0,0.0,12.0
+INFO|SCUE|Identificador da mídia de carga: NBNE,60,0,12.0,0.0,12.0
+INFO|VOTA|Ano de nascimento digitado é igual ao do cadastro,214,167,42.8,54.4,-11.600000000000001
+INFO|SCUE|Identificador da mídia de carga: DNBN,5,38,1.0,12.4,-11.4
+INFO|SCUE|Identificador da mídia de carga: NBNBEBB,56,0,11.2,0.0,11.2
+INFO|VOTA|Urna ligada conectada na rede CA em [N.NV] e na Bateria Interna com [N.NV/NA],485,264,97.0,86.0,11.0
+INFO|SCUE|Identificador da mídia de carga: FNFN,53,0,10.6,0.0,10.6
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NAA - NFNFA,52,0,10.4,0.0,10.4
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NBNFD - NFNFA,51,0,10.2,0.0,10.2
+INFO|VOTA|Carga da [ALIMENTAÇÃO BATERIA INTERNA]: [PLENA],316,225,63.2,73.3,-10.099999999999994
+INFO|ATUE|Fim do teste MSE - SUCESSO,485,267,97.0,87.0,10.0
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NFDFNFN - NC,15,40,3.0,13.0,-10.0
+INFO|SCUE|Detectada impressora com serial N,485,267,97.0,87.0,10.0
+INFO|SCUE|Tamanho da memória: N.N MB,15,40,3.0,13.0,-10.0
+INFO|SCUE|Tamanho da memória: N.N GB,485,267,97.0,87.0,10.0
+INFO|ATUE|Fim do teste MSD - SUCESSO,15,40,3.0,13.0,-10.0
+INFO|ATUE|Fim do teste Led Segurança - SUCESSO,15,40,3.0,13.0,-10.0
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NFDFNFN - NC,15,40,3.0,13.0,-10.0
+INFO|GAP|Detectada impressora com serial N,485,267,97.0,87.0,10.0
+INFO|GAP|Tamanho da partição dinâmica de dados da MI: N.N GB,485,267,97.0,87.0,10.0
+INFO|GAP|Tamanho da partição dinâmica de dados da MI: N.N MB,15,40,3.0,13.0,-10.0
+INFO|SCUE|Versão do UEFI: IYEAN_P,485,267,97.0,87.0,10.0
+INFO|SCUE|Tamanho da mídia interna: N.N MB,15,40,3.0,13.0,-10.0
+INFO|SCUE|Tamanho da mídia interna: N.N GB,485,267,97.0,87.0,10.0
+INFO|VOTA|Quantidade de memória livre [N.N GB],485,267,97.0,87.0,10.0
+INFO|VOTA|Quantidade de memória livre [N.N MB],15,40,3.0,13.0,-10.0
+INFO|ATUE|Início do teste MSE,485,267,97.0,87.0,10.0
+INFO|VOTA|Mesário N é eleitor da seção,410,221,82.0,72.0,10.0
+INFO|VOTA|Espaço livre na MI [N.N GB],485,267,97.0,87.0,10.0
+INFO|VOTA|Espaço livre na MI [N.N MB],15,40,3.0,13.0,-10.0
+INFO|VOTA|Quantidade de memória total [N.N MB],15,40,3.0,13.0,-10.0
+INFO|ATUE|Início do teste Led Segurança,15,40,3.0,13.0,-10.0
+INFO|ATUE|Início do teste MSD,15,40,3.0,13.0,-10.0
+INFO|VOTA|Quantidade de memória total [N.N GB],485,267,97.0,87.0,10.0
+INFO|VOTA|Realizada a conferência da biometria do mesário,388,209,77.6,68.1,9.5
+INFO|SCUE|Identificador da mídia de carga: NBNEENC,0,29,0.0,9.4,-9.4
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NDNDN - NFNFA,2,30,0.4,9.8,-9.4
+INFO|GAP|Mídia de votação gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NDNAD - NFNFA,1,29,0.2,9.4,-9.200000000000001
+INFO|SCUE|Mídia de carga gerada pelo computador (nome - tpm - instalação): ZPRNSTDN - NCCNANB - DNFDE,1,28,0.2,9.1,-8.9
+INFO|VOTA|Apresentada tela do reinício da votação,16,37,3.2,12.1,-8.899999999999999
+INFO|VOTA|Mesário confirmou o reinício da votação,16,37,3.2,12.1,-8.899999999999999
+INFO|SCUE|Bateria interna com carga plena,462,257,92.4,83.7,8.700000000000003
+INFO|SCUE|Bateria interna com carga parcial,37,49,7.4,16.0,-8.6
