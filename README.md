@@ -48,7 +48,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 
 - **2022 completo:** 941.987 seções dos dois turnos da eleição presidencial, em todas as 27 UFs, decodificadas e auditadas.
 - **2026 completo, nos dois turnos:** resultado oficial agregado (Brasil, 27 UFs, exterior e 5.757 municípios) e os Boletins de Urna de todas as 499.207 seções instaladas em cada turno. A soma dos BUs reproduz exatamente o resultado oficial: no 1º turno em todas as 28 UFs (27 mais o exterior) e nos 5.757 municípios; no 2º turno, voto a voto no total do Brasil (13: 64.256.232; 22: 59.826.041).
-- **[Veredicto da auditoria 2026](#veredicto-da-auditoria-2026):** 19 verificações nos dois turnos, sem nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos arquivos públicos. O limite real também está descrito: o software que rodou em cada urna não é verificável com dados públicos.
+- **[Veredicto da auditoria 2026](#veredicto-da-auditoria-2026):** 23 verificações nos dois turnos, sem nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos arquivos públicos. O limite real também está descrito: o software que rodou em cada urna não é verificável com dados públicos.
 - **RDV recontado em todas as seções dos dois turnos:** no 1º turno, 749.119.391 registros de voto em 499.206 seções, iguais ao BU em todos os cargos; no 2º turno, 499.205 seções com RDV, iguais ao BU, e a soma nacional do RDV é exatamente o resultado oficial. Nenhuma divergência. Detalhes na [recontagem do 1º turno](#recontagem-voto-a-voto-pelo-rdv-2026) e na [do 2º turno](#integridade-e-recontagem-do-2º-turno).
 - **Integridade dos arquivos de 2026 concluída nos dois turnos:** no 1º turno, 1.497.620 SHA-512 de BU, RDV e log conferem com o valor assinado pela urna; no 2º turno, 5.487.289 assinaturas de hardware de todos os arquivos listados no `.vsc` são válidas. Nenhum hash divergente e nenhuma assinatura inválida. Detalhes no [resultado do 1º turno](#integridade-dos-arquivos-resultado), no [relatório de integridade](docs/relatorio-integridade-2026.md) e nos [certificados do 2º turno](docs/certificados-2turno-2026.md).
 - **Resultados assinados pelo TSE conferidos:** as 11.572 assinaturas JWS dos resultados divulgados nos dois turnos (Brasil, 28 UFs e 5.757 municípios) são válidas e iguais à soma dos BUs ([JWS](docs/jws-totalizacao-2026.md)).
@@ -63,7 +63,7 @@ O projeto baixa os arquivos que cada urna gera ao fim da votação, decodifica o
 ## Veredicto da auditoria 2026
 
 <p align="center">
-  <img src="docs/assets/2026-veredicto.svg" alt="Resumo do veredicto da auditoria de 2026: 19 verificações nos dois turnos, nenhuma evidência de manipulação, de contagem errada ou de dado impossível; RDV recontado em 499.206 seções no 1º turno e 499.205 no 2º, sem divergência; 11.572 assinaturas JWS dos resultados válidas; margem oficial do 2º turno de 4.430.191 votos" width="100%">
+  <img src="docs/assets/2026-veredicto.svg" alt="Resumo do veredicto da auditoria de 2026: 23 verificações nos dois turnos, nenhuma evidência de manipulação, de contagem errada ou de dado impossível; RDV recontado em 499.206 seções no 1º turno e 499.205 no 2º, sem divergência; 11.572 assinaturas JWS dos resultados válidas; margem oficial do 2º turno de 4.430.191 votos" width="100%">
 </p>
 
 > **Não foi encontrada nenhuma evidência de manipulação, de contagem errada de votos ou de dado impossível nos arquivos públicos, em nenhum dos dois turnos de 2026.**
@@ -538,7 +538,7 @@ O painel é uma aplicação Streamlit com várias páginas. A página inicial, *
 A página **Veredicto da auditoria 2026** resume as verificações, o que não pode ser verificado com dados públicos e as pendências para o TSE:
 
 <p align="center">
-  <img src="docs/assets/telas/2026-veredicto.png" alt="Página Veredicto da auditoria 2026 do painel: nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos dois turnos, com a tabela das 19 verificações e o RDV recontado em todas as seções" width="100%">
+  <img src="docs/assets/telas/2026-veredicto.png" alt="Página Veredicto da auditoria 2026 do painel: nenhuma evidência de manipulação, de contagem errada ou de dado impossível nos dois turnos, com a tabela das 23 verificações e o RDV recontado em todas as seções" width="100%">
 </p>
 
 A página **Presidente 1º turno** apresenta o resultado do 1º turno de 2026:

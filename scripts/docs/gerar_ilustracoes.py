@@ -874,7 +874,7 @@ def integridade_t2() -> str:
 # ----------------------------------------------------------------------
 # g) Veredicto da auditoria (resumo de docs/veredicto-auditoria-2026.md)
 # ----------------------------------------------------------------------
-# Short labels for the 19 checks of the verdict table; keep in sync with the document.
+# Short labels for the 23 checks of the verdict table; keep in sync with the document.
 VERIFICADO = [
     ("Coleta versionada, 8 voltas de reconferência", "0 arquivos alterados ou removidos"),
     ("Assinatura digital de todos os arquivos", "5.487.289 válidas, 0 inválidas"),
@@ -895,6 +895,10 @@ VERIFICADO = [
     ("Hashes lacrados x programas nos logs", "todos os de inicialização estão na lista"),
     ("Assinatura JWS dos resultados divulgados", "11.572 válidas, 0 inválidas"),
     ("Alegações externas sobre viradas", "explicadas pela ordem geográfica de chegada"),
+    ("Pacote oficial do 2º turno x noite da eleição", "998.356 arquivos idênticos ao guardado"),
+    ("Imagem do BU e log x BU, pacote completo", "votos iguais nas 499.207 seções por turno"),
+    ("Ordem e horário de chegada dos BUs", "nenhum sinal de injeção; segue a geografia"),
+    ("Plausibilidade da virada", "chance perto de 50% pela margem do 1º turno"),
 ]
 NAO_VERIFICAVEL = [
     ("Qual software rodou em cada urna",
@@ -945,17 +949,17 @@ def veredicto() -> str:
         y += 50
     y += 10
     corpo.append(rect(32, y, W - 64, 40, SOFT, rx=10))
-    corpo.append(text(48, y + 25, "12 pontos de transparência e registro pedem esclarecimento do "
+    corpo.append(text(48, y + 25, "13 pontos de transparência e registro pedem esclarecimento do "
                       "TSE; nenhum deles altera a contagem.", size=13, fill=INK))
     h = int(y + 40 + 76)
     titulo = "Veredicto da auditoria: eleição presidencial de 2026"
-    subt = "19 verificações sobre os arquivos públicos dos dois turnos; método e números em docs/"
+    subt = "23 verificações sobre os arquivos públicos dos dois turnos; método e números em docs/"
     desc = ("Infográfico do veredicto: nenhuma evidência de manipulação, de contagem errada ou de "
             "dado impossível nos arquivos públicos, em nenhum dos dois turnos. Verificado: "
             + "; ".join(f"{rot}: {res}" for rot, res in VERIFICADO)
             + ". Não pode ser verificado com dados públicos: "
             + "; ".join(f"{rot} ({res})" for rot, res in NAO_VERIFICAVEL)
-            + ". 12 pontos pedem esclarecimento do TSE, nenhum altera a contagem.")
+            + ". 13 pontos pedem esclarecimento do TSE, nenhum altera a contagem.")
     fonte = "Fonte: docs/veredicto-auditoria-2026.md e documentos citados nele"
     return documento(W, h, titulo, desc, corpo, subt, fonte)
 
