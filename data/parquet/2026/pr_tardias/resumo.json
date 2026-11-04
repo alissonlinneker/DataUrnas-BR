@@ -1,0 +1,497 @@
+{
+  "resultado_oficial_gerado": "2026-10-05 12:51:05",
+  "ultimas_499": {
+    "por_uf": {
+      "pr": 481,
+      "ba": 14,
+      "rs": 2,
+      "sp": 1,
+      "sc": 1
+    },
+    "primeira": "2026-10-07 12:19:03",
+    "ultima": "2026-10-07 15:00:09",
+    "st_secao": {
+      "Recebida": 499
+    }
+  },
+  "tardias_brasil": {
+    "secoes": 2765,
+    "por_uf": {
+      "pa": 1621,
+      "pr": 500,
+      "ma": 403,
+      "ba": 135,
+      "pe": 76,
+      "pi": 19,
+      "sp": 4,
+      "am": 3,
+      "rs": 2,
+      "sc": 1,
+      "rj": 1
+    },
+    "st_secao": {
+      "Recebida": 2677,
+      "Totalizada": 88
+    },
+    "recebida_fora_das_tardias": 0
+  },
+  "pr": {
+    "secoes_pr": 27142,
+    "tardias": 500,
+    "tardias_entre_ultimas_499": 481,
+    "rec_min": "2026-10-07 12:15:32",
+    "rec_max": "2026-10-07 15:00:09",
+    "comparecimento": 132758,
+    "municipios": 14,
+    "zonas": 14,
+    "por_zona": [
+      {
+        "cd_mun": "74225",
+        "nm_mun": "CANDÓI",
+        "zona": "0203",
+        "tardias": 5,
+        "rec_min": "2026-10-07 12:15:32",
+        "rec_max": "2026-10-07 12:22:53",
+        "locais": 4,
+        "secoes_zona": 43
+      },
+      {
+        "cd_mun": "75388",
+        "nm_mun": "GOIOXIM",
+        "zona": "0203",
+        "tardias": 8,
+        "rec_min": "2026-10-07 12:15:49",
+        "rec_max": "2026-10-07 12:20:52",
+        "locais": 3,
+        "secoes_zona": 20
+      },
+      {
+        "cd_mun": "84514",
+        "nm_mun": "CANTAGALO",
+        "zona": "0203",
+        "tardias": 14,
+        "rec_min": "2026-10-07 12:16:20",
+        "rec_max": "2026-10-07 12:23:09",
+        "locais": 6,
+        "secoes_zona": 35
+      },
+      {
+        "cd_mun": "75353",
+        "nm_mun": "CURITIBA",
+        "zona": "0178",
+        "tardias": 360,
+        "rec_min": "2026-10-07 12:18:01",
+        "rec_max": "2026-10-07 15:00:09",
+        "locais": 43,
+        "secoes_zona": 415
+      },
+      {
+        "cd_mun": "74969",
+        "nm_mun": "VIRMOND",
+        "zona": "0203",
+        "tardias": 4,
+        "rec_min": "2026-10-07 12:19:58",
+        "rec_max": "2026-10-07 12:22:43",
+        "locais": 4,
+        "secoes_zona": 12
+      },
+      {
+        "cd_mun": "74675",
+        "nm_mun": "CALIFÓRNIA",
+        "zona": "0076",
+        "tardias": 25,
+        "rec_min": "2026-10-07 13:31:34",
+        "rec_max": "2026-10-07 13:40:37",
+        "locais": 4,
+        "secoes_zona": 25
+      },
+      {
+        "cd_mun": "74330",
+        "nm_mun": "MARILÂNDIA DO SUL",
+        "zona": "0076",
+        "tardias": 28,
+        "rec_min": "2026-10-07 13:44:20",
+        "rec_max": "2026-10-07 13:51:46",
+        "locais": 5,
+        "secoes_zona": 28
+      },
+      {
+        "cd_mun": "74543",
+        "nm_mun": "MAUÁ DA SERRA",
+        "zona": "0076",
+        "tardias": 25,
+        "rec_min": "2026-10-07 13:54:23",
+        "rec_max": "2026-10-07 14:01:16",
+        "locais": 5,
+        "secoes_zona": 25
+      },
+      {
+        "cd_mun": "76678",
+        "nm_mun": "LONDRINA",
+        "zona": "0157",
+        "tardias": 1,
+        "rec_min": "2026-10-07 14:01:03",
+        "rec_max": "2026-10-07 14:01:03",
+        "locais": 1,
+        "secoes_zona": 290
+      },
+      {
+        "cd_mun": "78190",
+        "nm_mun": "RIO BOM",
+        "zona": "0076",
+        "tardias": 11,
+        "rec_min": "2026-10-07 14:02:21",
+        "rec_max": "2026-10-07 14:04:27",
+        "locais": 3,
+        "secoes_zona": 11
+      },
+      {
+        "cd_mun": "74934",
+        "nm_mun": "CASCAVEL",
+        "zona": "0068",
+        "tardias": 1,
+        "rec_min": "2026-10-07 14:03:28",
+        "rec_max": "2026-10-07 14:03:28",
+        "locais": 1,
+        "secoes_zona": 372
+      },
+      {
+        "cd_mun": "78514",
+        "nm_mun": "SANTA IZABEL DO OESTE",
+        "zona": "0130",
+        "tardias": 1,
+        "rec_min": "2026-10-07 14:33:25",
+        "rec_max": "2026-10-07 14:33:25",
+        "locais": 1,
+        "secoes_zona": 29
+      },
+      {
+        "cd_mun": "76295",
+        "nm_mun": "JACAREZINHO",
+        "zona": "0024",
+        "tardias": 15,
+        "rec_min": "2026-10-07 14:42:59",
+        "rec_max": "2026-10-07 14:54:28",
+        "locais": 3,
+        "secoes_zona": 102
+      },
+      {
+        "cd_mun": "79375",
+        "nm_mun": "UNIÃO DA VITÓRIA",
+        "zona": "0033",
+        "tardias": 2,
+        "rec_min": "2026-10-07 14:50:39",
+        "rec_max": "2026-10-07 14:57:56",
+        "locais": 1,
+        "secoes_zona": 139
+      }
+    ],
+    "st_secao": {
+      "Recebida": 500
+    },
+    "tipo_urna": {
+      "secao": 497,
+      "reservaSecao": 3
+    },
+    "tipo_urna_pr_todas": {
+      "secao": 26878,
+      "reservaSecao": 264
+    },
+    "origem_bu": {
+      "bu": 500
+    },
+    "modelo_urna": {
+      "UE2022": 481,
+      "UE2015": 15,
+      "UE2020": 4
+    },
+    "modelo_urna_pr_todas": {
+      "UE2020": 11336,
+      "UE2022": 9937,
+      "UE2015": 4367,
+      "UE2013": 1502
+    },
+    "emissao_local_min": "2026-10-04 17:01:31",
+    "emissao_local_max": "2026-10-04 18:29:26",
+    "encerramento_local_min": "2026-10-04 17:00:19",
+    "encerramento_local_max": "2026-10-04 18:25:54",
+    "encerradas_apos_17h05": 129,
+    "encerradas_apos_17h05_pr_pontuais": 5777
+  },
+  "votos": {
+    "tardias": {
+      "secoes": 500,
+      "v13": 37441,
+      "v22": 76535,
+      "fatia_13_no_13_22": 32.85
+    },
+    "mesmas_zonas_pontuais": {
+      "secoes": 1046,
+      "v13": 76170,
+      "v22": 160151,
+      "fatia_13_no_13_22": 32.23
+    },
+    "mesmos_municipios_pontuais": {
+      "secoes": 5932,
+      "v13": 454920,
+      "v22": 924663,
+      "fatia_13_no_13_22": 32.98
+    },
+    "pr_pontuais": {
+      "secoes": 26642,
+      "v13": 2017156,
+      "v22": 3868810,
+      "fatia_13_no_13_22": 34.27
+    },
+    "por_zona": [
+      {
+        "cd_mun": "74225",
+        "zona": "0203",
+        "tardias": 5,
+        "pontuais": 38,
+        "fatia13_tardias": 45.85,
+        "fatia13_pontuais": 45.93
+      },
+      {
+        "cd_mun": "74330",
+        "zona": "0076",
+        "tardias": 28,
+        "pontuais": 0,
+        "fatia13_tardias": 29.51,
+        "fatia13_pontuais": null
+      },
+      {
+        "cd_mun": "74543",
+        "zona": "0076",
+        "tardias": 25,
+        "pontuais": 0,
+        "fatia13_tardias": 35.1,
+        "fatia13_pontuais": null
+      },
+      {
+        "cd_mun": "74675",
+        "zona": "0076",
+        "tardias": 25,
+        "pontuais": 0,
+        "fatia13_tardias": 29.83,
+        "fatia13_pontuais": null
+      },
+      {
+        "cd_mun": "74934",
+        "zona": "0068",
+        "tardias": 1,
+        "pontuais": 371,
+        "fatia13_tardias": 16.53,
+        "fatia13_pontuais": 29.74
+      },
+      {
+        "cd_mun": "74969",
+        "zona": "0203",
+        "tardias": 4,
+        "pontuais": 8,
+        "fatia13_tardias": 29.42,
+        "fatia13_pontuais": 41.11
+      },
+      {
+        "cd_mun": "75353",
+        "zona": "0178",
+        "tardias": 360,
+        "pontuais": 55,
+        "fatia13_tardias": 31.29,
+        "fatia13_pontuais": 30.7
+      },
+      {
+        "cd_mun": "75388",
+        "zona": "0203",
+        "tardias": 8,
+        "pontuais": 12,
+        "fatia13_tardias": 49.22,
+        "fatia13_pontuais": 56.43
+      },
+      {
+        "cd_mun": "76295",
+        "zona": "0024",
+        "tardias": 15,
+        "pontuais": 87,
+        "fatia13_tardias": 58.01,
+        "fatia13_pontuais": 43.37
+      },
+      {
+        "cd_mun": "76678",
+        "zona": "0157",
+        "tardias": 1,
+        "pontuais": 289,
+        "fatia13_tardias": 26.42,
+        "fatia13_pontuais": 27.94
+      },
+      {
+        "cd_mun": "78190",
+        "zona": "0076",
+        "tardias": 11,
+        "pontuais": 0,
+        "fatia13_tardias": 40.17,
+        "fatia13_pontuais": null
+      },
+      {
+        "cd_mun": "78514",
+        "zona": "0130",
+        "tardias": 1,
+        "pontuais": 28,
+        "fatia13_tardias": 31.94,
+        "fatia13_pontuais": 40.94
+      },
+      {
+        "cd_mun": "79375",
+        "zona": "0033",
+        "tardias": 2,
+        "pontuais": 137,
+        "fatia13_tardias": 28.12,
+        "fatia13_pontuais": 33.19
+      },
+      {
+        "cd_mun": "84514",
+        "zona": "0203",
+        "tardias": 14,
+        "pontuais": 21,
+        "fatia13_tardias": 47.69,
+        "fatia13_pontuais": 50.22
+      }
+    ],
+    "t2_tardias": {
+      "fatia13_t1": 32.85,
+      "fatia13_t2": 35.71
+    },
+    "t2_pontuais": {
+      "fatia13_t1": 34.27,
+      "fatia13_t2": 37.46
+    }
+  },
+  "t2_mesmas_secoes": {
+    "secoes": 500,
+    "rec_min": "2026-10-25 17:05:39",
+    "rec_max": "2026-10-25 21:12:10",
+    "st": {
+      "Recebida": 360,
+      "Totalizada": 140
+    },
+    "pr_rec_max_t2": "2026-10-25 21:21:07"
+  },
+  "controle_t2": {
+    "secoes": 1341,
+    "por_uf": {
+      "pe": 447,
+      "ba": 344,
+      "pa": 216,
+      "ma": 191,
+      "am": 77,
+      "rs": 62,
+      "rj": 2,
+      "pi": 1,
+      "sp": 1
+    },
+    "um_unico_hash": 1341,
+    "totalizadas_antes": 1341,
+    "rec_totalizado_max": "2026-10-25 21:24:35",
+    "rec_ultimo_min": "2026-10-26 08:09:39",
+    "rec_ultimo_max": "2026-10-28 09:44:50",
+    "bu_sha_unico": 1341,
+    "st_final": {
+      "Recebida": 1341
+    },
+    "f_final": {
+      "O": 1341
+    },
+    "final_lista_imgbu": 1341
+  },
+  "pacote_head": {
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/arqurnatot/bu_imgbu_logjez_rdv_vscmr_2026_1t_PR.zip",
+    "tamanho": 5175339811,
+    "last_modified": "Thu, 22 Oct 2026 20:21:43 GMT"
+  },
+  "pacote_cd": {
+    "membros": 135710,
+    "secoes": 27142,
+    "imgbu_tardias": 500,
+    "imgbu_pontuais": 26642,
+    "data_zip_bu_tardias": {
+      "2026-10-05": 500
+    },
+    "data_zip_bu_pontuais": {
+      "2026-10-05": 26642
+    }
+  },
+  "pacote_exame": {
+    "controle": {
+      "secoes": 307,
+      "assinatura_valida": {
+        "True": 307
+      },
+      "hash_bu_confere": {
+        "True": 307
+      },
+      "hash_rdv_confere": {
+        "True": 307
+      },
+      "hash_log_confere": {
+        "True": 307
+      },
+      "hash_imgbu_confere": {
+        "True": 307
+      },
+      "rdv_confere": {
+        "True": 307
+      },
+      "rdv_tipo_urna": {
+        "secao": 305,
+        "reservaSecao": 2
+      },
+      "log_linhas_fora_do_dia": 307,
+      "log_ultima_min": "04/10/2026 17:01:52",
+      "log_ultima_max": "04/10/2026 18:11:48",
+      "log_mais_de_uma_urna": 2,
+      "secoes_log_kw_contingencia": 2,
+      "secoes_log_kw_apuracao_sa": 0,
+      "secoes_log_kw_recuperacao": 0,
+      "secoes_log_kw_substituicao": 1,
+      "secoes_log_kw_midia": 307,
+      "secoes_log_kw_transmissao": 0
+    },
+    "tardia": {
+      "secoes": 500,
+      "assinatura_valida": {
+        "True": 500
+      },
+      "hash_bu_confere": {
+        "True": 500
+      },
+      "hash_rdv_confere": {
+        "True": 500
+      },
+      "hash_log_confere": {
+        "True": 500
+      },
+      "hash_imgbu_confere": {
+        "True": 500
+      },
+      "rdv_confere": {
+        "True": 500
+      },
+      "rdv_tipo_urna": {
+        "secao": 497,
+        "reservaSecao": 3
+      },
+      "log_linhas_fora_do_dia": 500,
+      "log_ultima_min": "04/10/2026 17:02:16",
+      "log_ultima_max": "04/10/2026 18:31:51",
+      "log_mais_de_uma_urna": 3,
+      "secoes_log_kw_contingencia": 4,
+      "secoes_log_kw_apuracao_sa": 0,
+      "secoes_log_kw_recuperacao": 0,
+      "secoes_log_kw_substituicao": 0,
+      "secoes_log_kw_midia": 500,
+      "secoes_log_kw_transmissao": 0,
+      "rdv_13_22_igual_bu": 500
+    }
+  },
+  "mensagens_log_max_dif_pontos": 59.0
+}

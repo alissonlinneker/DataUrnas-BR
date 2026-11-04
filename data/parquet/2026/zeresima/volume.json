@@ -1,0 +1,572 @@
+{
+ "total": {
+  "zip_bytes": 219202414224,
+  "membros": 4992203,
+  "logs": 998354,
+  "log_bytes": 143792831238,
+  "ler_bytes": 211932150672,
+  "ranges": 25651
+ },
+ "por_zip": [
+  {
+   "uf": "AC",
+   "turno": 1,
+   "zip_bytes": 393536972,
+   "membros": 11351,
+   "logs": 2270,
+   "log_bytes": 209234019,
+   "ler_bytes": 368108498,
+   "ranges": 45
+  },
+  {
+   "uf": "AL",
+   "turno": 1,
+   "zip_bytes": 1404372980,
+   "membros": 35506,
+   "logs": 7101,
+   "log_bytes": 842984277,
+   "ler_bytes": 1329777595,
+   "ranges": 161
+  },
+  {
+   "uf": "AM",
+   "turno": 1,
+   "zip_bytes": 1595550575,
+   "membros": 40786,
+   "logs": 8157,
+   "log_bytes": 919260916,
+   "ler_bytes": 1498849565,
+   "ranges": 181
+  },
+  {
+   "uf": "AP",
+   "turno": 1,
+   "zip_bytes": 351213339,
+   "membros": 9571,
+   "logs": 1914,
+   "log_bytes": 190965588,
+   "ler_bytes": 328500503,
+   "ranges": 40
+  },
+  {
+   "uf": "BA",
+   "turno": 1,
+   "zip_bytes": 6967798815,
+   "membros": 177381,
+   "logs": 35476,
+   "log_bytes": 4071115654,
+   "ler_bytes": 6558859793,
+   "ranges": 792
+  },
+  {
+   "uf": "CE",
+   "turno": 1,
+   "zip_bytes": 4506414880,
+   "membros": 118826,
+   "logs": 23765,
+   "log_bytes": 2572138663,
+   "ler_bytes": 4235577021,
+   "ranges": 511
+  },
+  {
+   "uf": "DF",
+   "turno": 1,
+   "zip_bytes": 1347108781,
+   "membros": 34846,
+   "logs": 6969,
+   "log_bytes": 738319468,
+   "ler_bytes": 1254386884,
+   "ranges": 152
+  },
+  {
+   "uf": "ES",
+   "turno": 1,
+   "zip_bytes": 1799395069,
+   "membros": 49221,
+   "logs": 9844,
+   "log_bytes": 994969334,
+   "ler_bytes": 1686926524,
+   "ranges": 204
+  },
+  {
+   "uf": "GO",
+   "turno": 1,
+   "zip_bytes": 3001376540,
+   "membros": 78431,
+   "logs": 15686,
+   "log_bytes": 1689378949,
+   "ler_bytes": 2810595493,
+   "ranges": 340
+  },
+  {
+   "uf": "MA",
+   "turno": 1,
+   "zip_bytes": 3266353465,
+   "membros": 90466,
+   "logs": 18093,
+   "log_bytes": 1813497909,
+   "ler_bytes": 3067073508,
+   "ranges": 371
+  },
+  {
+   "uf": "MG",
+   "turno": 1,
+   "zip_bytes": 9638559468,
+   "membros": 260311,
+   "logs": 52060,
+   "log_bytes": 5362469368,
+   "ler_bytes": 9025803470,
+   "ranges": 1089
+  },
+  {
+   "uf": "MS",
+   "turno": 1,
+   "zip_bytes": 1238255431,
+   "membros": 35531,
+   "logs": 7106,
+   "log_bytes": 668456343,
+   "ler_bytes": 1161165312,
+   "ranges": 140
+  },
+  {
+   "uf": "MT",
+   "turno": 1,
+   "zip_bytes": 1537057359,
+   "membros": 41436,
+   "logs": 8287,
+   "log_bytes": 870311972,
+   "ler_bytes": 1445459099,
+   "ranges": 175
+  },
+  {
+   "uf": "PA",
+   "turno": 1,
+   "zip_bytes": 3851198257,
+   "membros": 104136,
+   "logs": 20827,
+   "log_bytes": 2161465079,
+   "ler_bytes": 3617028424,
+   "ranges": 437
+  },
+  {
+   "uf": "PB",
+   "turno": 1,
+   "zip_bytes": 2017890630,
+   "membros": 53561,
+   "logs": 10712,
+   "log_bytes": 1166255062,
+   "ler_bytes": 1902130767,
+   "ranges": 230
+  },
+  {
+   "uf": "PE",
+   "turno": 1,
+   "zip_bytes": 4297820068,
+   "membros": 107091,
+   "logs": 21418,
+   "log_bytes": 2518839673,
+   "ler_bytes": 4040273862,
+   "ranges": 488
+  },
+  {
+   "uf": "PI",
+   "turno": 1,
+   "zip_bytes": 1820165179,
+   "membros": 51126,
+   "logs": 10225,
+   "log_bytes": 1019018590,
+   "ler_bytes": 1715381139,
+   "ranges": 207
+  },
+  {
+   "uf": "PR",
+   "turno": 1,
+   "zip_bytes": 5175339811,
+   "membros": 135711,
+   "logs": 27142,
+   "log_bytes": 2918073783,
+   "ler_bytes": 4853930382,
+   "ranges": 586
+  },
+  {
+   "uf": "RJ",
+   "turno": 1,
+   "zip_bytes": 7515732123,
+   "membros": 188376,
+   "logs": 37675,
+   "log_bytes": 4159987404,
+   "ler_bytes": 6998955045,
+   "ranges": 845
+  },
+  {
+   "uf": "RN",
+   "turno": 1,
+   "zip_bytes": 1589430071,
+   "membros": 40576,
+   "logs": 8115,
+   "log_bytes": 950862201,
+   "ler_bytes": 1505163236,
+   "ranges": 182
+  },
+  {
+   "uf": "RO",
+   "turno": 1,
+   "zip_bytes": 812596377,
+   "membros": 23491,
+   "logs": 4698,
+   "log_bytes": 430906018,
+   "ler_bytes": 758844048,
+   "ranges": 92
+  },
+  {
+   "uf": "RR",
+   "turno": 1,
+   "zip_bytes": 260658618,
+   "membros": 7596,
+   "logs": 1519,
+   "log_bytes": 135397097,
+   "ler_bytes": 242816928,
+   "ranges": 30
+  },
+  {
+   "uf": "RS",
+   "turno": 1,
+   "zip_bytes": 5183300321,
+   "membros": 137736,
+   "logs": 27547,
+   "log_bytes": 2896240788,
+   "ler_bytes": 4856818982,
+   "ranges": 586
+  },
+  {
+   "uf": "SC",
+   "turno": 1,
+   "zip_bytes": 3356270600,
+   "membros": 86631,
+   "logs": 17326,
+   "log_bytes": 1935400818,
+   "ler_bytes": 3155892966,
+   "ranges": 381
+  },
+  {
+   "uf": "SE",
+   "turno": 1,
+   "zip_bytes": 1102702588,
+   "membros": 29616,
+   "logs": 5923,
+   "log_bytes": 623963012,
+   "ler_bytes": 1036983610,
+   "ranges": 126
+  },
+  {
+   "uf": "SP",
+   "turno": 1,
+   "zip_bytes": 20134436001,
+   "membros": 518281,
+   "logs": 103656,
+   "log_bytes": 11092936446,
+   "ler_bytes": 18770709807,
+   "ranges": 2264
+  },
+  {
+   "uf": "TO",
+   "turno": 1,
+   "zip_bytes": 765142259,
+   "membros": 21921,
+   "logs": 4384,
+   "log_bytes": 417108719,
+   "ler_bytes": 717961444,
+   "ranges": 87
+  },
+  {
+   "uf": "ZZ",
+   "turno": 1,
+   "zip_bytes": 136668327,
+   "membros": 6551,
+   "logs": 1281,
+   "log_bytes": 66805365,
+   "ler_bytes": 128728184,
+   "ranges": 16
+  },
+  {
+   "uf": "AC",
+   "turno": 2,
+   "zip_bytes": 512147002,
+   "membros": 11351,
+   "logs": 2270,
+   "log_bytes": 356548823,
+   "ler_bytes": 506574848,
+   "ranges": 62
+  },
+  {
+   "uf": "AL",
+   "turno": 2,
+   "zip_bytes": 1876467424,
+   "membros": 35506,
+   "logs": 7101,
+   "log_bytes": 1396112511,
+   "ler_bytes": 1857776922,
+   "ranges": 225
+  },
+  {
+   "uf": "AM",
+   "turno": 2,
+   "zip_bytes": 2140254436,
+   "membros": 40789,
+   "logs": 8157,
+   "log_bytes": 1582322230,
+   "ler_bytes": 2119209210,
+   "ranges": 257
+  },
+  {
+   "uf": "AP",
+   "turno": 2,
+   "zip_bytes": 438924137,
+   "membros": 9572,
+   "logs": 1914,
+   "log_bytes": 309334087,
+   "ler_bytes": 434097612,
+   "ranges": 53
+  },
+  {
+   "uf": "BA",
+   "turno": 2,
+   "zip_bytes": 9211995695,
+   "membros": 177388,
+   "logs": 35476,
+   "log_bytes": 6812900765,
+   "ler_bytes": 9116229447,
+   "ranges": 1105
+  },
+  {
+   "uf": "CE",
+   "turno": 2,
+   "zip_bytes": 5908815459,
+   "membros": 118830,
+   "logs": 23765,
+   "log_bytes": 4301303914,
+   "ler_bytes": 5848772059,
+   "ranges": 709
+  },
+  {
+   "uf": "DF",
+   "turno": 2,
+   "zip_bytes": 1781729243,
+   "membros": 34847,
+   "logs": 6969,
+   "log_bytes": 1304830171,
+   "ler_bytes": 1763298513,
+   "ranges": 214
+  },
+  {
+   "uf": "ES",
+   "turno": 2,
+   "zip_bytes": 2416165761,
+   "membros": 49223,
+   "logs": 9844,
+   "log_bytes": 1743085993,
+   "ler_bytes": 2391611281,
+   "ranges": 290
+  },
+  {
+   "uf": "GO",
+   "turno": 2,
+   "zip_bytes": 3907722655,
+   "membros": 78435,
+   "logs": 15686,
+   "log_bytes": 2846400456,
+   "ler_bytes": 3868067852,
+   "ranges": 469
+  },
+  {
+   "uf": "MA",
+   "turno": 2,
+   "zip_bytes": 4254857478,
+   "membros": 90469,
+   "logs": 18093,
+   "log_bytes": 3032531016,
+   "ler_bytes": 4210516316,
+   "ranges": 510
+  },
+  {
+   "uf": "MG",
+   "turno": 2,
+   "zip_bytes": 12591095192,
+   "membros": 260315,
+   "logs": 52062,
+   "log_bytes": 9068951145,
+   "ler_bytes": 12462769628,
+   "ranges": 1508
+  },
+  {
+   "uf": "MS",
+   "turno": 2,
+   "zip_bytes": 1615457320,
+   "membros": 35531,
+   "logs": 7106,
+   "log_bytes": 1134479506,
+   "ler_bytes": 1598640557,
+   "ranges": 194
+  },
+  {
+   "uf": "MT",
+   "turno": 2,
+   "zip_bytes": 2033142943,
+   "membros": 41436,
+   "logs": 8287,
+   "log_bytes": 1472469052,
+   "ler_bytes": 2012109484,
+   "ranges": 244
+  },
+  {
+   "uf": "PA",
+   "turno": 2,
+   "zip_bytes": 5009831870,
+   "membros": 104141,
+   "logs": 20827,
+   "log_bytes": 3602542096,
+   "ler_bytes": 4958842907,
+   "ranges": 600
+  },
+  {
+   "uf": "PB",
+   "turno": 2,
+   "zip_bytes": 2678479040,
+   "membros": 53561,
+   "logs": 10712,
+   "log_bytes": 1954761134,
+   "ler_bytes": 2651232996,
+   "ranges": 322
+  },
+  {
+   "uf": "PE",
+   "turno": 2,
+   "zip_bytes": 5668750144,
+   "membros": 107095,
+   "logs": 21418,
+   "log_bytes": 4219756622,
+   "ler_bytes": 5611719436,
+   "ranges": 680
+  },
+  {
+   "uf": "PI",
+   "turno": 2,
+   "zip_bytes": 2402070716,
+   "membros": 51127,
+   "logs": 10225,
+   "log_bytes": 1710710448,
+   "ler_bytes": 2376416739,
+   "ranges": 288
+  },
+  {
+   "uf": "PR",
+   "turno": 2,
+   "zip_bytes": 6778665283,
+   "membros": 135714,
+   "logs": 27142,
+   "log_bytes": 4943564086,
+   "ler_bytes": 6708825950,
+   "ranges": 813
+  },
+  {
+   "uf": "RJ",
+   "turno": 2,
+   "zip_bytes": 9637646040,
+   "membros": 188386,
+   "logs": 37675,
+   "log_bytes": 7088814922,
+   "ler_bytes": 9540467988,
+   "ranges": 1156
+  },
+  {
+   "uf": "RN",
+   "turno": 2,
+   "zip_bytes": 2210656291,
+   "membros": 40576,
+   "logs": 8115,
+   "log_bytes": 1655661867,
+   "ler_bytes": 2188612089,
+   "ranges": 266
+  },
+  {
+   "uf": "RO",
+   "turno": 2,
+   "zip_bytes": 1047273569,
+   "membros": 23492,
+   "logs": 4698,
+   "log_bytes": 729497294,
+   "ler_bytes": 1035943732,
+   "ranges": 126
+  },
+  {
+   "uf": "RR",
+   "turno": 2,
+   "zip_bytes": 325077964,
+   "membros": 7596,
+   "logs": 1519,
+   "log_bytes": 222166602,
+   "ler_bytes": 321395695,
+   "ranges": 39
+  },
+  {
+   "uf": "RS",
+   "turno": 2,
+   "zip_bytes": 6804732142,
+   "membros": 137740,
+   "logs": 27547,
+   "log_bytes": 4940994076,
+   "ler_bytes": 6733259795,
+   "ranges": 818
+  },
+  {
+   "uf": "SC",
+   "turno": 2,
+   "zip_bytes": 4448702623,
+   "membros": 86635,
+   "logs": 17326,
+   "log_bytes": 3276838807,
+   "ler_bytes": 4399541049,
+   "ranges": 536
+  },
+  {
+   "uf": "SE",
+   "turno": 2,
+   "zip_bytes": 1452351183,
+   "membros": 29616,
+   "logs": 5923,
+   "log_bytes": 1051912204,
+   "ler_bytes": 1437505428,
+   "ranges": 174
+  },
+  {
+   "uf": "SP",
+   "turno": 2,
+   "zip_bytes": 25758256844,
+   "membros": 518296,
+   "logs": 103656,
+   "log_bytes": 18743189687,
+   "ler_bytes": 25494538067,
+   "ranges": 3087
+  },
+  {
+   "uf": "TO",
+   "turno": 2,
+   "zip_bytes": 1020216357,
+   "membros": 21922,
+   "logs": 4384,
+   "log_bytes": 719902575,
+   "ler_bytes": 1009519376,
+   "ranges": 123
+  },
+  {
+   "uf": "ZZ",
+   "turno": 2,
+   "zip_bytes": 204584509,
+   "membros": 6551,
+   "logs": 1281,
+   "log_bytes": 134886634,
+   "ler_bytes": 201953607,
+   "ranges": 25
+  }
+ ]
+}

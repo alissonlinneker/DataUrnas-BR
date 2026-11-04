@@ -19,8 +19,9 @@ Atualizado em 03/11/2026.
 | Liberações sem biometria, sequências rápidas de votos e votos na última hora, todas as seções | feito em 04/11 | nenhum intervalo abaixo de 10 s; 1 sequência rápida só sem biometria no Brasil (6 votos); sem relação com o voto | `biometria-1t-2t-2026.md`, `pacote-nacional-imgbu-logs-2026.md` |
 | Pacote oficial do 2º turno x arquivos publicados na noite | feito | 998.356 de 998.356 idênticos | `verificacoes-externas-2turno-2026.md`, seção 6 |
 | Reconferência periódica dos arquivos publicados (troca no mesmo endereço) | feito até 27/10 e de novo em 03/11 | 0 alterações, 0 remoções, 0 BU com segunda versão em 989.290 arquivos conferidos | idem |
-| Coerência entre cargos no mesmo BU (Presidente x Governador no 2º turno; todos os cargos no 1º) | falta | o 2º turno só teve Presidente decodificado; conferir comparecimento e padrão de voto dividido | `auditoria-consistencia-bu-2026.md` |
-| Zerésima de cada urna (relatório de zero votos antes da abertura) | falta parcial | o log só registra que foi impressa; conferir horário e presença em todos os logs | `hash-software-urna-2026.md` |
+| Coerência entre cargos no mesmo BU (Presidente x Governador no 2º turno; todos os cargos no 1º) | feito em 04/11 | 0 BUs com cargo que não fecha ou comparecimento diferente entre cargos em 787.986 BUs (1º turno de 2026, 2º turno de governador de 2026 e de 2022); voto dividido dentro da faixa de 2022 | `coerencia-cargos-2026.md` |
+| Zerésima de cada urna (relatório de zero votos antes da abertura) | feito em 04/11 | 998.354 logs: nenhum voto antes da zerésima; 2 seções sem zerésima no log publicado, ambas sem o log da urna que abriu a votação | `zeresima-2026.md` |
+| Pacote do MA 1º turno republicado em 03/11 | feito em 04/11 | nenhum arquivo de urna mudou (72.371 iguais ao catálogo de 13/10); entrou o RDV de MA 07846/0074/0228, que confere com a assinatura | `ma-republicacao-2026.md` |
 | `-hash.dat` e `-mr.ver` (assinados pela urna, não publicados) | depende do TSE | pedir publicação | `hash-software-urna-2026.md` |
 
 ## 2. Software, carga e lacração
@@ -45,6 +46,7 @@ Atualizado em 03/11/2026.
 | Totais divulgados ao longo da noite nunca caíram | feito | 12 mil versões | `verificacoes-externas-2turno-2026.md` |
 | Totais depois da noite da eleição | feito em 03/11 | nenhuma versão nova desde 25/10 23:27:02 | idem, seção 6 |
 | Ordem de chegada das seções e cruzamentos da curva acumulada | feito | explicado pela ordem geográfica de chegada | `ordem-de-envio-viradas-2022-2026.md` |
+| Últimas seções recebidas no 1º turno (PR, 07/10) | feito em 04/11 | já somadas no resultado oficial de 05/10; o horário de 07/10 é reenvio do mesmo pacote; o motivo do reenvio vai ao TSE | `pr-secoes-tardias-1t-2026.md` |
 | Voto por seção x horário de chegada (injeção tardia) | feito | curva reproduzida pela geografia de chegada; desvios de centésimos de ponto, abaixo de 1,5% da margem | `chegada-bus-2026.md` |
 | Logs do sistema de totalização e da transmissão (JE-Connect) | depende do TSE | não publicados | |
 
