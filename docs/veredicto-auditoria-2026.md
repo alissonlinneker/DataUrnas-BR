@@ -36,6 +36,9 @@ Foram encontrados pontos de transparência e de registro que pedem esclareciment
 | 18 | Assinatura JWS dos resultados divulgados x soma dos BUs | 5.786 arquivos por turno (Brasil, 28 UFs, 5.757 municípios), dois turnos | 11.572 assinaturas válidas, 0 inválidas; payload idêntico ao `.json`; 0 divergências com a soma dos BUs | `docs/jws-totalizacao-2026.md` |
 | 19 | Alegações externas (vídeo sobre "virada única" e "vales igualmente espaçados") | 2022 e 2026 | Explicadas pela ordem geográfica de chegada; ordem aleatória não produz o padrão alegado | `docs/ordem-de-envio-viradas-2022-2026.md` |
 | 20 | Pacote oficial do 2º turno (zips por UF de 26/10) x BUs e assinaturas guardados na noite da eleição; totais de novo em 03/11 | 998.356 arquivos; Brasil, UFs e municípios | 998.356 idênticos à última versão guardada; nenhum total novo depois de 25/10 23:27:02 | `docs/verificacoes-externas-2turno-2026.md` |
+| 21 | Pacote oficial completo dos dois turnos: imagem do BU x BU e log eleitor a eleitor x BU | 499.207 seções por turno (56 zips, 219 GB) | Votos iguais entre imagem do BU e BU em todas; log = comparecimento salvo 16 seções com log faltando ou sobrando no pacote (RDV igual ao BU nelas); log republicado em 03/11 confere com a assinatura da urna | `docs/pacote-nacional-imgbu-logs-2026.md` |
+| 22 | Ordem e horário de chegada dos BUs x voto | 499.205 seções; 2022 de controle | Nenhum sinal de injeção; curva da noite reproduzida pela geografia de chegada | `docs/chegada-bus-2026.md` |
+| 23 | Plausibilidade da virada: base histórica (454 disputas), pesquisas, transferências, simulação de fraude e eleitorado x população | Brasil 1994 a 2026 e 31 casos internacionais | Virada com chance perto de 50% pela margem do 1º turno; fraude concentrada capaz de inverter apareceria; eleitorado inflado não favoreceu o 13 | `docs/virada-2026-probabilidades.md` |
 
 ## O que não pode ser verificado com dados públicos
 
@@ -55,12 +58,13 @@ Ordem de relevância; nenhuma altera contagem.
 4. 3 seções assinadas por urna diferente da que recebeu a carga (SP 64777/0393/0312, RJ 58696/0027/0139, ES 57932/0009/0085); as urnas que assinaram são de contingência da própria zona.
 5. Correspondência esperada do 2º turno com `ST_CORRESP_ALTERADA=N` em 372 seções que mudaram; 35 seções votaram com urna diferente da esperada, 8 delas com urna que não aparece em nenhum produto; 108 urnas de reserva vindas de fora da contingência da zona; correspondência efetivada e BU web do 2º turno ainda não publicados.
 6. 862 cargas sem log GEDAI (Parauapebas zona 0106, Guarulhos zona 0176, zona 0339 de MG, Juruá, Monte Alegre); 5 urnas carregadas em 25/10; 2 estações geradoras sem log publicado.
-7. Erro "Problema ao desmontar a MR" em 2.993 de 2.997 urnas no dia do 2º turno e em nenhuma no 1º.
+7. Erro "Problema ao desmontar a MR" (aplicação GAP) em 2.993 de 2.997 urnas da amostra no dia do 2º turno e em nenhuma no 1º; na leitura do pacote completo, 531.983 ocorrências em 497.702 seções do 2º turno, fora da lista de erros mais frequentes do 1º.
 8. 11 seções com falha de verificação de arquivos de dados no log (`infomidia.vsc`, `vota.vsu`, `bu.vsu`, `turno2.vsc`).
 9. 368 seções com BU emitido mais de 1 hora depois do encerramento (urna parada na tela de registro de mesários) e Belo Horizonte 0039/0168 no 1º turno (apuração mista no Sistema de Apuração; log e BU da urna original não publicados).
 10. Horário de recebimento publicado (`aux.json`) posterior à totalização completa do município em 16.574 seções; o carimbo não representa a chegada real.
 11. Certificado da AC URNA publicado vencido em 18/07/2026, com 53 certificados de urna emitidos depois dessa data.
 12. 187 arquivos de resultado do 1º turno no exterior regerados em 24/10/2026 (mesmos números da totalização de 05/10), sem explicação; lista de certificados revogados da AC de totalização (`actot.tse.jus.br`) inacessível (403), o que impede conferir revogação da chave que assina os resultados.
+13. Pacote oficial republicado em 03/11/2026 sem aviso, em três zips: MG 1º turno (retirada do `-imgbu.dat` da urna na seção 50075/0047/0041, de apuração em cédula), SP 2º turno (`-log.jez` e `-vota.vsc` da seção 64777/0395/0298 regravados; conteúdo igual ao assinado pela urna) e MA 1º turno (mudança não visível no diretório do zip). Pedir registro público de versões do pacote, com data e motivo.
 
 ## Correções feitas no próprio projeto durante a auditoria
 
