@@ -1,0 +1,697 @@
+{
+  "secoes_por_turno": {
+    "1": 499207,
+    "2": 499207
+  },
+  "A": {
+    "1": {
+      "secoes": 499207,
+      "com_bu": 499176,
+      "com_imgbu": 499177,
+      "erro_bu": 0,
+      "erro_imgbu": 0,
+      "imgbu_sem_bloco_presidente": 0,
+      "comparadas": 499176,
+      "divergentes": 5,
+      "divergencias_por_campo": {
+        "cab_codigo_ue": 5
+      },
+      "soma_bu_v13": 53878914,
+      "soma_bu_v22": 56103951,
+      "soma_bu_brancos": 2300777,
+      "soma_bu_nulos": 3668963,
+      "soma_bu_comparecimento": 125274487,
+      "soma_img_v13": 53878914,
+      "soma_img_v22": 56103951,
+      "soma_img_brancos": 2300777,
+      "soma_img_nulos": 3668963,
+      "soma_img_total_apurado": 125274487,
+      "imgbu_sem_bu": 1,
+      "sa": {
+        "secoes": 31,
+        "com_busa_e_imgbusa": 31,
+        "divergentes": 0,
+        "divergencias": [],
+        "soma_v13": 624,
+        "soma_v22": 552,
+        "soma_brancos": 21,
+        "soma_nulos": 40,
+        "soma_comparecimento": 1348
+      },
+      "total_v13_com_sa": 53879538,
+      "total_v22_com_sa": 56104503
+    },
+    "2": {
+      "secoes": 499207,
+      "com_bu": 499178,
+      "com_imgbu": 499178,
+      "erro_bu": 0,
+      "erro_imgbu": 0,
+      "imgbu_sem_bloco_presidente": 0,
+      "comparadas": 499178,
+      "divergentes": 4,
+      "divergencias_por_campo": {
+        "cab_codigo_ue": 4
+      },
+      "soma_bu_v13": 64255787,
+      "soma_bu_v22": 59825688,
+      "soma_bu_brancos": 1430484,
+      "soma_bu_nulos": 2723284,
+      "soma_bu_comparecimento": 128235243,
+      "soma_img_v13": 64255787,
+      "soma_img_v22": 59825688,
+      "soma_img_brancos": 1430484,
+      "soma_img_nulos": 2723284,
+      "soma_img_total_apurado": 128235243,
+      "imgbu_sem_bu": 0,
+      "sa": {
+        "secoes": 29,
+        "com_busa_e_imgbusa": 29,
+        "divergentes": 0,
+        "divergencias": [],
+        "soma_v13": 445,
+        "soma_v22": 353,
+        "soma_brancos": 12,
+        "soma_nulos": 21,
+        "soma_comparecimento": 831
+      },
+      "total_v13_com_sa": 64256232,
+      "total_v22_com_sa": 59826041
+    }
+  },
+  "B": {
+    "1": {
+      "secoes_com_log": 499176,
+      "logs_lidos": 499176,
+      "erro_log": 0,
+      "votos_log_igual_comparecimento": 499167,
+      "votos_log_diferente": 9,
+      "soma_votos_log": 125274428,
+      "soma_comparecimento_bu": 125274487,
+      "hab_bio_log_igual_bu": 460993,
+      "soma_bu_hab_biometrica": 109650927,
+      "soma_bu_hab_biografica": 8342249,
+      "soma_bu_hab_sem_biometria": 6940334,
+      "somas_log": {
+        "log_rajadas": 3,
+        "log_rajadas_votos": 15,
+        "log_rajadas_sem_bio": 10,
+        "log_rajadas_so_sem_bio": 2,
+        "log_rajadas_sb": 2,
+        "log_rajadas_sb_votos": 10,
+        "log_rajadas_sb_sem_bio": 10,
+        "log_rajadas_sb_so_sem_bio": 2,
+        "log_votos_ultima_hora": 11200346,
+        "log_sem_bio_ultima_hora": 1378087,
+        "log_votos_apos_17h": 3727772,
+        "log_sem_bio_apos_17h": 444785,
+        "log_linhas_erro": 10793,
+        "log_suspensos": 125354,
+        "log_mesario_indagado": 1447544,
+        "log_ep_nao_habilitado": 11540783,
+        "log_hab_bio": 109686154,
+        "log_hab_biog": 8348532,
+        "log_hab_manual_sem_digital": 0,
+        "log_hab_sem_digital": 7284392,
+        "log_hab_outro": 4020,
+        "log_hab_desconhecido": 0,
+        "log_votos_bio": 109646855,
+        "log_votos_biog": 8342245,
+        "log_votos_manual_sem_digital": 0,
+        "log_votos_sem_digital": 7281306,
+        "log_votos_outro": 4020,
+        "log_votos_desconhecido": 2,
+        "log_linhas_alerta": 8764744,
+        "log_votos_log": 125274428,
+        "log_votos_sem_bio": 15627573,
+        "log_gaps_lt_30s": 3962,
+        "log_gaps_lt_10s": 0,
+        "log_linhas_externo": 1476,
+        "log_linhas_what": 7109,
+        "log_linhas_indo": 1
+      },
+      "pct_votos_sem_bio": 12.4747,
+      "secoes_com_rajada": 3,
+      "secoes_com_rajada_so_sem_bio": 2,
+      "secoes_com_rajada_sb": 2,
+      "secoes_reinicio": 28255,
+      "secoes_troca_urna": 2101,
+      "secoes_voto_antes_8h": 0,
+      "secoes_voto_apos_encerramento": 0,
+      "secoes_voto_antes_pronta": 0,
+      "secoes_voto_outras_datas": 0,
+      "secoes_relogio_inverso": 0,
+      "secoes_com_linha_erro": 5578,
+      "maior_rajada": 5,
+      "maior_seq_sem_bio": 552
+    },
+    "2": {
+      "secoes_com_log": 499178,
+      "logs_lidos": 499178,
+      "erro_log": 0,
+      "votos_log_igual_comparecimento": 499171,
+      "votos_log_diferente": 7,
+      "soma_votos_log": 128235493,
+      "soma_comparecimento_bu": 128235243,
+      "hab_bio_log_igual_bu": 486785,
+      "soma_bu_hab_biometrica": 111970333,
+      "soma_bu_hab_biografica": 8632488,
+      "soma_bu_hab_sem_biometria": 7251810,
+      "somas_log": {
+        "log_rajadas": 4378,
+        "log_rajadas_votos": 23569,
+        "log_rajadas_sem_bio": 733,
+        "log_rajadas_so_sem_bio": 12,
+        "log_rajadas_sb": 13,
+        "log_rajadas_sb_votos": 73,
+        "log_rajadas_sb_sem_bio": 73,
+        "log_rajadas_sb_so_sem_bio": 13,
+        "log_votos_ultima_hora": 6643153,
+        "log_sem_bio_ultima_hora": 840183,
+        "log_votos_apos_17h": 34747,
+        "log_sem_bio_apos_17h": 5886,
+        "log_linhas_erro": 542255,
+        "log_suspensos": 16358,
+        "log_mesario_indagado": 181244,
+        "log_ep_nao_habilitado": 11089907,
+        "log_hab_bio": 111973373,
+        "log_hab_biog": 8633623,
+        "log_hab_manual_sem_digital": 0,
+        "log_hab_sem_digital": 7633379,
+        "log_hab_outro": 4356,
+        "log_hab_desconhecido": 0,
+        "log_votos_bio": 111966019,
+        "log_votos_biog": 8632485,
+        "log_votos_manual_sem_digital": 0,
+        "log_votos_sem_digital": 7632633,
+        "log_votos_outro": 4356,
+        "log_votos_desconhecido": 0,
+        "log_linhas_alerta": 7050772,
+        "log_votos_log": 128235493,
+        "log_votos_sem_bio": 16269474,
+        "log_gaps_lt_30s": 1580240,
+        "log_gaps_lt_10s": 0,
+        "log_linhas_externo": 1074,
+        "log_linhas_what": 6184,
+        "log_linhas_indo": 0
+      },
+      "pct_votos_sem_bio": 12.6872,
+      "secoes_com_rajada": 3689,
+      "secoes_com_rajada_so_sem_bio": 7,
+      "secoes_com_rajada_sb": 8,
+      "secoes_reinicio": 24625,
+      "secoes_troca_urna": 1417,
+      "secoes_voto_antes_8h": 0,
+      "secoes_voto_apos_encerramento": 0,
+      "secoes_voto_antes_pronta": 0,
+      "secoes_voto_outras_datas": 0,
+      "secoes_relogio_inverso": 0,
+      "secoes_com_linha_erro": 497707,
+      "maior_rajada": 12,
+      "maior_seq_sem_bio": 579
+    }
+  },
+  "eventos_erro_top": {
+    "1": [
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Captura da digital do eleitor | Falha na captura da digital (N) | Ocorreu um erro durante captura da digital do eleitor. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",
+        "ocorrencias": 4270,
+        "secoes": 1977
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não foi possível exibir imagem no LCD do terminal do mesário: Erro (N) exibindo imagem no microterminal.",
+        "ocorrencias": 2077,
+        "secoes": 1460
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Erro ao tentar configurar LED do MT: Setando leds para cabine livre - N",
+        "ocorrencias": 742,
+        "secoes": 741
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | ERROR opening the biometric reader - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para rece",
+        "ocorrencias": 589,
+        "secoes": 217
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | ERROR starting image acquisition - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para recebe",
+        "ocorrencias": 497,
+        "secoes": 417
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Erro inesperado durante a votação | O voto do eleitor NÃO foi registrado (N) | Ocorreu um erro enquanto o eleitor registrava suas escolhas. Desligue e ligue a urna. Se o erro persistir, tire uma foto ",
+        "ocorrencias": 368,
+        "secoes": 260
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Impressora com atolamento de papel",
+        "ocorrencias": 201,
+        "secoes": 175
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Device open error /dev/uescan - No such device Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa",
+        "ocorrencias": 192,
+        "secoes": 148
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Mídia externa ausente",
+        "ocorrencias": 169,
+        "secoes": 83
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "GAP erro N | Validação do VOTA | O aplicativo Software de Votação precisa de uma mídia de votação para ser executado. Desligue a urna, insira uma mídia de votação válida e tente novamente.",
+        "ocorrencias": 160,
+        "secoes": 76
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Erro na Mídia Externa - Mídia não está presente Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte p",
+        "ocorrencias": 160,
+        "secoes": 114
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Erro na aquisição da imagem NxNbaNf(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie pa",
+        "ocorrencias": 150,
+        "secoes": 69
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Impressora desconectada",
+        "ocorrencias": 114,
+        "secoes": 76
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Error ao encerrar captura - estado N (-NxN) call(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supor",
+        "ocorrencias": 103,
+        "secoes": 76
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Erro ao tentar acionar beep do TM: Tocando beeps - N",
+        "ocorrencias": 85,
+        "secoes": 80
+      }
+    ],
+    "2": [
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Problema ao desmontar a MR",
+        "ocorrencias": 531983,
+        "secoes": 497702
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Captura da digital do eleitor | Falha na captura da digital (N) | Ocorreu um erro durante captura da digital do eleitor. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",
+        "ocorrencias": 3732,
+        "secoes": 1745
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não foi possível exibir imagem no LCD do terminal do mesário: Erro (N) exibindo imagem no microterminal.",
+        "ocorrencias": 2714,
+        "secoes": 1829
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Erro ao tentar configurar LED do MT: Setando leds para cabine livre - N",
+        "ocorrencias": 728,
+        "secoes": 725
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | ERROR opening the biometric reader - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para rece",
+        "ocorrencias": 479,
+        "secoes": 188
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | ERROR starting image acquisition - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para recebe",
+        "ocorrencias": 414,
+        "secoes": 349
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Erro inesperado durante a votação | O voto do eleitor NÃO foi registrado (N) | Ocorreu um erro enquanto o eleitor registrava suas escolhas. Desligue e ligue a urna. Se o erro persistir, tire uma foto ",
+        "ocorrencias": 334,
+        "secoes": 242
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Iniciando aplicativo | ELEIÇÃO OFICIAL SEGUNDO TURNO (N) | Falha na execução do aplicativo. Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e en",
+        "ocorrencias": 236,
+        "secoes": 234
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Device open error /dev/uescan - No such device Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa",
+        "ocorrencias": 168,
+        "secoes": 113
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Erro na aquisição da imagem NxNbaNf(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie pa",
+        "ocorrencias": 113,
+        "secoes": 44
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "GAP erro N | Validação do VOTA | O aplicativo Software de Votação precisa de uma mídia de votação para ser executado. Desligue a urna, insira uma mídia de votação válida e tente novamente.",
+        "ocorrencias": 110,
+        "secoes": 62
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Não é possível continuar a execução | Erro inesperado (N) | Erro na Mídia Externa - Mídia não está presente Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte p",
+        "ocorrencias": 106,
+        "secoes": 74
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Mídia externa ausente",
+        "ocorrencias": 100,
+        "secoes": 62
+      },
+      {
+        "aplicacao": "VOTA",
+        "mensagem": "Erro ao tentar acionar beep do TM: Tocando beeps - N",
+        "ocorrencias": 93,
+        "secoes": 92
+      },
+      {
+        "aplicacao": "GAP",
+        "mensagem": "Impressora desconectada",
+        "ocorrencias": 82,
+        "secoes": 61
+      }
+    ]
+  },
+  "pareamento": {
+    "secoes_pareadas": 499176,
+    "base_regressao": 499115,
+    "municipios": 5687,
+    "media_tx_sem_bio_1": 0.1263,
+    "media_tx_sem_bio_2": 0.1277,
+    "media_tx_rajada_1": 0.0,
+    "media_tx_rajada_2": 0.0001,
+    "swing_medio_pp": 2.903,
+    "regressoes": {
+      "d_sem_bio": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "d_sem_bio": {
+            "beta": -0.000229,
+            "ep": 0.00157,
+            "t": -0.146,
+            "p": 0.884214
+          }
+        }
+      },
+      "d_rajada": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "d_rajada": {
+            "beta": -0.042257,
+            "ep": 0.018966,
+            "t": -2.228,
+            "p": 0.025878
+          }
+        }
+      },
+      "d_rajada_sb": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "d_rajada_sb": {
+            "beta": -0.325629,
+            "ep": 0.212587,
+            "t": -1.532,
+            "p": 0.125585
+          }
+        }
+      },
+      "d_sb_tarde": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "d_sb_tarde": {
+            "beta": -0.012658,
+            "ep": 0.007293,
+            "t": -1.736,
+            "p": 0.082634
+          }
+        }
+      },
+      "conjunto": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "d_sem_bio": {
+            "beta": 0.000742,
+            "ep": 0.001467,
+            "t": 0.506,
+            "p": 0.612867
+          },
+          "d_rajada": {
+            "beta": -0.041592,
+            "ep": 0.018984,
+            "t": -2.191,
+            "p": 0.028457
+          },
+          "d_rajada_sb": {
+            "beta": -0.271774,
+            "ep": 0.213981,
+            "t": -1.27,
+            "p": 0.204055
+          },
+          "d_sb_tarde": {
+            "beta": -0.01289,
+            "ep": 0.007268,
+            "t": -1.774,
+            "p": 0.076127
+          }
+        }
+      },
+      "top1pct_d_sem_bio": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "top_d_sem_bio": {
+            "beta": -0.001778,
+            "ep": 0.000364,
+            "t": -4.884,
+            "p": 1e-06
+          }
+        },
+        "limiar": 0.057944,
+        "secoes_marcadas": 4992
+      },
+      "top1pct_d_rajada": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "top_d_rajada": {
+            "beta": -0.000798,
+            "ep": 0.000453,
+            "t": -1.76,
+            "p": 0.07847
+          }
+        },
+        "limiar": 0.0,
+        "secoes_marcadas": 3689
+      },
+      "top1pct_d_rajada_sb": {
+        "n": 499115,
+        "grupos": 5687,
+        "coef": {
+          "top_d_rajada_sb": {
+            "beta": -0.004079,
+            "ep": 0.005653,
+            "t": -0.722,
+            "p": 0.470554
+          }
+        },
+        "limiar": 0.0,
+        "secoes_marcadas": 8
+      }
+    },
+    "decis": [
+      {
+        "variavel": "d_sem_bio",
+        "decil": 1,
+        "secoes": 49912,
+        "x_media_pp": -3.984,
+        "swing_medio_pp": 2.715,
+        "swing_vs_municipio_pp": -0.061
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 2,
+        "secoes": 49911,
+        "x_media_pp": -1.988,
+        "swing_medio_pp": 2.922,
+        "swing_vs_municipio_pp": -0.005
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 3,
+        "secoes": 49912,
+        "x_media_pp": -1.198,
+        "swing_medio_pp": 2.977,
+        "swing_vs_municipio_pp": 0.018
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 4,
+        "secoes": 49911,
+        "x_media_pp": -0.607,
+        "swing_medio_pp": 3.007,
+        "swing_vs_municipio_pp": 0.039
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 5,
+        "secoes": 49912,
+        "x_media_pp": -0.098,
+        "swing_medio_pp": 2.952,
+        "swing_vs_municipio_pp": 0.021
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 6,
+        "secoes": 49911,
+        "x_media_pp": 0.385,
+        "swing_medio_pp": 3.004,
+        "swing_vs_municipio_pp": 0.034
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 7,
+        "secoes": 49911,
+        "x_media_pp": 0.901,
+        "swing_medio_pp": 2.957,
+        "swing_vs_municipio_pp": 0.007
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 8,
+        "secoes": 49912,
+        "x_media_pp": 1.495,
+        "swing_medio_pp": 2.941,
+        "swing_vs_municipio_pp": 0.007
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 9,
+        "secoes": 49911,
+        "x_media_pp": 2.29,
+        "swing_medio_pp": 2.887,
+        "swing_vs_municipio_pp": 0.01
+      },
+      {
+        "variavel": "d_sem_bio",
+        "decil": 10,
+        "secoes": 49912,
+        "x_media_pp": 4.176,
+        "swing_medio_pp": 2.666,
+        "swing_vs_municipio_pp": -0.072
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 1,
+        "secoes": 49912,
+        "x_media_pp": -0.0,
+        "swing_medio_pp": 2.017,
+        "swing_vs_municipio_pp": 0.0
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 2,
+        "secoes": 49911,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 2.413,
+        "swing_vs_municipio_pp": -0.002
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 3,
+        "secoes": 49912,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 2.782,
+        "swing_vs_municipio_pp": 0.002
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 4,
+        "secoes": 49911,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 3.04,
+        "swing_vs_municipio_pp": -0.002
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 5,
+        "secoes": 49912,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 2.209,
+        "swing_vs_municipio_pp": 0.003
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 6,
+        "secoes": 49911,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 3.183,
+        "swing_vs_municipio_pp": 0.001
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 7,
+        "secoes": 49911,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 3.375,
+        "swing_vs_municipio_pp": 0.0
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 8,
+        "secoes": 49912,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 3.079,
+        "swing_vs_municipio_pp": -0.01
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 9,
+        "secoes": 49911,
+        "x_media_pp": 0.0,
+        "swing_medio_pp": 3.784,
+        "swing_vs_municipio_pp": 0.011
+      },
+      {
+        "variavel": "d_rajada",
+        "decil": 10,
+        "secoes": 49912,
+        "x_media_pp": 0.149,
+        "swing_medio_pp": 3.149,
+        "swing_vs_municipio_pp": -0.003
+      }
+    ],
+    "votos_sem_bio_1": 15627573,
+    "votos_sem_bio_2": 16269302,
+    "votos_rajadas_so_sem_bio_secoes_2": 7
+  }
+}

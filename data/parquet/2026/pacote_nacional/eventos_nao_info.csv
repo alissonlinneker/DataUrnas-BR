@@ -1,0 +1,468 @@
+turno,nivel,aplicacao,mensagem,ocorrencias,secoes
+1,ALERTA,VOTA,Identificador do eleitor digitado inválido,5540561,496701
+1,ALERTA,VOTA,Mesário indagado se eleitor está votando,1447544,327798
+1,ALERTA,VOTA,Digitado título inválido para o registro de mesário,722022,309552
+1,ALERTA,VOTA,Habilitação cancelada durante reconhecimento biométrico,365021,154718
+1,ALERTA,VOTA,Ano de nascimento digitado é diferente do cadastro,164047,89724
+1,ALERTA,VOTA,Eleitor não está votando,127669,83288
+1,ALERTA,VOTA,O eleitor identificado já votou,119324,66826
+1,ALERTA,VOTA,Título N é válido para suspender a votação,82403,62930
+1,ALERTA,VOTA,Eleitor já justificou,72223,44641
+1,ALERTA,VOTA,Título N é inválido para suspender a votação,55959,25192
+1,ALERTA,VOTA,Encerramento só pode ser solicitado após as N:N:N horas,19246,17046
+1,ALERTA,VOTA,Ano de nascimento inválido,10215,8167
+1,ALERTA,VOTA,Carga da [ALIMENTAÇÃO BATERIA INTERNA]: [CRÍTICA],7297,3824
+1,ALERTA,VOTA,Limite de mesários registrados atingido. Limite máximo: N,6801,4126
+1,ERRO,VOTA,"Captura da digital do eleitor | Falha na captura da digital (N) | Ocorreu um erro durante captura da digital do eleitor. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",4270,1977
+1,ALERTA,VOTA,Impressora atolada. Aguardando ação do operador,4042,1396
+1,ALERTA,VOTA,Procedimento de encerramento abortado,4042,3960
+1,WHAT,VOTA,WHAT: virtual void api::CFingerScanner::StartAcquireImage():N:N - ERROR starting image acquisition - -N,3806,1598
+1,ALERTA,GAP,Bateria interna ausente,3007,2288
+1,ALERTA,GAP,Bateria interna com carga crítica,2491,1729
+1,ALERTA,VOTA,Eleitor não tem idade mínima,2348,1912
+1,ERRO,VOTA,Não foi possível exibir imagem no LCD do terminal do mesário: Erro (N) exibindo imagem no microterminal.,2077,1460
+1,ALERTA,VOTA,Impressora com falha no corte do papel. Aguardando ação do operador,2003,241
+1,EXTERNO,LOGD,Arquivo N-N.jez referente ao log da ME,1471,1454
+1,ALERTA,LOGD,Arquivo NME.jez referente ao log corrompido da ME,1420,1405
+1,ALERTA,LOGD,Identificado arquivo de log corrompido na ME,1414,1401
+1,ALERTA,VOTA,Carga da [ALIMENTAÇÃO BATERIA EXTERNA]: [CRÍTICA],1097,660
+1,ALERTA,VOTA,Impressora sem papel. Aguardando ação do operador,839,297
+1,WHAT,VOTA,WHAT: void api::CFingerScannerFSNHS::Open():N:N - Device open error /dev/uescan - No such device,771,408
+1,ERRO,VOTA,Erro ao tentar configurar LED do MT: Setando leds para cabine livre - N,742,741
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR opening the biometric reader - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para rece,589,217
+1,WHAT,VOTA,WHAT: void api::CFingerScanner::Open():N:N - ERROR opening the biometric reader - -N,589,217
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR starting image acquisition - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para recebe,497,417
+1,ALERTA,VOTA,Tempo limite de espera usando bateria interna atingido,454,453
+1,ALERTA,GAP,Impressora desconectada. Aguardando ação do operador,368,79
+1,ERRO,VOTA,"Erro inesperado durante a votação | O voto do eleitor NÃO foi registrado (N) | Ocorreu um erro enquanto o eleitor registrava suas escolhas. Desligue e ligue a urna. Se o erro persistir, tire uma foto ",368,260
+1,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=Erro na aquisição da imagem NxNbaNf(N),291,99
+1,WHAT,VOTA,WHAT: void api::CFingerScannerN::FinishAcquireImageInternal(int):N:N - Error ao encerrar captura - estado N (-NxN) call(N),288,151
+1,WHAT,VOTA,WHAT: void vota::CThreadMonitor::VerificaErroCriticoFlash():N:N - Erro na Mídia Externa - Mídia não está presente,264,147
+1,ALERTA,VOTA,Impressora desconectada. Aguardando ação do operador,214,85
+1,ERRO,GAP,Impressora com atolamento de papel,201,175
+1,WHAT,VOTA,WHAT: virtual void api::CInputKbd::OpenSession():N:N - msteOpenSession ERROR -N,198,141
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Device open error /dev/uescan - No such device Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa,192,148
+1,WHAT,GAP,WHAT: virtual std::vector<std::unique_ptr<const gap::gatilho::CGatilho> > gap::gatilho::fabricas::CVotaOficialSimulado::Cria() const:N,177,91
+1,ERRO,GAP,Mídia externa ausente,169,83
+1,ERRO,GAP,"GAP erro N | Validação do VOTA | O aplicativo Software de Votação precisa de uma mídia de votação para ser executado. Desligue a urna, insira uma mídia de votação válida e tente novamente.",160,76
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro na Mídia Externa - Mídia não está presente Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte p,160,114
+1,ALERTA,VOTA,Impressora com mecanismo aberto. Aguardando ação do operador,155,67
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Erro na aquisição da imagem NxNbaNf(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie pa,150,69
+1,ALERTA,GAP,Urna não testada,143,97
+1,ALERTA,GAP,Impressora com erro desconhecido. Aguardando ação do operador,124,47
+1,WHAT,VOTA,WHAT: void vota::CThreadMonitor::VerificaErroCriticoKbdTE():N:N - Erro no teclado do eleitor - dispositivo desconectado,124,69
+1,ERRO,GAP,Impressora desconectada,114,76
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Error ao encerrar captura - estado N (-NxN) call(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supor,103,76
+1,ERRO,VOTA,Erro ao tentar acionar beep do TM: Tocando beeps - N,85,80
+1,ALERTA,VOTA,Impressora não responde. Aguardando ação do operador,84,25
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR OpenSession command - N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxíli,83,73
+1,WHAT,VOTA,WHAT: void api::CFingerScanner::Open():N:N - ERROR OpenSession command - N,83,73
+1,ERRO,GAP,Inicialização do aplicativo | Preparando impressora (N) | Não foi possível preparar a impressora. Desligue a urna e faça uma nova carga.,71,43
+1,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=Erro na aquisição da imagem: size=N brilho=Nxff,64,29
+1,ALERTA,VOTA,Impressora com erro desconhecido. Aguardando ação do operador,60,44
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Erro na aquisição da imagem: size=N brilho=Nxff Tire uma foto dessa tela em que apareça o QR Code ao lado e,57,23
+1,ERRO,VOTA,Erro ao tentar acionar buzzer do TM: Tocando buzzer - N,51,45
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro no teclado do eleitor - dispositivo desconectado Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de sup,49,36
+1,ERRO,GAP,Impressora com erro desconhecido,47,46
+1,WHAT,GAP,WHAT: virtual void api::CPrinter::Cut():N:N - Falha no corte de papel. | Por favor verifique a guilhotina da impressora.,46,33
+1,ALERTA,GAP,O operador cancelou a contingência de urna,45,38
+1,ERRO,GAP,"Inicialização do aplicativo | Preparando impressora (N) | Não foi possível preparar a impressora. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",41,23
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR OpenSession and Close comands - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para rec,39,33
+1,WHAT,VOTA,WHAT: void api::CFingerScanner::Open():N:N - ERROR OpenSession and Close comands - -N,39,33
+1,ERRO,ATUE,Teclado TM - Na tecla N: Falha do teste: Tecla esperada CORRIGE. Tecla pressionada N,34,17
+1,ERRO,GAP,Erro de leitura da mídia de resultado,34,20
+1,ERRO,RED,"Erro na execução do sistema | Ocorreu erro durante a execução do RED. Desligue e ligue a urna. Se o erro persistir, faça a apuração em outra urna.",34,15
+1,WHAT,RED,WHAT: filesystem error: cannot copy: File exists [/dsk/fi/dinamico/trabN/bkpres] [/dsk/fe/dinamico/trabN/bkpres],34,15
+1,WHAT,GAP,"WHAT: void api::CPrinter::CheckAndThrowPrinterStatus(const char*, const char*):N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",29,17
+1,WHAT,GAP,"WHAT: void api::CPrinter::CheckAndThrowPrinterStatus(const char*, const char*):N:N - Impressora desconectada. | Por favor, verifique se está encaixada corretamente à urna.",28,14
+1,ERRO,VOTA,"Não é possível continuar a execução | Erro inesperado (N) | Não foi possível concluir a impressão. Desligue a urna, confira o encaixe da impressora e ligue novamente. Se o erro persistir, substitua o ",27,21
+1,ERRO,GAP,GAP erro N | Validação do ADH | Aplicativo de Ajuste de Data e Hora não pode ser executado após a impressão da zerésima. Desligue a urna.,23,14
+1,WHAT,GAP,WHAT: virtual std::vector<std::unique_ptr<const gap::gatilho::CGatilho> > gap::gatilho::fabricas::CADH::Cria() const:N,23,14
+1,ERRO,GAP,Erro na verificação de assinatura do arquivo - vota.vsu,17,17
+1,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=write disable /sys/devices/pciN:N/N:N:Nd.N/usbN/N-N/N-N:N.N/N-N-portN/disable: error N,17,12
+1,WHAT,VOTA,"WHAT: virtual void api::CEscritorLogTxtFilaMsg::fazLog(uebyte, ESeveridade, const std::string&):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, st",17,12
+1,WHAT,GAP,"WHAT: std::vector<int> comum::CEscritorInitFilaMsg::EnviarMensagem(ueintN, uebyte):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::se",16,15
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=write disable /sys/devices/pciN:N/N:N:Nd.N/usbN/N-N/N-N:N.N/N-N-portN/disable: error NxN Tire uma foto dess,15,10
+1,WHAT,VOTA,WHAT: void api::CFingerScannerN::OpenDev():N:N - CFingerScannerN: open -NxN,15,11
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Device open error  Finger write not valid - Input/output error Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equi,13,10
+1,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=Error ao encerrar captura - estado N (-NxN) call(N),13,11
+1,WHAT,VOTA,WHAT: void api::CFingerScannerFSNHS::Open():N:N - Device open error |  Finger write not valid - Input/output error,13,10
+1,ALERTA,ATUE,Fim do teste Mídia Externa - NÃO EXECUTADO,11,6
+1,ALERTA,GAP,Impressora com falha no corte do papel. Aguardando ação do operador,11,5
+1,WHAT,GAP,WHAT: virtual gap::gatilho::CResultadoAcao gap::gatilho::acao::CSincronizaInternaParaExternaSeNecessario::Age() const:N,11,4
+1,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxNc (estado N),11,10
+1,WHAT,VOTA,WHAT: virtual void api::CScreenMT::Clear():N:N - LimpaTela retornou erro mesmo depois de N tentativas: N,11,10
+1,ERRO,ATUE,Teclado TM - Na tecla N: Falha do teste: Tecla esperada N. Tecla pressionada N,10,10
+1,ERRO,GAP,"GAP erro N | Sincronização da MI para MV | Os dados contidos na mídia de votação não correspondem aos dados contidos na mídia interna da urna. Desligue a urna, insira a mídia de votação original ou um",10,3
+1,ERRO,GAP,"Inicialização do aplicativo | Validando assinaturas (N) | Erro na verificação de integridade do sistema. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",10,9
+1,ERRO,VOTA,Erro gravando EG/Eleitores na Mídia Externa,10,10
+1,ERRO,GAP,Inicialização do aplicativo | Validando assinaturas (N) | Erro na verificação de integridade do sistema. Desligue a urna e faça uma nova carga.,9,9
+1,ERRO,GAP,ME não conhecida,9,2
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | CFingerScannerN: open -NxN Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio p,9,7
+1,ERRO,GAP,"Erro detectado: Falha ao montar o volume Dinâmico [part. N] da ME, acesso N: N",8,2
+1,ERRO,GAP,Erro na verificação de assinatura do arquivo - bu.vsu,8,1
+1,ERRO,GAP,"Falha inesperada | Falha na validação do ambiente (N) | ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equip",8,8
+1,WHAT,GAP,"WHAT: virtual void api::CScreenMT::Write(const api::SPoint&, const api::IText&):N:N - ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N",8,8
+1,WHAT,VOTA,WHAT: virtual void api::CPrinter::Cut():N:N - Falha no corte de papel. | Por favor verifique a guilhotina da impressora.,8,8
+1,ERRO,VOTA,Erro ao tentar configurar LED do MT: Setando leds para cabine ocupada - N,7,7
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | CFingerScannerN: start_stream -NxNc (estado N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa,7,6
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado | Resource temporarily unavailable Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio,7,7
+1,WHAT,GAP,"WHAT: void api::CPrinter::CheckAndThrowPrinterStatus(const char*, const char*):N:N - Erro desconhecido na impressora.",7,3
+1,WHAT,VOTA,WHAT: Resource temporarily unavailable,7,7
+1,ALERTA,GAP,Bateria externa com carga crítica,6,5
+1,ALERTA,LOGD,Arquivo NMI.jez referente ao log corrompido da MI,6,5
+1,ALERTA,LOGD,Identificados arquivos de log corrompidos na MI e ME,6,5
+1,ALERTA,VOTA,Impressora com erro na segurança. Aguardando ação do operador,6,2
+1,WHAT,VOTA,"WHAT: virtual void api::CPrinter::Cut():N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",6,2
+1,ALERTA,ATUE,Bateria interna ausente,5,5
+1,ALERTA,GAP,Impressora sem papel. Aguardando ação do operador,5,2
+1,ERRO,GAP,Contingência de urna | Validando configuração (N) | Contingência cancelada pelo usuário por falta de mídia de resultado. Desligue a urna.,5,5
+1,ERRO,GAP,GAP erro N | Validação do VOTA | Não é possível executar o Software de Votação após a execução do Recuperador de Dados. Desligue a urna.,5,3
+1,ERRO,GAP,Impressora com problema na guilhotina,5,5
+1,ERRO,GAP,"Inicialização do aplicativo | Validando mídia externa (N) | Não foi possível validar a mídia externa. Desligue e ligue a urna. Se o erro persistir, substitua a mídia de votação.",5,5
+1,ERRO,GAP,"Iniciando aplicativo | ELEIÇÃO OFICIAL PRIMEIRO TURNO (N) | Falha na execução do aplicativo. Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e e",5,5
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro ao inicializar assinatura. - N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber ,5,5
+1,ERRO,VOTA,"Não é possível continuar a execução | Erro inesperado (N) | virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite exc",5,5
+1,EXTERNO,LOGD,Arquivo N-N.jez referente ao log da MI,5,5
+1,WHAT,GAP,WHAT: gap::CGAP::ResultadoContingencia gap::CGAP::ExecutaContingenciaUrna():N:N - Contingência cancelada pelo usuário por falta de mídia de resultado.,5,5
+1,WHAT,GAP,WHAT: static void gap::impl::CValidadorUrna::ValidaFlashExterna():N:N - Falha durante leitura do serial de votação da MV. Falha ao validar a existência do recurso [/dsk/fe/estatico/infomidia.dat]: Inp,5,5
+1,WHAT,VOTA,WHAT: api::pkcsN::CPkcsNSignature api::pkcsN::CPkcsNUE::DoSign(const std::vector<unsigned char>&) const:N:N - Erro ao inicializar assinatura. - N,5,5
+1,ERRO,ATUE,Impressora - Impressora com erro desconhecido: Status da impressora: N,4,1
+1,ERRO,GAP,"Erro detectado: virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite excedido aguardando mensagem (aguardando respos",4,4
+1,ERRO,GAP,Erro na verificação de assinatura do arquivo - uenux.vsu,4,4
+1,ERRO,GAP,Inicialização do aplicativo | Inicializando log (N) | Erro na inicialização do log. Desligue a urna e faça uma nova carga.,4,4
+1,ERRO,GAP,"Inicialização do aplicativo | Inicializando log (N) | Erro na inicialização do log. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",4,3
+1,ERRO,GAP,"Iniciando aplicativo | ELEIÇÃO OFICIAL PRIMEIRO TURNO | Falha na execução do aplicativo. Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e envie",4,4
+1,ERRO,VOTA,Erro gravando RDV na Mídia Externa,4,4
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Error ao encerrar captura - estado N (-NxN) call(N) Tire uma foto dessa tela em que apareça o QR Code ao la,4,4
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Falha ao validar assinatura UE pacote: (/dsk/fi/dinamico/trabN/bu.vsu) Erro SAVD: (N - /dsk/fi/dinamico/trabN/bu.vsu) Tire uma foto dessa te,4,1
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Leitor nao encontrado - NxN Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio ,4,4
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | LimpaTela retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de s,4,3
+1,WHAT,GAP,WHAT: filesystem error: directory iterator cannot open directory: Input/output error [/dsk/fe/estatico/],4,4
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura SEVIN | pacote: (/dsk/fe/estatico/infomidia.vsc) | ,4,4
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/boot/boot/avboot.vst) | Erro SAVD: ,4,3
+1,WHAT,VOTA,WHAT: void api::CFingerScannerN::OpenDev():N:N - Leitor nao encontrado - NxN,4,4
+1,WHAT,VOTA,WHAT: void comum::CPacoteArquivos::TrataErroPacote(const comum::IInterfaceSavd&) const:N:N - Falha ao validar assinatura UE | pacote: (/dsk/fi/dinamico/trabN/bu.vsu) | Erro SAVD: (N - /dsk/fi/dinamico,4,1
+1,ALERTA,GAP,Impressora atolada. Aguardando ação do operador,3,2
+1,ERRO,ATUE,Led TM - Operador reprovou o teste: Apagar LEDs,3,2
+1,ERRO,ATUE,Teclado TM - Na tecla CONFIRMA: Falha do teste: Tecla esperada N. Tecla pressionada CONFIRMA,3,3
+1,ERRO,GAP,Falha inesperada | Falha na validação do ambiente (N) | LimpaTela retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supor,3,3
+1,ERRO,GAP,"GAP erro N | Validação do VOTA | Dados contidos na mídia de votação não correspondem aos dados contidos na urna. Desligue a urna, insira uma mídia de votação válida e tente novamente.",3,3
+1,ERRO,GAP,GAP erro N | Validação do VOTA | Erro na validação de assinatura dos dados de fotos de candidatos. Desligue a urna e faça a sua substituição.,3,3
+1,ERRO,GAP,GAP erro N | Validação do VOTA | Erro verificando assinatura do arquivo /uenux/bin/vota.of em /uenux/bin/avusrbinof.vst. Desligue a urna e faça uma nova carga.,3,3
+1,ERRO,GAP,Impressora sem papel,3,3
+1,ERRO,GAP,"Inicialização do aplicativo | Validando assinaturas da MV (N) | Erro na verificação de integridade do sistema. Desligue e ligue a urna. Se o erro persistir, substitua a mídia de votação.",3,3
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro lendo filme recurso :/resource/gifs/senador.gif Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supo,3,3
+1,WHAT,GAP,WHAT: virtual void api::CScreenMT::Clear():N:N - LimpaTela retornou erro mesmo depois de N tentativas: N,3,3
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar a existência do recurso [/dsk/fe/estatico/N-lo.dat]: Input/out,3,3
+1,WHAT,VOTA,WHAT: virtual api::CMovie api::CQTResource::getMovie(const std::string&) const:N:N - Erro lendo filme recurso :/resource/gifs/senador.gif,3,3
+1,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxN,3,3
+1,WHAT,VOTA,WHAT: virtual void api::CInputKbd::OpenSession():N:N - Try recall keyboard_enable -N,3,3
+1,WHAT,VOTA,"WHAT: void api::{anonymous}::PrintImage(const std::vector<unsigned char>&, uebyte):N:N - Não foi possível imprimir a imagem.",3,1
+1,ERRO,ATUE,Mídia de Resultado - Erro ao detectar a mídia de resultado: Mídia de resultados ausente,2,2
+1,ERRO,ATUE,Sensor da Fonte - Operador reprovou o teste: Sensor da Fonte com problema,2,2
+1,ERRO,ATUE,"Teclado - Erro na execução do teste: Esperado N, pressionado N",2,2
+1,ERRO,ATUE,Teclado TM - Na tecla CORRIGE: Falha do teste: Tecla esperada N. Tecla pressionada CORRIGE,2,2
+1,ERRO,GAP,"Erro detectado: Falha ao montar o volume Estático [part. N] da ME, acesso N: N",2,1
+1,ERRO,GAP,"GAP erro N | Validação dos arquivos estáticos | Foi verificado que o arquivo de eleitores está inconsistente na mídia de votação. Desligue a urna, substitua a mídia de votação e tente novamente.",2,2
+1,ERRO,GAP,Problema ao remontar a FE_ESTATICO RO,2,2
+1,ERRO,GAP,Problema ao remontar a FI_ESTATICO RO,2,2
+1,ERRO,VOTA,Erro ao decifrar a biometria do eleitor - Código (N),2,2
+1,ERRO,VOTA,Erro gravando EG/Eleitores na Mídia Interna,2,2
+1,ERRO,VOTA,"Gravando o banco de dados na MV (N) | Ocorreu um erro durante a persitência dos dados na MV. Desligue e ligue a urna. Se o erro persistir, substitua a mídia de votação.",2,2
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro lendo filme recurso :/resource/gifs/depFederal.gif Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de s,2,2
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Filme inválido :/resource/gifs/votoLegenda.gif Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa,2,2
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Filme inválido :/resource/gifs/votoNulo.gif Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para ,2,2
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado | random_device: rdrand failed Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio par,2,1
+1,WHAT,GAP,"WHAT: bool api::ExistResource(stat&, const std::string&):N:N - Falha ao validar a existência do recurso [/dsk/fe/dinamico/eg.bin]: Input/output error",2,2
+1,WHAT,GAP,WHAT: virtual gap::gatilho::CResultadoAcao gap::gatilho::acao::CLancaErroArquivosEstaticos::Age() const:N,2,2
+1,WHAT,GAP,"WHAT: virtual void api::CEscritorLogTxtFilaMsg::fazLog(uebyte, ESeveridade, const std::string&):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, st",2,2
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/lib/avlib.vst) | Erro SAVD: (N - /l,2,2
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/share/RHVoice/voices/Leticia-FN/N/a,2,2
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/uenux/bin/avusrbin.vst) | Erro SAVD,2,2
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/uenux/lib/avusrlib.vst) | Erro SAVD,2,2
+1,WHAT,VOTA,WHAT: random_device: rdrand failed,2,1
+1,WHAT,VOTA,WHAT: virtual api::CMovie api::CQTResource::getMovie(const std::string&) const:N:N - Erro lendo filme recurso :/resource/gifs/depFederal.gif,2,2
+1,WHAT,VOTA,WHAT: virtual api::CMovie api::CQTResource::getMovie(const std::string&) const:N:N - Filme inválido :/resource/gifs/votoLegenda.gif,2,2
+1,WHAT,VOTA,WHAT: virtual api::CMovie api::CQTResource::getMovie(const std::string&) const:N:N - Filme inválido :/resource/gifs/votoNulo.gif,2,2
+1,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxN (estado N),2,2
+1,02471677,Tipo de habilitação do eleitor [biométrica],NDNFN,1,1
+1,ALERTA,ATUE,Bateria interna com carga crítica,1,1
+1,ALERTA,ATUE,Fim do teste Impressora - NÃO EXECUTADO,1,1
+1,ALERTA,RED,Impressora atolada. Aguardando ação do operador,1,1
+1,ERRO,ATUE,Impressora - Impressora desconectada: Status da impressora: N,1,1
+1,ERRO,ATUE,Sensor da Chave - Botão Liga/Desliga com problema: Botão de ligar/desligar a urna com problemas,1,1
+1,ERRO,ATUE,"Teclado - Erro na execução do teste: Esperado CONFIRMA, pressionado N",1,1
+1,ERRO,ATUE,"Teclado - Erro na execução do teste: Esperado CORRIGE, pressionado BRANCO",1,1
+1,ERRO,ATUE,"Teclado - Erro na execução do teste: Esperado CORRIGE, pressionado CONFIRMA",1,1
+1,ERRO,ATUE,Teclado TM - Na tecla CONFIRMA: Falha do teste: Tecla esperada CORRIGE. Tecla pressionada CONFIRMA,1,1
+1,ERRO,GAP,Contingência de urna | Sincronizando mídias (N) | Ocorreu uma falha na sincronização. Desligue a urna e substitua-a.,1,1
+1,ERRO,GAP,"Contingência de urna | Validando configuração (N) | Um problema foi detectado durante o procedimento de contingência de urna. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",1,1
+1,ERRO,GAP,Erro na verificação de assinatura do arquivo - rdv.vsu,1,1
+1,ERRO,GAP,Erro na verificação de assinatura do arquivo - ze.vsu,1,1
+1,ERRO,GAP,"Falha inesperada | Falha na validação do ambiente (N) | virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite excedid",1,1
+1,ERRO,GAP,"GAP erro N | Os processos eleitorais da MI e da MV são diferentes | Processo eleitoral da MI: N. Não foi possível determinar processo Eleitoral da MV. Desligue a urna, insira uma mídia de votação do m",1,1
+1,ERRO,GAP,GAP erro N | Sincronização da MI para ME | Os dados contidos na mídia de votação não correspondem aos dados contidos na mídia interna da urna. Há diferença no registro da quantidade de eleitores que c,1,1
+1,ERRO,GAP,GAP erro N | Validação do VOTA | Erro na validação de assinatura dos dados de fotos de candidatos. Desligue a urna e faça uma nova carga.,1,1
+1,ERRO,GAP,GAP erro N | Validação do VOTA | Erro verificando assinatura do arquivo /uenux/bin/vota.of em /uenux/bin/avusrbinof.vst. Desligue a urna e faça a sua substituição.,1,1
+1,ERRO,GAP,"GAP erro N | Validação do Verificador | O arquivo com a chave pública da entidade fiscalizadora não foi encontrado na mídia de resultados (/dsk/mr/N.pub). Desligue a urna, substitua a mídia de resulta",1,1
+1,ERRO,GAP,Inicialização do aplicativo | Montando volumes da mídia externa (N) | Erro na montagem dos volumes da mídia externa. Desligue a urna e faça uma nova carga.,1,1
+1,ERRO,GAP,"Inicialização do aplicativo | Montando volumes da mídia externa (N) | Erro na montagem dos volumes da mídia externa. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",1,1
+1,ERRO,GAP,"Inicialização do aplicativo | Validando configuração (N) | Uma configuração inválida foi detectada. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",1,1
+1,ERRO,GAP,Inicialização do aplicativo | Verificando assinaturas (N) | Erro na verificação das assinaturas dos arquivos estáticos internos. Desligue a urna e faça uma nova carga.,1,1
+1,ERRO,GAP,"Iniciando aplicativo | AJUSTE DE DATA E HORA (N) | Falha na execução do aplicativo. Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e envie para",1,1
+1,ERRO,GAP,"Não é possível continuar a execução | Erro inesperado (N) | virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite exc",1,1
+1,ERRO,GAP,Problema ao desmontar a MR,1,1
+1,ERRO,RED,Erro mídia de votação inválida,1,1
+1,ERRO,RED,Erro procedimento - mídia de resultado não está vazia.,1,1
+1,ERRO,VOTA,"Copiando resultados para a MV (N) | Ocorreu um erro copiando arquivos gerados para o diretório de trabalho da MV Desligue e ligue a urna. Se o erro persistir, substitua a mídia de votação.",1,1
+1,ERRO,VOTA,"Erro na assinatura |  (N) | Ocorreu um erro durante a assinatura do arquivo: UENUXDB INT Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e envie",1,1
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=write disable /sys/devices/pciN:N/N:N:Nd.N/usbN/N-N/N-N:N.N/N-N-portN/disable: error NxNe Tire uma foto des,1,1
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro lendo filme recurso :/resource/gifs/votoLegenda.gif Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de ,1,1
+1,ERRO,VOTA,"Não é possível continuar a execução | Erro inesperado (N) | ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a e",1,1
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Filme inválido :/resource/gifs/votoBranco.gif Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte par,1,1
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Leitor nao encontrado - N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio pa,1,1
+1,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado | GNp failed: dois Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio para resolução ,1,1
+1,INDO,TOTA,Biometria cmletada lãm é do mesário N (N),1,1
+1,WHAT,GAP,WHAT: virtual std::vector<std::unique_ptr<const gap::gatilho::CGatilho> > gap::gatilho::fabricas::CVerificadorAssinaturas::Cria() const:N,1,1
+1,WHAT,GAP,"WHAT: virtual void api::CPrinter::Cut():N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",1,1
+1,WHAT,GAP,"WHAT: virtual void api::CPrinter::Cut():N:N - Timeout aguardando finalização de impressão para execução de corte (map=N). | Por favor, verifique o encaixe da impressora.",1,1
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/bin/avbin.vst) | Erro SAVD: (N - /b,1,1
+1,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/dsk/fi/estatico/chave/avusrchave.vs,1,1
+1,WHAT,GAP,"WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsig",1,1
+1,WHAT,GAP,WHAT: void comum::CPacoteArquivos::TrataErroPacote(const comum::IInterfaceSavd&) const:N:N - Falha ao validar assinatura SEVIN | pacote: (/dsk/fi/estatico/infomidia.vsc) | Erro SAVD: (N - /dsk/fi/esta,1,1
+1,WHAT,VOTA,WHAT: GNp failed: dois,1,1
+1,WHAT,VOTA,WHAT: virtual api::CMovie api::CQTResource::getMovie(const std::string&) const:N:N - Erro lendo filme recurso :/resource/gifs/votoLegenda.gif,1,1
+1,WHAT,VOTA,WHAT: virtual api::CMovie api::CQTResource::getMovie(const std::string&) const:N:N - Filme inválido :/resource/gifs/votoBranco.gif,1,1
+1,WHAT,VOTA,"WHAT: virtual std::pair<api::EInputResult, std::__cxxN::basic_string<char> > vota::CVotacaoStateAudio::EmiteEcoComInputField(const vota::CFormInterativoTelaVota&) const:N:N - Nao havia campos de input",1,1
+1,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxNe (estado N),1,1
+1,WHAT,VOTA,"WHAT: virtual void api::CScreenMT::Write(const api::SPoint&, const api::IText&):N:N - ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N",1,1
+1,WHAT,VOTA,"WHAT: virtual void api::CScreenMT::Write(const api::SPoint&, const api::IText&):N:N - ExibeTextoCentralizado(N, N) retornou erro mesmo depois de N tentativas: N",1,1
+1,WHAT,VOTA,WHAT: void api::CFingerScannerN::OpenDev():N:N - Leitor nao encontrado - N,1,1
+1,WHAT,VOTA,"WHAT: void api::CPrinter::CheckAndThrowPrinterStatus(const char*, const char*):N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",1,1
+1,WHAT,VOTA,WHAT: void api::pkcsN::CPkcsNUE::OpenROSession(CK_SESSION_HANDLE_PTR) const:N:N - Erro ao abrir uma sessao PKCS#N. - N,1,1
+1,WHAT,VOTA,"WHAT: void api::tPrinterExtension::throwError(intN_t, api::EUePrinterError, const std::string&):N:N - ImprimirImagemError msirPrintImage (StatusMap = N)",1,1
+2,ALERTA,VOTA,Identificador do eleitor digitado inválido,5775549,497189
+2,ALERTA,VOTA,Digitado título inválido para o registro de mesário,536476,261163
+2,ERRO,GAP,Problema ao desmontar a MR,531983,497702
+2,ALERTA,VOTA,Mesário indagado se eleitor está votando,181244,115242
+2,ALERTA,VOTA,Habilitação cancelada durante reconhecimento biométrico,176127,98545
+2,ALERTA,VOTA,Ano de nascimento digitado é diferente do cadastro,129654,79266
+2,ALERTA,VOTA,O eleitor identificado já votou,113979,73246
+2,ALERTA,VOTA,Eleitor já justificou,47487,30330
+2,ALERTA,VOTA,Encerramento só pode ser solicitado após as N:N:N horas,22035,19865
+2,ALERTA,VOTA,Eleitor não está votando,15468,12529
+2,ALERTA,VOTA,Título N é válido para suspender a votação,8498,8029
+2,ALERTA,VOTA,Limite de mesários registrados atingido. Limite máximo: N,8370,4479
+2,ALERTA,VOTA,Ano de nascimento inválido,6849,5973
+2,ALERTA,VOTA,Procedimento de encerramento abortado,5758,5658
+2,ALERTA,VOTA,Título N é inválido para suspender a votação,4990,2703
+2,ALERTA,VOTA,Carga da [ALIMENTAÇÃO BATERIA INTERNA]: [CRÍTICA],4157,2135
+2,ERRO,VOTA,"Captura da digital do eleitor | Falha na captura da digital (N) | Ocorreu um erro durante captura da digital do eleitor. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",3732,1745
+2,WHAT,VOTA,WHAT: virtual void api::CFingerScanner::StartAcquireImage():N:N - ERROR starting image acquisition - -N,3346,1452
+2,ERRO,VOTA,Não foi possível exibir imagem no LCD do terminal do mesário: Erro (N) exibindo imagem no microterminal.,2714,1829
+2,ALERTA,VOTA,Impressora com falha no corte do papel. Aguardando ação do operador,2404,244
+2,ALERTA,GAP,Bateria interna ausente,2171,1803
+2,ALERTA,VOTA,Eleitor não tem idade mínima,1784,1469
+2,ALERTA,VOTA,Impressora atolada. Aguardando ação do operador,1775,588
+2,ALERTA,GAP,Bateria interna com carga crítica,1649,1250
+2,EXTERNO,LOGD,Arquivo N-N.jez referente ao log da ME,1065,1054
+2,ALERTA,LOGD,Arquivo NME.jez referente ao log corrompido da ME,959,947
+2,ALERTA,LOGD,Identificado arquivo de log corrompido na ME,959,947
+2,ERRO,VOTA,Erro ao tentar configurar LED do MT: Setando leds para cabine livre - N,728,725
+2,WHAT,VOTA,WHAT: void api::CFingerScannerFSNHS::Open():N:N - Device open error /dev/uescan - No such device,664,352
+2,ALERTA,VOTA,Carga da [ALIMENTAÇÃO BATERIA EXTERNA]: [CRÍTICA],609,396
+2,ALERTA,VOTA,Impressora sem papel. Aguardando ação do operador,505,184
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR opening the biometric reader - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para rece,479,188
+2,WHAT,VOTA,WHAT: void api::CFingerScanner::Open():N:N - ERROR opening the biometric reader - -N,479,188
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR starting image acquisition - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para recebe,414,349
+2,ALERTA,VOTA,Tempo limite de espera usando bateria interna atingido,370,370
+2,ERRO,VOTA,"Erro inesperado durante a votação | O voto do eleitor NÃO foi registrado (N) | Ocorreu um erro enquanto o eleitor registrava suas escolhas. Desligue e ligue a urna. Se o erro persistir, tire uma foto ",334,242
+2,ALERTA,GAP,Impressora desconectada. Aguardando ação do operador,292,63
+2,WHAT,VOTA,WHAT: virtual void api::CInputKbd::OpenSession():N:N - msteOpenSession ERROR -N,284,202
+2,WHAT,VOTA,WHAT: void api::CFingerScannerN::FinishAcquireImageInternal(int):N:N - Error ao encerrar captura - estado N (-NxN) call(N),242,134
+2,ERRO,GAP,"Iniciando aplicativo | ELEIÇÃO OFICIAL SEGUNDO TURNO (N) | Falha na execução do aplicativo. Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e en",236,234
+2,WHAT,GAP,WHAT: void comum::IInterfaceInit::DesmontarMRSemDesabilitar():N:N - Falha ao desmontar mídia de resultado (N),212,212
+2,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=Erro na aquisição da imagem NxNbaNf(N),211,61
+2,ALERTA,VOTA,Impressora com mecanismo aberto. Aguardando ação do operador,178,58
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Device open error /dev/uescan - No such device Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa,168,113
+2,WHAT,GAP,WHAT: virtual std::vector<std::unique_ptr<const gap::gatilho::CGatilho> > gap::gatilho::fabricas::CVotaOficialSimulado::Cria() const:N,130,73
+2,WHAT,VOTA,WHAT: void vota::CThreadMonitor::VerificaErroCriticoFlash():N:N - Erro na Mídia Externa - Mídia não está presente,124,78
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Erro na aquisição da imagem NxNbaNf(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie pa,113,44
+2,ALERTA,GAP,Impressora com erro desconhecido. Aguardando ação do operador,112,32
+2,ERRO,GAP,"GAP erro N | Validação do VOTA | O aplicativo Software de Votação precisa de uma mídia de votação para ser executado. Desligue a urna, insira uma mídia de votação válida e tente novamente.",110,62
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro na Mídia Externa - Mídia não está presente Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte p,106,74
+2,ALERTA,VOTA,Impressora desconectada. Aguardando ação do operador,105,24
+2,ALERTA,GAP,Urna não testada,102,66
+2,ERRO,GAP,Mídia externa ausente,100,62
+2,ERRO,VOTA,Erro ao tentar acionar beep do TM: Tocando beeps - N,93,92
+2,ERRO,GAP,Impressora desconectada,82,61
+2,WHAT,VOTA,WHAT: void vota::CThreadMonitor::VerificaErroCriticoKbdTE():N:N - Erro no teclado do eleitor - dispositivo desconectado,79,43
+2,ERRO,GAP,Impressora com atolamento de papel,78,68
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Error ao encerrar captura - estado N (-NxN) call(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supor,78,61
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR OpenSession command - N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxíli,64,57
+2,WHAT,VOTA,WHAT: void api::CFingerScanner::Open():N:N - ERROR OpenSession command - N,64,57
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro no teclado do eleitor - dispositivo desconectado Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de sup,55,37
+2,ERRO,GAP,Erro de leitura da mídia de resultado,54,28
+2,ERRO,VOTA,Erro ao tentar acionar buzzer do TM: Tocando buzzer - N,52,49
+2,ERRO,GAP,Impressora com erro desconhecido,39,33
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | ERROR OpenSession and Close comands - -N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para rec,39,36
+2,WHAT,VOTA,WHAT: void api::CFingerScanner::Open():N:N - ERROR OpenSession and Close comands - -N,39,36
+2,ERRO,ATUE,Teclado TM - Na tecla N: Falha do teste: Tecla esperada CORRIGE. Tecla pressionada N,32,17
+2,ALERTA,VOTA,Impressora não responde. Aguardando ação do operador,30,14
+2,WHAT,GAP,"WHAT: std::vector<int> comum::CEscritorInitFilaMsg::EnviarMensagem(ueintN, uebyte):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::se",28,24
+2,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=Erro na aquisição da imagem: size=N brilho=Nxff,28,19
+2,ALERTA,GAP,O operador cancelou a contingência de urna,26,24
+2,ALERTA,VOTA,Impressora com erro desconhecido. Aguardando ação do operador,26,17
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Erro na aquisição da imagem: size=N brilho=Nxff Tire uma foto dessa tela em que apareça o QR Code ao lado e,22,15
+2,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=Error ao encerrar captura - estado N (-NxN) call(N),22,15
+2,ALERTA,GAP,Impressora com falha no corte do papel. Aguardando ação do operador,21,6
+2,ERRO,GAP,Inicialização do aplicativo | Preparando impressora (N) | Não foi possível preparar a impressora. Desligue a urna e faça uma nova carga.,20,16
+2,ERRO,VOTA,"Não é possível continuar a execução | Erro inesperado (N) | Não foi possível concluir a impressão. Desligue a urna, confira o encaixe da impressora e ligue novamente. Se o erro persistir, substitua o ",20,14
+2,WHAT,GAP,WHAT: virtual gap::gatilho::CResultadoAcao gap::gatilho::acao::CSincronizaInternaParaExternaSeNecessario::Age() const:N,19,6
+2,ALERTA,GAP,Impressora sem papel. Aguardando ação do operador,17,7
+2,ERRO,GAP,ME não conhecida,16,4
+2,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerN::AcquireImage():N:N - Erro CFingerScannerN: last error=write disable /sys/devices/pciN:N/N:N:Nd.N/usbN/N-N/N-N:N.N/N-N-portN/disable: error N,16,14
+2,WHAT,VOTA,"WHAT: virtual void api::CEscritorLogTxtFilaMsg::fazLog(uebyte, ESeveridade, const std::string&):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, st",16,13
+2,ERRO,GAP,"GAP erro N | Sincronização da MI para MV | Os dados contidos na mídia de votação não correspondem aos dados contidos na mídia interna da urna. Desligue a urna, insira a mídia de votação original ou um",15,5
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=write disable /sys/devices/pciN:N/N:N:Nd.N/usbN/N-N/N-N:N.N/N-N-portN/disable: error NxN Tire uma foto dess,15,13
+2,WHAT,GAP,WHAT: virtual void api::CPrinter::Cut():N:N - Falha no corte de papel. | Por favor verifique a guilhotina da impressora.,13,11
+2,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxNc (estado N),12,8
+2,ERRO,GAP,"Inicialização do aplicativo | Preparando impressora (N) | Não foi possível preparar a impressora. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",11,7
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro ao inicializar assinatura. - N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber ,11,11
+2,WHAT,VOTA,WHAT: api::pkcsN::CPkcsNSignature api::pkcsN::CPkcsNUE::DoSign(const std::vector<unsigned char>&) const:N:N - Erro ao inicializar assinatura. - N,11,11
+2,WHAT,VOTA,WHAT: void api::CFingerScannerN::OpenDev():N:N - CFingerScannerN: open -NxN,11,9
+2,ALERTA,GAP,Bateria externa com carga crítica,10,9
+2,ERRO,GAP,GAP erro N | Validação do ADH | Aplicativo de Ajuste de Data e Hora não pode ser executado após a impressão da zerésima. Desligue a urna.,10,6
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | CFingerScannerN: start_stream -NxNc (estado N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte pa,10,6
+2,WHAT,GAP,WHAT: virtual std::vector<std::unique_ptr<const gap::gatilho::CGatilho> > gap::gatilho::fabricas::CADH::Cria() const:N,10,6
+2,WHAT,GAP,"WHAT: void api::CPrinter::CheckAndThrowPrinterStatus(const char*, const char*):N:N - Impressora desconectada. | Por favor, verifique se está encaixada corretamente à urna.",10,7
+2,ERRO,GAP,Erro na verificação de assinatura do arquivo - vota.vsu,9,9
+2,ERRO,GAP,Impressora sem papel,9,7
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | CFingerScannerN: open -NxN Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio p,9,7
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Device open error  Finger write not valid - Input/output error Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equi,9,6
+2,EXTERNO,LOGD,Arquivo N-N.jez referente ao log da MI,9,7
+2,WHAT,VOTA,WHAT: void api::CFingerScannerFSNHS::Open():N:N - Device open error |  Finger write not valid - Input/output error,9,6
+2,ERRO,GAP,Erro na verificação de assinatura do arquivo - ze.vsu,8,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=Error ao encerrar captura - estado N (-NxN) call(N) Tire uma foto dessa tela em que apareça o QR Code ao la,8,6
+2,WHAT,VOTA,"WHAT: void api::{anonymous}::PrintImage(const std::vector<unsigned char>&, uebyte):N:N - Não foi possível imprimir a imagem.",8,2
+2,ERRO,GAP,"Erro detectado: Falha ao montar o volume Dinâmico [part. N] da ME, acesso N: N",7,3
+2,ERRO,GAP,"GAP erro N | Validação do VOTA | Dados contidos na mídia de votação não correspondem aos dados contidos na urna. Desligue a urna, insira uma mídia de votação válida e tente novamente.",7,4
+2,ERRO,GAP,GAP erro N | Validação do VOTA | Erro verificando assinatura do arquivo /uenux/bin/vota.of em /uenux/bin/avusrbinof.vst. Desligue a urna e faça uma nova carga.,7,1
+2,ERRO,VOTA,Erro ao tentar configurar LED do MT: Setando leds para cabine ocupada - N,7,7
+2,ERRO,VOTA,Erro gravando EG/Eleitores na Mídia Externa,7,7
+2,ERRO,VOTA,"Não é possível continuar a execução | Erro inesperado (N) | virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite exc",7,7
+2,ALERTA,GAP,Impressora com mecanismo aberto. Aguardando ação do operador,6,2
+2,ERRO,GAP,Contingência de urna | Validando configuração (N) | Contingência cancelada pelo usuário por falta de mídia de resultado. Desligue a urna.,6,5
+2,WHAT,GAP,WHAT: gap::CGAP::ResultadoContingencia gap::CGAP::ExecutaContingenciaUrna():N:N - Contingência cancelada pelo usuário por falta de mídia de resultado.,6,5
+2,ALERTA,RED,Impressora atolada. Aguardando ação do operador,5,2
+2,ERRO,ATUE,Teclado TM - Na tecla N: Falha do teste: Tecla esperada N. Tecla pressionada N,5,4
+2,ERRO,GAP,Impressora com problema na guilhotina,5,5
+2,ERRO,GAP,"Inicialização do aplicativo | Validando assinaturas (N) | Erro na verificação de integridade do sistema. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",5,5
+2,ERRO,GAP,Problema ao remontar a FE_ESTATICO RO,5,5
+2,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura SEVIN | pacote: (/dsk/fe/estatico/infomidia.vsc) | ,5,5
+2,WHAT,GAP,"WHAT: void api::CPrinter::CheckAndThrowPrinterStatus(const char*, const char*):N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",5,3
+2,WHAT,VOTA,WHAT: virtual void api::CInputKbd::OpenSession():N:N - Try recall keyboard_enable N,5,5
+2,WHAT,VOTA,"WHAT: virtual void api::CScreenMT::Write(const api::SPoint&, const api::IText&):N:N - ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N",5,5
+2,ERRO,ATUE,Teclado TM - Na tecla CONFIRMA: Falha do teste: Tecla esperada N. Tecla pressionada CONFIRMA,4,4
+2,ERRO,GAP,GAP erro N | Sincronização da MI para ME | Os dados contidos na mídia de votação não correspondem aos dados contidos na mídia interna da urna. Há diferença no registro da quantidade de eleitores que c,4,1
+2,ERRO,GAP,"Inicialização do aplicativo | Inicializando log (N) | Erro na inicialização do log. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",4,2
+2,ERRO,GAP,Problema ao remontar a FI_ESTATICO RO,4,4
+2,ERRO,RED,"Erro na execução do sistema | Ocorreu erro durante a execução do RED. Desligue e ligue a urna. Se o erro persistir, faça a apuração em outra urna.",4,2
+2,ERRO,VOTA,"Não é possível continuar a execução | Erro inesperado (N) | ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a e",4,4
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Falha ao validar assinatura UE pacote: (/dsk/fi/dinamico/trabN/ze.vsu) Erro SAVD: (N - /dsk/fi/dinamico/trabN/ze.vsu) Tire uma foto dessa te,4,1
+2,WHAT,RED,WHAT: filesystem error: cannot copy: File exists [/dsk/fi/dinamico/trabN/bkpres] [/dsk/fe/dinamico/trabN/bkpres],4,2
+2,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxN (estado N),4,4
+2,WHAT,VOTA,WHAT: virtual void api::CPrinter::Cut():N:N - Falha no corte de papel. | Por favor verifique a guilhotina da impressora.,4,4
+2,WHAT,VOTA,WHAT: virtual void api::CScreenMT::Clear():N:N - LimpaTela retornou erro mesmo depois de N tentativas: N,4,4
+2,WHAT,VOTA,WHAT: void comum::CPacoteArquivos::TrataErroPacote(const comum::IInterfaceSavd&) const:N:N - Falha ao validar assinatura UE | pacote: (/dsk/fi/dinamico/trabN/ze.vsu) | Erro SAVD: (N - /dsk/fi/dinamico,4,1
+2,ALERTA,ATUE,Fim do teste Mídia Externa - NÃO EXECUTADO,3,3
+2,ALERTA,VERIFICADOR,Impressora atolada. Aguardando ação do operador,3,2
+2,ALERTA,VOTA,Quantidade de vias adicionais excede o máximo permitido,3,2
+2,ERRO,ATUE,Led TM - Operador reprovou o teste: Apagar LEDs,3,3
+2,ERRO,GAP,"Erro detectado: virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite excedido aguardando mensagem (aguardando respos",3,3
+2,ERRO,GAP,"GAP erro N | Validação do VOTA | Erro verificando assinatura do arquivo turnoN.jez em /dsk/mr/turnoN.vsc. Desligue a urna, insira uma nova mídia de resultado de Nº turno e tente novamente.",3,3
+2,ERRO,GAP,Inicialização do aplicativo | Validando assinaturas (N) | Erro na verificação de integridade do sistema. Desligue a urna e faça uma nova carga.,3,3
+2,ERRO,GAP,"Iniciando aplicativo | ELEIÇÃO OFICIAL SEGUNDO TURNO | Falha na execução do aplicativo. Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e envie ",3,3
+2,ERRO,VOTA,Erro gravando RDV na Mídia Externa,3,2
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Leitor nao encontrado - NxN Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio ,3,3
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado | Resource temporarily unavailable Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio,3,3
+2,WHAT,GAP,WHAT: filesystem error: directory iterator cannot open directory: Input/output error [/dsk/fe/estatico/],3,3
+2,WHAT,GAP,WHAT: virtual gap::gatilho::CResultadoAcao gap::gatilho::acao::CLancaErroArquivosEstaticos::Age() const:N,3,2
+2,WHAT,VOTA,WHAT: Resource temporarily unavailable,3,3
+2,WHAT,VOTA,WHAT: void api::CFingerScannerN::OpenDev():N:N - Leitor nao encontrado - NxN,3,3
+2,ALERTA,ATUE,Bateria interna ausente,2,2
+2,ALERTA,VOTA,Data da eleição inválida,2,2
+2,ERRO,ATUE,Mídia de Resultado - Erro ao detectar a mídia de resultado: Mídia de resultados ausente,2,2
+2,ERRO,ATUE,Teclado TM - Timeout no teste do terminal do mesário: Número de tentativas excedido,2,2
+2,ERRO,ATUE,Áudio - Operador reprovou o teste: Audio com problemas,2,1
+2,ERRO,GAP,Erro na verificação de assinatura do arquivo - rdv.vsu,2,2
+2,ERRO,GAP,Erro na verificação de assinatura do arquivo - uenux.vsu,2,2
+2,ERRO,GAP,Falha inesperada | Falha na validação do ambiente (N) | LimpaTela retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supor,2,2
+2,ERRO,GAP,"GAP erro N | Descompactação dos dados de Nº turno da MR para a MI | Erro ao descompactar os dados de Nº turno da mídia de resultado para a mídia interna. Desligue a urna, insira outra mídia de resulta",2,2
+2,ERRO,GAP,"GAP erro N | Validação dos arquivos estáticos | Foi verificado que o arquivo de eleitores está inconsistente na mídia de votação. Desligue a urna, substitua a mídia de votação e tente novamente.",2,1
+2,ERRO,GAP,Inicialização do aplicativo | Inicializando log (N) | Erro na inicialização do log. Desligue a urna e faça uma nova carga.,2,2
+2,ERRO,VOTA,"Não é possível continuar a execução | Gravando o estado da urna (N) | Ocorreu um erro durante a sincronização do estado geral do VOTA. Desligue e ligue a urna. Se o erro persistir, substitua a mídia d",2,2
+2,WHAT,GAP,"WHAT: static void api::CSystem::CopyFile(const std::string&, const std::string&, bool, bool):N:N - O arquivo de origem [/dsk/mr/turnoN.vsc] não pode ser lido: No such file or directory",2,2
+2,WHAT,GAP,WHAT: static void gap::gatilho::acao::CInstalaPacoteVotaSegundoTurno::DescompactaPacoteTmp():N,2,2
+2,WHAT,GAP,WHAT: virtual std::vector<std::unique_ptr<const gap::gatilho::CGatilho> > gap::gatilho::fabricas::CSAOficial::Cria() const:N,2,2
+2,WHAT,GAP,"WHAT: virtual void api::CPrinter::Cut():N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",2,2
+2,WHAT,GAP,WHAT: virtual void api::CScreenMT::Clear():N:N - LimpaTela retornou erro mesmo depois de N tentativas: N,2,2
+2,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/share/RHVoice/voices/Leticia-FN/N/a,2,2
+2,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxN,2,2
+2,WHAT,VOTA,WHAT: virtual void api::CInputKbd::OpenSession():N:N - Try recall keyboard_enable -N,2,2
+2,WHAT,VOTA,"WHAT: void api::tPrinterExtension::throwError(intN_t, api::EUePrinterError, const std::string&):N:N - PrintImpError msirWriteBuffer (StatusMap = N)",2,2
+2,ALERTA,ATUE,Bateria interna com carga crítica,1,1
+2,ALERTA,ATUE,Fim do teste Impressora - NÃO EXECUTADO,1,1
+2,ALERTA,VERIFICADOR,Impressora com mecanismo aberto. Aguardando ação do operador,1,1
+2,ERRO,ATUE,Impressora - Operador rejeitou a impressão: Impressão rejeitada,1,1
+2,ERRO,ATUE,Led TM - Operador reprovou o teste: Acender LEDs,1,1
+2,ERRO,ATUE,Led TM - Timeout no teste do terminal do mesário: Número de tentativas excedido,1,1
+2,ERRO,ATUE,Não é possível continuar a execução | Erro inesperado (N) | Error ao encerrar captura - estado N (-NxN) call(N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de supor,1,1
+2,ERRO,ATUE,Teclado TM - Na tecla CONFIRMA: Falha do teste: Tecla esperada CORRIGE. Tecla pressionada CONFIRMA,1,1
+2,ERRO,ATUE,Teclado TM - Na tecla N: Falha do teste: Tecla esperada CONFIRMA. Tecla pressionada N,1,1
+2,ERRO,GAP,Contingência de urna | Sincronizando mídias (N) | Ocorreu uma falha na sincronização. Desligue a urna e substitua-a.,1,1
+2,ERRO,GAP,"Falha inesperada | Falha na validação do ambiente (N) | ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equip",1,1
+2,ERRO,GAP,"GAP erro N | Validação do SA | O aplicativo Sistema de Apuração não pode ser executado em urna de contingência com uma mídia de votação utilizada numa seção eleitoral. Desligue a urna, substitua a míd",1,1
+2,ERRO,GAP,GAP erro N | Validação do SA | Tentativa de executar o Sistema de Apuração numa urna de seção não encerrada. Desligue a urna. Para executar o Sistema de Apuração utilize uma urna de seção encerrada ou,1,1
+2,ERRO,GAP,"GAP erro N | Validação do VOTA | A mídia de resultado para ativação do VOTA está configurada para o Nº turno, mas a urna se encontra no Nº turno. Desligue a urna, insira a mídia de resultado do Nº tur",1,1
+2,ERRO,GAP,GAP erro N | Validação do VOTA | Erro na validação de assinatura dos dados candidatos. Desligue a urna e faça uma nova carga.,1,1
+2,ERRO,GAP,GAP erro N | Validação do VOTA | Erro verificando assinatura do arquivo /uenux/bin/vota.of em /uenux/bin/avusrbinof.vst. Desligue a urna e faça a sua substituição.,1,1
+2,ERRO,GAP,"GAP erro N | Validação dos arquivos estáticos | Foi detectado arquivo de processo eleitoral inconsistente na mídia de votação. Desligue a urna, substitua a mídia de votação e tente novamente.",1,1
+2,ERRO,GAP,Impressora com mecanismo aberto,1,1
+2,ERRO,GAP,"Inicialização do aplicativo | Validando configuração (N) | Uma configuração inválida foi detectada. Desligue e ligue a urna. Se o erro persistir, substitua a urna.",1,1
+2,ERRO,GAP,"Inicialização do aplicativo | Validando mídia externa (N) | Não foi possível validar a mídia externa. Desligue e ligue a urna. Se o erro persistir, substitua a mídia de votação.",1,1
+2,ERRO,GAP,"Não é possível continuar a execução | Erro inesperado (N) | virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::seconds):N:N - Tempo limite exc",1,1
+2,ERRO,VOTA,"Copiando resultados para a MV (N) | Ocorreu um erro copiando arquivos gerados para o diretório de trabalho da MV Desligue e ligue a urna. Se o erro persistir, substitua a mídia de votação.",1,1
+2,ERRO,VOTA,Erro ao decifrar a biometria do eleitor - Código (N),1,1
+2,ERRO,VOTA,Erro gravando EG/Eleitores na Mídia Interna,1,1
+2,ERRO,VOTA,Erro gravando RDV na Mídia Interna,1,1
+2,ERRO,VOTA,"Erro na assinatura dos arquivos de resultado |  (N) | Ocorreu um erro durante a assinatura dos arquivos: Log MI (res) Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apar",1,1
+2,ERRO,VOTA,"Erro na assinatura |  (N) | Ocorreu um erro durante a assinatura do arquivo: RDV MI Desligue e ligue a urna. Se o erro persistir, tire uma foto dessa tela em que apareça o QR Code ao lado e envie para",1,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | CFingerScannerN: start_stream -NxN (estado N) Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte par,1,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | CFingerScannerN: start_stream -NxN Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber a,1,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | Erro CFingerScannerN: last error=write disable /sys/devices/pciN:N/N:N:Nd.N/usbN/N-N/N-N:N.N/N-N-portN/disable: error NxNe Tire uma foto des,1,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado (N) | O arquivo de destino [/dsk/fe/dinamico/trabN/ze.dat] não pôde ser criado: Input/output error Tire uma foto dessa tela em que apareça o QR Co,1,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado | filesystem error: status: Input/output error [/dsk/fe/dinamico/trabN/bim.dat] Tire uma foto dessa tela em que apareça o QR Code ao lado e envie ,1,1
+2,ERRO,VOTA,Não é possível continuar a execução | Erro inesperado | random_device: rdrand failed Tire uma foto dessa tela em que apareça o QR Code ao lado e envie para a equipe de suporte para receber auxílio par,1,1
+2,WHAT,ATUE,WHAT: void api::CFingerScannerN::FinishAcquireImageInternal(int):N:N - Error ao encerrar captura - estado N (-NxN) call(N),1,1
+2,WHAT,GAP,"WHAT: bool api::ExistResource(stat&, const std::string&):N:N - Falha ao validar a existência do recurso [/dsk/fe/dinamico/eg.bin]: Input/output error",1,1
+2,WHAT,GAP,WHAT: static void gap::impl::CValidadorUrna::ValidaFlashExterna():N:N - Falha durante leitura do serial de votação da MV. Falha ao validar a existência do recurso [/dsk/fe/estatico/infomidia.dat]: Inp,1,1
+2,WHAT,GAP,"WHAT: virtual void api::CEscritorLogTxtFilaMsg::fazLog(uebyte, ESeveridade, const std::string&):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, st",1,1
+2,WHAT,GAP,"WHAT: virtual void api::CPrinter::Cut():N:N - Timeout aguardando finalização de impressão para execução de corte (map=N). | Por favor, verifique o encaixe da impressora.",1,1
+2,WHAT,GAP,"WHAT: virtual void api::CScreenMT::Write(const api::SPoint&, const api::IText&):N:N - ExibeTexto(N, N, N) retornou erro mesmo depois de N tentativas: N",1,1
+2,WHAT,GAP,WHAT: virtual void gap::impl::CValidadorUrna::ValidaAssinaturas() const:N:N - Validação de árvore genérica mal sucedida. Falha ao validar assinatura TSE | pacote: (/uenux/bin/avusrbin.vst) | Erro SAVD,1,1
+2,WHAT,VOTA,"WHAT: bool ecourna::api::io::CFile::Open(const std::string&, const std::string&, FileMode):N:N - nao foi possivel abrir /dsk/fe/dinamico/trabN/vota.bin [Open] - N - Read-only file system",1,1
+2,WHAT,VOTA,WHAT: filesystem error: status: Input/output error [/dsk/fe/dinamico/trabN/bim.dat],1,1
+2,WHAT,VOTA,WHAT: random_device: rdrand failed,1,1
+2,WHAT,VOTA,"WHAT: static void api::CSystem::CopyFile(const std::string&, const std::string&, bool, bool):N:N - Falha ao copiar o arquivo [/dsk/fi/dinamico/trabN/vota.vsu] para [/dsk/fe/dinamico/trabN/vota.vsu]: I",1,1
+2,WHAT,VOTA,"WHAT: static void api::CSystem::CopyFile(const std::string&, const std::string&, bool, bool):N:N - O arquivo de destino [/dsk/fe/dinamico/resN/oNpaN-bu.dat] não pôde ser criado: Structure needs cleani",1,1
+2,WHAT,VOTA,"WHAT: static void api::CSystem::CopyFile(const std::string&, const std::string&, bool, bool):N:N - O arquivo de destino [/dsk/fe/dinamico/trabN/ze.dat] não pôde ser criado: Input/output error",1,1
+2,WHAT,VOTA,"WHAT: std::vector<int> comum::CEscritorInitFilaMsg::EnviarMensagem(ueintN, uebyte):N:N - virtual void api::CIPCMessageQueue::read(long int, long int&, std::vector<unsigned char>&, int, std::chrono::se",1,1
+2,WHAT,VOTA,WHAT: virtual api::TSharedImageVector api::CFingerScannerFSNHS::AcquireImage():N:N - Finger write error - Input/output error,1,1
+2,WHAT,VOTA,WHAT: virtual void api::CFingerScannerN::StartAcquireImage():N:N - CFingerScannerN: start_stream -NxNe (estado N),1,1
+2,WHAT,VOTA,WHAT: virtual void api::CInputKbd::OpenSession():N:N - msteEnableKeypad ERROR -N,1,1
+2,WHAT,VOTA,"WHAT: virtual void api::CPrinter::Cut():N:N - Impressora desconectada. | Por favor, verifique se está encaixada corretamente à urna.",1,1
+2,WHAT,VOTA,"WHAT: virtual void api::CPrinter::Cut():N:N - Impressora sem papel. | Por favor, desligue a urna e substitua a bobina.",1,1
+2,WHAT,VOTA,WHAT: void api::CBeep::Beep(int):N:N - Device /dev/ttyN command error Operation not permitted,1,1
+2,WHAT,VOTA,"WHAT: void api::tPrinterExtension::throwError(intN_t, api::EUePrinterError, const std::string&):N:N - PrintImpError msirWriteBuffer (Ret = -N)",1,1
