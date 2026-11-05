@@ -26,6 +26,7 @@
 | [Coerência entre cargos](coerencia-cargos-2026.md) | Todos os cargos de cada BU do 1º turno, Presidente x Governador no 2º turno e voto dividido, com 2022 de controle |
 | [Seções tardias do PR](pr-secoes-tardias-1t-2026.md) | Por que as últimas seções do 1º turno aparecem recebidas em 07/10 |
 | [Republicação do pacote do MA](ma-republicacao-2026.md) | O que mudou no zip do MA 1º turno republicado em 03/11 |
+| [Acervo dos BUs assinados de 2026](acervo-bu-2026.md) | Cópia datada de todos os BUs dos dois turnos, com o hash e a assinatura de cada um, para provar o que o TSE publicou |
 | [Mapa de verificações](mapa-verificacoes-2026.md) | O que foi feito, o que falta e o que depende do TSE |
 | [Ordem de envio](ordem-de-envio-viradas-2022-2026.md) | Ordem de chegada das seções e a "virada" da curva acumulada em 2022 e 2026 |
 | [Forense estatística](forense-estatistica-2026.md) | Impressão digital eleitoral, dígitos, swing, transferência, dispersão e comparecimento, com 2022 de controle |
