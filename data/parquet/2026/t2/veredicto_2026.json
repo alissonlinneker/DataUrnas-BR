@@ -1,7 +1,7 @@
 {
   "titulo": "Veredicto da auditoria independente: eleição presidencial de 2026 (1º e 2º turnos)",
   "fonte": "docs/veredicto-auditoria-2026.md",
-  "data_referencia": "04/11/2026",
+  "data_referencia": "05/11/2026",
   "escopo": "Auditoria feita sobre os arquivos públicos das urnas e da totalização (BU, RDV, log, assinaturas .vsc, aux.json, totais .json/.jws, dados abertos, logs de preparação GEDAI e listas oficiais de hashes), sem partir de nenhuma premissa sobre a confiabilidade do TSE nem sobre o resultado político.",
   "resultado_oficial_2t": {
     "data_eleicao": "25/10/2026",
@@ -18,7 +18,7 @@
     "secoes_nao_instaladas_local": "exterior"
   },
   "indicadores": {
-    "verificacoes": 26,
+    "verificacoes": 27,
     "secoes_2t": 499207,
     "assinaturas_verificadas_2t": 5487289,
     "assinaturas_invalidas_2t": 0,
@@ -63,11 +63,12 @@
     {"n": 23, "verificacao": "Plausibilidade da virada: base histórica (454 disputas), pesquisas, transferências, simulação de fraude e eleitorado x população", "escopo": "Brasil 1994 a 2026 e 31 casos internacionais", "resultado": "Virada com chance perto de 50% pela margem do 1º turno; fraude concentrada capaz de inverter apareceria; eleitorado inflado não favoreceu o 13", "situacao": "confere", "documento": "docs/virada-2026-probabilidades.md"},
     {"n": 24, "verificacao": "Zerésima (relatório de zero votos) em todas as urnas: presença, horário e ordem em relação à abertura e ao primeiro voto", "escopo": "998.354 logs, dois turnos (143,8 GB)", "resultado": "Nenhum voto antes da zerésima e nenhuma zerésima depois da abertura, fora do dia ou antes das 7h de Brasília; mais de uma zerésima em 383 (1º) e 298 (2º) seções, quase sempre troca de urna antes de qualquer voto; 2 seções sem zerésima no log publicado (SP 71072/0002/0035 no 1º e MA 08893/0047/0609 no 2º), ambas com o log da urna que abriu a votação ausente do pacote", "situacao": "ressalva", "documento": "docs/zeresima-2026.md"},
     {"n": 25, "verificacao": "Coerência entre cargos no mesmo BU (todos os cargos no 1º turno; Presidente x Governador no 2º) e voto dividido, com 2022 de controle", "escopo": "499.207 BUs do 1º turno, 39.739 do 2º turno de governador (AC, AM, DF, ES, RN, TO) e 249.040 de 2022", "resultado": "0 BUs com cargo que não fecha, comparecimento ou aptos diferentes entre cargos; diferença Presidente x cargos estaduais explicada pelo voto em trânsito e no exterior; seções atípicas no voto dividido em 0,40% (2026) contra 0,24% (2022), dentro da faixa por UF de 2022", "situacao": "confere", "documento": "docs/coerencia-cargos-2026.md"},
-    {"n": 26, "verificacao": "Últimas seções recebidas no 1º turno (PR, 07/10)", "escopo": "500 seções do PR e 2.765 no país com recebimento depois do resultado oficial", "resultado": "Já somadas no resultado oficial do PR de 05/10 (27.142 de 27.142 seções); o horário de 07/10 é reenvio do mesmo pacote; assinaturas válidas e RDV igual ao BU nas 500; voto no 13 igual ao das seções da mesma zona", "situacao": "confere", "documento": "docs/pr-secoes-tardias-1t-2026.md"}
+    {"n": 26, "verificacao": "Últimas seções recebidas no 1º turno (PR, 07/10)", "escopo": "500 seções do PR e 2.765 no país com recebimento depois do resultado oficial", "resultado": "Já somadas no resultado oficial do PR de 05/10 (27.142 de 27.142 seções); o horário de 07/10 é reenvio do mesmo pacote; assinaturas válidas e RDV igual ao BU nas 500; voto no 13 igual ao das seções da mesma zona", "situacao": "confere", "documento": "docs/pr-secoes-tardias-1t-2026.md"},
+    {"n": 27, "verificacao": "Horário de encerramento da urna x voto (alegação de rotina a partir de 17:01)", "escopo": "497.897 seções do 2º turno, mesmas seções no 1º turno e 2º turno de 2022", "resultado": "Degrau de 47,9% a 56,4% para o 13 entre as primeiras e as últimas a encerrar, já presente no 1º turno (45,2% a 53,5%) e em 2022; dentro do mesmo local de votação nenhum efeito: +0,03 ponto no corte de 17:01 (IC 95% -0,01 a +0,07)", "situacao": "confere", "documento": "docs/encerramento-minuto-t2-2026.md"}
   ],
   "nao_verificavel": [
     {"titulo": "Qual software rodou em cada urna", "descricao": "O .vsc assina só os arquivos de resultado; o log registra o nome de cada pacote verificado e \"SUCESSO\", nunca o hash; a assinatura de software (chave SEVIN, algoritmo CEPESC) não é verificável fora do TSE. A ligação entre a urna e a lista lacrada existe só nas verificações por amostragem (AVPART/VPP na preparação e Teste de Autenticidade no dia), cujos relatórios ficam em ata e não são publicados."},
-    {"titulo": "Adulteração idêntica em todas as urnas", "descricao": "Os testes comparativos (modelo, troca, região, 2022) não detectam uma alteração aplicada igualmente a todas as urnas, porque ela não deixa diferença entre grupos. A proteção contra isso é o Teste de Integridade (votação paralela), cujo relatório do 2º turno só sai até cerca de 24/11 (TREs) e 23/01/2027 (TSE)."},
+    {"titulo": "Adulteração idêntica em todas as urnas", "descricao": "Os testes comparativos (modelo, troca, região, 2022) não detectam uma alteração aplicada igualmente a todas as urnas, porque ela não deixa diferença entre grupos. A proteção contra isso é o Teste de Integridade (votação paralela), cujo relatório do 2º turno só sai até cerca de 24/11 (TREs) e 23/01/2027 (TSE). As urnas do teste encerram às 17h e seus BUs, RDVs e logs não são fornecidos; uma alteração disparada pelo horário de encerramento deixaria diferença entre seções do mesmo local encerradas em minutos diferentes, e essa diferença não existe (verificação 27)."},
     {"titulo": "O que aconteceu na seção fora do arquivo", "descricao": "Como a razão de uma mesa esperar uma hora para emitir o BU. Isso está nas atas, não nos arquivos."}
   ],
   "pendencias_nota": "Ordem de relevância; nenhuma altera contagem.",

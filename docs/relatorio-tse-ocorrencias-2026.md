@@ -137,6 +137,12 @@ Também se registra a seção RJ 58971/0087/0184: uma única urna reiniciou 18 v
 
 **Pedido:** publicar ou disponibilizar os logs das urnas 02424441 (BA 39934/0183/0175), da urna que abriu a votação em SP 71072/0002/0035 (1º turno) e em MA 08893/0047/0609 (2º turno), as duas únicas seções sem registro de zerésima no log publicado ([zeresima-2026.md](zeresima-2026.md)), e da urna 01675257 (RS 89036/0083/0044), e esclarecer como a mídia externa da seção 0181 passou a integrar o pacote da seção 0175.
 
-## 7. Como reproduzir
+## 7. Teste de Integridade: horário de encerramento e resultado urna a urna
+
+O art. 69 da Res. TSE 23.673/2021 manda encerrar a votação do Teste de Integridade às 17 horas, e o art. 66-J (incluído pela Res. TSE 23.758/2026) veda o fornecimento da imagem do BU, do RDV e dos logs das urnas do teste. Nas seções reais do 2º turno, 75% das urnas encerraram a partir de 17:01:00 de Brasília. Circulou em 29/10 a 05/11/2026 a alegação de que uma rotina agiria só em urnas encerradas depois desse minuto, fora do alcance do teste. A conferência com os BUs não encontrou diferença entre seções do mesmo local encerradas antes e depois das 17:01 ([encerramento-minuto-t2-2026.md](encerramento-minuto-t2-2026.md)), mas um auditor externo não consegue conferir as urnas do teste.
+
+**Pedido:** publicar, para cada urna do Teste de Integridade do 2º turno, o horário de encerramento registrado pela urna, o resultado do BU e o resultado esperado das cédulas, e considerar, nas próximas eleições, encerrar parte das urnas do teste em horários espalhados, como acontece nas seções.
+
+## 8. Como reproduzir
 
 Os dados e o código que fundamentam este documento estão no repositório do projeto. O catálogo com MD5, SHA-256 e SHA-512 de cada um dos 1.999.485 arquivos baixados está nos anexos da versão [v0.2.1](https://github.com/alissonlinneker/DataUrnas-BR/releases/tag/v0.2.1), com `SHA256SUMS` para conferência. O [relatório de integridade](relatorio-integridade-2026.md) descreve o passo a passo para conferir qualquer seção com ferramentas comuns (`curl` e `shasum`).
