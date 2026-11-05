@@ -40,6 +40,8 @@ O arquivo de assinatura da seção traz o SHA-512 do `rdv.dat`, mas o `aux.json`
 1. Informar se o RDV dessa seção foi recebido pelo TSE e por que não consta do `aux.json`.
 2. Publicar o arquivo, caso disponível, para que o SHA-512 possa ser conferido com o valor assinado pela urna.
 
+**Atualização de 04/11/2026:** o zip do pacote oficial do MA 1º turno republicado em 03/11 traz esse `rdv.dat`. O SHA-512 é o assinado no `.vsc`, e a recontagem é igual ao BU nos 5 cargos ([ma-republicacao-2026.md](ma-republicacao-2026.md)). Continua sem resposta por que o arquivo não consta do `aux.json` do site de resultados.
+
 ## 3. Imagens do BU listadas e indisponíveis em seções com status "Recebida"
 
 Em 2.658 seções, o `aux.json` lista a imagem do BU (`-imgbu.dat`) e o endereço do arquivo responde HTTP 404. Todas têm status de seção "Recebida" e status de conjunto "Recebido", com data de recebimento entre 05 e 07/10/2026, posterior à geração do resultado oficial (05/10/2026 12:51:05). O BU, o RDV, o log e o `.vsc` dessas seções estão publicados e conferem com o que a urna assinou, e os votos delas estão contidos no resultado oficial.
@@ -133,7 +135,7 @@ Na seção BA 39934/0183/0175, a urna original da seção passou a gravar, às 1
 
 Também se registra a seção RJ 58971/0087/0184: uma única urna reiniciou 18 vezes no dia, sem contingência, com 12 votos interrompidos; o log publicado soma 256 votos contra 258 no BU, e não permite identificar quais 2 eleitores concluíram o voto antes de um reinício.
 
-**Pedido:** publicar ou disponibilizar os logs das urnas 02424441 (BA 39934/0183/0175), da urna que abriu a votação em SP 71072/0002/0035 e da urna 01675257 (RS 89036/0083/0044), e esclarecer como a mídia externa da seção 0181 passou a integrar o pacote da seção 0175.
+**Pedido:** publicar ou disponibilizar os logs das urnas 02424441 (BA 39934/0183/0175), da urna que abriu a votação em SP 71072/0002/0035 (1º turno) e em MA 08893/0047/0609 (2º turno), as duas únicas seções sem registro de zerésima no log publicado ([zeresima-2026.md](zeresima-2026.md)), e da urna 01675257 (RS 89036/0083/0044), e esclarecer como a mídia externa da seção 0181 passou a integrar o pacote da seção 0175.
 
 ## 7. Como reproduzir
 

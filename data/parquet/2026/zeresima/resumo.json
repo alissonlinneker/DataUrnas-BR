@@ -1,0 +1,202 @@
+{
+ "pacote_volume": {
+  "zip_bytes": 219202414224,
+  "membros": 4992203,
+  "logs": 998354,
+  "log_bytes": 143792831238,
+  "ler_bytes": 211932150672,
+  "ranges": 25651
+ },
+ "turno_1": {
+  "logs_no_pacote": 499176,
+  "logs_ilegiveis": 0,
+  "logs_lidos": 499176,
+  "secoes_com_voto": 499176,
+  "secoes_sem_voto": 0,
+  "secoes_sem_voto_sem_zeresima": 0,
+  "zer_n_distribuicao": {
+   "0": 1,
+   "1": 498792,
+   "2": 381,
+   "3": 2
+  },
+  "zer_urnas_distribuicao": {
+   "0": 1,
+   "1": 498795,
+   "2": 379,
+   "3": 1
+  },
+  "urnas_dia_distribuicao": {
+   "1": 496676,
+   "2": 2459,
+   "3": 40,
+   "4": 1
+  },
+  "zer_imprime_total": 504173,
+  "zer_resumo_total": 499557,
+  "secoes_zer_sem_resumo": 3,
+  "secoes_zer_sem_impressao": 0,
+  "sem_zeresima_com_voto": 1,
+  "zer_apos_voto_hora": 0,
+  "zer_apos_voto_ordem": 0,
+  "zer_apos_pronta_hora": 0,
+  "zer_apos_pronta_ordem": 0,
+  "zer_apos_encerramento_ordem": 0,
+  "mais_de_uma_zer": 383,
+  "zer_posterior_com_votos": 0,
+  "votos_antes_zer_hora_secoes": 0,
+  "votos_antes_zer_hora_votos": 0,
+  "votos_antes_zer_ordem_secoes": 0,
+  "zer_data_errada": 0,
+  "urnas_voto_sem_zer_secoes": 2120,
+  "urnas_voto_sem_zer_total": 2153,
+  "urnas_voto_sem_zer_sem_antecessor": 1,
+  "sem_pronta_com_voto": 0,
+  "zer_prim_local_quantis": {
+   "0.0": "05:00:02",
+   "0.001": "05:18:06",
+   "0.01": "06:13:13",
+   "0.5": "07:25:21",
+   "0.99": "08:00:31",
+   "0.999": "08:18:53",
+   "1.0": "12:48:12"
+  },
+  "zer_prim_brasilia_quantis": {
+   "0.0": "07:00:00",
+   "0.001": "07:00:04",
+   "0.01": "07:00:34",
+   "0.5": "07:27:00",
+   "0.99": "08:01:20",
+   "0.999": "08:22:41",
+   "1.0": "12:48:12"
+  },
+  "aguarda_conf_brasilia_quantis": {
+   "0.0": "07:00:00",
+   "0.001": "07:00:00",
+   "0.01": "07:00:00",
+   "0.5": "07:25:13",
+   "0.99": "07:59:45",
+   "0.999": "08:21:02",
+   "1.0": "12:47:57"
+  },
+  "zer_antes_7h_brasilia": 0,
+  "zer_apos_8h_brasilia": 6656,
+  "aguarda_conf_antes_7h_brasilia": 0,
+  "min_zer_ate_pronta_quantis": {
+   "0.0": 1.0,
+   "0.001": 3.3,
+   "0.01": 5.6,
+   "0.5": 33.2,
+   "0.99": 59.7,
+   "0.999": 65.5,
+   "1.0": 215.9
+  }
+ },
+ "turno_2": {
+  "logs_no_pacote": 499178,
+  "logs_ilegiveis": 0,
+  "logs_lidos": 499178,
+  "secoes_com_voto": 499178,
+  "secoes_sem_voto": 0,
+  "secoes_sem_voto_sem_zeresima": 0,
+  "zer_n_distribuicao": {
+   "0": 1,
+   "1": 498879,
+   "2": 298
+  },
+  "zer_urnas_distribuicao": {
+   "0": 1,
+   "1": 498881,
+   "2": 296
+  },
+  "urnas_dia_distribuicao": {
+   "1": 497455,
+   "2": 1687,
+   "3": 36
+  },
+  "zer_imprime_total": 502619,
+  "zer_resumo_total": 499473,
+  "secoes_zer_sem_resumo": 2,
+  "secoes_zer_sem_impressao": 0,
+  "sem_zeresima_com_voto": 1,
+  "zer_apos_voto_hora": 1,
+  "zer_apos_voto_ordem": 0,
+  "zer_apos_pronta_hora": 0,
+  "zer_apos_pronta_ordem": 0,
+  "zer_apos_encerramento_ordem": 0,
+  "mais_de_uma_zer": 298,
+  "zer_posterior_com_votos": 0,
+  "votos_antes_zer_hora_secoes": 0,
+  "votos_antes_zer_hora_votos": 0,
+  "votos_antes_zer_ordem_secoes": 0,
+  "zer_data_errada": 0,
+  "urnas_voto_sem_zer_secoes": 1429,
+  "urnas_voto_sem_zer_total": 1456,
+  "urnas_voto_sem_zer_sem_antecessor": 1,
+  "sem_pronta_com_voto": 0,
+  "log_t2_com_zer_do_1t": 497590,
+  "zer_prim_local_quantis": {
+   "0.0": "05:00:02",
+   "0.001": "05:17:00",
+   "0.01": "06:10:39",
+   "0.5": "07:24:17",
+   "0.99": "07:58:56",
+   "0.999": "08:08:22",
+   "1.0": "13:03:50"
+  },
+  "zer_prim_brasilia_quantis": {
+   "0.0": "07:00:00",
+   "0.001": "07:00:03",
+   "0.01": "07:00:29",
+   "0.5": "07:25:49",
+   "0.99": "07:59:34",
+   "0.999": "08:08:54",
+   "1.0": "13:03:50"
+  },
+  "aguarda_conf_brasilia_quantis": {
+   "0.0": "07:00:00",
+   "0.001": "07:00:00",
+   "0.01": "07:00:00",
+   "0.5": "07:24:12",
+   "0.99": "07:57:59",
+   "0.999": "08:08:20",
+   "1.0": "13:03:25"
+  },
+  "zer_antes_7h_brasilia": 0,
+  "zer_apos_8h_brasilia": 4573,
+  "aguarda_conf_antes_7h_brasilia": 0,
+  "min_zer_ate_pronta_quantis": {
+   "0.0": 0.4,
+   "0.001": 2.2,
+   "0.01": 3.9,
+   "0.5": 34.3,
+   "0.99": 59.6,
+   "0.999": 61.2,
+   "1.0": 206.8
+  }
+ },
+ "confronto_pacote_nacional": {
+  "turno_1": {
+   "secoes_pacote_nacional": 499207,
+   "pacote_nacional_tem_log": 499176,
+   "logs_lidos_aqui": 499176,
+   "so_aqui": 0,
+   "so_pacote_nacional_com_log": 0,
+   "pronta_difere": 0,
+   "primeiro_voto_difere": 0,
+   "votos_difere": 0
+  },
+  "turno_2": {
+   "secoes_pacote_nacional": 499207,
+   "pacote_nacional_tem_log": 499178,
+   "logs_lidos_aqui": 499178,
+   "so_aqui": 0,
+   "so_pacote_nacional_com_log": 0,
+   "pronta_difere": 0,
+   "primeiro_voto_difere": 0,
+   "votos_difere": 0
+  }
+ },
+ "catalogo_formas": 38,
+ "sem_zer_nos_dois_turnos": 0
+}

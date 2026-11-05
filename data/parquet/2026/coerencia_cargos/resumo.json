@@ -1,0 +1,2088 @@
+{
+ "gerado_em": "2026-11-04 23:11:55",
+ "membros_e_erros": {
+  "2022_2_al": {
+   "membros": 6626,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:41:16 GMT",
+   "exemplos": []
+  },
+  "2022_2_al_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:41:16 GMT",
+   "exemplos": []
+  },
+  "2022_2_am": {
+   "membros": 7453,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:41:23 GMT",
+   "exemplos": []
+  },
+  "2022_2_am_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:41:23 GMT",
+   "exemplos": []
+  },
+  "2022_2_ba": {
+   "membros": 34423,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:42:05 GMT",
+   "exemplos": []
+  },
+  "2022_2_ba_sa": {
+   "membros": 1,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:42:05 GMT",
+   "exemplos": []
+  },
+  "2022_2_es": {
+   "membros": 9239,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:42:30 GMT",
+   "exemplos": []
+  },
+  "2022_2_es_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:42:30 GMT",
+   "exemplos": []
+  },
+  "2022_2_ms": {
+   "membros": 6912,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:43:50 GMT",
+   "exemplos": []
+  },
+  "2022_2_ms_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:43:50 GMT",
+   "exemplos": []
+  },
+  "2022_2_pb": {
+   "membros": 9602,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:44:19 GMT",
+   "exemplos": []
+  },
+  "2022_2_pb_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:44:19 GMT",
+   "exemplos": []
+  },
+  "2022_2_pe": {
+   "membros": 20571,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:44:39 GMT",
+   "exemplos": []
+  },
+  "2022_2_pe_sa": {
+   "membros": 1,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:44:39 GMT",
+   "exemplos": []
+  },
+  "2022_2_ro": {
+   "membros": 4198,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:45:55 GMT",
+   "exemplos": []
+  },
+  "2022_2_ro_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:45:55 GMT",
+   "exemplos": []
+  },
+  "2022_2_rs": {
+   "membros": 27200,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:46:26 GMT",
+   "exemplos": []
+  },
+  "2022_2_rs_sa": {
+   "membros": 1,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:46:26 GMT",
+   "exemplos": []
+  },
+  "2022_2_sc": {
+   "membros": 16241,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:46:39 GMT",
+   "exemplos": []
+  },
+  "2022_2_sc_sa": {
+   "membros": 1,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:46:39 GMT",
+   "exemplos": []
+  },
+  "2022_2_se": {
+   "membros": 5498,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:46:45 GMT",
+   "exemplos": []
+  },
+  "2022_2_se_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:46:45 GMT",
+   "exemplos": []
+  },
+  "2022_2_sp": {
+   "membros": 101073,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:48:28 GMT",
+   "exemplos": []
+  },
+  "2022_2_sp_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Wed, 02 Nov 2022 21:48:28 GMT",
+   "exemplos": []
+  },
+  "2026_1_ac": {
+   "membros": 2270,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:42:45 GMT",
+   "exemplos": []
+  },
+  "2026_1_ac_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:42:45 GMT",
+   "exemplos": []
+  },
+  "2026_1_al": {
+   "membros": 7101,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:43:42 GMT",
+   "exemplos": []
+  },
+  "2026_1_al_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:43:42 GMT",
+   "exemplos": []
+  },
+  "2026_1_am": {
+   "membros": 8157,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:44:45 GMT",
+   "exemplos": []
+  },
+  "2026_1_am_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:44:45 GMT",
+   "exemplos": []
+  },
+  "2026_1_ap": {
+   "membros": 1914,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:44:58 GMT",
+   "exemplos": []
+  },
+  "2026_1_ap_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:44:58 GMT",
+   "exemplos": []
+  },
+  "2026_1_ba": {
+   "membros": 35476,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:49:40 GMT",
+   "exemplos": []
+  },
+  "2026_1_ba_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:49:40 GMT",
+   "exemplos": []
+  },
+  "2026_1_ce": {
+   "membros": 23765,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:52:37 GMT",
+   "exemplos": []
+  },
+  "2026_1_ce_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:52:37 GMT",
+   "exemplos": []
+  },
+  "2026_1_df": {
+   "membros": 6969,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:53:27 GMT",
+   "exemplos": []
+  },
+  "2026_1_df_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:53:27 GMT",
+   "exemplos": []
+  },
+  "2026_1_es": {
+   "membros": 9844,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:54:32 GMT",
+   "exemplos": []
+  },
+  "2026_1_es_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:54:32 GMT",
+   "exemplos": []
+  },
+  "2026_1_go": {
+   "membros": 15686,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:56:26 GMT",
+   "exemplos": []
+  },
+  "2026_1_go_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 19:56:26 GMT",
+   "exemplos": []
+  },
+  "2026_1_ma": {
+   "membros": 18093,
+   "erros": 0,
+   "last_modified": "Tue, 03 Nov 2026 19:59:01 GMT",
+   "exemplos": []
+  },
+  "2026_1_ma_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Tue, 03 Nov 2026 19:59:01 GMT",
+   "exemplos": []
+  },
+  "2026_1_mg": {
+   "membros": 52060,
+   "erros": 0,
+   "last_modified": "Tue, 03 Nov 2026 21:08:00 GMT",
+   "exemplos": []
+  },
+  "2026_1_mg_sa": {
+   "membros": 2,
+   "erros": 0,
+   "last_modified": "Tue, 03 Nov 2026 21:08:00 GMT",
+   "exemplos": []
+  },
+  "2026_1_ms": {
+   "membros": 7106,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:05:30 GMT",
+   "exemplos": []
+  },
+  "2026_1_ms_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:05:30 GMT",
+   "exemplos": []
+  },
+  "2026_1_mt": {
+   "membros": 8287,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:06:47 GMT",
+   "exemplos": []
+  },
+  "2026_1_mt_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:06:47 GMT",
+   "exemplos": []
+  },
+  "2026_1_pa": {
+   "membros": 20827,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:10:18 GMT",
+   "exemplos": []
+  },
+  "2026_1_pa_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:10:18 GMT",
+   "exemplos": []
+  },
+  "2026_1_pb": {
+   "membros": 10712,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:12:08 GMT",
+   "exemplos": []
+  },
+  "2026_1_pb_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:12:08 GMT",
+   "exemplos": []
+  },
+  "2026_1_pe": {
+   "membros": 21418,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:15:44 GMT",
+   "exemplos": []
+  },
+  "2026_1_pe_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:15:44 GMT",
+   "exemplos": []
+  },
+  "2026_1_pi": {
+   "membros": 10225,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:17:20 GMT",
+   "exemplos": []
+  },
+  "2026_1_pi_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:17:20 GMT",
+   "exemplos": []
+  },
+  "2026_1_pr": {
+   "membros": 27142,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:21:43 GMT",
+   "exemplos": []
+  },
+  "2026_1_pr_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:21:43 GMT",
+   "exemplos": []
+  },
+  "2026_1_rj": {
+   "membros": 37675,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:28:14 GMT",
+   "exemplos": []
+  },
+  "2026_1_rj_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:28:14 GMT",
+   "exemplos": []
+  },
+  "2026_1_rn": {
+   "membros": 8115,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:29:44 GMT",
+   "exemplos": []
+  },
+  "2026_1_rn_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:29:44 GMT",
+   "exemplos": []
+  },
+  "2026_1_ro": {
+   "membros": 4698,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:30:28 GMT",
+   "exemplos": []
+  },
+  "2026_1_ro_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:30:28 GMT",
+   "exemplos": []
+  },
+  "2026_1_rr": {
+   "membros": 1519,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:30:42 GMT",
+   "exemplos": []
+  },
+  "2026_1_rr_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:30:42 GMT",
+   "exemplos": []
+  },
+  "2026_1_rs": {
+   "membros": 27547,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:34:50 GMT",
+   "exemplos": []
+  },
+  "2026_1_rs_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:34:50 GMT",
+   "exemplos": []
+  },
+  "2026_1_sc": {
+   "membros": 17326,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:37:50 GMT",
+   "exemplos": []
+  },
+  "2026_1_sc_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:37:50 GMT",
+   "exemplos": []
+  },
+  "2026_1_se": {
+   "membros": 5923,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:38:43 GMT",
+   "exemplos": []
+  },
+  "2026_1_se_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:38:43 GMT",
+   "exemplos": []
+  },
+  "2026_1_sp": {
+   "membros": 103656,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:52:29 GMT",
+   "exemplos": []
+  },
+  "2026_1_sp_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:52:29 GMT",
+   "exemplos": []
+  },
+  "2026_1_to": {
+   "membros": 4384,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:52:59 GMT",
+   "exemplos": []
+  },
+  "2026_1_to_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:52:59 GMT",
+   "exemplos": []
+  },
+  "2026_1_zz": {
+   "membros": 1281,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:53:05 GMT",
+   "exemplos": []
+  },
+  "2026_1_zz_sa": {
+   "membros": 29,
+   "erros": 0,
+   "last_modified": "Thu, 22 Oct 2026 20:53:05 GMT",
+   "exemplos": []
+  },
+  "2026_2_ac": {
+   "membros": 2270,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 19:56:12 GMT",
+   "exemplos": []
+  },
+  "2026_2_ac_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 19:56:12 GMT",
+   "exemplos": []
+  },
+  "2026_2_am": {
+   "membros": 8157,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 21:10:41 GMT",
+   "exemplos": []
+  },
+  "2026_2_am_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 21:10:41 GMT",
+   "exemplos": []
+  },
+  "2026_2_df": {
+   "membros": 6969,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 21:21:22 GMT",
+   "exemplos": []
+  },
+  "2026_2_df_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 21:21:22 GMT",
+   "exemplos": []
+  },
+  "2026_2_es": {
+   "membros": 9844,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 20:20:14 GMT",
+   "exemplos": []
+  },
+  "2026_2_es_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 20:20:14 GMT",
+   "exemplos": []
+  },
+  "2026_2_rn": {
+   "membros": 8115,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 18:19:28 GMT",
+   "exemplos": []
+  },
+  "2026_2_rn_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 18:19:28 GMT",
+   "exemplos": []
+  },
+  "2026_2_to": {
+   "membros": 4384,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 18:08:00 GMT",
+   "exemplos": []
+  },
+  "2026_2_to_sa": {
+   "membros": 0,
+   "erros": 0,
+   "last_modified": "Mon, 26 Oct 2026 18:08:00 GMT",
+   "exemplos": []
+  }
+ },
+ "coerencia": {
+  "2022_2t": {
+   "secoes": 249040,
+   "linhas_cargo": 498951,
+   "secoes_por_cargo": {
+    "governador": 249040,
+    "prefeito": 871,
+    "presidente": 249040
+   },
+   "secoes_com_divergencia": {
+    "fecha_nao": 0,
+    "comp_divergente": 0,
+    "comp_eleicoes_inexplicado": 0,
+    "aptos_divergente": 0,
+    "legenda_majoritario": 0,
+    "comp_maior_aptos": 0,
+    "aptos_soma": 0,
+    "f_codigo_invalido": 0,
+    "f_partido_invalido": 0,
+    "f_negativos": 0,
+    "f_sem_candidato": 0,
+    "f_outros": 0,
+    "cargo_repetido": 0,
+    "cargos_fora_do_esperado": 0,
+    "f_chaves_extra": 0
+   },
+   "secoes_com_qualquer_divergencia": 0,
+   "secoes_comp_fed_est_difere_por_tte": 11038,
+   "votos_tte_so_presidente": 92371,
+   "secoes_com_eleicao_municipal": 871,
+   "linhas_por_tipo_urna": {
+    "secao": 480474,
+    "reservaSecao": 18461,
+    "reservaEncerrandoSecao": 10,
+    "contingencia": 6
+   },
+   "comparecimento_zero": 0
+  },
+  "2026_1t": {
+   "secoes": 499207,
+   "linhas_cargo": 2490805,
+   "secoes_por_cargo": {
+    "cargo25": 10,
+    "deputadoDistrital": 6969,
+    "deputadoEstadual": 490928,
+    "deputadoFederal": 497897,
+    "governador": 497897,
+    "presidente": 499207,
+    "senador": 497897
+   },
+   "secoes_com_divergencia": {
+    "fecha_nao": 0,
+    "comp_divergente": 0,
+    "comp_eleicoes_inexplicado": 0,
+    "aptos_divergente": 0,
+    "legenda_majoritario": 0,
+    "comp_maior_aptos": 0,
+    "aptos_soma": 0,
+    "f_codigo_invalido": 0,
+    "f_partido_invalido": 0,
+    "f_negativos": 0,
+    "f_sem_candidato": 0,
+    "f_outros": 0,
+    "cargo_repetido": 0,
+    "cargos_fora_do_esperado": 0,
+    "f_chaves_extra": 0
+   },
+   "secoes_com_qualquer_divergencia": 0,
+   "secoes_comp_fed_est_difere_por_tte": 17237,
+   "votos_tte_so_presidente": 165584,
+   "secoes_com_eleicao_municipal": 10,
+   "linhas_por_tipo_urna": {
+    "secao": 2475717,
+    "reservaSecao": 15049,
+    "contingencia": 39
+   },
+   "comparecimento_zero": 1
+  },
+  "2026_2t": {
+   "secoes": 39739,
+   "linhas_cargo": 79512,
+   "secoes_por_cargo": {
+    "governador": 39739,
+    "prefeito": 34,
+    "presidente": 39739
+   },
+   "secoes_com_divergencia": {
+    "fecha_nao": 0,
+    "comp_divergente": 0,
+    "comp_eleicoes_inexplicado": 0,
+    "aptos_divergente": 0,
+    "legenda_majoritario": 0,
+    "comp_maior_aptos": 0,
+    "aptos_soma": 0,
+    "f_codigo_invalido": 0,
+    "f_partido_invalido": 0,
+    "f_negativos": 0,
+    "f_sem_candidato": 0,
+    "f_outros": 0,
+    "cargo_repetido": 0,
+    "cargos_fora_do_esperado": 0,
+    "f_chaves_extra": 0
+   },
+   "secoes_com_qualquer_divergencia": 0,
+   "secoes_comp_fed_est_difere_por_tte": 1819,
+   "votos_tte_so_presidente": 24727,
+   "secoes_com_eleicao_municipal": 34,
+   "linhas_por_tipo_urna": {
+    "secao": 78726,
+    "reservaSecao": 784,
+    "reservaEncerrandoSecao": 2
+   },
+   "comparecimento_zero": 0
+  }
+ },
+ "federal_x_estadual": {
+  "2022_2t_AL": {
+   "secoes": 6626,
+   "secoes_com_as_duas_eleicoes": 6626,
+   "comp_igual": 6250,
+   "comp_difere_explicado_tte": 376,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2581
+  },
+  "2022_2t_AM": {
+   "secoes": 7453,
+   "secoes_com_as_duas_eleicoes": 7453,
+   "comp_igual": 7073,
+   "comp_difere_explicado_tte": 380,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2796
+  },
+  "2022_2t_BA": {
+   "secoes": 34424,
+   "secoes_com_as_duas_eleicoes": 34424,
+   "comp_igual": 33620,
+   "comp_difere_explicado_tte": 804,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 7484
+  },
+  "2022_2t_ES": {
+   "secoes": 9239,
+   "secoes_com_as_duas_eleicoes": 9239,
+   "comp_igual": 9092,
+   "comp_difere_explicado_tte": 147,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 3919
+  },
+  "2022_2t_MS": {
+   "secoes": 6912,
+   "secoes_com_as_duas_eleicoes": 6912,
+   "comp_igual": 6846,
+   "comp_difere_explicado_tte": 66,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2263
+  },
+  "2022_2t_PB": {
+   "secoes": 9602,
+   "secoes_com_as_duas_eleicoes": 9602,
+   "comp_igual": 8929,
+   "comp_difere_explicado_tte": 673,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 5109
+  },
+  "2022_2t_PE_municipal": {
+   "secoes": 20572,
+   "secoes_com_as_duas_eleicoes": 208,
+   "comp_igual": 197,
+   "comp_difere_explicado_tte": 11,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 77
+  },
+  "2022_2t_PE": {
+   "secoes": 20572,
+   "secoes_com_as_duas_eleicoes": 20572,
+   "comp_igual": 20295,
+   "comp_difere_explicado_tte": 277,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 5376
+  },
+  "2022_2t_RO_municipal": {
+   "secoes": 4198,
+   "secoes_com_as_duas_eleicoes": 208,
+   "comp_igual": 201,
+   "comp_difere_explicado_tte": 7,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 7
+  },
+  "2022_2t_RO": {
+   "secoes": 4198,
+   "secoes_com_as_duas_eleicoes": 4198,
+   "comp_igual": 4035,
+   "comp_difere_explicado_tte": 163,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 954
+  },
+  "2022_2t_RS_municipal": {
+   "secoes": 27201,
+   "secoes_com_as_duas_eleicoes": 293,
+   "comp_igual": 258,
+   "comp_difere_explicado_tte": 35,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 169
+  },
+  "2022_2t_RS": {
+   "secoes": 27201,
+   "secoes_com_as_duas_eleicoes": 27201,
+   "comp_igual": 26795,
+   "comp_difere_explicado_tte": 406,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 6249
+  },
+  "2022_2t_SC_municipal": {
+   "secoes": 16242,
+   "secoes_com_as_duas_eleicoes": 127,
+   "comp_igual": 126,
+   "comp_difere_explicado_tte": 1,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1
+  },
+  "2022_2t_SC": {
+   "secoes": 16242,
+   "secoes_com_as_duas_eleicoes": 16242,
+   "comp_igual": 15543,
+   "comp_difere_explicado_tte": 699,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 15036
+  },
+  "2022_2t_SE": {
+   "secoes": 5498,
+   "secoes_com_as_duas_eleicoes": 5498,
+   "comp_igual": 5277,
+   "comp_difere_explicado_tte": 221,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1929
+  },
+  "2022_2t_SP_municipal": {
+   "secoes": 101073,
+   "secoes_com_as_duas_eleicoes": 35,
+   "comp_igual": 34,
+   "comp_difere_explicado_tte": 1,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 9
+  },
+  "2022_2t_SP": {
+   "secoes": 101073,
+   "secoes_com_as_duas_eleicoes": 101073,
+   "comp_igual": 94278,
+   "comp_difere_explicado_tte": 6795,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 38675
+  },
+  "2026_1t_AC": {
+   "secoes": 2270,
+   "secoes_com_as_duas_eleicoes": 2270,
+   "comp_igual": 2222,
+   "comp_difere_explicado_tte": 48,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 359
+  },
+  "2026_1t_AL": {
+   "secoes": 7101,
+   "secoes_com_as_duas_eleicoes": 7101,
+   "comp_igual": 6865,
+   "comp_difere_explicado_tte": 236,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2608
+  },
+  "2026_1t_AM": {
+   "secoes": 8157,
+   "secoes_com_as_duas_eleicoes": 8157,
+   "comp_igual": 7527,
+   "comp_difere_explicado_tte": 630,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2278
+  },
+  "2026_1t_AP": {
+   "secoes": 1914,
+   "secoes_com_as_duas_eleicoes": 1914,
+   "comp_igual": 1893,
+   "comp_difere_explicado_tte": 21,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 543
+  },
+  "2026_1t_BA": {
+   "secoes": 35476,
+   "secoes_com_as_duas_eleicoes": 35476,
+   "comp_igual": 34685,
+   "comp_difere_explicado_tte": 791,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 7422
+  },
+  "2026_1t_CE": {
+   "secoes": 23765,
+   "secoes_com_as_duas_eleicoes": 23765,
+   "comp_igual": 23161,
+   "comp_difere_explicado_tte": 604,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 4949
+  },
+  "2026_1t_DF": {
+   "secoes": 6969,
+   "secoes_com_as_duas_eleicoes": 6969,
+   "comp_igual": 6566,
+   "comp_difere_explicado_tte": 403,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 13475
+  },
+  "2026_1t_ES": {
+   "secoes": 9844,
+   "secoes_com_as_duas_eleicoes": 9844,
+   "comp_igual": 9683,
+   "comp_difere_explicado_tte": 161,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 3670
+  },
+  "2026_1t_GO": {
+   "secoes": 15686,
+   "secoes_com_as_duas_eleicoes": 15686,
+   "comp_igual": 15349,
+   "comp_difere_explicado_tte": 337,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 5099
+  },
+  "2026_1t_MA": {
+   "secoes": 18093,
+   "secoes_com_as_duas_eleicoes": 18093,
+   "comp_igual": 17931,
+   "comp_difere_explicado_tte": 162,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1948
+  },
+  "2026_1t_MG": {
+   "secoes": 52062,
+   "secoes_com_as_duas_eleicoes": 52062,
+   "comp_igual": 50542,
+   "comp_difere_explicado_tte": 1520,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 10107
+  },
+  "2026_1t_MS": {
+   "secoes": 7106,
+   "secoes_com_as_duas_eleicoes": 7106,
+   "comp_igual": 7046,
+   "comp_difere_explicado_tte": 60,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2211
+  },
+  "2026_1t_MT": {
+   "secoes": 8287,
+   "secoes_com_as_duas_eleicoes": 8287,
+   "comp_igual": 8104,
+   "comp_difere_explicado_tte": 183,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2415
+  },
+  "2026_1t_PA": {
+   "secoes": 20827,
+   "secoes_com_as_duas_eleicoes": 20827,
+   "comp_igual": 20392,
+   "comp_difere_explicado_tte": 435,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 3754
+  },
+  "2026_1t_PB": {
+   "secoes": 10712,
+   "secoes_com_as_duas_eleicoes": 10712,
+   "comp_igual": 10348,
+   "comp_difere_explicado_tte": 364,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 6084
+  },
+  "2026_1t_PE_municipal": {
+   "secoes": 21418,
+   "secoes_com_as_duas_eleicoes": 10,
+   "comp_igual": 3,
+   "comp_difere_explicado_tte": 7,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 18
+  },
+  "2026_1t_PE": {
+   "secoes": 21418,
+   "secoes_com_as_duas_eleicoes": 21418,
+   "comp_igual": 21081,
+   "comp_difere_explicado_tte": 337,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 5826
+  },
+  "2026_1t_PI": {
+   "secoes": 10225,
+   "secoes_com_as_duas_eleicoes": 10225,
+   "comp_igual": 10012,
+   "comp_difere_explicado_tte": 213,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1497
+  },
+  "2026_1t_PR": {
+   "secoes": 27142,
+   "secoes_com_as_duas_eleicoes": 27142,
+   "comp_igual": 25795,
+   "comp_difere_explicado_tte": 1347,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 11842
+  },
+  "2026_1t_RJ": {
+   "secoes": 37675,
+   "secoes_com_as_duas_eleicoes": 37675,
+   "comp_igual": 34950,
+   "comp_difere_explicado_tte": 2725,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 13935
+  },
+  "2026_1t_RN": {
+   "secoes": 8115,
+   "secoes_com_as_duas_eleicoes": 8115,
+   "comp_igual": 7570,
+   "comp_difere_explicado_tte": 545,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 3299
+  },
+  "2026_1t_RO": {
+   "secoes": 4698,
+   "secoes_com_as_duas_eleicoes": 4698,
+   "comp_igual": 4550,
+   "comp_difere_explicado_tte": 148,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 767
+  },
+  "2026_1t_RR": {
+   "secoes": 1519,
+   "secoes_com_as_duas_eleicoes": 1519,
+   "comp_igual": 1508,
+   "comp_difere_explicado_tte": 11,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 813
+  },
+  "2026_1t_RS": {
+   "secoes": 27547,
+   "secoes_com_as_duas_eleicoes": 27547,
+   "comp_igual": 27056,
+   "comp_difere_explicado_tte": 491,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 5479
+  },
+  "2026_1t_SC": {
+   "secoes": 17326,
+   "secoes_com_as_duas_eleicoes": 17326,
+   "comp_igual": 16721,
+   "comp_difere_explicado_tte": 605,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 13609
+  },
+  "2026_1t_SE": {
+   "secoes": 5923,
+   "secoes_com_as_duas_eleicoes": 5923,
+   "comp_igual": 5732,
+   "comp_difere_explicado_tte": 191,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2473
+  },
+  "2026_1t_SP": {
+   "secoes": 103656,
+   "secoes_com_as_duas_eleicoes": 103656,
+   "comp_igual": 99053,
+   "comp_difere_explicado_tte": 4603,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 37736
+  },
+  "2026_1t_TO": {
+   "secoes": 4384,
+   "secoes_com_as_duas_eleicoes": 4384,
+   "comp_igual": 4322,
+   "comp_difere_explicado_tte": 62,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1386
+  },
+  "2026_2t_AC": {
+   "secoes": 2270,
+   "secoes_com_as_duas_eleicoes": 2270,
+   "comp_igual": 2225,
+   "comp_difere_explicado_tte": 45,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 320
+  },
+  "2026_2t_AM": {
+   "secoes": 8157,
+   "secoes_com_as_duas_eleicoes": 8157,
+   "comp_igual": 7531,
+   "comp_difere_explicado_tte": 626,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 2199
+  },
+  "2026_2t_DF": {
+   "secoes": 6969,
+   "secoes_com_as_duas_eleicoes": 6969,
+   "comp_igual": 6572,
+   "comp_difere_explicado_tte": 397,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 13957
+  },
+  "2026_2t_ES": {
+   "secoes": 9844,
+   "secoes_com_as_duas_eleicoes": 9844,
+   "comp_igual": 9686,
+   "comp_difere_explicado_tte": 158,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 3560
+  },
+  "2026_2t_RN": {
+   "secoes": 8115,
+   "secoes_com_as_duas_eleicoes": 8115,
+   "comp_igual": 7582,
+   "comp_difere_explicado_tte": 533,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 3313
+  },
+  "2026_2t_TO_municipal": {
+   "secoes": 4384,
+   "secoes_com_as_duas_eleicoes": 34,
+   "comp_igual": 33,
+   "comp_difere_explicado_tte": 1,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1
+  },
+  "2026_2t_TO": {
+   "secoes": 4384,
+   "secoes_com_as_duas_eleicoes": 4384,
+   "comp_igual": 4325,
+   "comp_difere_explicado_tte": 59,
+   "comp_difere_inexplicado": 0,
+   "aptos_secao_divergente": 0,
+   "votos_so_presidente_tte": 1378
+  }
+ },
+ "conferencia_oficial": {
+  "2022": {
+   "munzona_cargo": 5992,
+   "so_no_bu": 8,
+   "so_no_oficial": 0,
+   "aptos_diferente": 2,
+   "comparecimento_diferente": 0,
+   "brancos_diferente": 0,
+   "soma_dif_comparecimento": 0,
+   "por_turno_cargo": {
+    "2t_1": {
+     "bu_aptos": 82958244,
+     "of_aptos": 82958328,
+     "bu_comp": 66207827,
+     "of_comp": 66207827,
+     "bu_branco": 1064645,
+     "of_branco": 1064645,
+     "bu_secoes": 249040,
+     "of_secoes": 255997,
+     "of_secoes_principais": 249041,
+     "of_nao_instaladas": 1
+    },
+    "2t_3": {
+     "bu_aptos": 82854800,
+     "of_aptos": 82854881,
+     "bu_comp": 66115456,
+     "of_comp": 66115456,
+     "bu_branco": 2031729,
+     "of_branco": 2031729,
+     "bu_secoes": 249040,
+     "of_secoes": 255997,
+     "of_secoes_principais": 249041,
+     "of_nao_instaladas": 1
+    },
+    "2t_11": {
+     "bu_aptos": 293641,
+     "of_aptos": 0,
+     "bu_comp": 231476,
+     "of_comp": 0,
+     "bu_branco": 7694,
+     "of_branco": 0,
+     "bu_secoes": 871,
+     "of_secoes": 0,
+     "of_secoes_principais": 0,
+     "of_nao_instaladas": 0
+    }
+   }
+  },
+  "2026": {
+   "munzona_cargo": 31743,
+   "so_no_bu": 1,
+   "so_no_oficial": 40,
+   "aptos_diferente": 0,
+   "comparecimento_diferente": 0,
+   "brancos_diferente": 0,
+   "soma_dif_comparecimento": 0,
+   "por_turno_cargo": {
+    "1t_1.0": {
+     "bu_aptos": 158745079,
+     "of_aptos": 158745502,
+     "bu_comp": 125275835,
+     "of_comp": 125275835,
+     "bu_branco": 2300798,
+     "of_branco": 2300798,
+     "bu_secoes": 499207,
+     "of_secoes": 517179,
+     "of_secoes_principais": 499248,
+     "of_nao_instaladas": 41
+    },
+    "1t_3.0": {
+     "bu_aptos": 157646356,
+     "of_aptos": 157646356,
+     "bu_comp": 124768485,
+     "of_comp": 124768485,
+     "bu_branco": 5067116,
+     "of_branco": 5067116,
+     "bu_secoes": 497897,
+     "of_secoes": 514464,
+     "of_secoes_principais": 497897,
+     "of_nao_instaladas": 0
+    },
+    "1t_5.0": {
+     "bu_aptos": 157646356,
+     "of_aptos": 157646356,
+     "bu_comp": 124768485,
+     "of_comp": 124768485,
+     "bu_branco": 18678856,
+     "of_branco": 18678856,
+     "bu_secoes": 497897,
+     "of_secoes": 514464,
+     "of_secoes_principais": 497897,
+     "of_nao_instaladas": 0
+    },
+    "1t_6.0": {
+     "bu_aptos": 157646356,
+     "of_aptos": 157646356,
+     "bu_comp": 124768485,
+     "of_comp": 124768485,
+     "bu_branco": 6445372,
+     "of_branco": 6445372,
+     "bu_secoes": 497897,
+     "of_secoes": 514464,
+     "of_secoes_principais": 497897,
+     "of_nao_instaladas": 0
+    },
+    "1t_7.0": {
+     "bu_aptos": 155402368,
+     "of_aptos": 155402368,
+     "bu_comp": 122950564,
+     "of_comp": 122950564,
+     "bu_branco": 6872914,
+     "of_branco": 6872914,
+     "bu_secoes": 490928,
+     "of_secoes": 507414,
+     "of_secoes_principais": 490928,
+     "of_nao_instaladas": 0
+    },
+    "1t_8.0": {
+     "bu_aptos": 2243988,
+     "of_aptos": 2243988,
+     "bu_comp": 1817921,
+     "of_comp": 1817921,
+     "bu_branco": 77934,
+     "of_branco": 77934,
+     "bu_secoes": 6969,
+     "of_secoes": 7050,
+     "of_secoes_principais": 6969,
+     "of_nao_instaladas": 0
+    },
+    "2t_1.0": {
+     "bu_aptos": 12504794,
+     "of_aptos": 12504794,
+     "bu_comp": 10110793,
+     "of_comp": 10110793,
+     "bu_branco": 106804,
+     "of_branco": 106804,
+     "bu_secoes": 39739,
+     "of_secoes": 40987,
+     "of_secoes_principais": 39739,
+     "of_nao_instaladas": 0
+    },
+    "2t_3.0": {
+     "bu_aptos": 12478054,
+     "of_aptos": 12478054,
+     "bu_comp": 10086066,
+     "of_comp": 10086066,
+     "bu_branco": 228427,
+     "of_branco": 228427,
+     "bu_secoes": 39739,
+     "of_secoes": 40987,
+     "of_secoes_principais": 39739,
+     "of_nao_instaladas": 0
+    },
+    "2t_11.0": {
+     "bu_aptos": 8811,
+     "of_aptos": 0,
+     "bu_comp": 7703,
+     "of_comp": 0,
+     "bu_branco": 35,
+     "of_branco": 0,
+     "bu_secoes": 34,
+     "of_secoes": 0,
+     "of_secoes_principais": 0,
+     "of_nao_instaladas": 0
+    }
+   }
+  }
+ },
+ "split_ticket": [
+  {
+   "ano": 2022,
+   "uf": "AL",
+   "secoes": 6626,
+   "gov_alinhado_13": 15,
+   "gov_outro": 44,
+   "p13_uf": 0.5868,
+   "g_uf": 0.5233,
+   "r_secoes": 0.8483,
+   "r_dentro_municipio": 0.6923,
+   "beta_logit_fe": 0.5747,
+   "phi": 0.946,
+   "z_maior_4": 18,
+   "z_maior_5": 3,
+   "z_maior_6": 1,
+   "pct_z_maior_4": 0.272,
+   "esperado_normal_z4": 0.42,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "AM",
+   "secoes": 7453,
+   "gov_alinhado_13": 15,
+   "gov_outro": 44,
+   "p13_uf": 0.511,
+   "g_uf": 0.4335,
+   "r_secoes": 0.5947,
+   "r_dentro_municipio": 0.6171,
+   "beta_logit_fe": 0.2752,
+   "phi": 2.105,
+   "z_maior_4": 49,
+   "z_maior_5": 13,
+   "z_maior_6": 3,
+   "pct_z_maior_4": 0.657,
+   "esperado_normal_z4": 0.47,
+   "opostos_extremos": 5,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 20
+  },
+  {
+   "ano": 2022,
+   "uf": "BA",
+   "secoes": 34424,
+   "gov_alinhado_13": 13,
+   "gov_outro": 44,
+   "p13_uf": 0.7212,
+   "g_uf": 0.5279,
+   "r_secoes": 0.7318,
+   "r_dentro_municipio": 0.8436,
+   "beta_logit_fe": 0.6919,
+   "phi": 1.0,
+   "z_maior_4": 76,
+   "z_maior_5": 12,
+   "z_maior_6": 1,
+   "pct_z_maior_4": 0.221,
+   "esperado_normal_z4": 2.18,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 5
+  },
+  {
+   "ano": 2022,
+   "uf": "ES",
+   "secoes": 9239,
+   "gov_alinhado_13": 40,
+   "gov_outro": 22,
+   "p13_uf": 0.4196,
+   "g_uf": 0.538,
+   "r_secoes": 0.8921,
+   "r_dentro_municipio": 0.8855,
+   "beta_logit_fe": 0.789,
+   "phi": 0.507,
+   "z_maior_4": 42,
+   "z_maior_5": 13,
+   "z_maior_6": 5,
+   "pct_z_maior_4": 0.455,
+   "esperado_normal_z4": 0.59,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "MS",
+   "secoes": 6912,
+   "gov_alinhado_13": 45,
+   "gov_outro": 28,
+   "p13_uf": 0.4051,
+   "g_uf": 0.569,
+   "r_secoes": 0.7878,
+   "r_dentro_municipio": 0.8422,
+   "beta_logit_fe": 0.598,
+   "phi": 0.94,
+   "z_maior_4": 27,
+   "z_maior_5": 8,
+   "z_maior_6": 4,
+   "pct_z_maior_4": 0.391,
+   "esperado_normal_z4": 0.44,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 1
+  },
+  {
+   "ano": 2022,
+   "uf": "PB",
+   "secoes": 9602,
+   "gov_alinhado_13": 40,
+   "gov_outro": 45,
+   "p13_uf": 0.6662,
+   "g_uf": 0.5251,
+   "r_secoes": 0.7452,
+   "r_dentro_municipio": 0.5127,
+   "beta_logit_fe": 0.4022,
+   "phi": 1.465,
+   "z_maior_4": 28,
+   "z_maior_5": 6,
+   "z_maior_6": 4,
+   "pct_z_maior_4": 0.292,
+   "esperado_normal_z4": 0.61,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "PE",
+   "secoes": 20572,
+   "gov_alinhado_13": 77,
+   "gov_outro": 45,
+   "p13_uf": 0.6693,
+   "g_uf": 0.413,
+   "r_secoes": 0.7812,
+   "r_dentro_municipio": 0.7706,
+   "beta_logit_fe": 0.6745,
+   "phi": 0.992,
+   "z_maior_4": 102,
+   "z_maior_5": 41,
+   "z_maior_6": 13,
+   "pct_z_maior_4": 0.496,
+   "esperado_normal_z4": 1.3,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "RO",
+   "secoes": 4198,
+   "gov_alinhado_13": 44,
+   "gov_outro": 22,
+   "p13_uf": 0.2934,
+   "g_uf": 0.5247,
+   "r_secoes": 0.3568,
+   "r_dentro_municipio": 0.3251,
+   "beta_logit_fe": 0.2338,
+   "phi": 2.052,
+   "z_maior_4": 97,
+   "z_maior_5": 56,
+   "z_maior_6": 32,
+   "pct_z_maior_4": 2.311,
+   "esperado_normal_z4": 0.27,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "RS",
+   "secoes": 27201,
+   "gov_alinhado_13": 45,
+   "gov_outro": 22,
+   "p13_uf": 0.4365,
+   "g_uf": 0.5712,
+   "r_secoes": 0.9258,
+   "r_dentro_municipio": 0.8718,
+   "beta_logit_fe": 0.7027,
+   "phi": 0.617,
+   "z_maior_4": 31,
+   "z_maior_5": 7,
+   "z_maior_6": 2,
+   "pct_z_maior_4": 0.114,
+   "esperado_normal_z4": 1.72,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 1,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 1
+  },
+  {
+   "ano": 2022,
+   "uf": "SC",
+   "secoes": 16242,
+   "gov_alinhado_13": 13,
+   "gov_outro": 22,
+   "p13_uf": 0.3073,
+   "g_uf": 0.2931,
+   "r_secoes": 0.9854,
+   "r_dentro_municipio": 0.978,
+   "beta_logit_fe": 0.9784,
+   "phi": 0.119,
+   "z_maior_4": 32,
+   "z_maior_5": 9,
+   "z_maior_6": 4,
+   "pct_z_maior_4": 0.197,
+   "esperado_normal_z4": 1.03,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "SE",
+   "secoes": 5498,
+   "gov_alinhado_13": 13,
+   "gov_outro": 55,
+   "p13_uf": 0.6721,
+   "g_uf": 0.483,
+   "r_secoes": 0.7413,
+   "r_dentro_municipio": 0.707,
+   "beta_logit_fe": 0.5488,
+   "phi": 1.155,
+   "z_maior_4": 29,
+   "z_maior_5": 8,
+   "z_maior_6": 1,
+   "pct_z_maior_4": 0.527,
+   "esperado_normal_z4": 0.35,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2022,
+   "uf": "SP",
+   "secoes": 101073,
+   "gov_alinhado_13": 13,
+   "gov_outro": 10,
+   "p13_uf": 0.4476,
+   "g_uf": 0.4473,
+   "r_secoes": 0.9891,
+   "r_dentro_municipio": 0.9773,
+   "beta_logit_fe": 0.9947,
+   "phi": 0.124,
+   "z_maior_4": 73,
+   "z_maior_5": 9,
+   "z_maior_6": 2,
+   "pct_z_maior_4": 0.072,
+   "esperado_normal_z4": 6.4,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2026,
+   "uf": "AC",
+   "secoes": 2270,
+   "gov_alinhado_13": 11,
+   "gov_outro": 10,
+   "p13_uf": 0.3343,
+   "g_uf": 0.6621,
+   "r_secoes": 0.3154,
+   "r_dentro_municipio": 0.4231,
+   "beta_logit_fe": 0.2687,
+   "phi": 1.752,
+   "z_maior_4": 11,
+   "z_maior_5": 2,
+   "z_maior_6": 0,
+   "pct_z_maior_4": 0.485,
+   "esperado_normal_z4": 0.14,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 3,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 3
+  },
+  {
+   "ano": 2026,
+   "uf": "AM",
+   "secoes": 8157,
+   "gov_alinhado_13": 55,
+   "gov_outro": 22,
+   "p13_uf": 0.5402,
+   "g_uf": 0.6142,
+   "r_secoes": 0.9454,
+   "r_dentro_municipio": 0.9111,
+   "beta_logit_fe": 0.8591,
+   "phi": 0.425,
+   "z_maior_4": 64,
+   "z_maior_5": 31,
+   "z_maior_6": 12,
+   "pct_z_maior_4": 0.785,
+   "esperado_normal_z4": 0.52,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 25,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 28
+  },
+  {
+   "ano": 2026,
+   "uf": "DF",
+   "secoes": 6969,
+   "gov_alinhado_13": 13,
+   "gov_outro": 11,
+   "p13_uf": 0.4572,
+   "g_uf": 0.4282,
+   "r_secoes": 0.936,
+   "r_dentro_municipio": 0.936,
+   "beta_logit_fe": 0.9785,
+   "phi": 0.258,
+   "z_maior_4": 9,
+   "z_maior_5": 1,
+   "z_maior_6": 0,
+   "pct_z_maior_4": 0.129,
+   "esperado_normal_z4": 0.44,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2026,
+   "uf": "ES",
+   "secoes": 9844,
+   "gov_alinhado_13": 15,
+   "gov_outro": 10,
+   "p13_uf": 0.4363,
+   "g_uf": 0.4783,
+   "r_secoes": 0.786,
+   "r_dentro_municipio": 0.8266,
+   "beta_logit_fe": 0.6827,
+   "phi": 0.717,
+   "z_maior_4": 30,
+   "z_maior_5": 10,
+   "z_maior_6": 2,
+   "pct_z_maior_4": 0.305,
+   "esperado_normal_z4": 0.62,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2026,
+   "uf": "RN",
+   "secoes": 8115,
+   "gov_alinhado_13": 13,
+   "gov_outro": 44,
+   "p13_uf": 0.6572,
+   "g_uf": 0.5077,
+   "r_secoes": 0.7046,
+   "r_dentro_municipio": 0.6783,
+   "beta_logit_fe": 0.5151,
+   "phi": 0.989,
+   "z_maior_4": 24,
+   "z_maior_5": 7,
+   "z_maior_6": 6,
+   "pct_z_maior_4": 0.296,
+   "esperado_normal_z4": 0.51,
+   "opostos_extremos": 0,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 0
+  },
+  {
+   "ano": 2026,
+   "uf": "TO",
+   "secoes": 4384,
+   "gov_alinhado_13": 44,
+   "gov_outro": 45,
+   "p13_uf": 0.4863,
+   "g_uf": 0.3548,
+   "r_secoes": 0.1398,
+   "r_dentro_municipio": -0.0838,
+   "beta_logit_fe": -0.0234,
+   "phi": 1.706,
+   "z_maior_4": 20,
+   "z_maior_5": 9,
+   "z_maior_6": 2,
+   "pct_z_maior_4": 0.456,
+   "esperado_normal_z4": 0.28,
+   "opostos_extremos": 3,
+   "gov_zero_cand_alinhado_n100": 0,
+   "gov_zero_outro_n100": 0,
+   "pres_zero_13_n100": 0,
+   "pres_zero_22_n100": 5
+  }
+ ],
+ "split_top20": [
+  {
+   "ano": 2026,
+   "uf": "AM",
+   "cd_mun": 2151,
+   "zona": 14,
+   "secao": 32,
+   "p13": 81.0,
+   "p22": 97.0,
+   "gA": 172.0,
+   "gB": 7.0,
+   "np": 178.0,
+   "n": 179.0,
+   "p": 0.4550561797752809,
+   "g": 0.9608938547486033,
+   "ajuste": 0.6697777512109904,
+   "z": 9.437338112104536,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "MS",
+   "cd_mun": 91111,
+   "zona": 15,
+   "secao": 34,
+   "p13": 211.0,
+   "p22": 17.0,
+   "gA": 114.0,
+   "gB": 110.0,
+   "np": 228.0,
+   "n": 224.0,
+   "p": 0.9254385964912281,
+   "g": 0.5089285714285714,
+   "ajuste": 0.8542424365828232,
+   "z": -8.947533456512948,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "ES",
+   "cd_mun": 56677,
+   "zona": 5,
+   "secao": 70,
+   "p13": 136.0,
+   "p22": 155.0,
+   "gA": 246.0,
+   "gB": 47.0,
+   "np": 291.0,
+   "n": 293.0,
+   "p": 0.46735395189003437,
+   "g": 0.8395904436860068,
+   "ajuste": 0.6295406619012516,
+   "z": 8.542749839521827,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2026,
+   "uf": "AM",
+   "cd_mun": 2151,
+   "zona": 14,
+   "secao": 41,
+   "p13": 103.0,
+   "p22": 97.0,
+   "gA": 187.0,
+   "gB": 14.0,
+   "np": 200.0,
+   "n": 201.0,
+   "p": 0.515,
+   "g": 0.9303482587064676,
+   "ajuste": 0.7135052069381673,
+   "z": 8.468573166415423,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2026,
+   "uf": "RN",
+   "cd_mun": 17590,
+   "zona": 34,
+   "secao": 235,
+   "p13": 191.0,
+   "p22": 116.0,
+   "gA": 36.0,
+   "gB": 279.0,
+   "np": 307.0,
+   "n": 315.0,
+   "p": 0.6221498371335505,
+   "g": 0.11428571428571428,
+   "ajuste": 0.3805158514877328,
+   "z": -8.36427111425212,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2026,
+   "uf": "AM",
+   "cd_mun": 2020,
+   "zona": 45,
+   "secao": 76,
+   "p13": 16.0,
+   "p22": 101.0,
+   "gA": 100.0,
+   "gB": 20.0,
+   "np": 117.0,
+   "n": 120.0,
+   "p": 0.13675213675213677,
+   "g": 0.8333333333333334,
+   "ajuste": 0.4608588217581061,
+   "z": 8.050704836025517,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "ES",
+   "cd_mun": 57959,
+   "zona": 35,
+   "secao": 151,
+   "p13": 65.0,
+   "p22": 212.0,
+   "gA": 188.0,
+   "gB": 100.0,
+   "np": 277.0,
+   "n": 288.0,
+   "p": 0.23465703971119134,
+   "g": 0.6527777777777778,
+   "ajuste": 0.4194570466673068,
+   "z": 8.050021016046626,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "ES",
+   "cd_mun": 56731,
+   "zona": 19,
+   "secao": 34,
+   "p13": 36.0,
+   "p22": 108.0,
+   "gA": 127.0,
+   "gB": 23.0,
+   "np": 144.0,
+   "n": 150.0,
+   "p": 0.25,
+   "g": 0.8466666666666667,
+   "ajuste": 0.5421922483769478,
+   "z": 7.899550296325266,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "ES",
+   "cd_mun": 56731,
+   "zona": 19,
+   "secao": 33,
+   "p13": 33.0,
+   "p22": 108.0,
+   "gA": 121.0,
+   "gB": 25.0,
+   "np": 141.0,
+   "n": 146.0,
+   "p": 0.23404255319148937,
+   "g": 0.8287671232876712,
+   "ajuste": 0.5253537490273912,
+   "z": 7.651390187223086,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "PE",
+   "cd_mun": 23213,
+   "zona": 84,
+   "secao": 126,
+   "p13": 225.0,
+   "p22": 33.0,
+   "gA": 70.0,
+   "gB": 181.0,
+   "np": 258.0,
+   "n": 251.0,
+   "p": 0.872093023255814,
+   "g": 0.2788844621513944,
+   "ajuste": 0.6158176387667152,
+   "z": -7.574906067687246,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "PE",
+   "cd_mun": 23213,
+   "zona": 84,
+   "secao": 60,
+   "p13": 219.0,
+   "p22": 35.0,
+   "gA": 64.0,
+   "gB": 176.0,
+   "np": 254.0,
+   "n": 240.0,
+   "p": 0.8622047244094488,
+   "g": 0.2666666666666667,
+   "ajuste": 0.6021730917634928,
+   "z": -7.513668562494451,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "SC",
+   "cd_mun": 80608,
+   "zona": 4,
+   "secao": 70,
+   "p13": 131.0,
+   "p22": 155.0,
+   "gA": 87.0,
+   "gB": 197.0,
+   "np": 286.0,
+   "n": 284.0,
+   "p": 0.458041958041958,
+   "g": 0.3063380281690141,
+   "ajuste": 0.4093225281154233,
+   "z": -7.485747834813789,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2026,
+   "uf": "RN",
+   "cd_mun": 17590,
+   "zona": 34,
+   "secao": 228,
+   "p13": 205.0,
+   "p22": 45.0,
+   "gA": 59.0,
+   "gB": 203.0,
+   "np": 250.0,
+   "n": 262.0,
+   "p": 0.82,
+   "g": 0.22519083969465647,
+   "ajuste": 0.5083223257076293,
+   "z": -7.476769955603645,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "PB",
+   "cd_mun": 21598,
+   "zona": 55,
+   "secao": 89,
+   "p13": 221.0,
+   "p22": 38.0,
+   "gA": 95.0,
+   "gB": 152.0,
+   "np": 259.0,
+   "n": 247.0,
+   "p": 0.8532818532818532,
+   "g": 0.38461538461538464,
+   "ajuste": 0.7022686161597536,
+   "z": -7.394019626043901,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "AM",
+   "cd_mun": 2631,
+   "zona": 43,
+   "secao": 47,
+   "p13": 241.0,
+   "p22": 3.0,
+   "gA": 12.0,
+   "gB": 230.0,
+   "np": 244.0,
+   "n": 242.0,
+   "p": 0.9877049180327869,
+   "g": 0.04958677685950408,
+   "ajuste": 0.6410139834981232,
+   "z": -7.387702380464206,
+   "opostos_extremos": true
+  },
+  {
+   "ano": 2022,
+   "uf": "RO",
+   "cd_mun": 19,
+   "zona": 1,
+   "secao": 94,
+   "p13": 257.0,
+   "p22": 51.0,
+   "gA": 58.0,
+   "gB": 250.0,
+   "np": 308.0,
+   "n": 308.0,
+   "p": 0.8344155844155844,
+   "g": 0.18831168831168832,
+   "ajuste": 0.5313738439711795,
+   "z": -7.376333631109178,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2026,
+   "uf": "AM",
+   "cd_mun": 2194,
+   "zona": 13,
+   "secao": 33,
+   "p13": 166.0,
+   "p22": 143.0,
+   "gA": 281.0,
+   "gB": 32.0,
+   "np": 309.0,
+   "n": 313.0,
+   "p": 0.5372168284789643,
+   "g": 0.8977635782747604,
+   "ajuste": 0.7610223650495562,
+   "z": 7.325024170971925,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2026,
+   "uf": "AM",
+   "cd_mun": 2216,
+   "zona": 21,
+   "secao": 71,
+   "p13": 225.0,
+   "p22": 95.0,
+   "gA": 308.0,
+   "gB": 18.0,
+   "np": 320.0,
+   "n": 326.0,
+   "p": 0.703125,
+   "g": 0.9447852760736196,
+   "ajuste": 0.8276993622855935,
+   "z": 7.304280673754801,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "RO",
+   "cd_mun": 35,
+   "zona": 6,
+   "secao": 426,
+   "p13": 42.0,
+   "p22": 192.0,
+   "gA": 21.0,
+   "gB": 209.0,
+   "np": 234.0,
+   "n": 230.0,
+   "p": 0.1794871794871795,
+   "g": 0.09130434782608696,
+   "ajuste": 0.5320342178390863,
+   "z": -7.302337379956861,
+   "opostos_extremos": false
+  },
+  {
+   "ano": 2022,
+   "uf": "PB",
+   "cd_mun": 19755,
+   "zona": 68,
+   "secao": 108,
+   "p13": 237.0,
+   "p22": 23.0,
+   "gA": 138.0,
+   "gB": 121.0,
+   "np": 260.0,
+   "n": 259.0,
+   "p": 0.9115384615384615,
+   "g": 0.5328185328185329,
+   "ajuste": 0.8113948986726864,
+   "z": -7.233385861100082,
+   "opostos_extremos": false
+  }
+ ]
+}

@@ -49,7 +49,7 @@ A seção ES 57932/0009/0112, cujo log aparece dentro do pacote da 0085, tem o p
 2. SP 2º turno, seção 64777/0395/0298: o `-log.jez` e o `-vota.vsc` foram regravados em 03/11 12:10. O `.vsc` tem o mesmo CRC da versão de 26/10, e as métricas do log, relidas da versão nova, são iguais às calculadas aqui (268 votos, igual ao BU). Conferido à parte: o SHA-512 do `-log.jez` regravado é o mesmo que a urna assinou no `-vota.vsc` (que não mudou desde 26/10), e as 11 assinaturas ECDSA secp521r1 de arquivo dessa seção são válidas. O conteúdo do log é, portanto, o assinado na noite da eleição; mudou só a entrada no zip.
 3. Os `-bu.dat` e `-vota.vsc` de SP 2º turno são todos iguais (CRC) aos do pacote de 26/10 já confrontado em [cadeia-de-confianca-2026.md](cadeia-de-confianca-2026.md).
 
-No MA 1º turno a mudança não aparece no diretório (nenhum membro com data posterior a 20/10). Isso fica como limitação.
+No MA 1º turno a mudança não aparece no diretório (nenhum membro com data posterior a 20/10). A conferência completa do zip novo está em [ma-republicacao-2026.md](ma-republicacao-2026.md): nenhum arquivo de urna mudou, e o zip passou a trazer o RDV da seção 07846/0074/0228, que confere com a assinatura da urna.
 
 **B. Mesário votando no lugar de ausentes: não há sinal em escala.** Resumo dos números do 2º turno, detalhados abaixo:
 
