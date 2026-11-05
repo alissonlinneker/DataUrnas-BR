@@ -92,7 +92,7 @@ def test_resultado_t2_real_e_soma_dos_bus():
 @tem_t2
 def test_veredicto_json_coerente_com_os_dados():
     v = d26.load_veredicto()
-    assert len(v["verificacoes"]) == v["indicadores"]["verificacoes"] == 26
+    assert len(v["verificacoes"]) == v["indicadores"]["verificacoes"] == 27
     assert len(v["pendencias"]) == v["indicadores"]["pendencias"] == 13
     assert len(v["nao_verificavel"]) == 3
     assert set(d26.verificacoes_df(v)["situacao"]) <= set(d26.SITUACAO_VERIFICACAO)

@@ -47,6 +47,7 @@ Atualizado em 03/11/2026.
 | Totais depois da noite da eleição | feito em 03/11 | nenhuma versão nova desde 25/10 23:27:02 | idem, seção 6 |
 | Ordem de chegada das seções e cruzamentos da curva acumulada | feito | explicado pela ordem geográfica de chegada | `ordem-de-envio-viradas-2022-2026.md` |
 | Últimas seções recebidas no 1º turno (PR, 07/10) | feito em 04/11 | já somadas no resultado oficial de 05/10; o horário de 07/10 é reenvio do mesmo pacote; o motivo do reenvio vai ao TSE | `pr-secoes-tardias-1t-2026.md` |
+| Horário de encerramento da urna x voto (alegação de rotina a partir de 17:01) | feito em 05/11 | degrau explicado pelo local: some dentro do mesmo local de votação, já existia no 1º turno e em 2022; horários do Teste de Integridade pedidos ao TSE | `encerramento-minuto-t2-2026.md` |
 | Voto por seção x horário de chegada (injeção tardia) | feito | curva reproduzida pela geografia de chegada; desvios de centésimos de ponto, abaixo de 1,5% da margem | `chegada-bus-2026.md` |
 | Logs do sistema de totalização e da transmissão (JE-Connect) | depende do TSE | não publicados | |
 
