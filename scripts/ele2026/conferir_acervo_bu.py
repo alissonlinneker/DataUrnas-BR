@@ -281,15 +281,26 @@ def ler_tar(path: Path) -> Iterator[tuple[str, bytes]]:
         return
     if shutil.which("zstd") is None:
         raise SystemExit("zstd command line tool not found (needed for .tar.zst)")
-    proc = subprocess.Popen(["zstd", "-dcq", "--long=31", str(path)], stdout=subprocess.PIPE)
+    # input through stdin: the zstd CLI silently skips a symlinked file argument
+    with open(path, "rb") as entrada:
+        proc = subprocess.Popen(["zstd", "-dcq", "--long=31"], stdin=entrada,
+                                stdout=subprocess.PIPE)
+    completo = False
     try:
         with tarfile.open(fileobj=proc.stdout, mode="r|") as tf:
             for m in tf:
                 if m.isfile():
                     yield m.name, tf.extractfile(m).read()
+        # tarfile stops at the end-of-archive marker and leaves the record
+        # padding unread; drain it so zstd does not exit on a broken pipe
+        while proc.stdout.read(1 << 16):
+            pass
+        completo = True
     finally:
+        if not completo:
+            proc.kill()   # reader stopped early or failed: zstd exit code is moot
         proc.stdout.close()
-        if proc.wait() != 0:
+        if proc.wait() != 0 and completo:
             raise OSError(f"zstd failed on {path}")
 
 

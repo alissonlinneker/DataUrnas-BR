@@ -9,6 +9,8 @@ import argparse
 import hashlib
 import importlib.util
 import io
+import shutil
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -112,6 +114,16 @@ def test_agrupar_secoes_do_tar(tmp_path):
     _tar(p, {NOME_BU: BU, NOME_VSC: VSC, outro: b"x"})
     secoes = list(C.agrupar_secoes(C.ler_tar(p)))
     assert [sorted(s) for s in secoes] == [[NOME_BU, NOME_VSC], [outro]]
+
+
+@pytest.mark.skipif(shutil.which("zstd") is None, reason="zstd command line tool not found")
+def test_ler_tar_zst(tmp_path):
+    # tarfile leaves the record padding unread; ler_tar must still end cleanly
+    p = tmp_path / "a.tar"
+    _tar(p, {NOME_BU: BU, NOME_VSC: VSC})
+    subprocess.run(["zstd", "-q", "--rm", str(p)], check=True)
+    itens = dict(C.ler_tar(tmp_path / "a.tar.zst"))
+    assert itens == {NOME_BU: BU, NOME_VSC: VSC}
 
 
 def test_cmd_conferir_acervo(tmp_path):
