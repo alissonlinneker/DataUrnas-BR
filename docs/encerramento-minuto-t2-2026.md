@@ -2,6 +2,8 @@
 
 Conferência feita em 05/11/2026 de uma alegação que circulou no X entre 29/10 e 05/11/2026 (perfil `urna_2026`, "Urna Eletrônica"; o post principal, de 03/11, passou de 1 milhão de visualizações). Os posts foram lidos na íntegra em 05/11/2026: 37 próprios e 82 repostagens, com as 14 imagens anexas. O próprio perfil anunciou que apagaria o conteúdo no dia seguinte, e por isso este texto resume cada afirmação com o número que ela traz.
 
+Em 09/11/2026 o perfil não existia mais no X (a consulta devolve "User not found") e o post principal aparece como apagado pelo próprio autor. O Internet Archive não tem cópia da página do perfil. O projeto guarda a cópia feita em 05/11/2026, com os 119 posts e as 14 imagens, fora do repositório por conter texto e imagens de terceiros. O SHA-256 do arquivo com os posts (`statuses.json`) é `bfb5cb9a93a2e73ac086b0eb89d0cd929b67725ecab3a8e93e2fa6f7554bb52b`, o que permite provar depois que a cópia não foi alterada.
+
 Script: `scripts/ele2026/encerramento_minuto_t2.py` (testes em `tests/ele2026/test_encerramento_minuto_t2.py`). Saída: `data/parquet/2026/t2/encerramento_minuto/resumo.json` e `tabelas.md`.
 
 ## Conclusão
